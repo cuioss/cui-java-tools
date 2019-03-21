@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 /**
- * Utility Methods for Collections and some type to be used in the context of Collections
+ * Utility Methods for Collections and some types to be used in the context of Collections
  *
  * @author i001428, Oliver Wolff
  *

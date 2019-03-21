@@ -22,10 +22,10 @@ import java.util.stream.Stream;
 import com.google.common.base.MoreObjects;
 
 /**
- * Builder for creating {@link Collections}s providing some convenience methods. The class itself
- * contains no state, but writes everything through the contained collector. Using the default
- * constructor a newly created {@link ArrayList} will be used as collector, but you can pass you own
- * collector as constructor-argument
+ * Builder for creating {@link Collections}s providing some convenience methods. The class writes
+ * everything through the contained collector. Using the default constructor a newly created
+ * {@link ArrayList} will be used as collector, but you can pass you own collector as
+ * constructor-argument.
  *
  * @author i001428, Oliver Wolff
  * @param <E> The type of the contained {@link Collection}

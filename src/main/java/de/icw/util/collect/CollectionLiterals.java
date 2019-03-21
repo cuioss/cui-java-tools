@@ -24,7 +24,7 @@ import com.google.common.collect.Sets;
  * Provides a number of utilities simplifying the task of creating populated {@link Collection}s. In
  * essence its doing the same compared to the corresponding {@link com.google.common.collect} types
  * but with different semantics (like naming, types) and is designed as a one stop utility class.
- * In essence it differentiates between the sub-types and mutability / immutability. This class is
+ * It differentiates between the sub-types and mutability / immutability. This class is
  * complementary to the corresponding guava types.
  *
  * @author i001428, Oliver Wolff
