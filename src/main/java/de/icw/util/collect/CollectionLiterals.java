@@ -27,7 +27,7 @@ import com.google.common.collect.Sets;
  * It differentiates between the sub-types and mutability / immutability. This class is
  * complementary to the corresponding guava types.
  *
- * @author i001428, Oliver Wolff
+ * @author Oliver Wolff
  *
  */
 public class CollectionLiterals {

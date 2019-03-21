@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 /**
  * Utility Methods for Collections and some types to be used in the context of Collections
  *
- * @author i001428, Oliver Wolff
+ * @author Oliver Wolff
  *
  */
 public final class MoreCollections {

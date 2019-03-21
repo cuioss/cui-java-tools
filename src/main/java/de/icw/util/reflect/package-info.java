@@ -1,7 +1,7 @@
 /**
  * Provides some utility classes simplifying usage of reflection
  *
- * @author i001428, Oliver Wolff
+ * @author Oliver Wolff
  *
  */
 package de.icw.util.reflect;

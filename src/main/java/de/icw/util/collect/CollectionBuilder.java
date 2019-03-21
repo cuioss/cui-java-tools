@@ -27,7 +27,7 @@ import com.google.common.base.MoreObjects;
  * {@link ArrayList} will be used as collector, but you can pass you own collector as
  * constructor-argument.
  *
- * @author i001428, Oliver Wolff
+ * @author Oliver Wolff
  * @param <E> The type of the contained {@link Collection}
  *
  */

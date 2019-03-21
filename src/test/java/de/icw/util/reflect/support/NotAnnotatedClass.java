@@ -1,10 +1,6 @@
 package de.icw.util.reflect.support;
 
-
-/**
- * @author i001428, Oliver Wolff
- *
- */
+@SuppressWarnings("javadoc")
 public class NotAnnotatedClass {
 
 }
