@@ -9,22 +9,20 @@
         <relativePath />
     </parent>
     <artifactId>guava-plus</artifactId>
-    <name>guava-plus: a number of additional utilites on top on guava-light 
-    </name>
+    <name>guava plus</name>
     <description>
-        guava-plus: a number of additional utilites on top on guava-light
+        guava-plus: A number of additional utilites on top on guava-light
     </description>
     <version>27.1-SNAPSHOT</version>
     <properties>
-        <guava.version>27.1-SNAPSHOT</guava.version>
-        <junit.jupiter.version>5.4.1</junit.jupiter.version>
+        <cuiosss.dependencies.version>1.0-SNAPSHOT</cuiosss.dependencies.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.github.cuioss</groupId>
                 <artifactId>cuioss-dependency-management</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${cuiosss.dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
