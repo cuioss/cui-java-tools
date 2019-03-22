@@ -14,6 +14,17 @@
         A number of additional utilites on top on guava-light
     </description>
     <version>27.1-SNAPSHOT</version>
+    <url>https://github.com/cuioss/cuioss-java-utils/</url>
+    <scm>
+        <url>https://github.com/cuioss/cuioss-java-utils/</url>
+        <connection>https://github.com/cuioss/cuioss-java-utils.git</connection>
+        <developerConnection>scm:git:https://github.com/cuioss/cuioss-java-utils/</developerConnection>
+    </scm>
+    <issueManagement>
+        <url>https://github.com/cuioss/cuioss-java-utils/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
     <properties>
         <cuiosss.dependencies.version>1.0-SNAPSHOT</cuiosss.dependencies.version>
     </properties>
