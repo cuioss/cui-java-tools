@@ -1,4 +1,4 @@
-# guava-plus
+# cuioss-java-utils
 ## What is it?
 A number of additional utilites on top on guava-light
 

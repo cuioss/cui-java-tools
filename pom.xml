@@ -8,10 +8,10 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath />
     </parent>
-    <artifactId>guava-plus</artifactId>
-    <name>guava plus</name>
+    <artifactId>cuioss-java-utils</artifactId>
+    <name>cuioss-java-utils</name>
     <description>
-        guava-plus: A number of additional utilites on top on guava-light
+        A number of additional utilites on top on guava-light
     </description>
     <version>27.1-SNAPSHOT</version>
     <properties>
