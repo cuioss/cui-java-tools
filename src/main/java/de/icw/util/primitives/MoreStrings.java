@@ -24,7 +24,7 @@ import com.google.common.base.Joiner;
 /**
  * Simple tooling for MoreStrings
  *
- * @author i001428, Oliver Wolff
+ * @author Oliver Wolff
  *
  */
 public final class MoreStrings {

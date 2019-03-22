@@ -24,7 +24,6 @@
         <url>https://github.com/cuioss/cuioss-java-utils/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
-
     <properties>
         <cuiosss.dependencies.version>1.0-SNAPSHOT</cuiosss.dependencies.version>
     </properties>
@@ -44,10 +43,18 @@
             <groupId>com.github.cuioss</groupId>
             <artifactId>guava-light</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
         <!-- Unit testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
         </dependency>
     </dependencies>
 </project>
