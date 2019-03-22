@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
 import com.google.common.collect.Lists;
 
 import de.icw.util.reflect.support.ChildAnnotatedClass;
-import de.icw.util.reflect.support.MethodNameTests;
+import de.icw.util.reflect.support.FileldNameClass;
+import de.icw.util.reflect.support.MethodNameClass;
 import de.icw.util.reflect.support.NotAnnotatedClass;
 
 @SuppressWarnings("deprecation")
@@ -37,36 +38,36 @@ class MoreReflectionTest {
 
     @Test
     void shouldAccessGetterMethods() {
-        assertTrue(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "name").isPresent());
-        assertTrue(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "flag").isPresent());
+        assertTrue(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "name").isPresent());
+        assertTrue(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "flag").isPresent());
 
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "protected").isPresent());
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "private").isPresent());
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "module").isPresent());
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "static").isPresent());
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "wrongName").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "protected").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "private").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "module").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "static").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "wrongName").isPresent());
 
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "class").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "class").isPresent());
 
-        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameTests.class, "wrongParameter").isPresent());
+        assertFalse(MoreReflection.retrieveAccessMethod(MethodNameClass.class, "wrongParameter").isPresent());
     }
 
     @Test
     void shouldFilterAccessGetterMethods() {
-        assertEquals(2, MoreReflection.retrieveAccessMethods(MethodNameTests.class, Collections.emptyList()).size());
-        assertEquals(1, MoreReflection.retrieveAccessMethods(MethodNameTests.class, Lists.newArrayList("name")).size());
+        assertEquals(2, MoreReflection.retrieveAccessMethods(MethodNameClass.class, Collections.emptyList()).size());
+        assertEquals(1, MoreReflection.retrieveAccessMethods(MethodNameClass.class, Lists.newArrayList("name")).size());
     }
 
     @Test
     void shouldAccessModifierMethods() {
-        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameTests.class, "name", String.class).isPresent());
-        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameTests.class, "flag", boolean.class).isPresent());
+        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameClass.class, "name", String.class).isPresent());
+        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameClass.class, "flag", boolean.class).isPresent());
 
-        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameTests.class, "builderWriteMethod", String.class)
+        assertTrue(MoreReflection.retrieveWriteMethod(MethodNameClass.class, "builderWriteMethod", String.class)
                 .isPresent());
 
-        assertFalse(MoreReflection.retrieveWriteMethod(MethodNameTests.class, "name", boolean.class).isPresent());
-        assertFalse(MoreReflection.retrieveWriteMethod(MethodNameTests.class, "wrongParameterCount", String.class)
+        assertFalse(MoreReflection.retrieveWriteMethod(MethodNameClass.class, "name", boolean.class).isPresent());
+        assertFalse(MoreReflection.retrieveWriteMethod(MethodNameClass.class, "wrongParameterCount", String.class)
                 .isPresent());
     }
 
@@ -100,4 +101,11 @@ class MoreReflectionTest {
 
     }
 
+    @Test
+    void shouldAccessField() {
+        assertTrue(MoreReflection.accessField(FileldNameClass.class, "myField").isPresent());
+        assertFalse(MoreReflection.accessField(FileldNameClass.class, "notThere").isPresent());
+        // read from parent
+        assertTrue(MoreReflection.accessField(FileldNameClass.class, "flag").isPresent());
+    }
 }

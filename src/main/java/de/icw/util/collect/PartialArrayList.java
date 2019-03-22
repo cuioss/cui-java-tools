@@ -1,13 +1,3 @@
-/**
- * Copyright 2018, InterComponentWare AG
- *
- * NO WARRANTIES OR ANY FURTHER CONDITIONS are implied as to the availability
- * of this source code.
- *
- * In case you receive a copy of this source code you are not permitted
- * to modify, use, or distribute this copy without agreement and an explicit
- * license issued by InterComponentWare AG.
- */
 package de.icw.util.collect;
 
 import java.io.Serializable;

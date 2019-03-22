@@ -52,6 +52,11 @@ class LoggerTest {
     }
 
     @Test
+    void shouldHandleNamedLogger() {
+        assertFalse(new Logger("someName").isDebugEnabled());
+    }
+
+    @Test
     void shouldHandleTraceLogging() {
 
         underTest.trace(TRACE);

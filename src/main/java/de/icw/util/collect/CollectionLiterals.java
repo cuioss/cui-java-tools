@@ -154,6 +154,9 @@ public class CollectionLiterals {
      * @return the <i>immutable</i> {@link List} with the given elements
      */
     public static <E> List<E> immutableList(E element) {
+        if (null == element) {
+            return Collections.emptyList();
+        }
         return ImmutableList.of(element);
     }
 
@@ -394,7 +397,7 @@ public class CollectionLiterals {
      */
     public static <E> SortedSet<E> mutableSortedSet(E element) {
         SortedSet<E> set = new TreeSet<>();
-        if (isEmpty(element)) {
+        if (null == element) {
             return set;
         }
         set.add(element);
@@ -480,6 +483,9 @@ public class CollectionLiterals {
      * @return the <i>immutable</i> {@link Set} with the given elements
      */
     public static <E> SortedSet<E> immutableSortedSet(E element) {
+        if (null == element) {
+            return Collections.emptySortedSet();
+        }
         return Collections.unmodifiableSortedSet(mutableSortedSet(element));
     }
 

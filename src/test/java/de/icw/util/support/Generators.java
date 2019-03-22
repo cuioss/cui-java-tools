@@ -17,7 +17,7 @@ public class Generators {
 
     /**
      * @param count
-     * @return a {@link List} containing a number random Strings derived by {@link UUID}
+     * @return a {@link List} containing a number random MoreStrings derived by {@link UUID}
      */
     public static List<String> randomStrings(int count) {
         List<String> result = new ArrayList<>();
