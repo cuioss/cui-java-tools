@@ -24,7 +24,7 @@ import com.google.common.base.Joiner;
 import lombok.experimental.UtilityClass;
 
 /**
- * Simple tooling for MoreStrings
+ * Provides some extensions to String handling like {@link com.google.common.base.Strings}
  *
  * @author Oliver Wolff
  *
