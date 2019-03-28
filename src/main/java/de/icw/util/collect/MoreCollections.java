@@ -4,12 +4,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Utility Methods for Collections and some types to be used in the context of Collections
  *
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public final class MoreCollections {
 
     /**
@@ -65,7 +68,4 @@ public final class MoreCollections {
         return null == elements;
     }
 
-    private MoreCollections() {
-        // Highlander
-    }
 }

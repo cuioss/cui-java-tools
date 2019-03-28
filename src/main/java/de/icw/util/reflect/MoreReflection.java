@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 
 import de.icw.util.logging.Logger;
+import lombok.experimental.UtilityClass;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based access
@@ -25,6 +26,7 @@ import de.icw.util.logging.Logger;
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public final class MoreReflection {
 
     private static final Logger LOG = new Logger(MoreReflection.class);
@@ -194,10 +196,6 @@ public final class MoreReflection {
             }
         }
         return methodName;
-    }
-
-    private MoreReflection() {
-        // Utility Class
     }
 
     /**

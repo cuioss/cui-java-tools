@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import de.icw.util.logging.Logger;
+import lombok.experimental.UtilityClass;
 
 /**
  * Provides {@link Path} related utilities
@@ -15,6 +16,7 @@ import de.icw.util.logging.Logger;
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public final class MorePaths {
 
     private static final Logger LOG = new Logger(MorePaths.class);
@@ -63,9 +65,5 @@ public final class MorePaths {
     public static Path getRealPathSafely(File file) {
         requireNonNull(file, "File must not be null");
         return getRealPathSafely(file.toPath());
-    }
-
-    private MorePaths() {
-        // Utility class
     }
 }

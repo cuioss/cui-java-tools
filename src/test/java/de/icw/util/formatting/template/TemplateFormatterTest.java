@@ -54,8 +54,7 @@ public class TemplateFormatterTest {
 
     @Test
     public void formatWithFirstMissing() {
-        final PersonBuilder builder = new PersonBuilder();
-        final PersonName personName = builder.setGivenName("Given").setMiddleName("Middle").build();
+        final PersonName personName = new PersonBuilder().setGivenName("Given").setMiddleName("Middle").build();
         final TemplateFormatter<PersonName> formatter = getPersonNameFormatterByLexer();
         assertEquals("Given Middle", formatter.format(personName));
     }

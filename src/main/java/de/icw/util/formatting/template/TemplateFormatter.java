@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 /**
  * Formatter which is able to replace parameter inside the template based on
- * {@link FormatterSupport} information. See
- * https://wiki.icw.int/display/DOC/Configurable+formatting+for+complex+
- * structure
+ * {@link FormatterSupport} information. See {@link de.icw.util.formatting} for details.
  *
  * @author Eugen Fischer
  * @param <T>

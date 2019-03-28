@@ -2,12 +2,15 @@ package de.icw.util.net;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Provides some utility methods for url / path related data
  *
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public final class UrlHelper {
 
     /**
@@ -34,7 +37,4 @@ public final class UrlHelper {
         return removeTrailingSlashesFromUrl(url.substring(0, url.length() - 1));
     }
 
-    private UrlHelper() {
-        // Utility Class
-    }
 }

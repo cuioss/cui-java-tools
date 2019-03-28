@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Provides a number of utilities simplifying the task of creating populated {@link Collection}s. In
  * essence its doing the same compared to the corresponding {@link com.google.common.collect} types
@@ -30,6 +32,7 @@ import com.google.common.collect.Sets;
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public class CollectionLiterals {
 
     /**
@@ -697,7 +700,4 @@ public class CollectionLiterals {
         return Collections.unmodifiableMap(map);
     }
 
-    private CollectionLiterals() {
-        // Highlander
-    }
 }

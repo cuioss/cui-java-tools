@@ -5,13 +5,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Default implementation of {@link PartialCollection} based on {@link ArrayList}.
+ * <h3>Usage</h3>
+ * <p>
+ * See {@link PartialArrayList#of(List, int)}
+ * </p>
  *
  * @param <T>
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class PartialArrayList<T extends Serializable> extends ArrayList<T> implements PartialCollection<T> {
 
     private static final long serialVersionUID = -7548645400982124555L;
@@ -44,28 +52,8 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
         return new PartialArrayList<>(Collections.emptyList(), false);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(moreAvailable);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        PartialArrayList<?> other = (PartialArrayList<?>) obj;
-        return moreAvailable == other.moreAvailable;
-    }
-
     /**
-     * Convenience method for creating an {@link PartialArrayList} as sublist for the given
+     * Convenience method for creating a {@link PartialArrayList} as sublist for the given
      * collection with setting the {@link PartialCollection#isMoreAvailable()} automatically
      *
      * @param full the complete List to be wrapped, may be larger than the limit. If so, a sublist

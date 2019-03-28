@@ -21,12 +21,15 @@ import java.util.List;
 
 import com.google.common.base.Joiner;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Simple tooling for MoreStrings
  *
  * @author Oliver Wolff
  *
  */
+@UtilityClass
 public final class MoreStrings {
 
     /**
@@ -78,7 +81,4 @@ public final class MoreStrings {
         return joinNotBlankStrings(separator, Arrays.asList(strings));
     }
 
-    private MoreStrings() {
-        // Utility class
-    }
 }
