@@ -50,7 +50,6 @@ class MorePathsTest {
     private static final Path TARGET_PATH = Paths.get("target/test-classes");
     private static final Path TARGET_PLAYGROUND = TARGET_PATH.resolve("playground");
 
-    private static final File TARGET_PLAYGROUND_FILE = TARGET_PLAYGROUND.resolve(POM_XML).toFile();
     private static final Path EXISITING_FILE = Paths.get(POM_XML);
     private static final Path NOT_EXISITING_DIRECTORY = Paths.get("not/there");
 

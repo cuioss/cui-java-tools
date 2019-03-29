@@ -16,7 +16,7 @@ import lombok.ToString;
 /**
  * Helper class for splitting / interacting with Filename and corresponding suffixes.
  *
- * @author Oliver Wolff, i001428
+ * @author Oliver Wolff
  */
 @EqualsAndHashCode
 @ToString
