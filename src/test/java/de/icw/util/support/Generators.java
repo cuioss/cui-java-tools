@@ -17,14 +17,21 @@ public class Generators {
 
     /**
      * @param count
-     * @return a {@link List} containing a number random MoreStrings derived by {@link UUID}
+     * @return a {@link List} containing a number random String derived by {@link UUID}
      */
     public static List<String> randomStrings(int count) {
         List<String> result = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            result.add(UUID.randomUUID().toString());
+            result.add(randomString());
         }
         return result;
+    }
+
+    /**
+     * @return a {@link List} containing a number random String derived by {@link UUID}
+     */
+    public static String randomString() {
+        return UUID.randomUUID().toString();
     }
 
     /**
