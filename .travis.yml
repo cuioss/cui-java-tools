@@ -1,4 +1,13 @@
 language: java
+dist: trusty
+addons:
+  sonarcloud:
+    organization: "cuioss-github"
+    token:
+      secure: 7edd46d964994bdd156f77c82aae0b9f8ca832b0
+script:
+  # other script steps might be done before running the actual analysis
+  - sonar-scanner
 cache:
   directories:
     - $HOME/.m2
