@@ -1,7 +1,7 @@
 # cui-java-utils
 
 ## Status
-[![Build Status](https://travis-ci.com/cuioss/cuioss-java-utils.svg?branch=master)](https://travis-ci.org/cuioss/cui-java-utils)
+[![Build Status](https://travis-ci.com/cuioss/cui-java-utils.svg?branch=master)](https://travis-ci.org/cuioss/cui-java-utils)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Maven](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/github/cuioss/cui-java-utils/maven-metadata.xml.svg)](http://central.maven.org/maven2/com/github/cuioss/cui-java-utils/)
 
