@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-
 import de.icw.util.formatting.template.lexer.Lexer;
 import de.icw.util.formatting.template.lexer.LexerBuilder;
 import de.icw.util.formatting.template.token.Token;

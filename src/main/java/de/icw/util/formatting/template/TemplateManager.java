@@ -78,7 +78,7 @@ public class TemplateManager<T extends FormatterSupport> {
          * @param formatter
          * @return TemplateManagerBuilder return the default formatter
          */
-        public TemplateManagerBuilder<B> useAsDeafult(final TemplateFormatter<B> formatter) {
+        public TemplateManagerBuilder<B> useAsDefault(final TemplateFormatter<B> formatter) {
             this.defFormatter = formatter;
             return this;
         }

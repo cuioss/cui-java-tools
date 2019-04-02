@@ -9,51 +9,50 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.junit.jupiter.api.Test;
-
 import de.icw.util.formatting.support.PersonDto;
 import de.icw.util.formatting.support.PersonName;
 import de.icw.util.formatting.template.TemplateManager.TemplateManagerBuilder;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("javadoc")
 public class TemplateManagerTest {
 
-    TemplateManager<PersonName> manager;
-    PersonName targetToFormat;
-    String actual;
+    private TemplateManager<PersonName> manager;
+    private PersonName targetToFormat;
+    private String actual;
 
     @Test
-    public void shouldSupportFormatInManyLangauages() {
+    public void shouldSupportFormatInManyLanguages() {
 
-        manager = templateManagerWithTwoLangaugesSupport();
+        manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
 
         // expected result givenName, familyName
-        assertThat(actual, is("Hans, Müller"));
+        assertThat(actual, is("Hans, M\00FCller"));
 
         final String resultUS = manager.format(targetToFormat, Locale.US);
         // expected result familyName, givenName
-        assertThat(resultUS, is("Müller, Hans"));
+        assertThat(resultUS, is("M\00FCller, Hans"));
 
         // expect fallback to default formatter
         final String resultDefault = manager.format(targetToFormat, Locale.CHINA);
         // expected result familyName
-        assertThat(resultDefault, is("Müller"));
+        assertThat(resultDefault, is("M\00FCller"));
 
     }
 
     private static PersonName anyPersonName() {
         final PersonDto person = new PersonDto();
-        person.setFamilyName("Müller");
+        person.setFamilyName("M\00FCller");
         person.setGivenName("Hans");
         return new PersonName(person);
     }
 
-    private static TemplateManager<PersonName> templateManagerWithTwoLangaugesSupport() {
+    private static TemplateManager<PersonName> templateManagerWithTwoLanguagesSupport() {
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
 
-        return builder.useAsDeafult(getDeafultFormatter()).with(Locale.GERMANY, getFormatterForGermany())
+        return builder.useAsDefault(getDeafultFormatter()).with(Locale.GERMANY, getFormatterForGermany())
                 .with(Locale.US, getFormatterFoUs()).build();
     }
 
@@ -74,17 +73,17 @@ public class TemplateManagerTest {
     @Test
     public void shouldReturnDefaultFormatter() {
 
-        manager = templateManagerWithTwoLangaugesSupport();
+        manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.FRENCH);
 
-        assertNotEquals(actual, "Hans, Müller");
+        assertNotEquals(actual, "Hans, M\00FCller");
     }
 
     @Test
     public void shouldFail() {
         // expected = NullPointerException.class
-        manager = templateManagerWithTwoLangaugesSupport();
+        manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
         assertThrows(NullPointerException.class, () -> actual = manager.format(null, Locale.GERMANY));
     }
@@ -94,7 +93,7 @@ public class TemplateManagerTest {
         manager = templateManagerWithoutLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertThat(actual, is(not("Hans, Müller")));
+        assertThat(actual, is(not("Hans, M\00FCller")));
     }
 
     @Test
@@ -102,7 +101,7 @@ public class TemplateManagerTest {
         manager = templateManagerWithoutOneLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertThat(actual, is("Hans, Müller"));
+        assertThat(actual, is("Hans, M\00FCller"));
     }
 
     @Test
@@ -110,26 +109,26 @@ public class TemplateManagerTest {
         manager = templateManagerWithoutLocation2();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertThat(actual, is(not("Hans, Müller")));
+        assertThat(actual, is(not("Hans, M\00FCller")));
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation() {
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
-        return builder.useAsDeafult(getDeafultFormatter()).with(null).build();
+        return builder.useAsDefault(getDeafultFormatter()).with(null).build();
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutOneLocation() {
         final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>();
         map.put(Locale.GERMANY, getFormatterForGermany());
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
-        return builder.useAsDeafult(getDeafultFormatter()).with(map).build();
+        return builder.useAsDefault(getDeafultFormatter()).with(map).build();
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation2() {
         final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>();
         map.put(null, null);
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
-        return builder.useAsDeafult(getDeafultFormatter()).with(map).build();
+        return builder.useAsDefault(getDeafultFormatter()).with(map).build();
     }
 
 }
