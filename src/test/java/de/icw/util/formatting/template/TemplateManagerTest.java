@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.Locale;
 
-import de.icw.util.formatting.support.PersonDto;
 import de.icw.util.formatting.support.PersonName;
 import de.icw.util.formatting.template.TemplateManager.TemplateManagerBuilder;
 import org.junit.jupiter.api.Test;
@@ -43,10 +42,10 @@ public class TemplateManagerTest {
     }
 
     private static PersonName anyPersonName() {
-        final PersonDto person = new PersonDto();
+        final PersonName person = new PersonName();
         person.setFamilyName("M\00FCller");
         person.setGivenName("Hans");
-        return new PersonName(person);
+        return person;
     }
 
     private static TemplateManager<PersonName> templateManagerWithTwoLanguagesSupport() {
@@ -118,14 +117,14 @@ public class TemplateManagerTest {
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutOneLocation() {
-        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>();
+        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>(0);
         map.put(Locale.GERMANY, getFormatterForGermany());
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
         return builder.useAsDefault(getDeafultFormatter()).with(map).build();
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation2() {
-        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>();
+        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>(0);
         map.put(null, null);
         final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
         return builder.useAsDefault(getDeafultFormatter()).with(map).build();

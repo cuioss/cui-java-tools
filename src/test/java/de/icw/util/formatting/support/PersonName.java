@@ -1,6 +1,5 @@
 package de.icw.util.formatting.support;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.io.Serializable;
@@ -9,140 +8,84 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-
 import de.icw.util.formatting.template.FormatterSupport;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * PersonName consolidate several Person Objects by make a one-way
  * transformation. It implements {@linkplain FormatterSupport} interface.
  * <p/>
- * Supported Classes:
- * <ul>
- * <li>{@link PersonDto}</li>
- * <li>{@link RecordEntryPersonDto}</li>
- * </ul>
+ *
  * Mapping of properties will be done during construction. Properties which
  * can't be mapped will be initialize to null.
  *
- * @author i000576
+ * @author Eugen Fischer
  */
-@ToString
-@EqualsAndHashCode
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public final class PersonName implements FormatterSupport, Serializable {
 
-    private static final long serialVersionUID = 6986009875675450180L;
-
+    private static final long serialVersionUID = -6138413254405190225L;
     /**
-     * alternative {@link org.apache.commons.beanutils.BeanUtils} could provide
-     * the same information, but than no filtering for properties will be
-     * possible
+     * alternative reflection could provide the same information, but than no filtering for properties will be possible
      */
     private static final List<String> SUPPORTED_PROP_LIST = new ImmutableList.Builder<String>().add("familyNamePrefix")
-            .add("familyName").add("familyBirthname").add("givenNamePrefix").add("givenName").add("givenNameSuffix")
-            .add("givenBirthname").add("middleName").add("secondName").add("nickname").add("academicPrefix")
+            .add("familyName").add("familyBirthName").add("givenNamePrefix").add("givenName").add("givenNameSuffix")
+            .add("givenBirthName").add("middleName").add("secondName").add("nickname").add("academicPrefix")
             .add("academicSuffix").add("professionalPrefix").add("professionalSuffix").add("genericPrefix")
             .add("genericSuffix").add("nobilityPrefix").add("nobilitySuffix").build();
 
-    private String familyNamePrefix = null;
+    private String familyNamePrefix;
 
-    private String familyName = null;
+    private String familyName;
 
-    private String familyBirthname = null;
+    private String familyBirthName;
 
-    private String givenNamePrefix = null;
+    private String givenNamePrefix;
 
-    private String givenName = null;
+    private String givenName;
 
-    private String givenNameSuffix = null;
+    private String givenNameSuffix;
 
-    private String givenBirthname = null;
+    private String givenBirthName;
 
-    private String middleName = null;
+    private String middleName;
 
-    private String secondName = null;
+    private String secondName;
 
-    private String nickname = null;
+    private String nickname;
 
-    private String academicPrefix = null;
+    private String academicPrefix;
 
-    private String academicSuffix = null;
+    private String academicSuffix;
 
-    private String professionalPrefix = null;
+    private String professionalPrefix;
 
-    private String professionalSuffix = null;
+    private String professionalSuffix;
 
-    private String genericPrefix = null;
+    private String genericPrefix;
 
-    private String genericSuffix = null;
+    private String genericSuffix;
 
-    private String nobilityPrefix = null;
+    private String nobilityPrefix;
 
-    private String nobilitySuffix = null;
-
-    private final Map<String, Serializable> propertyValues;
-
-    /**
-     * Default constructor initialize all property values to null
-     */
-    public PersonName() {
-        propertyValues = retrieveAvailablePropertyValues();
-    }
-
-    /**
-     * Map properties values to PersonName properties
-     * 
-     * @param facadePerson
-     *            must not be null
-     */
-    public PersonName(final PersonDto facadePerson) {
-        checkNotNull(facadePerson, "PersonDto must not be null");
-        familyNamePrefix = facadePerson.getFamilyNamePrefix();
-        familyName = facadePerson.getFamilyName();
-        familyBirthname = facadePerson.getFamilyBirthname();
-        givenName = facadePerson.getGivenName();
-        givenNameSuffix = facadePerson.getGivenNameSuffix();
-        givenBirthname = facadePerson.getGivenBirthname();
-        middleName = facadePerson.getMiddleName();
-        nickname = facadePerson.getNickname();
-        academicPrefix = facadePerson.getAcademicPrefix();
-        academicSuffix = facadePerson.getAcademicSuffix();
-        professionalPrefix = facadePerson.getProfessionalPrefix();
-        professionalSuffix = facadePerson.getProfessionalSuffix();
-        genericPrefix = facadePerson.getGenericPrefix();
-        genericSuffix = facadePerson.getGenericSuffix();
-        nobilityPrefix = facadePerson.getNobilityPrefix();
-        nobilitySuffix = facadePerson.getNobilitySuffix();
-        propertyValues = retrieveAvailablePropertyValues();
-    }
-
-    /**
-     * Map properties values to PersonName properties
-     * 
-     * @param recordEntryPerson
-     */
-    public PersonName(final RecordEntryPersonDto recordEntryPerson) {
-        checkNotNull(recordEntryPerson, "RecordEntryPersonDto must not be null");
-        familyName = recordEntryPerson.getFamilyName();
-        givenNamePrefix = recordEntryPerson.getNamePrefix();
-        givenName = recordEntryPerson.getGivenName();
-        givenNameSuffix = recordEntryPerson.getNameSuffix();
-        middleName = recordEntryPerson.getMiddleName();
-        academicPrefix = recordEntryPerson.getAcademicTitle();
-        propertyValues = retrieveAvailablePropertyValues();
-    }
+    private String nobilitySuffix;
 
     private Map<String, Serializable> retrieveAvailablePropertyValues() {
-        final Builder<String, Serializable> builder = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, Serializable> builder = ImmutableMap.builder();
         putIfNotNullOrEmpty(builder, "familyNamePrefix", familyNamePrefix);
         putIfNotNullOrEmpty(builder, "familyName", familyName);
-        putIfNotNullOrEmpty(builder, "familyBirthname", familyBirthname);
+        putIfNotNullOrEmpty(builder, "familyBirthName", familyBirthName);
         putIfNotNullOrEmpty(builder, "givenNamePrefix", givenNamePrefix);
         putIfNotNullOrEmpty(builder, "givenName", givenName);
         putIfNotNullOrEmpty(builder, "givenNameSuffix", givenNameSuffix);
-        putIfNotNullOrEmpty(builder, "givenBirthname", givenBirthname);
+        putIfNotNullOrEmpty(builder, "givenBirthName", givenBirthName);
         putIfNotNullOrEmpty(builder, "middleName", middleName);
         putIfNotNullOrEmpty(builder, "secondName", secondName);
         putIfNotNullOrEmpty(builder, "nickname", nickname);
@@ -157,7 +100,7 @@ public final class PersonName implements FormatterSupport, Serializable {
         return builder.build();
     }
 
-    private static void putIfNotNullOrEmpty(final Builder<String, Serializable> builder, final String key,
+    private static void putIfNotNullOrEmpty(final ImmutableMap.Builder<String, Serializable> builder, final String key,
             final String value) {
         if (!isNullOrEmpty(value)) {
             builder.put(key, value);
@@ -171,7 +114,7 @@ public final class PersonName implements FormatterSupport, Serializable {
 
     @Override
     public Map<String, Serializable> getAvailablePropertyValues() {
-        return propertyValues;
+        return retrieveAvailablePropertyValues();
     }
 
 }

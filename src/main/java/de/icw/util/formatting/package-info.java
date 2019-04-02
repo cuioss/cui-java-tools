@@ -29,18 +29,22 @@
  *
  * <pre>
  * <code>
-        final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final PersonName personName = new PersonDtoNameBuilder().setFamilyName("Fischers").setGivenName("Fritz")
-                .setMiddleName("Felix").setGivenNameSuffix("Dr.").build();
+ final PersonName personName = PersonName.builder()
+ .setFamilyName("Fischers")
+ .setGivenName("Fritz")
+ .setMiddleName("Felix")
+ .setGivenNameSuffix("Dr.")
+ .build();
 
-        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+ final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.builder()
+ .useTemplate("[familyName], [givenName], [middleName] [givenNameSuffix]")
+ .forType(PersonName.class);
 
-        assertEquals("Fischers, Fritz, Felix Dr.", formatter.format(personName));
+ assertEquals("Fischers, Fritz, Felix Dr.", formatter.format(personName));
  * </code>
  *
  * </pre>
  *
- * @author i001466
  */
 package de.icw.util.formatting;

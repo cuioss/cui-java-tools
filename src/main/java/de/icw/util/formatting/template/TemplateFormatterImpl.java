@@ -67,7 +67,7 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
 
         final List<Token> tokenList = getParsedTokens();
 
-        final StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder(0);
 
         for (int index = 0; index < tokenList.size(); index++) {
             final Token token = tokenList.get(index);
@@ -126,41 +126,45 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
      * The created TemplateFormatter provide only usage of simple expression
      * language with squared brackets.
      *
-     * @param template must not be null
+     * @param template   must not be null
      * @param sourceType must not be null
      *
      * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * forwarded
      */
     public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
             final String template,
             final Class<F> sourceType) {
-        return Builder.useTemplate(template).forType(sourceType);
+        return TemplateBuilder.useTemplate(template).forType(sourceType);
     }
 
     /**
      * @param template must not be null
-     * @param source must not be null
+     * @param source   must not be null
      *
      * @return TemplateFormatter
      */
     public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
             final String template,
             final F source) {
-        return Builder.useTemplate(template).forSource(source);
+        return TemplateBuilder.useTemplate(template).forSource(source);
     }
 
     /**
      * @param template must not be null
-     * @param lexer must not be null
+     * @param lexer    must not be null
      *
      * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * forwarded
      */
     public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
             final String template,
             final Lexer<F> lexer) {
-        return Builder.useTemplate(template).scanBy(lexer);
+        return TemplateBuilder.useTemplate(template).scanBy(lexer);
+    }
+
+    public static TemplateBuilder builder() {
+        return new TemplateBuilder();
     }
 
     /**
@@ -168,16 +172,16 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
      *
      * @author Eugen Fischer
      */
-    public static final class Builder {
+    public static final class TemplateBuilder {
 
-        private Builder() {
+        private TemplateBuilder() {
         }
 
         static FormatterBuilder useTemplate(final String template) {
             return new FormatterBuilder(template);
         }
 
-        private static final class FormatterBuilder {
+        static final class FormatterBuilder {
 
             private final String template;
 
@@ -197,7 +201,7 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
             public <F extends FormatterSupport> TemplateFormatter<F> forType(
                     final Class<F> classType) {
                 final Lexer<F> lexer =
-                    LexerBuilder.useSimpleElWithSquaredBrackets().build(classType);
+                        LexerBuilder.useSimpleElWithSquaredBrackets().build(classType);
                 return scanBy(lexer);
             }
         }
