@@ -3,22 +3,23 @@ package de.icw.util.formatting.template;
 import java.io.Serializable;
 
 /**
- * Formatter which is able to replace parameter inside the template based on
- * {@link FormatterSupport} information. See {@link de.icw.util.formatting} for details.
+ * The formatter should be able to convert complex type based on {@link FormatterSupport} into text by using a defined template.
+ *
+ * See {@link de.icw.util.formatting} for details.
+ *
+ * @param <T> bounded type based on {@link FormatterSupport}
  *
  * @author Eugen Fischer
- * @param <T>
  */
 public interface TemplateFormatter<T extends FormatterSupport> extends Serializable {
 
     /**
-     * replace attributes from template by attribute values from the map.
-     * missing template attributes will be ignored and doesn't add to result at
-     * all.
+     * Execute transformation based on configured template and values for the defined placeholders. Missing values should get ignored.
      *
-     * @param reference
-     *            must not be null
-     * @return completed template
+     * @param reference must not be {@code null}
+     *
+     * @return formatted text
+     * @throws NullPointerException if reference is missing
      */
     String format(final T reference);
 
