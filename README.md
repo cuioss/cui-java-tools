@@ -1,4 +1,4 @@
-# cuioss-java-utils
+# cui-java-utils
 
 ## Status
 [![Build Status](https://travis-ci.com/cuioss/cuioss-java-utils.svg?branch=master)](https://travis-ci.org/cuioss/cuioss-java-utils)
