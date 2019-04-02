@@ -4,35 +4,35 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.cuioss</groupId>
-        <artifactId>cuioss-parent-java</artifactId>
+        <artifactId>cui-parent-java</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath />
     </parent>
-    <artifactId>cuioss-java-utils</artifactId>
-    <name>cuioss-java-utils</name>
+    <artifactId>cui-java-utils</artifactId>
+    <name>cui java toolbox</name>
     <description>
         A number of additional utilites on top on guava-light
     </description>
     <version>1.0-SNAPSHOT</version>
     <url>https://github.com/cuioss/cuioss-java-utils/</url>
     <scm>
-        <url>https://github.com/cuioss/cuioss-java-utils/</url>
-        <connection>https://github.com/cuioss/cuioss-java-utils.git</connection>
-        <developerConnection>scm:git:https://github.com/cuioss/cuioss-java-utils/</developerConnection>
+        <url>https://github.com/cuioss/cui-java-utils/</url>
+        <connection>https://github.com/cuioss/cui-java-utils.git</connection>
+        <developerConnection>scm:git:https://github.com/cuioss/cui-java-utils/</developerConnection>
     </scm>
     <issueManagement>
-        <url>https://github.com/cuioss/cuioss-java-utils/issues</url>
+        <url>https://github.com/cuioss/cui-java-utils/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
     <properties>
-        <cuiosss.dependencies.version>1.0-SNAPSHOT</cuiosss.dependencies.version>
+        <cui.dependencies.version>1.0-SNAPSHOT</cui.dependencies.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.github.cuioss</groupId>
-                <artifactId>cuioss-dependency-management</artifactId>
-                <version>${cuiosss.dependencies.version}</version>
+                <artifactId>cui-dependency-management</artifactId>
+                <version>${cui.dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
