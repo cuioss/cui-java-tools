@@ -41,6 +41,8 @@ class MorePathsTest {
     private static final String NOT_THERE = "not.there";
     private static final String TARGET = "target";
     private static final String POM_XML = "pom.xml";
+    private static final String TEST_FILE_NAME = "someTestFile.txt";
+    private static final Path TEST_FILE_SOURCE_PATH = Paths.get("src/test/resources", TEST_FILE_NAME);
 
     static final Path POM_PATH = Paths.get(POM_XML);
     static final Path NOT_THERE_PATH = Paths.get(NOT_THERE);
@@ -50,8 +52,8 @@ class MorePathsTest {
     private static final Path TARGET_PATH = Paths.get("target/test-classes");
     private static final Path TARGET_PLAYGROUND = TARGET_PATH.resolve("playground");
 
-    private static final Path EXISITING_FILE = Paths.get(POM_XML);
-    private static final Path NOT_EXISITING_DIRECTORY = Paths.get("not/there");
+    private static final Path EXISTING_FILE = Paths.get(POM_XML);
+    private static final Path NOT_EXISTING_DIRECTORY = Paths.get("not/there");
 
     private Path playGroundBase;
     private Path playGroundBackup;
@@ -102,14 +104,14 @@ class MorePathsTest {
         assertFalse(checkAccessiblePath(BASE_PATH, false, true));
         assertFalse(checkAccessiblePath(BASE_PATH, false, false));
 
-        assertFalse(checkAccessiblePath(NOT_EXISITING_DIRECTORY, true, true));
-        assertFalse(checkAccessiblePath(NOT_EXISITING_DIRECTORY, true, false));
+        assertFalse(checkAccessiblePath(NOT_EXISTING_DIRECTORY, true, true));
+        assertFalse(checkAccessiblePath(NOT_EXISTING_DIRECTORY, true, false));
 
         // File is not directory
-        assertFalse(checkAccessiblePath(EXISITING_FILE, true, true));
-        assertFalse(checkAccessiblePath(EXISITING_FILE, true, false));
-        assertTrue(checkAccessiblePath(EXISITING_FILE, false, true));
-        assertTrue(checkAccessiblePath(EXISITING_FILE, false, false));
+        assertFalse(checkAccessiblePath(EXISTING_FILE, true, true));
+        assertFalse(checkAccessiblePath(EXISTING_FILE, true, false));
+        assertTrue(checkAccessiblePath(EXISTING_FILE, false, true));
+        assertTrue(checkAccessiblePath(EXISTING_FILE, false, false));
         assertTrue(checkAccessiblePath(TARGET_PATH, true, true));
         assertTrue(checkAccessiblePath(TARGET_PATH, true, false));
     }
@@ -131,7 +133,7 @@ class MorePathsTest {
 
     @Test
     void shouldBackupExisitingFile() throws IOException {
-        Path exisiting = createTestPath();
+        Path exisiting = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
         backupFile(exisiting);
@@ -148,7 +150,7 @@ class MorePathsTest {
 
     @Test
     void shouldCreateTempFile() throws IOException {
-        Path exisiting = createTestPath();
+        Path exisiting = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
         Path temp = copyToTempLocation(exisiting);
@@ -161,7 +163,7 @@ class MorePathsTest {
     @Test
     void shouldFailToProvideBackupDirectoryIfParentNotExists() {
         assertThrows(IllegalArgumentException.class, () -> {
-            getBackupDirectoryForPath(NOT_EXISITING_DIRECTORY);
+            getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY);
         });
     }
 
@@ -173,14 +175,14 @@ class MorePathsTest {
         Path newFilePath = createNonExistingPath(playGroundBase, filename);
         assertFalse(Files.exists(newFilePath));
         assertEquals(filename, newFilePath.getFileName().toString());
-        Files.copy(EXISITING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
+        Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
         assertTrue(Files.exists(newFilePath));
         for (int counter = 1; counter < 20; counter++) {
             newFilePath = createNonExistingPath(playGroundBase, filename);
             assertFalse(Files.exists(newFilePath));
             assertEquals(filename + "_" + counter, newFilePath.getFileName().toString());
-            Files.copy(EXISITING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
+            Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
                     StandardCopyOption.COPY_ATTRIBUTES);
             assertTrue(Files.exists(newFilePath));
         }
@@ -220,7 +222,7 @@ class MorePathsTest {
 
     @Test
     void shouldSaveAndBackup() throws IOException {
-        Path existingFile = createTestPath();
+        Path existingFile = copyPomFileToPlayground();
 
         saveAndBackup(existingFile,
                 filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
@@ -228,12 +230,23 @@ class MorePathsTest {
         assertTrue(Files.exists(playGroundBackup));
     }
 
-    private Path createTestPath() throws IOException {
+    private Path copyPomFileToPlayground() throws IOException {
         Path existingFile = playGroundBase.resolve(POM_XML);
-        Files.copy(EXISITING_FILE, existingFile, StandardCopyOption.REPLACE_EXISTING,
+        Files.copy(EXISTING_FILE, existingFile, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
         assertTrue(!Files.exists(playGroundBackup), "File could not be created");
         return existingFile;
+    }
+
+    private Path copyTestFileToPlayground() throws IOException {
+        Path path = playGroundBase.resolve(TEST_FILE_NAME);
+        if (path.toFile().exists()) {
+            return path;
+        }
+        Files.copy(TEST_FILE_SOURCE_PATH, path, StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES);
+        assertTrue(path.toFile().exists());
+        return path;
     }
 
     @Test
@@ -248,7 +261,7 @@ class MorePathsTest {
     @Test
     void testDeleteQuietlyDir() throws IOException {
 
-        Path existingFile = createTestPath();
+        Path existingFile = copyPomFileToPlayground();
 
         Path testDirectory = playGroundBackup.resolve("directory");
         testDirectory.toFile().mkdirs();
@@ -262,7 +275,7 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyFile() throws IOException {
-        Path existingFile = createTestPath();
+        Path existingFile = copyPomFileToPlayground();
 
         assertTrue(existingFile.toFile().exists());
         assertTrue(deleteQuietly(playGroundBase));
@@ -285,20 +298,14 @@ class MorePathsTest {
     @Test
     void testContentEquals() throws Exception {
 
-        // Path file = createTestPath();
-        // Path file2 = playGroundBase.resolve("2" + POM_XML);
-        // Files.copy(EXISITING_FILE, file2, StandardCopyOption.REPLACE_EXISTING,
-        // StandardCopyOption.COPY_ATTRIBUTES);
-        // assertTrue(!Files.exists(file2), "File could not be created");
-
         // Non-existent files
-        Path file = playGroundBase.resolve(POM_XML);
-        Path file2 = playGroundBase.resolve("2" + POM_XML);
+        Path notThere1 = playGroundBase.resolve(POM_XML);
+        Path notThere2 = playGroundBase.resolve("2" + POM_XML);
         // both don't exist
-        assertTrue(MorePaths.contentEquals(file, file));
-        assertTrue(MorePaths.contentEquals(file, file2));
-        assertTrue(MorePaths.contentEquals(file2, file2));
-        assertTrue(MorePaths.contentEquals(file2, file));
+        assertTrue(MorePaths.contentEquals(notThere1, notThere1));
+        assertTrue(MorePaths.contentEquals(notThere1, notThere2));
+        assertTrue(MorePaths.contentEquals(notThere2, notThere2));
+        assertTrue(MorePaths.contentEquals(notThere2, notThere1));
 
         // Directories
         try {
@@ -309,118 +316,15 @@ class MorePathsTest {
         }
 
         // Different files
-        // final File objFile1 =
-        // new File(getTestDirectory(), getName() + ".object");
-        // objFile1.deleteOnExit();
-        // FileUtils.copyURLToFile(
-        // getClass().getResource("/java/lang/Object.class"),
-        // objFile1);
-        //
-        // final File objFile1b =
-        // new File(getTestDirectory(), getName() + ".object2");
-        // objFile1.deleteOnExit();
-        // FileUtils.copyURLToFile(
-        // getClass().getResource("/java/lang/Object.class"),
-        // objFile1b);
-        //
-        // final File objFile2 =
-        // new File(getTestDirectory(), getName() + ".collection");
-        // objFile2.deleteOnExit();
-        // FileUtils.copyURLToFile(
-        // getClass().getResource("/java/util/Collection.class"),
-        // objFile2);
-        //
-        // assertFalse(contentEquals(objFile1, objFile2));
-        // assertFalse(contentEquals(objFile1b, objFile2));
-        // assertTrue(contentEquals(objFile1, objFile1b));
-        //
-        // assertTrue(contentEquals(objFile1, objFile1));
-        // assertTrue(contentEquals(objFile1b, objFile1b));
-        // assertTrue(contentEquals(objFile2, objFile2));
-        //
-        // // Equal files
-        // file.createNewFile();
-        // file2.createNewFile();
-        // assertTrue(contentEquals(file, file));
-        // assertTrue(contentEquals(file, file2));
+        Path existing1 = copyPomFileToPlayground();
+        Path existing2 = copyTestFileToPlayground();
+
+        assertFalse(MorePaths.contentEquals(existing1, existing2));
+        assertTrue(MorePaths.contentEquals(existing1, POM_PATH));
+
+        assertTrue(MorePaths.contentEquals(existing1, existing1));
+        assertTrue(MorePaths.contentEquals(existing2, existing2));
+
     }
 
-    @Test
-    void testContentEqualsIgnoreEOL() throws Exception {
-        // // Non-existent files
-        // final File file1 = new File(getTestDirectory(), getName());
-        // final File file2 = new File(getTestDirectory(), getName() + "2");
-        // // both don't exist
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file1, file1, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file1, file2, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file2, file2, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file2, file1, null));
-        //
-        // // Directories
-        // try {
-        // FileUtils.contentEqualsIgnoreEOL(getTestDirectory(), getTestDirectory(), null);
-        // fail("Comparing directories should fail with an IOException");
-        // } catch (final IOException ioe) {
-        // // expected
-        // }
-        //
-        // // Different files
-        // final File tfile1 = new File(getTestDirectory(), getName() + ".txt1");
-        // tfile1.deleteOnExit();
-        // FileUtils.write(tfile1, "123\r");
-        //
-        // final File tfile2 = new File(getTestDirectory(), getName() + ".txt2");
-        // tfile1.deleteOnExit();
-        // FileUtils.write(tfile2, "123\n");
-        //
-        // final File tfile3 = new File(getTestDirectory(), getName() + ".collection");
-        // tfile3.deleteOnExit();
-        // FileUtils.write(tfile3, "123\r\n2");
-        //
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(tfile1, tfile1, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(tfile2, tfile2, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(tfile3, tfile3, null));
-        //
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(tfile1, tfile2, null));
-        // assertFalse(FileUtils.contentEqualsIgnoreEOL(tfile1, tfile3, null));
-        // assertFalse(FileUtils.contentEqualsIgnoreEOL(tfile2, tfile3, null));
-        //
-        // final URL urlCR = getClass().getResource("FileUtilsTestDataCR.dat");
-        // assertNotNull(urlCR);
-        // final File cr = new File(urlCR.toURI());
-        // assertTrue(cr.exists());
-        //
-        // final URL urlCRLF = getClass().getResource("FileUtilsTestDataCRLF.dat");
-        // assertNotNull(urlCRLF);
-        // final File crlf = new File(urlCRLF.toURI());
-        // assertTrue(crlf.exists());
-        //
-        // final URL urlLF = getClass().getResource("FileUtilsTestDataLF.dat");
-        // assertNotNull(urlLF);
-        // final File lf = new File(urlLF.toURI());
-        // assertTrue(lf.exists());
-        //
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(cr, cr, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(crlf, crlf, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(lf, lf, null));
-        //
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(cr, crlf, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(cr, lf, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(crlf, lf, null));
-        //
-        // // Check the files behave OK when EOL is not ignored
-        // assertTrue(contentEquals(cr, cr));
-        // assertTrue(contentEquals(crlf, crlf));
-        // assertTrue(contentEquals(lf, lf));
-        //
-        // assertFalse(contentEquals(cr, crlf));
-        // assertFalse(contentEquals(cr, lf));
-        // assertFalse(contentEquals(crlf, lf));
-        //
-        // // Equal files
-        // file1.createNewFile();
-        // file2.createNewFile();
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file1, file1, null));
-        // assertTrue(FileUtils.contentEqualsIgnoreEOL(file1, file2, null));
-    }
 }

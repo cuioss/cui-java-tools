@@ -6,13 +6,13 @@ import static de.icw.util.support.Generators.randomInt;
 import static de.icw.util.support.Generators.randomStrings;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
+
+import de.icw.util.support.ObjectMethodsAsserts;
 
 class PartialArrayListTest {
 
@@ -47,18 +47,7 @@ class PartialArrayListTest {
     }
 
     @Test
-    public void shouldHandleEquals() {
-        assertFalse(emptyList().equals(null));
-        List<String> listOfFour = randomStrings(4);
-        PartialCollection<String> partialList = of(listOfFour, 4);
-        assertFalse(emptyList().equals(of(listOfFour, 5)));
-        assertTrue(emptyList().equals(emptyList()));
-        assertTrue(partialList.equals(partialList));
-        assertTrue(partialList.equals(of(listOfFour, 5)));
-    }
-
-    @Test
-    public void shouldHandleHashCode() {
-        assertNotNull(emptyList().hashCode());
+    void shouldImplementObjectContracts() {
+        ObjectMethodsAsserts.assertNiceObject(of(randomStrings(4), 4));
     }
 }

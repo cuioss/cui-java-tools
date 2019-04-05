@@ -9,19 +9,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.HashMap;
 import java.util.Locale;
 
-import de.icw.util.formatting.support.PersonName;
-import de.icw.util.formatting.template.TemplateManager.TemplateManagerBuilder;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("javadoc")
-public class TemplateManagerTest {
+import de.icw.util.formatting.support.PersonName;
+import de.icw.util.formatting.template.TemplateManager.TemplateManagerBuilder;
+
+class TemplateManagerTest {
 
     private TemplateManager<PersonName> manager;
     private PersonName targetToFormat;
     private String actual;
 
     @Test
-    public void shouldSupportFormatInManyLanguages() {
+    void shouldSupportFormatInManyLanguages() {
 
         manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
@@ -70,7 +70,7 @@ public class TemplateManagerTest {
     }
 
     @Test
-    public void shouldReturnDefaultFormatter() {
+    void shouldReturnDefaultFormatter() {
 
         manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
@@ -80,7 +80,7 @@ public class TemplateManagerTest {
     }
 
     @Test
-    public void shouldFail() {
+    void shouldFail() {
         // expected = NullPointerException.class
         manager = templateManagerWithTwoLanguagesSupport();
         targetToFormat = anyPersonName();
@@ -88,7 +88,7 @@ public class TemplateManagerTest {
     }
 
     @Test
-    public void shouldNotBeEqual() {
+    void shouldNotBeEqual() {
         manager = templateManagerWithoutLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
@@ -96,7 +96,7 @@ public class TemplateManagerTest {
     }
 
     @Test
-    public void shouldNotBeEqual2() {
+    void shouldNotBeEqual2() {
         manager = templateManagerWithoutOneLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
@@ -104,7 +104,7 @@ public class TemplateManagerTest {
     }
 
     @Test
-    public void shouldNotBeEqual3() {
+    void shouldNotBeEqual3() {
         manager = templateManagerWithoutLocation2();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);

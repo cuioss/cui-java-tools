@@ -4,22 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
+
 import de.icw.util.formatting.support.PersonName;
 import de.icw.util.formatting.template.lexer.Lexer;
 import de.icw.util.formatting.template.lexer.Lexer.ExpressionLanguage;
 import de.icw.util.formatting.template.lexer.LexerBuilder;
-import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("javadoc")
-public class TemplateFormatterTest {
+class TemplateFormatterTest {
 
     private static final String PERSON_NAME_FORMAT = "[familyName, ][givenName ][middleName]";
 
     private static final String PERSON_NAME_FORMAT_ANGLE_BRACKET =
-            "Dr. <familyName, ><givenName ><middleName>";
+        "Dr. <familyName, ><givenName ><middleName>";
 
     @Test
-    public void completeFormatting() {
+    void completeFormatting() {
 
         final PersonName personName = PersonName.builder()
                 .familyName("FamilyName")
@@ -33,7 +33,7 @@ public class TemplateFormatterTest {
     }
 
     @Test
-    public void formatWithLikelySoundsProperties() {
+    void formatWithLikelySoundsProperties() {
 
         final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
@@ -45,14 +45,14 @@ public class TemplateFormatterTest {
                 .build();
 
         final TemplateFormatter<PersonName> formatter =
-                TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
 
         assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
                 formatter.format(personName));
     }
 
     @Test
-    public void formatWithLikelySoundsMissingProperties() {
+    void formatWithLikelySoundsMissingProperties() {
         final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
         final PersonName personName = PersonName.builder()
@@ -62,26 +62,26 @@ public class TemplateFormatterTest {
                 .build();
 
         final TemplateFormatter<PersonName> formatter =
-                TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
         assertEquals("FamilyName, GivenName, MiddleName", formatter.format(personName));
     }
 
     @Test
-    public void formatWithFirstMissing() {
+    void formatWithFirstMissing() {
         final PersonName personName = PersonName.builder().givenName("Given").middleName("Middle").build();
         final TemplateFormatter<PersonName> formatter = getPersonNameFormatterByLexer();
         assertEquals("Given Middle", formatter.format(personName));
     }
 
     @Test
-    public void specialFormatForOnlyOneValue() {
+    void specialFormatForOnlyOneValue() {
         final PersonName personName = PersonName.builder().givenName("Otto").build();
         final TemplateFormatter<PersonName> formatter = getPersonNameFormatter();
         assertEquals("Otto", formatter.format(personName));
     }
 
     @Test
-    public void shouldPassValidation() {
+    void shouldPassValidation() {
         Validator.validateTemplate(PERSON_NAME_FORMAT, PersonName.class);
 
         Validator.validateTemplate(PERSON_NAME_FORMAT_ANGLE_BRACKET,
@@ -89,28 +89,28 @@ public class TemplateFormatterTest {
     }
 
     @Test
-    public void shouldFailOnValidation() {
+    void shouldFailOnValidation() {
         assertThrows(IllegalArgumentException.class,
                 () -> Validator.validateTemplate(PERSON_NAME_FORMAT, WrongDataObject.class));
     }
 
     @Test
-    public void shouldFailOnValidationByLexer() {
+    void shouldFailOnValidationByLexer() {
         final Lexer<WrongDataObject> lexer =
-                LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET)
-                        .build(WrongDataObject.class);
+            LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET)
+                    .build(WrongDataObject.class);
         assertThrows(IllegalArgumentException.class,
                 () -> Validator.validateTemplate(PERSON_NAME_FORMAT_ANGLE_BRACKET, lexer));
     }
 
     @Test
-    public void createdFormatterCanBeReused() {
+    void createdFormatterCanBeReused() {
         final String familyName = "Famname";
         final String givenName = "Given";
 
         final PersonName object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
         final PersonName object2 =
-                PersonName.builder().familyName(familyName).givenName(givenName).givenBirthName("other one").build();
+            PersonName.builder().familyName(familyName).givenName(givenName).givenBirthName("other one").build();
 
         assertNotEquals(object1, object2);
 
@@ -121,27 +121,27 @@ public class TemplateFormatterTest {
     }
 
     @Test
-    public void shouldRemoveUselessDelimiter() {
+    void shouldRemoveUselessDelimiter() {
         final String familyName = anyValidString();
         final String givenName = anyValidString();
         final String myTemplate = "[familyName], [givenName], [middleName]";
         final PersonName object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
 
         final TemplateFormatter<PersonName> formatter =
-                TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
         final String expected = familyName + ", " + givenName;
         assertEquals(expected, formatter.format(object1));
     }
 
     @Test
-    public void shouldRemoveDelimiterAtBeginning() {
+    void shouldRemoveDelimiterAtBeginning() {
         final String middle = anyValidString();
         final String givenName = anyValidString();
         final String myTemplate = "[familyName], [givenName], [middleName]";
         final PersonName object1 = PersonName.builder().middleName(middle).givenName(givenName).build();
 
         final TemplateFormatter<PersonName> formatter =
-                TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
         final String expected = givenName + ", " + middle;
         assertEquals(expected, formatter.format(object1));
     }
@@ -152,7 +152,7 @@ public class TemplateFormatterTest {
      * missing no separator will be added : VALUE1 - if token 1 is missing no
      * separator will be added : VALUE2
      */
-    public void shouldProvideConditionalFormatting() {
+    void shouldProvideConditionalFormatting() {
         /*
          * implementation idea : use Guava JOINER for String Tokens in between
          * therefore tree graph is needed, no linear list is able to represent
@@ -168,7 +168,7 @@ public class TemplateFormatterTest {
 
     private static TemplateFormatter<PersonName> getPersonNameFormatterByLexer() {
         final Lexer<PersonName> lexer =
-                LexerBuilder.useSimpleElWithSquaredBrackets().build(PersonName.class);
+            LexerBuilder.useSimpleElWithSquaredBrackets().build(PersonName.class);
         return TemplateFormatterImpl.createFormatter(PERSON_NAME_FORMAT, lexer);
     }
 

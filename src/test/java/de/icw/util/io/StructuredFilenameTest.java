@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
+import de.icw.util.support.ObjectMethodsAsserts;
+
 class StructuredFilenameTest {
 
     static final String EXISTING_FILE_NAME = "/META-INF/someTestFile.txt";
@@ -41,6 +43,13 @@ class StructuredFilenameTest {
     }
 
     @Test
+    void shouldHandleDotOnlyName() {
+        final StructuredFilename filename = new StructuredFilename(".");
+        assertEquals(".", filename.getNamePart());
+        assertNull(filename.getSuffix());
+    }
+
+    @Test
     void shouldResolvePath() {
         final StructuredFilename filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME));
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
@@ -51,5 +60,10 @@ class StructuredFilenameTest {
         final StructuredFilename filename =
             new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
+    }
+
+    @Test
+    void shouldImplementObjectContracts() {
+        ObjectMethodsAsserts.assertNiceObject(new StructuredFilename("test.suffix"));
     }
 }
