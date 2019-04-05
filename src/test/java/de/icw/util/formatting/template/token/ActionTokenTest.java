@@ -8,7 +8,7 @@ class ActionTokenTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        ObjectMethodsAsserts.assertNiceObject(new ActionToken("abc", ","));
+        ObjectMethodsAsserts.assertNiceObject(new ActionToken("a,bc", ","));
     }
 
 }
