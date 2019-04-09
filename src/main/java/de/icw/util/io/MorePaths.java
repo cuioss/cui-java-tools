@@ -93,7 +93,7 @@ public final class MorePaths {
      *
      * @param path to checked, must not be null
      * @param checkForDirectory check whether it is a file or directory
-     * @param verbose indicates whether to LOG corresponding Portal-115 messages at warn-level
+     * @param verbose indicates whether to log errors at warn-level
      *
      * @return boolean indicating whether the given {@link Path} denotes an existing read and
      *         writable directory.
@@ -120,7 +120,7 @@ public final class MorePaths {
      *
      * @param path to checked, must not be null
      * @param checkForDirectory check whether it is a file or directory
-     * @param verbose indicates whether to LOG corresponding Portal-115 messages at warn-level
+     * @param verbose indicates whether to log errors at warn-level
      *
      * @return boolean indicating whether the given {@link Path} denotes an existing readable
      *         directory.
@@ -144,7 +144,7 @@ public final class MorePaths {
             }
         } else if (!pathFile.isFile()) {
             if (verbose) {
-                LOG.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
+                LOG.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
@@ -155,6 +155,41 @@ public final class MorePaths {
             return false;
         }
         LOG.debug("{} denotes an existing file / directory with read permissions", absolutePath);
+        return true;
+    }
+
+    /**
+     * Checks whether the given {@link Path} denotes an existing executable file.
+     *
+     * @param path to checked, must not be null
+     * @param verbose indicates whether to log errors at warn-level
+     *
+     * @return boolean indicating whether the given {@link Path} denotes an existing readable
+     *         directory.
+     */
+    public static boolean checkExecutablePath(final @NonNull Path path,
+            final boolean verbose) {
+        final File pathFile = path.toFile();
+        final String absolutePath = pathFile.getAbsolutePath();
+        if (!pathFile.exists()) {
+            if (verbose) {
+                LOG.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
+            }
+            return false;
+        }
+        if (!pathFile.isFile()) {
+            if (verbose) {
+                LOG.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
+            }
+            return false;
+        }
+        if (!pathFile.canExecute()) {
+            if (verbose) {
+                LOG.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Executable");
+            }
+            return false;
+        }
+        LOG.debug("{} denotes an existing file / directory with execute permission", absolutePath);
         return true;
     }
 

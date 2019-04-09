@@ -4,6 +4,7 @@ import static de.icw.util.io.MorePaths.BACKUP_DIR_NAME;
 import static de.icw.util.io.MorePaths.BACKUP_FILE_SUFFIX;
 import static de.icw.util.io.MorePaths.backupFile;
 import static de.icw.util.io.MorePaths.checkAccessiblePath;
+import static de.icw.util.io.MorePaths.checkExecutablePath;
 import static de.icw.util.io.MorePaths.copyToTempLocation;
 import static de.icw.util.io.MorePaths.createNonExistingPath;
 import static de.icw.util.io.MorePaths.deleteQuietly;
@@ -114,6 +115,24 @@ class MorePathsTest {
         assertTrue(checkAccessiblePath(EXISTING_FILE, false, false));
         assertTrue(checkAccessiblePath(TARGET_PATH, true, true));
         assertTrue(checkAccessiblePath(TARGET_PATH, true, false));
+    }
+
+    @Test
+    void shouldCheckExecutablePath() throws IOException {
+        assertFalse(checkExecutablePath(BASE_PATH, true));
+        assertFalse(checkExecutablePath(BASE_PATH, false));
+
+        assertFalse(checkExecutablePath(NOT_EXISTING_DIRECTORY, true));
+        assertFalse(checkExecutablePath(NOT_EXISTING_DIRECTORY, false));
+
+        Path testFile = copyTestFileToPlayground();
+        // testFile.toFile().setExecutable(false);
+        // assertFalse(checkExecutablePath(testFile, true));
+        // assertFalse(checkExecutablePath(testFile, false));
+
+        testFile.toFile().setExecutable(true);
+        assertTrue(checkExecutablePath(testFile, true));
+        assertTrue(checkExecutablePath(testFile, false));
     }
 
     @Test

@@ -102,28 +102,13 @@ public class IOStreams {
 
     /**
      * Returns the given reader if it is a {@link BufferedReader}, otherwise creates a
-     * BufferedReader from the given
-     * reader.
+     * BufferedReader from the given reader.
      *
      * @param reader the reader to wrap or return (not null)
      * @return the given reader or a new {@link BufferedReader} for the given reader
      * @throws NullPointerException if the input parameter is null
-     * @see #buffer(Reader)
      */
     public static BufferedReader toBufferedReader(final Reader reader) {
-        return reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
-    }
-
-    /**
-     * Returns the given reader if it is already a {@link BufferedReader}, otherwise creates a
-     * BufferedReader from
-     * the given reader.
-     *
-     * @param reader the reader to wrap or return (not null)
-     * @return the given reader or a new {@link BufferedReader} for the given reader
-     * @throws NullPointerException if the input parameter is null
-     */
-    public static BufferedReader buffer(final Reader reader) {
         return reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
     }
 }
