@@ -17,7 +17,7 @@
     <url>https://github.com/cuioss/cuioss-java-utils/</url>
     <scm>
         <url>https://github.com/cuioss/cui-java-utils/</url>
-        <connection>https://github.com/cuioss/cui-java-utils.git</connection>
+        <connection>scm:git:https://github.com/cuioss/cui-java-utils.git</connection>
         <developerConnection>scm:git:https://github.com/cuioss/cui-java-utils/</developerConnection>
     </scm>
     <issueManagement>
