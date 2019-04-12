@@ -1,5 +1,7 @@
 package de.icw.util.runner;
 
+import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
+
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +22,7 @@ public abstract class AbstractApplicationRunner {
     private static final Logger LOG = new Logger(AbstractApplicationRunner.class);
 
     @Getter
-    private Optional<Process> process = Optional.empty();
+    private Optional<ProcessWrapper> process = Optional.empty();
 
     /** the current {@link State} of the service. */
     @Getter
@@ -68,7 +70,7 @@ public abstract class AbstractApplicationRunner {
     /**
      * Stops / terminates the contained application
      */
-    public void teminate() {
+    public void terminate() {
         Stopwatch stopWatch = Stopwatch.createStarted();
         LOG.debug("Terminating process '{}'", getName());
         if (!process.isPresent()) {
@@ -77,7 +79,7 @@ public abstract class AbstractApplicationRunner {
         }
         LOG.info("Terminating process '{}', '{}'", getName(), process);
         state = State.STOPPING;
-        Optional<Process> shutdownProcess = gracefulShutdown(environment);
+        Optional<ProcessWrapper> shutdownProcess = gracefulShutdown(environment);
 
         if (shutdownProcess.isPresent()) {
             LOG.info("Waiting for shutdown-process to complete {}", getName());
@@ -105,7 +107,7 @@ public abstract class AbstractApplicationRunner {
     /**
      * @param proc
      */
-    private void shutdownProcess(Process proc) {
+    private void shutdownProcess(ProcessWrapper proc) {
         if (proc != null) {
             proc.destroy();
             try {
@@ -122,21 +124,15 @@ public abstract class AbstractApplicationRunner {
 
     private boolean checkProcessIsUpAndRunning() {
         boolean isUp = false;
-        try {
-            for (int i = 0; i < getScriptMetadata().getStartCheckCount() && !isUp; ++i) {
-                try {
-                    isUp = startedCheck.call();
-                } catch (final AssertionError assertionError) {
-                    throw assertionError;
-                } catch (final Exception ex) {
-                    // ignore, this might be the only chance to tell that it is not running...
-                }
-                if (!isUp) {
-                    Thread.sleep(getScriptMetadata().getStartCheckTimeout());
-                }
+        for (int i = 0; i < getScriptMetadata().getStartCheckCount() && !isUp; ++i) {
+            try {
+                isUp = startedCheck.call();
+            } catch (Exception e) {
+                // ignore, this might be the only chance to tell that it is not running...
             }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException("Error checking whether keycloak has started", e);
+            if (!isUp) {
+                sleepUninterruptibly(getScriptMetadata().getStartCheckTimeout(), TimeUnit.SECONDS);
+            }
         }
         return isUp;
     }
@@ -164,20 +160,20 @@ public abstract class AbstractApplicationRunner {
      *
      * @param system
      *
-     * @return The {@link Process} object
+     * @return The {@link ProcessWrapper} object
      */
-    protected abstract Optional<Process> doStart(Environment system);
+    protected abstract Optional<ProcessWrapper> doStart(Environment system);
 
     /**
      * The synchronous termination of the the Script. This is an optional operation. The
      * implementation usually calls a shutdown script.
      *
      * @param system identifying the system
-     * @return An {@link Optional} on the {@link Process} that represents the <em>shutdown</em>
-     *         script / process
+     * @return An {@link Optional} on the {@link ProcessWrapper} that represents the
+     *         <em>shutdown</em> script / process
      *
      */
-    protected Optional<Process> gracefulShutdown(Environment system) {
+    protected Optional<ProcessWrapper> gracefulShutdown(Environment system) {
         // default is noop
         return Optional.empty();
     }

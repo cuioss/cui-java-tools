@@ -10,8 +10,9 @@ import de.icw.util.support.ObjectMethodsAsserts;
 class ScriptMetadataTest {
 
     static final ScriptMetadata SCRIPT_METADATA =
-        ScriptMetadata.builder().linuxParameter(LINUX_META).name("test-script")
-                .windowsParameter(WINDOWS_META).macOsParameter(LINUX_META).build();
+        ScriptMetadata.builder().linuxParameter(LINUX_META).name("test-script").shutdownTimeout(10).startCheckCount(2)
+                .startCheckTimeout(500)
+                .windowsParameter(WINDOWS_META).build();
 
     @Test
     void shouldImplementObjectContracts() {

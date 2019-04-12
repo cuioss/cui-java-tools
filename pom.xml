@@ -53,10 +53,10 @@
             <artifactId>junit-jupiter</artifactId>
         </dependency>
         <!-- Buggar There seems to be a bug in the eclipse junit runner -->
-        <!-- <dependency> -->
-        <!-- <groupId>junit</groupId> -->
-        <!-- <artifactId>junit</artifactId> -->
-        <!-- </dependency> -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>

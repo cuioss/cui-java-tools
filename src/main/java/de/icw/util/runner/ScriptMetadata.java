@@ -27,26 +27,31 @@ public class ScriptMetadata implements Serializable {
     public static final int MAX_ATTEMPTS_STARTED_CHECK = 10;
 
     /**
-     * Default time to wait whether the startup was successful in milliseconds: 5000
+     * Default time to wait whether the startup was successful in seconds: 5
      */
-    public static final long STARTED_CHECK_INTERVAL = 5000L;
+    public static final int STARTED_CHECK_INTERVAL = 5;
 
     /** Defines the name of the script, to be used for logging. */
     @NonNull
     private String name;
 
+    /** Tells the used ProcessBuilder to redirect the errorStream to the default outputStream. */
+    @Builder.Default
+    private boolean redirectOutputStream = true;
+
     private ScriptMetadataParameter linuxParameter;
 
     private ScriptMetadataParameter windowsParameter;
 
-    private ScriptMetadataParameter macOsParameter;
-
     /** See {@link #SHUTDOWN_TIMEOUT}. */
+    @Builder.Default
     private int shutdownTimeout = SHUTDOWN_TIMEOUT;
 
     /** See {@link #MAX_ATTEMPTS_STARTED_CHECK}. */
+    @Builder.Default
     private int startCheckCount = MAX_ATTEMPTS_STARTED_CHECK;
 
     /** See {@link #STARTED_CHECK_INTERVAL}. */
+    @Builder.Default
     private long startCheckTimeout = STARTED_CHECK_INTERVAL;
 }

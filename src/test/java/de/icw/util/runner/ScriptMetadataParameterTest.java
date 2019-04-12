@@ -1,9 +1,6 @@
 package de.icw.util.runner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,25 +40,6 @@ class ScriptMetadataParameterTest {
                     .build();
         assertNotNull(meta.getStartScript());
 
-        assertEquals(START_SCRIPT_WINDOWS + " " + START_PARAMETER, meta.getStartScriptWithParameter());
-
-        assertTrue(meta.getStopScriptWithParameter().isPresent());
-
-        assertEquals(STOP_SCRIPT_WINDOWS + " " + STOP_PARAMETER, meta.getStopScriptWithParameter().get());
-    }
-
-    @Test
-    void shouldHandleMissingParameter() {
-        assertEquals(START_SCRIPT_WINDOWS,
-                ScriptMetadataParameter.builder().environment(Environment.WINDOWS).startScript(START_SCRIPT_WINDOWS)
-                        .build().getStartScriptWithParameter());
-        assertFalse(
-                ScriptMetadataParameter.builder().environment(Environment.WINDOWS).startScript(START_SCRIPT_WINDOWS)
-                        .build().getStopScriptWithParameter().isPresent());
-        assertEquals(STOP_SCRIPT_WINDOWS,
-                ScriptMetadataParameter.builder().environment(Environment.WINDOWS).startScript(START_SCRIPT_WINDOWS)
-                        .stopScript(STOP_SCRIPT_WINDOWS)
-                        .build().getStopScriptWithParameter().get());
     }
 
     @Test
@@ -70,10 +48,6 @@ class ScriptMetadataParameterTest {
             ScriptMetadataParameter.builder().environment(Environment.WINDOWS).startScript(START_SCRIPT_WINDOWS)
                     .startParameter(START_PARAMETER).build();
         assertNotNull(meta.getStartScript());
-
-        assertEquals(START_SCRIPT_WINDOWS + " " + START_PARAMETER, meta.getStartScriptWithParameter());
-
-        assertFalse(meta.getStopScriptWithParameter().isPresent());
 
     }
 

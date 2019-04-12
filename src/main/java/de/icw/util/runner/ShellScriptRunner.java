@@ -2,13 +2,9 @@ package de.icw.util.runner;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import de.icw.util.io.MorePaths;
 import de.icw.util.logging.Logger;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,51 +35,31 @@ public class ShellScriptRunner extends AbstractApplicationRunner {
     }
 
     @Override
-    protected Optional<Process> doStart(Environment system) {
+    protected Optional<ProcessWrapper> doStart(Environment system) {
         Optional<ScriptMetadataParameter> meta = getMetadataForEnvironment(system);
         if (!meta.isPresent()) {
-            LOG.error("No configured metadata found for '{}' in environment '{}'", getName(), system);
+            LOG.error("No configured metadata found for '{}' in environment '{}'", scriptMetadata.getName(), system);
             return Optional.empty();
         }
-        Path executable = Paths.get(meta.get().getStartScript());
-        if (!MorePaths.checkExecutablePath(executable, true)) {
-            LOG.error("Given path does not denote an executable script: '{}' ", executable);
-            return Optional.empty();
-        }
-        String startScript = meta.get().getStartScriptWithParameter();
-        LOG.debug("Starting script {}", startScript);
-        try {
-            return Optional.of(Runtime.getRuntime().exec(startScript));
-        } catch (IOException e) {
-            LOG.error("Unable to start script " + startScript, e);
-            return Optional.empty();
-        }
+        ScriptMetadataParameter parameter = meta.get();
+        return ShellCommandHandler.builder().command(parameter.getStartScript()).name(getScriptMetadata().getName())
+                .parameter(parameter.getStartParameter()).build().execute();
     }
 
     @Override
-    protected Optional<Process> gracefulShutdown(Environment system) {
+    protected Optional<ProcessWrapper> gracefulShutdown(Environment system) {
         Optional<ScriptMetadataParameter> meta = getMetadataForEnvironment(system);
         if (!meta.isPresent()) {
-            LOG.warn("No configured metadata found for '{}' in environment '{}'", getName(), system);
+            LOG.warn("No configured metadata found for '{}' in environment '{}'", scriptMetadata.getName(), system);
             return Optional.empty();
         }
         if (isNullOrEmpty(meta.get().getStopScript())) {
-            LOG.debug("No configured stop-script {}' in environment '{}'", getName(), system);
+            LOG.debug("No configured stop-script {}' in environment '{}'", scriptMetadata.getName(), system);
             return Optional.empty();
         }
-        Path executable = Paths.get(meta.get().getStopScript());
-        if (!MorePaths.checkExecutablePath(executable, true)) {
-            LOG.error("Given path does not denote an executable script: '{}' ", executable);
-            return Optional.empty();
-        }
-        String stopScript = meta.get().getStartScriptWithParameter();
-        LOG.debug("Calling stop script {}", stopScript);
-        try {
-            return Optional.of(Runtime.getRuntime().exec(stopScript));
-        } catch (IOException e) {
-            LOG.error("Unable to call stop script " + stopScript, e);
-            return Optional.empty();
-        }
+        ScriptMetadataParameter parameter = meta.get();
+        return ShellCommandHandler.builder().command(parameter.getStopScript()).name(getScriptMetadata().getName())
+                .parameter(parameter.getStopParameter()).build().execute();
     }
 
     private Optional<ScriptMetadataParameter> getMetadataForEnvironment(Environment environment) {
@@ -92,15 +68,9 @@ public class ShellScriptRunner extends AbstractApplicationRunner {
                 return Optional.ofNullable(scriptMetadata.getLinuxParameter());
             case WINDOWS:
                 return Optional.ofNullable(scriptMetadata.getWindowsParameter());
-            case MAC_OS:
-                return Optional.ofNullable(scriptMetadata.getMacOsParameter());
             default:
                 return Optional.empty();
         }
-    }
-
-    private String getName() {
-        return scriptMetadata.getName();
     }
 
 }

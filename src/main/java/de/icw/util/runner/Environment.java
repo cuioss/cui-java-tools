@@ -12,10 +12,7 @@ enum Environment {
     LINUX,
 
     /** Windows. */
-    WINDOWS,
-
-    /** MacOsx. */
-    MAC_OS;
+    WINDOWS;
 
     /**
      * @return the {@link Environment} determined from the system-property
@@ -24,9 +21,6 @@ enum Environment {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win")) {
             return WINDOWS;
-        }
-        if (os.contains("mac os x")) {
-            return MAC_OS;
         }
         return Environment.LINUX;
     }

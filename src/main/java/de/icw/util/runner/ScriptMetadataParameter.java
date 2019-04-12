@@ -1,13 +1,6 @@
 package de.icw.util.runner;
 
-import static com.google.common.base.Strings.emptyToNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Strings.nullToEmpty;
-
 import java.io.Serializable;
-import java.util.Optional;
-
-import com.google.common.base.Joiner;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -43,24 +36,4 @@ public class ScriptMetadataParameter implements Serializable {
     /** Identifies the parameters passed to the optional stop script, therefore optional as well. */
     private String stopParameter;
 
-    /**
-     * @return a String representation of {@link #getStartScript()} concatenated with
-     *         {@link #getStartParameter()} if present.
-     */
-    public String getStartScriptWithParameter() {
-        return Joiner.on(' ').skipNulls().join(nullToEmpty(getStartScript()), emptyToNull(getStartParameter()));
-    }
-
-    /**
-     * @return a String representation of {@link #getStopScript()} concatenated with
-     *         {@link #getStopParameter()} if present.
-     */
-    public Optional<String> getStopScriptWithParameter() {
-        if (isNullOrEmpty(getStopScript())) {
-            return Optional.empty();
-
-        }
-        return Optional
-                .of(Joiner.on(' ').skipNulls().join(nullToEmpty(getStopScript()), emptyToNull(getStopParameter())));
-    }
 }
