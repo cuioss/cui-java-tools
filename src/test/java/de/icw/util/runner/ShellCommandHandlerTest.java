@@ -7,11 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ShellCommandHandlerTest {
 
     @Test
+    @Disabled
     void shouldExecuteExisitingScript() {
         ScriptMetadataParameter meta = getMetadataForEnvironment().get();
 

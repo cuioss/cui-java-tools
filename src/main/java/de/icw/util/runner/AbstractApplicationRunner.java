@@ -113,6 +113,7 @@ public abstract class AbstractApplicationRunner {
             try {
                 proc.waitFor(getScriptMetadata().getShutdownTimeout(), TimeUnit.SECONDS);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 LOG.debug("Process destroy was interrupted for " + getName(), e);
             }
             if (proc.isAlive()) {
