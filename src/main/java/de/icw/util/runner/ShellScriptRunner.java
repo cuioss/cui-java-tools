@@ -43,7 +43,7 @@ public class ShellScriptRunner extends AbstractApplicationRunner {
         }
         ScriptMetadataParameter parameter = meta.get();
         return ShellCommandHandler.builder().command(parameter.getStartScript()).name(getScriptMetadata().getName())
-                .parameter(parameter.getStartParameter()).build().execute();
+                .parameters(parameter.getStartParameters()).build().execute();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ShellScriptRunner extends AbstractApplicationRunner {
         }
         ScriptMetadataParameter parameter = meta.get();
         return ShellCommandHandler.builder().command(parameter.getStopScript()).name(getScriptMetadata().getName())
-                .parameter(parameter.getStopParameter()).build().execute();
+                .parameters(parameter.getStopParameters()).build().execute();
     }
 
     private Optional<ScriptMetadataParameter> getMetadataForEnvironment(Environment environment) {

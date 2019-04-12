@@ -1,9 +1,11 @@
 package de.icw.util.runner;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.Singular;
 import lombok.Value;
 
 /**
@@ -28,12 +30,14 @@ public class ScriptMetadataParameter implements Serializable {
     private String startScript;
 
     /** Identifies the parameters passed to the start script. */
-    private String startParameter;
+    @Singular
+    private List<String> startParameters;
 
     /** Optional stop script. */
     private String stopScript;
 
     /** Identifies the parameters passed to the optional stop script, therefore optional as well. */
-    private String stopParameter;
+    @Singular
+    private List<String> stopParameters;
 
 }

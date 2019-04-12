@@ -1,19 +1,21 @@
 package de.icw.util.runner;
 
-import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Joiner;
 
+import de.icw.util.collect.CollectionBuilder;
 import de.icw.util.io.MorePaths;
 import de.icw.util.logging.Logger;
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.Singular;
 import lombok.Value;
 
 /**
@@ -31,7 +33,8 @@ class ShellCommandHandler {
     @NonNull
     private String command;
 
-    private String parameter;
+    @Singular
+    private List<String> parameters;
 
     private Path directory;
 
@@ -59,12 +62,15 @@ class ShellCommandHandler {
         if (null != directory) {
             workingDir = directory;
         }
-        String script = Joiner.on(' ').skipNulls().join(executable.toFile(),
-                emptyToNull(parameter));
+        List<String> commandAndParameter =
+            CollectionBuilder.copyFrom(command).addIfNotNull(getParameters()).toImmutableList();
+        String script = Joiner.on(' ').skipNulls().join(commandAndParameter);
         LOG.info("Using script command '{}' in directory '{}'", script, workingDir.toAbsolutePath());
         try {
-            return Optional.of(new ProcessWrapper(new ProcessBuilder(script).directory(workingDir.toFile())
-                    .redirectErrorStream(redirectOutputStream).start()));
+            return Optional.of(new ProcessWrapper(
+                    new ProcessBuilder(commandAndParameter.toArray(new String[commandAndParameter.size()]))
+                            .directory(workingDir.toFile())
+                            .redirectErrorStream(redirectOutputStream).start()));
         } catch (IOException e) {
             LOG.error("Unable to start script " + script, e);
             return Optional.empty();
