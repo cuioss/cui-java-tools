@@ -3,17 +3,15 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.cuioss</groupId>
-        <artifactId>cui-parent-java</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>io.github.cuioss</groupId>
+        <artifactId>cui-parent-pom</artifactId>
+        <version>0.0.2</version>
         <relativePath />
     </parent>
     <artifactId>cui-java-utils</artifactId>
-    <name>cui java toolbox</name>
-    <description>
-        A number of additional utilites on top on guava-light
-    </description>
-    <version>1.0-SNAPSHOT</version>
+    <name>cui java utils</name>
+    <version>0.0.1-SNAPHSOT</version>
+    <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging facades/frameworks.</description>
     <url>https://github.com/cuioss/cuioss-java-utils/</url>
     <scm>
         <url>https://github.com/cuioss/cui-java-utils/</url>
@@ -25,24 +23,33 @@
         <system>GitHub Issues</system>
     </issueManagement>
     <properties>
-        <cui.dependencies.version>1.0-SNAPSHOT</cui.dependencies.version>
+        <cui.bom.version>0.0.2</cui.bom.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.github.cuioss</groupId>
-                <artifactId>cui-dependency-management</artifactId>
-                <version>${cui.dependencies.version}</version>
+                <groupId>io.github.cuioss</groupId>
+                <artifactId>cui-java-bom</artifactId>
+                <version>${cui.bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- owolff: Kept locally, because solely used for local testing -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcmail-jdk16</artifactId>
+                <version>1.46</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.1.1</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>com.github.cuioss</groupId>
-            <artifactId>guava-light</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -52,14 +59,17 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
         </dependency>
-        <!-- Buggar There seems to be a bug in the eclipse junit runner -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk16</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
 </project>

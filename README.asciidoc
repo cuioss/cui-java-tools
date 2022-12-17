@@ -1,0 +1,664 @@
+== cui-java-util
+
+=== Status
+
+
+=== What is it?
+
+Provides a number of useful utilities for java, similar to googles guava
+
+=== Maven Coordinates
+
+[source,xml]
+----
+    <dependency>
+        <groupId>io.github.cuioss</groupId>
+        <name>cui-java-util</name>
+    </dependency>
+----
+
+=== History
+
+First of all: We love guava and enjoyed working with it. While doing so
+we learned a lot about java and software-engineering. But over the time
+it became too big and the messy library split up, just saying
+"listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" gave us
+the push to move on. We started to find or create something more
+suitable for our needs. Our first approach was to create a stripped
+version of guava removing all stuff we do not need. Not being happy with
+the result we created our own called library "cui-java-util". In
+addition to the stuff derived from guava we picked some elements from
+other open-source libraries. Much of the code we implemented ourselves.
+The goal was not create a complete general purpose java-util-library but
+a library for our needs. It contains a lot of ideas and code of some
+great open-source projects:
+
+* https://github.com/google/guava[Google Guava]
+* https://github.com/apache/commons-codec[Apache Commons Codec]
+* https://github.com/apache/commons-io[Apache Commons IO]
+* https://github.com/apache/commons-lang[Apache Commons Lang]
+* https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/[Spring-Core]
+
+=== Design Goals
+
+* Zero Dependencies
+* Extensive Tests, Documentation, Sonar loves us
+* Use standard java where possible: Most structures provide a
+convenience API for standard Java implementations
+
+=== Comparison to Guava
+
+* Guava is huge with vast amounts of functionality
+* Guava provides a big number of implementations, while cui-java-util
+acts more like a facade / decorator on java-standard elements
+* Many of Guavas Collection-implementations are said to be faster
+compared to JRE variants. But usually this should not be a problem.
+* The size of Guava is about 15 times compared to cui-java-util
+
+== Provided Features
+
+So, what's in the box, lets see by package:
+
+[[iocuiutilbase]]
+=== io.cui.util.base
+
+Provides some basic utilities, inspired by googles package
+'com.google.common.base'
+
+[[iocuiutilbasebooleanoperations]]
+==== io.cui.util.base.BooleanOperations
+
+Provides some minimal tooling for checking some `or` / `and` conditions,
+e.g.
+
+[source,java]
+----
+ @​Test
+ void shouldDetectAnyTrue() {
+     assertTrue(BooleanOperations.isAnyTrue(true));
+     assertTrue(BooleanOperations.isAnyTrue(true, true));
+     assertTrue(BooleanOperations.isAnyTrue(true, false));
+     assertFalse(BooleanOperations.isAnyTrue(false, false));
+     // Not really sensible, but defined contract -> Corner Case
+     assertFalse(BooleanOperations.isAnyTrue());
+     assertFalse(BooleanOperations.isAnyTrue(null));
+ }
+
+ @​Test
+ void shouldDetectAnyFalse() {
+     assertFalse(BooleanOperations.isAnyFalse(true));
+     assertTrue(BooleanOperations.isAnyFalse(true, false));
+     assertTrue(BooleanOperations.isAnyFalse(false, false));
+     // Not really sensible, but defined contract -> Corner Case
+     assertFalse(BooleanOperations.isAnyFalse());
+     assertFalse(BooleanOperations.isAnyFalse(null));
+ }
+
+ @​Test
+ void shouldDetectAllFalse() {
+     assertFalse(BooleanOperations.areAllFalse(true));
+     assertFalse(BooleanOperations.areAllFalse(true, false));
+     assertFalse(BooleanOperations.areAllFalse(true, true));
+     assertTrue(BooleanOperations.areAllFalse(false, false));
+     // Not really sensible, but defined contract -> Corner Case
+     assertFalse(BooleanOperations.areAllFalse());
+     assertFalse(BooleanOperations.areAllFalse(null));
+ }
+
+ @​Test
+ void shouldDetectAllTrue() {
+     assertTrue(BooleanOperations.areAllTrue(true));
+     assertFalse(BooleanOperations.areAllTrue(true, false));
+     assertTrue(BooleanOperations.areAllTrue(true, true));
+     assertFalse(BooleanOperations.areAllTrue(false, false));
+     // Not really sensible, but defined contract -> Corner Case
+     assertTrue(BooleanOperations.areAllTrue());
+     assertTrue(BooleanOperations.areAllTrue(null));
+ }
+----
+
+[[iocuiutilbasepreconditions]]
+==== io.cui.util.base.Preconditions
+
+Provide some basic checks for states and arguments like
+
+[source,java]
+----
+     Preconditions.checkArgument(number.size > 1); 
+     Preconditions.checkArgument(number.size > 2, "The expected number must be greater than '2' but was %s", number); 
+     Preconditions.checkState(0 == number);
+     Preconditions.checkState(4 == number, "The expected number must be '4' but was %s", number);
+----
+
+[[iocuiutilcodec]]
+=== io.cui.util.codec
+
+Provides types and structures similar to
+https://github.com/apache/commons-codec[https://github.com/apache/commons-codec].
+Currently it provides the capability for encoding / decoding Hex-values,
+see io.cui.util.codec.Hex
+
+[[iocuiutilcodechex]]
+==== io.cui.util.codec.Hex
+
+Converts hexadecimal Strings. The Charset can be set explicitly, the
+default is `StandardCharsets.UTF_8`.
+
+[source,java]
+----
+   String roundtrip = "roundtrip";
+   assertEquals(roundtrip, new String(Hex.decodeHex(Hex.encodeHex(roundtrip.getBytes()))));
+
+----
+
+[[iocuiutilcollect]]
+=== io.cui.util.collect
+
+Provides a number of utilities in the context of java.util.Collections
+
+[[iocuiutilcollectcollectionbuilder]]
+==== io.cui.util.collect.CollectionBuilder
+
+Builder for creating Collections providing some convenience methods. The
+class writes everything through into the contained collector. Using the
+default constructor a newly created ArrayList will be used as collector,
+but you can pass you own collector as constructor-argument. Of course
+this should be mutable in order to work.
+
+===== Handling of null-values
+
+As default null values are ignored. This behavior can be changed by call
+addNullValues(boolean). Caution: In case of using one of the
+`copyFrom(Collection)` methods for instantiation the null values will
+not be checked in that way.
+
+===== Standard Usage
+
+[source,java]
+----
+     List<String> result = new CollectionBuilder<String>().add("this").add("that")
+         .add(mutableList("on", "or an other")).toImmutableList();
+----
+
+or
+
+[source,java]
+----
+    Set<String> result = new CollectionBuilder<String>().add("this").add("that")
+        .add(mutableList("on", "or an other")).toMutableSet();
+----
+
+===== Copy From
+
+This methods can be used for ensuring a real copy Caution: The given
+source will be used as it is, there will be no filtering as defined
+within `addNullValues(boolean)`.
+
+[source,java]
+----
+     List<String> result =
+     CollectionBuilder.copyFrom(mutableList("on", "or an other")).add("element").toMutableList();
+
+----
+
+[[iocuiutilcollectcollectionliterals]]
+==== io.cui.util.collect.CollectionLiterals
+
+Provides a number of methods simplifying the task of creating populated
+Collections. In essence its doing the same compared to the corresponding
+com.google.common.collect types but with different semantics (like
+naming, types) and is designed as a one stop utility class. It
+differentiates between the sub-types and mutability / immutability. This
+class is complementary to the corresponding guava types.
+
+===== Lists
+
+[source,java]
+----
+    assertMutable(CollectionLiterals.mutableList("1"));
+    assertMutable(CollectionLiterals.mutableList("1", "2"));
+    assertMutable(CollectionLiterals.mutableList(Arrays.asList("1", "2").stream()));
+----
+
+[source,java]
+----
+    assertImmutable(CollectionLiterals.immutableList("1"));
+    assertImmutable(CollectionLiterals.immutableList("1", "2"));
+    assertImmutable(CollectionLiterals.immutableList(Arrays.asList("1", "2").stream()));
+----
+
+===== Sets
+
+[source,java]
+----
+    assertMutable(CollectionLiterals.mutableSet("1"));
+    assertMutable(CollectionLiterals.mutableSet("1", "2"));
+    assertMutable(CollectionLiterals.mutableSet(Arrays.asList("1", "2").stream()));
+----
+
+[source,java]
+----
+    assertImmutable(CollectionLiterals.immutableSet("1"));
+    assertImmutable(CollectionLiterals.immutableSet("1", "2"));
+    assertImmutable(CollectionLiterals.immutableSet(Arrays.asList("1", "2").stream()));
+----
+
+===== Maps
+
+[source,java]
+----
+    assertMutable(CollectionLiterals.mutableMap());
+    assertMutable(CollectionLiterals.mutableMap("1", "1-1"));
+    assertMutable(CollectionLiterals.mutableMap("1", "1-1", "2", "2-2", "3", "3-3", "4", "4-4"));
+----
+
+[source,java]
+----
+    assertImmutable(CollectionLiterals.immutableMap());
+    assertImmutable(CollectionLiterals.immutableMap("1", "1-1"));
+    assertImmutable(CollectionLiterals.immutableMap("1", "1-1", "2", "2-2", "3", "3-3", "4", "4-4"));
+----
+
+[[iocuiutilcollectmapbuilder]]
+==== io.cui.util.collect.MapBuilder
+
+Builder for creating Maps providing some convenience methods. The class
+writes everything through into the contained collector. Using the
+default constructor a newly created HashMap will be used as collector,
+but you can pass you own collector as constructor-argument. Of course
+this should be mutable in order to work.
+
+Although not being a Map itself it provides the same methods with
+different semantics -> Builder approach.
+
+===== Standard Usage
+
+[source,java]
+----
+    MapBuilder<String, String> builder = new MapBuilder<>();
+    builder.put("key1", "value1").put("key2", "value2");
+    assertEquals(2, builder.size());
+    assertMutable(builder.toMutableMap());
+    assertImmutable(builder.toImmutableMap());
+----
+
+===== Using from()
+
+This methods can be used for ensuring a real copy.
+
+[source,java]
+----
+    assertEquals(4, MapBuilder.from("key1", 1, "key2", 2, "key3", 3, "key4", 4).size());
+----
+
+[[iocuiutilcollectmorecollections]]
+==== io.cui.util.collect.MoreCollections
+
+Utility Methods for Collections and some types to be used in the context
+of Collections.
+
+===== isEmpty()
+
+The overloaded method `MoreCollections.isEmpty(Collection)` checks all
+kinds of Collections / varargs parameter for not being null and
+emptiness. In case of Streams it solely checks for being not null in
+order not to consume it.
+
+===== requireNotEmpty()
+
+The overloaded method `MoreCollections.requireNotEmpty(Collection)`
+checks all kinds of Collections / varargs parameter for not being null
+nor empty. In case of being null / empty they will throw an
+IllegalArgumentException.
+
+===== Map Difference
+
+The method `MoreCollections.difference(Map, Map)` creates a
+MapDifference view on the two given maps in order to check, well whether
+the are equal or not and if not which elements are differing.
+
+===== Map contains key
+
+Check whether the given Map contains at least one of the given keys
+(varags)
+
+[[iocuiutilcollectpartialcollection]]
+==== io.cui.util.collect.PartialCollection
+
+Represents a partial collection / sub-collection. It extends the
+Collection interface with isMoreAvailable() flag. This indicates that
+the original Collection provides more data than the current
+PartialCollection. It defines the lower bound for the contained types to
+Serializable. Currently the only implementation is PartialArrayList. It
+provides convenient methods for instantiation, like
+`PartialArrayList.of(java.util.List, int)`.
+
+[[iocuiutilconcurrent]]
+=== io.cui.util.concurrent
+
+Some tooling for concurrent operations.
+
+[source,java]
+----
+ConcurrentTools.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+----
+
+Well, sends the thread to sleep while taking care of the possible
+interrupts
+
+[[iocuiutilconcurrentstopwatch]]
+==== io.cui.util.concurrent.StopWatch
+
+An object that measures elapsed time in nanoseconds.
+
+[source,java]
+----
+StopWatch stopwatch = StopWatch.createStarted();
+doSomething();
+stopwatch.stop(); // optional
+
+Duration duration = stopwatch.elapsed();
+
+log.info("time: " + stopwatch); // formatted string like "12.3 ms"
+
+----
+
+[[iocuiutilformatting]]
+=== io.cui.util.formatting
+
+==== The Problem
+
+Provide a text representation for given complex object. As a plus the
+formatting should be easy configurable with a simple DSL-style template
+language.
+
+==== The Solution
+
+The io.cui.util.formatting framework presented here. The starting point
+is `io.cui.util.formatting.template.FormatterSupport` providing two
+methods:
+
+* `FormatterSupport.getSupportedPropertyNames()`:Provides the property
+names that can be used for formatting
+* `FormatterSupport.getAvailablePropertyValues()`:Provides a name with
+with the supported names and values.
+
+The other interface needed is
+`io.cui.util.formatting.template.TemplateFormatter` defining the method
+`TemplateFormatter.format(FormatterSupport)` doing the actual
+formatting.
+
+==== Sample
+
+Dto PersonName implementing
+`io.cui.util.formatting.template.FormatterSupport`
+
+[source,java]
+----
+final PersonName personName = PersonName.builder()
+.setFamilyName("Fischers")
+.setGivenName("Fritz")
+.setMiddleName("Felix")
+.setGivenNameSuffix("Dr.")
+.build();
+
+final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.builder()
+.useTemplate("[familyName], [givenName], [middleName] [givenNameSuffix]")
+.forType(PersonName.class);
+
+assertEquals("Fischers, Fritz, Felix Dr.", formatter.format(personName));
+----
+
+[[iocuiutilio]]
+=== io.cui.util.io
+
+Provides some IO-related tooling especially for `java.io.File`,
+`java.nio.file.Path` `java.io.InputStream` and `java.io.OutputStream`.
+
+[[iocuiutillang]]
+=== io.cui.util.lang
+
+Provides utils for arbitrary objects and locales.
+
+[[iocuiutillanglocaleutils]]
+==== io.cui.util.lang.LocaleUtils
+
+`LocaleUtils.toLocale("us_EN")` Converts a String to a Locale. This
+method takes the string format of a locale and creates the locale object
+from it.
+
+[[iocuiutillangmoreobjects]]
+==== io.cui.util.lang.MoreObjects
+
+===== requireType()
+
+Checks and returns the given Object if it is assignable to the given
+targetType.Otherwise it throws an IllegalArgumentException. This will be
+thrown also if one of the parameters is null.
+
+[source,java]
+----
+ assertNotNull(MoreObjects.requireType(Integer.valueOf(0), Serializable.class));
+ assertNotNull(MoreObjects.requireType(Integer.valueOf(1), Number.class));
+ assertNotNull(MoreObjects.requireType("hello", String.class));
+ String hello = MoreObjects.requireType("hello", String.class)
+       
+ assertThrows(IllegalArgumentException.class, () -> {
+   MoreObjects.requireType("hello", Number.class);
+ });
+       
+----
+
+===== allNonNull()
+
+[source,java]
+----
+ assertTrue(MoreObjects.allNonNull());
+ assertTrue(MoreObjects.allNonNull(""));
+ assertTrue(MoreObjects.allNonNull("", 1, new File("")));
+ assertFalse(MoreObjects.allNonNull("", null, new File("")));
+ assertFalse(MoreObjects.allNonNull("", null));
+ assertFalse(MoreObjects.allNonNull((String) null));
+
+----
+
+[[iocuiutillogging]]
+=== io.cui.util.logging
+
+Although small in size, our logging framework is the most precious part
+of this library. It is a wrapper around java-util Logger that simplifies
+its usage. In addition it provides an api similar to slf4j. It is not
+meant to act as logging-facade like slf4j or jakarta-commons-logging. It
+only provides a little syntactic sugar for the built-in logger.
+
+==== Obtaining a logger
+
+[source,java]
+----
+private static final CuiLogger log = new CuiLogger(SomeClass.class); 
+private static final CuiLogger log = new CuiLogger("SomeLoggerName"); 
+private static final CuiLogger log = CuiLoggerFactory.getLogger(); 
+----
+
+==== Logging
+
+CuiLogger provides an implicit code guard, if used correctly. Used
+correctly hereby means to either use formatting with parameter or
+incorporating Supplier for generating the actual log-message. For other
+means of creating a message you still can use code guards.
+
+[source,java]
+----
+log.trace("Parameter-type matches exactly '{}'", assignableSource); 
+log.debug("Adding found method '%s' on class '%s'", name, clazz);
+log.info("Starting up application"); 
+
+// In order not to mess up with the ellipsis parameter
+// exceptions must be the first parameter
+log.warn(e, "Exception during lenientFormat for '%s'", objectToString); 
+log.error(e, "Caught an exception");  
+
+log.info(() -> "Supplier can be used as well");
+log.error(e, () -> "Even with exceptions"); 
+log.trace(() -> "I will only be evaluated if the trace-level for is enabled"); 
+----
+
+==== Formatting
+
+Like slf4j there is a simple way of formatting log-messages. In addition
+to `{}` the formatting supports `%s` as well. At runtime it replaces the
+`{}` tokens with `%s` and passes the data to
+`MoreStrings.lenientFormat(String, Object)` for creating the actual
+log-message. As a variant providing a Supplier works as well.
+
+[[iocuiutilstring]]
+=== io.cui.util.string
+
+Provides a number of String related utilities
+
+[[iocuiutilstringjoiner]]
+==== io.cui.util.string.Joiner
+
+Inspired by Googles Joiner. It uses internally the
+`String.join(CharSequence, Iterable)` implementation of java and
+provides a guava like wrapper. It focuses on the simplified Joining and
+omits the Map based variants.
+
+===== Usage
+
+[source,java]
+----
+assertEquals("key=value", Joiner.on('=').join("key", "value"));
+assertEquals("key=no value", Joiner.on('=').useForNull("no value").join("key", null));
+assertEquals("key", Joiner.on('=').skipNulls().join("key", null));
+assertEquals("key", Joiner.on('=').skipEmptyStrings().join("key", ""));
+assertEquals("key", Joiner.on('=').skipBlankStrings().join("key", " "));
+----
+
+===== Migrating from Guava
+
+In order to migrate for most case you only need to replace the package
+name on the import.
+
+===== Changes to Guavas-Joiner
+
+In case of content to be joined containing null-values and not set to
+skip nulls, `skipNulls()` it does not throw an `NullPointerException`
+but writes `null` for each null element. You can define a different
+String by calling `useForNull(String) `
+
+In addition to `skipEmptyStrings()` it provides a variant
+`skipBlankStrings()`
+
+[[iocuiutilstringmorestrings]]
+==== io.cui.util.string.MoreStrings
+
+Provides a number basic String tooling scraped from commons-lang3,
+spring and guava.
+
+===== Usage
+
+====== Standard String Operations
+
+[source,java]
+----
+assertTrue(MoreStrings.isAllLowerCase("abc"));
+assertFalse(MoreStrings.isAllLowerCase("abc "));
+
+assertTrue(MoreStrings.isAllUpperCase("ABC"));
+assertFalse(MoreStrings.isAllUpperCase("ABC "));
+
+assertTrue(MoreStrings.isNumeric("1000"));
+assertFalse(MoreStrings.isNumeric("A"));
+
+assertTrue(MoreStrings.isEmpty(null));
+assertTrue(MoreStrings.isEmpty(""));
+assertFalse(MoreStrings.isEmpty(" "));
+
+assertTrue(MoreStrings.isBlank(""));
+assertFalse(MoreStrings.isBlank("  foo  "));
+
+assertEquals(3, MoreStrings.countMatches("one long someone sentence of one", "one"));
+assertEquals(0, MoreStrings.countMatches("one long someone sentence of one", "two"));
+
+assertEquals("     ", MoreStrings.leftPad("", 5, ' '));
+assertEquals("  abc", MoreStrings.leftPad("abc", 5, ' '));
+
+assertEquals(1, MoreStrings.indexOf("aabaabaa", "ab", 0));
+
+assertEquals("  abc", MoreStrings.stripEnd("  abc  ", " "));
+
+assertFalse(MoreStrings.hasNonWhitespaceChar(" "));
+----
+
+====== requireNotEmpty()
+
+[source,java]
+----
+// Positive / Passthrough cases
+MoreStrings.requireNotEmpty(NON_EMPTY_STRING);
+MoreStrings.requireNotEmpty(NON_EMPTY_STRING, MESSAGE);
+
+MoreStrings.requireNotEmptyTrimmed(NON_EMPTY_STRING);
+MoreStrings.requireNotEmptyTrimmed(NON_EMPTY_STRING, MESSAGE);
+
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmpty("");
+});
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmpty("", MESSAGE);
+});
+
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmptyTrimmed("");
+});
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmptyTrimmed("", MESSAGE);
+});
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmptyTrimmed(" ");
+});
+assertThrows(IllegalArgumentException.class, () -> {
+    MoreStrings.requireNotEmptyTrimmed(" ", MESSAGE);
+});
+----
+
+[[nulltoempty--emptytonull]]
+====== nullToEmpty / emptyToNull
+
+[source,java]
+----
+assertEquals(NON_EMPTY_STRING, MoreStrings.nullToEmpty(NON_EMPTY_STRING));
+assertEquals("", MoreStrings.nullToEmpty(null));
+assertEquals("", MoreStrings.nullToEmpty(""));
+assertEquals(" ", MoreStrings.nullToEmpty(" "), "Must not trim");
+
+assertEquals(NON_EMPTY_STRING, MoreStrings.emptyToNull(NON_EMPTY_STRING));
+assertNull(MoreStrings.emptyToNull(null));
+assertNull(MoreStrings.emptyToNull(""));
+assertEquals(" ", MoreStrings.emptyToNull(" "), "Must not trim");
+
+----
+
+[[morestringslenientformat]]
+====== MoreStrings.lenientFormat
+
+[source,java]
+----
+assertEquals("%s", MoreStrings.lenientFormat("%s"));
+assertEquals("5", MoreStrings.lenientFormat("%s", 5));
+assertEquals("foo [5]", MoreStrings.lenientFormat("foo", 5));
+assertEquals("foo [5, 6, 7]", MoreStrings.lenientFormat("foo", 5, 6, 7));
+assertEquals("%s 1 2", MoreStrings.lenientFormat("%s %s %s", "%s", 1, 2));
+assertEquals(" [5, 6]", MoreStrings.lenientFormat("", 5, 6));
+assertEquals("123", MoreStrings.lenientFormat("%s%s%s", 1, 2, 3));
+assertEquals("1%s%s", MoreStrings.lenientFormat("%s%s%s", 1));
+assertEquals("5 + 6 = 11", MoreStrings.lenientFormat("%s + 6 = 11", 5));
+assertEquals("5 + 6 = 11", MoreStrings.lenientFormat("5 + %s = 11", 6));
+assertEquals("5 + 6 = 11", MoreStrings.lenientFormat("5 + 6 = %s", 11));
+assertEquals("5 + 6 = 11", MoreStrings.lenientFormat("%s + %s = %s", 5, 6, 11));
+assertEquals("null [null, null]", MoreStrings.lenientFormat("%s", null, null, null));
+assertEquals("null [5, 6]", MoreStrings.lenientFormat(null, 5, 6));
+assertEquals("null", MoreStrings.lenientFormat("%s", (Object) null));
+assertEquals("(Object[])null", MoreStrings.lenientFormat("%s", (Object[]) null));
+----
