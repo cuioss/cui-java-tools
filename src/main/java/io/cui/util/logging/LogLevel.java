@@ -92,7 +92,7 @@ public enum LogLevel {
     public static LogLevel from(@NonNull final Level juliLevel) {
         // highest value first, i.e. OFF, ERROR, WARN, INFO, DEBUG, TRACE
         List<LogLevel> sortedCuiLevels = CollectionLiterals.mutableList(values());
-        sortedCuiLevels.sort(Comparator.comparing((logLevel) -> logLevel.getJuliLevel().intValue()));
+        sortedCuiLevels.sort(Comparator.comparing(logLevel -> logLevel.getJuliLevel().intValue()));
         sortedCuiLevels.sort(Comparator.reverseOrder());
 
         final int juliIntLevel = juliLevel.intValue();

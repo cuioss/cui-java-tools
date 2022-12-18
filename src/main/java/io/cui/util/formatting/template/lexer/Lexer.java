@@ -39,7 +39,7 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
      * @throws NullPointerException if source is missing
      * @throws IllegalArgumentException if attribute is null or empty
      */
-    public Lexer(final T source) {
+    protected Lexer(final T source) {
         requireNonNull(source, "Source must not be null");
         this.tokenList = immutableList(requireNonNull(source.getSupportedPropertyNames()));
         for (final String attribute : this.tokenList) {

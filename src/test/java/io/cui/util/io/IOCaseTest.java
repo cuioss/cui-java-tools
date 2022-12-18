@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
  * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java
  *
  */
+@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
 class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';

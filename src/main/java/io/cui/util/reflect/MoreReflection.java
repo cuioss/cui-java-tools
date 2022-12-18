@@ -66,6 +66,7 @@ public final class MoreReflection {
      * @return an {@link Optional} {@link Field} if it can be found
      */
     @Synchronized
+    @SuppressWarnings("java:S3824") // owolff: computeIfAbsent is not an option because we add null to the field
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);

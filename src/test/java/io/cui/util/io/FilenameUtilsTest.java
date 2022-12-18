@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
  * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsTestCase.java
  *
  */
+@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
 class FilenameUtilsTest {
 
     private static final String SEP = "" + File.separatorChar;
@@ -651,7 +652,7 @@ class FilenameUtilsTest {
     @Test
     void testGetPath_with_nullbyte() {
         assertThrows(IllegalArgumentException.class, () -> {
-            assertEquals("a/b/", FilenameUtils.getPath("~user/a/\u0000b/c.txt"));
+            FilenameUtils.getPath("~user/a/\u0000b/c.txt");
         });
     }
 
