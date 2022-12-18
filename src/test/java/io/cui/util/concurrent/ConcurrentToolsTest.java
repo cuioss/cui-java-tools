@@ -97,6 +97,7 @@ class ConcurrentToolsTest {
     }
 
     /** Interrupts the current thread after sleeping for the specified delay. */
+    @SuppressWarnings("squid:S2925") // owolff: ok for testing
     static void requestInterruptIn(final long time) {
         final Thread interruptee = Thread.currentThread();
         new Thread(

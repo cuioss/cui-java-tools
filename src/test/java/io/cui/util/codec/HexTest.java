@@ -156,12 +156,6 @@ class HexTest {
         }
     }
 
-    /**
-     * @param name
-     * @param parent
-     * @throws UnsupportedEncodingException
-     * @throws DecoderException
-     */
     private void testCustomCharset(final String name, final String parent) throws UnsupportedEncodingException,
         DecoderException {
         if (!charsetSanityCheck(name)) {

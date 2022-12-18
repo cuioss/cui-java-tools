@@ -93,7 +93,7 @@ class CollectionBuilderTest {
         builder.add("1");
 
         assertNotNull(builder.toString());
-        assertNotNull(builder.hashCode());
+        assertNotEquals(0, builder.hashCode());
         assertEquals(builder, builder);
     }
 

@@ -23,9 +23,9 @@
         <system>GitHub Issues</system>
     </issueManagement>
     <properties>
+        <cui.bom.version>0.0.3</cui.bom.version>
         <sonar.organization>cuioss-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <cui.bom.version>0.0.3</cui.bom.version>
         <sonar.maven.plugin.version>3.9.1.2184</sonar.maven.plugin.version>
         <jacoco.maven.plugin.version>0.8.8</jacoco.maven.plugin.version>
     </properties>

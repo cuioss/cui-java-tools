@@ -95,8 +95,11 @@ class FileSystemLoaderTest {
 
     @Test
     void shouldNotHandleFileOnlyPathname() {
+        String prefix = FileTypePrefix.FILE.getPrefix();
         assertThrows(IllegalArgumentException.class,
-                () -> FileSystemLoader.checkPathName(FileTypePrefix.FILE.getPrefix()));
+                () -> {
+                    FileSystemLoader.checkPathName(prefix);
+                });
     }
 
     @Test
@@ -107,6 +110,9 @@ class FileSystemLoaderTest {
 
     @Test
     void shouldFailToLoadNotExistingFile() {
-        assertThrows(IllegalStateException.class, () -> new FileSystemLoader(NOT_EXISTING_FILE_PATH).inputStream());
+        FileSystemLoader fileSystemLoader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
+        assertThrows(IllegalStateException.class, () -> {
+            fileSystemLoader.inputStream();
+        });
     }
 }
