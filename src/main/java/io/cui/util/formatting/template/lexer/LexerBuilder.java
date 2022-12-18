@@ -2,6 +2,7 @@ package io.cui.util.formatting.template.lexer;
 
 import static java.util.Objects.requireNonNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
 
 import io.cui.util.formatting.template.FormatterSupport;
@@ -71,7 +72,8 @@ public final class LexerBuilder {
         }
 
         /**
-         * @param strict enabling the strict mode for pattern matching (only match exact name) instead of best fitting
+         * @param strict enabling the strict mode for pattern matching (only match exact name)
+         *            instead of best fitting
          * @return The concrete {@link Builder}
          */
         public Builder strict(boolean strict) {
@@ -103,11 +105,11 @@ public final class LexerBuilder {
          */
         public <F extends FormatterSupport> Lexer<F> build(final Class<F> sourceType) {
             try {
-                return build(sourceType.newInstance());
-            } catch (final InstantiationException e) {
-                throw new IllegalStateException("Class '" + sourceType + "' should provide a default constructor.", e);
-            } catch (final IllegalAccessException e) {
-                throw new IllegalStateException("Class '" + sourceType + "' should be public.", e);
+                return build(sourceType.getDeclaredConstructor().newInstance());
+            } catch (final IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+                    | SecurityException | InstantiationException | IllegalAccessException e) {
+                throw new IllegalStateException(
+                        "Class '" + sourceType + "' should provide an accessible default constructor.", e);
             }
         }
 
