@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import io.cui.util.formatting.template.FormatterSupport;
 import io.cui.util.formatting.template.token.ActionToken;
@@ -73,6 +74,8 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         }
     }
 
+    private static final Pattern SPACE_CLEANER_PATTERN = Pattern.compile("\\,");
+    
     private final Brackets brackets;
 
     private final boolean strict;
@@ -145,7 +148,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
             if (!strict) {
                 token = getBestFittingToken(cleaned, getTokenList());
             } else {
-                String spaceCleaned = cleaned.replaceAll("\\,", "").trim();
+                String spaceCleaned = SPACE_CLEANER_PATTERN.matcher(cleaned).replaceAll("").trim();
                 if (getTokenList().contains(spaceCleaned)) {
                     token = spaceCleaned;
                 } else {
