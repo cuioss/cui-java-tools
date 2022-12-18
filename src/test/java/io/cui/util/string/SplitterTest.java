@@ -223,7 +223,10 @@ class SplitterTest {
             assertEquals(elements, splitted);
         }
 
+        Splitter splitter = Splitter.on("[").doNotModifySeparatorString();
         assertThrows(IllegalArgumentException.class,
-                () -> Splitter.on("[").doNotModifySeparatorString().splitToList("[boom]"));
+                () -> {
+                    splitter.splitToList("[boom]");
+                });
     }
 }

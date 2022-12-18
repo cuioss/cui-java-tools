@@ -65,8 +65,9 @@ class PropertyUtilTest {
         assertNotNull(writeProperty(underTest, PROPERTY_NAME, "5"));
         assertEquals(Integer.valueOf(5), readProperty(underTest, PROPERTY_NAME));
 
+        ArrayList<Object> propertyValue = new ArrayList<>();
         assertThrows(IllegalArgumentException.class, () -> {
-            writeProperty(underTest, PROPERTY_NAME, new ArrayList<>());
+            writeProperty(underTest, PROPERTY_NAME, propertyValue);
         });
     }
 

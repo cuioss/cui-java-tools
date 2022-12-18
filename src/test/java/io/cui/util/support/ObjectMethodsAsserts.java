@@ -19,6 +19,7 @@ import java.io.Serializable;
  * @author Oliver Wolff
  *
  */
+@SuppressWarnings("java:S5785") // owolff THe fine-grained equals test is by design and not a bug
 public class ObjectMethodsAsserts {
 
     private static final Integer DEFAULT_INT_VALUE = 0;
