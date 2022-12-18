@@ -2,6 +2,8 @@
 
 === Status
 
+https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-utils[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-utils&metric=alert_status[Quality
+Gate Status]]
 
 === What is it?
 
