@@ -477,12 +477,4 @@ public class CuiLogger {
         return LogLevel.from(delegate.getLevel());
     }
 
-    /**
-     * Change the log level of the current logger.
-     * @param logLevel new log level
-     */
-    public void setLogLevel(final LogLevel logLevel) {
-        debug("changed log level to: {}", logLevel);
-        delegate.setLevel(logLevel.getJuliLevel());
-    }
 }

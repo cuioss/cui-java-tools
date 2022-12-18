@@ -241,14 +241,17 @@ public final class MorePaths {
      * Creates a a temp-copy of the given file, identified by the given path. The original file
      * attributes will be applied to the
      * copied filed, See {@link StandardCopyOption#COPY_ATTRIBUTES}.
+     * <h2>Caution: Security-Impact</h2>
+     * Creating a temp-file might introduce a security issue. Never ever use this location for
+     * sensitive information that might be of interest for an attacker
      *
      * @param path must not be null and denote an existing read and writable file
      * @return Path on the newly created file
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyToTempLocation(final Path path) throws IOException {
         assertAccessibleFile(path);
-
         StructuredFilename filename = new StructuredFilename(path.getFileName());
         Path tempFile = Files.createTempFile(filename.getNamePart(), filename.getSuffix());
 
@@ -441,21 +444,24 @@ public final class MorePaths {
         // Replace original with temp file
         java.nio.file.Files.copy(temp, filePath,
                 StandardCopyOption.REPLACE_EXISTING,
-            StandardCopyOption.COPY_ATTRIBUTES);
+                StandardCopyOption.COPY_ATTRIBUTES);
     }
 
     /**
      * Checks, if the two given paths are pointing to the same location.
      *
-     * If both paths are not {@code null} and do {@link File#exists()}, the {@link Files#isSameFile(Path, Path)}
+     * If both paths are not {@code null} and do {@link File#exists()}, the
+     * {@link Files#isSameFile(Path, Path)}
      * method is used to check if both paths are pointing to the same location.
-     * Otherwise, if one of the paths does not exists, the {@link Paths#equals(Object)} method is used.
+     * Otherwise, if one of the paths does not exists, the {@link Paths#equals(Object)} method is
+     * used.
      *
      * @param path to be compared with path2
      * @param path2 to be compared with path
      *
      * @return {@code true}, if both paths are {@code null}.
-     *         {@code true}, if both paths not {@code null}, do exist, and {@link Files#isSameFile(Path, Path)}.
+     *         {@code true}, if both paths not {@code null}, do exist, and
+     *         {@link Files#isSameFile(Path, Path)}.
      *         {@code true}, if both paths not {@code null} and {@link Paths#equals(Object)}
      *         {@code false} otherwise.
      */

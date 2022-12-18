@@ -50,6 +50,9 @@ public final class FileLoaderUtility {
     /**
      * Helper class that copies the content of a {@link FileLoader} to the temp-folder and
      * references it
+     * <h2>Caution: Security-Impact</h2>
+     * Creating a temp-file might introduce a security issue. Never ever use this location for
+     * sensitive information that might be of interest for an attacker
      *
      * @param source must not be null and represent an an accessible file, saying
      *            {@link FileLoader#isReadable()}
@@ -57,6 +60,7 @@ public final class FileLoaderUtility {
      * @return a reference on a file copied in the temp folder
      * @throws IOException
      */
+    @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyFileToTemp(final FileLoader source, final boolean markDeleteOnExit)
         throws IOException {
         checkArgument(null != source, "Attribute with name source must not be null");

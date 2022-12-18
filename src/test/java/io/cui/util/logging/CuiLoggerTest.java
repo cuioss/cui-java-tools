@@ -231,15 +231,4 @@ class CuiLoggerTest {
         handler.assertMessagePresent(TEMPLATE_RESULT, Level.SEVERE, throwable);
     }
 
-    @Test
-    void changesLogLevel() {
-        underTest.setLogLevel(LogLevel.ERROR);
-        assertEquals(LogLevel.ERROR, underTest.getLogLevel());
-
-        underTest.setLogLevel(LogLevel.DEBUG);
-        assertEquals(LogLevel.DEBUG, underTest.getLogLevel());
-
-        underTest.setLogLevel(LogLevel.OFF);
-        assertEquals(LogLevel.OFF, underTest.getLogLevel());
-    }
 }
