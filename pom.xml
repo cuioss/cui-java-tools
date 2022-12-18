@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.cuioss</groupId>
         <artifactId>cui-parent-pom</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
         <relativePath />
     </parent>
     <artifactId>cui-java-utils</artifactId>
@@ -23,7 +23,11 @@
         <system>GitHub Issues</system>
     </issueManagement>
     <properties>
-        <cui.bom.version>0.0.2</cui.bom.version>
+        <sonar.organization>cuioss-github</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <cui.bom.version>0.0.3</cui.bom.version>
+        <sonar.maven.plugin.version>3.9.1.2184</sonar.maven.plugin.version>
+        <jacoco.maven.plugin.version>0.8.7</jacoco.maven.plugin.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -34,7 +38,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- owolff: Kept locally, because solely used for local testing -->
+            <!-- owolff: Kept locally, because solely used for module testing -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcmail-jdk16</artifactId>
@@ -72,4 +76,52 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.maven.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.maven.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <formats>
+                                    <format>XML</format>
+                                </formats>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
