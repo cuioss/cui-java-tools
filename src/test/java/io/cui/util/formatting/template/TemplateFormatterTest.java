@@ -116,8 +116,7 @@ class TemplateFormatterTest {
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class, true);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
-                formatter.format(personName));
+                formatter.format(personName);
         });
     }
 
