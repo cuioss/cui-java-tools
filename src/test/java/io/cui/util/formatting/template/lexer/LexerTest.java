@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import io.cui.util.formatting.template.FormatterSupport;
+import io.cui.util.formatting.template.lexer.LexerBuilder.Builder;
 import io.cui.util.formatting.template.token.Token;
 
 class LexerTest {
@@ -44,6 +45,13 @@ class LexerTest {
             return null;
         }
 
+    }
+
+    @Test
+    void shouldFailwithInvalidSourceType() {
+        Builder builder = LexerBuilder.useSimpleElWithSquaredBrackets();
+        assertThrows(IllegalStateException.class,
+                () -> builder.<NoPublicZeroArgConstructor> build(NoPublicZeroArgConstructor.class));
     }
 
 }

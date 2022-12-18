@@ -106,8 +106,8 @@ public final class LexerBuilder {
         public <F extends FormatterSupport> Lexer<F> build(final Class<F> sourceType) {
             try {
                 return build(sourceType.getDeclaredConstructor().newInstance());
-            } catch (final IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-                    | SecurityException | InstantiationException | IllegalAccessException e) {
+            } catch (final RuntimeException | InstantiationException | IllegalAccessException
+                    | InvocationTargetException | NoSuchMethodException e) {
                 throw new IllegalStateException(
                         "Class '" + sourceType + "' should provide an accessible default constructor.", e);
             }
