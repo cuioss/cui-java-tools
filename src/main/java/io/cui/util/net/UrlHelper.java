@@ -1,6 +1,9 @@
 package io.cui.util.net;
 
-import static io.cui.util.string.MoreStrings.isEmpty;
+import io.cui.util.logging.CuiLogger;
+import io.cui.util.string.MoreStrings;
+import io.cui.util.string.Splitter;
+import lombok.experimental.UtilityClass;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -8,10 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import io.cui.util.logging.CuiLogger;
-import io.cui.util.string.MoreStrings;
-import io.cui.util.string.Splitter;
-import lombok.experimental.UtilityClass;
+import static io.cui.util.string.MoreStrings.isEmpty;
 
 /**
  * Provides some utility methods for url / path related data
@@ -72,7 +72,7 @@ public final class UrlHelper {
         if (isEmpty(path) || !path.startsWith("/")) {
             return path;
         }
-        return removePrecedingSlashFromPath(path.substring(1, path.length()));
+        return removePrecedingSlashFromPath(path.substring(1));
     }
 
     /**

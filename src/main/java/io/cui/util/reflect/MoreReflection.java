@@ -1,31 +1,17 @@
 package io.cui.util.reflect;
 
-import static io.cui.util.collect.MoreCollections.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.WeakHashMap;
-
 import io.cui.util.base.Preconditions;
 import io.cui.util.collect.CollectionBuilder;
 import io.cui.util.logging.CuiLogger;
 import lombok.Synchronized;
 import lombok.experimental.UtilityClass;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
+
+import static io.cui.util.collect.MoreCollections.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based access.
@@ -458,7 +444,7 @@ public final class MoreReflection {
      * Returns a proxy instance that implements {@code interfaceType} by dispatching method
      * invocations to {@code handler}. The class loader of {@code interfaceType} will be used to
      * define the proxy class. To implement multiple
-     * interfaces or specify a class loader, use {@link Proxy#newProxyInstance}.
+     * interfaces or specify a class loader, use Proxy#newProxyInstance(Class, Constructor, InvocationHandler).
      *
      * @param interfaceType must not be null
      * @param handler
@@ -487,10 +473,7 @@ public final class MoreReflection {
      */
     public static Optional<String> findCaller(final Collection<String> markerClasses) {
         final Optional<StackTraceElement> callerElement = findCallerElement(null, markerClasses);
-        if (callerElement.isPresent()) {
-            return Optional.of(callerElement.get().getClassName());
-        }
-        return Optional.empty();
+        return callerElement.map(StackTraceElement::getClassName);
     }
 
     /**

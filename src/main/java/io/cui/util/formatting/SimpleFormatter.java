@@ -1,17 +1,17 @@
 package io.cui.util.formatting;
 
-import static io.cui.util.collect.MoreCollections.isEmpty;
-import static io.cui.util.string.MoreStrings.emptyToNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
+import static io.cui.util.collect.MoreCollections.isEmpty;
+import static io.cui.util.string.MoreStrings.emptyToNull;
 
 /**
  * Provide concatenation of strings by using
@@ -72,7 +72,7 @@ public class SimpleFormatter implements Serializable {
 
     private List<String> cleanUp(final String... values) {
         final List<String> result = new ArrayList<>(0);
-        if (null != values && values.length > 0) {
+        if (null != values) {
             for (final String item : values) {
                 final String value = emptyToNull(item);
                 if (null == value) {
@@ -146,7 +146,7 @@ public class SimpleFormatter implements Serializable {
          */
         @ToString
         @EqualsAndHashCode
-        public class BuilderWithStrategy implements Serializable {
+        public static class BuilderWithStrategy implements Serializable {
 
             private static final long serialVersionUID = -1987354973684803562L;
 

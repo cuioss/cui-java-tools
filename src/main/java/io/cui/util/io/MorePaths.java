@@ -1,6 +1,8 @@
 package io.cui.util.io;
 
-import static java.util.Objects.requireNonNull;
+import io.cui.util.logging.CuiLogger;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,9 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import io.cui.util.logging.CuiLogger;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides {@link Path} related utilities
@@ -228,8 +228,8 @@ public final class MorePaths {
         Path backupDir = getBackupDirectoryForPath(path.getParent());
 
         Path backupFile =
-            createNonExistingPath(backupDir, new StringBuilder().append(path.getFileName()).append(BACKUP_FILE_SUFFIX)
-                    .append(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())).toString());
+            createNonExistingPath(backupDir, path.getFileName() + BACKUP_FILE_SUFFIX +
+                    new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
 
         Files.copy(path, backupFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         log.debug("Created backup from '{}' at '{}'", path.toFile().getAbsolutePath(),
@@ -283,7 +283,7 @@ public final class MorePaths {
         }
 
         for (int counter = 1; counter < 20; counter++) {
-            String newName = new StringBuilder().append(fileName).append("_").append(counter).toString();
+            String newName = fileName + "_" + counter;
             Path newBackupFile = parentDir.resolve(newName);
             if (!newBackupFile.toFile().exists()) {
                 return newBackupFile;

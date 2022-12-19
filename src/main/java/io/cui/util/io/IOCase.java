@@ -71,7 +71,7 @@ enum IOCase {
      * @param name the name
      * @param sensitive the sensitivity
      */
-    private IOCase(final String name, final boolean sensitive) {
+    IOCase(final String name, final boolean sensitive) {
         this.name = name;
         this.sensitive = sensitive;
     }

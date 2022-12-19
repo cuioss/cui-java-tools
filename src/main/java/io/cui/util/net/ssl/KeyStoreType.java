@@ -47,5 +47,5 @@ public enum KeyStoreType {
      * </ul>
      * .
      */
-    KEY_STORE;
+    KEY_STORE
 }

@@ -1,22 +1,5 @@
 package io.cui.util.net;
 
-import static io.cui.util.collect.CollectionLiterals.immutableList;
-import static io.cui.util.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.net.URLEncoder.encode;
-import static java.util.Objects.requireNonNull;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import io.cui.util.collect.CollectionBuilder;
 import io.cui.util.collect.MoreCollections;
 import io.cui.util.logging.CuiLogger;
@@ -26,6 +9,18 @@ import io.cui.util.string.Splitter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static io.cui.util.collect.CollectionLiterals.immutableList;
+import static io.cui.util.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.net.URLEncoder.encode;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Simple wrapper around an Url Parameter Object.
@@ -42,9 +37,6 @@ import lombok.ToString;
 @ToString
 public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
-    /** . */
-    private static final String UNSUPPORTED_ENCODING_EXCEPTION = "UnsupportedEncodingException";
-
     private static final CuiLogger log = new CuiLogger(UrlParameter.class);
 
     /** Shortcut constant for faces redirect parameter. */
@@ -55,8 +47,6 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         new UrlParameter("includeViewParams", "true");
 
     private static final long serialVersionUID = 634175928228707534L;
-
-    private static final String UTF_8 = "UTF-8";
 
     /** The name of the parameter. */
     @Getter
@@ -93,17 +83,12 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         super();
         requireNotEmptyTrimmed(name, "Parameter name must not be empty");
         if (encode) {
-            try {
-                this.name = encode(name, UTF_8);
+                this.name = encode(name, StandardCharsets.UTF_8);
                 if (MoreStrings.isEmpty(value)) {
                     this.value = null;
                 } else {
-                    this.value = encode(value, UTF_8);
+                    this.value = encode(value, StandardCharsets.UTF_8);
                 }
-            } catch (final UnsupportedEncodingException e) {
-                // UTF-8 will always be supported, so this a strange exception.
-                throw new IllegalStateException(UNSUPPORTED_ENCODING_EXCEPTION, e);
-            }
         } else {
             this.name = name;
             this.value = value;
@@ -254,7 +239,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         }
         String cleaned = queryString.trim();
         if (cleaned.startsWith("?")) {
-            cleaned = cleaned.substring(1, cleaned.length());
+            cleaned = cleaned.substring(1);
         }
         if (MoreStrings.isEmpty(cleaned)) {
             log.debug("Given String solely consists of '?' symbol, ignoring");
@@ -290,23 +275,14 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         return builder.toImmutableList();
     }
 
-    private static final UrlParameter createDecoded(final String name, final String value) {
+    private static UrlParameter createDecoded(final String name, final String value) {
         requireNonNull(name);
         String decodedKey;
-        try {
-            decodedKey = URLDecoder.decode(name, UTF_8);
-        } catch (final UnsupportedEncodingException e) {
-            // UTF-8 will always be supported, so this a strange exception.
-            throw new IllegalStateException(UNSUPPORTED_ENCODING_EXCEPTION, e);
-        }
+            decodedKey = URLDecoder.decode(name, StandardCharsets.UTF_8);
+
         String decodedValue = null;
         if (null != value) {
-            try {
-                decodedValue = URLDecoder.decode(value, UTF_8);
-            } catch (UnsupportedEncodingException e) {
-                // UTF-8 will always be supported, so this a strange exception.
-                throw new IllegalStateException(UNSUPPORTED_ENCODING_EXCEPTION, e);
-            }
+                decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
         }
 
         return new UrlParameter(decodedKey, decodedValue, false);

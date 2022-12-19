@@ -1,19 +1,20 @@
 package io.cui.util.property;
 
-import static io.cui.util.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Optional;
-
 import io.cui.util.base.Preconditions;
 import io.cui.util.logging.CuiLogger;
 import io.cui.util.reflect.MoreReflection;
 import io.cui.util.string.MoreStrings;
 import lombok.experimental.UtilityClass;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+
+import static io.cui.util.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Helper class providing convenient methods for reading from / writing to java beans.
@@ -51,7 +52,7 @@ public class PropertyUtil {
      * @throws IllegalStateException in case some Exception occurred while reading
      */
     @SuppressWarnings("squid:S3655") // owolff: False Positive, Optional#isPresent is checked
-    public static final Object readProperty(Object bean, String propertyName) {
+    public static Object readProperty(Object bean, String propertyName) {
         log.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
@@ -76,18 +77,14 @@ public class PropertyUtil {
      *             method)
      * @throws IllegalStateException in case some Exception occurred while writing
      */
-    public static final Object writeProperty(Object bean, String propertyName, Object propertyValue) {
+    public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
         log.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
         Method writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
         try {
             Object result = writeMethod.invoke(bean, propertyValue);
-            if (null == result) {
-                return bean;
-            } else {
-                return result;
-            }
+            return Objects.requireNonNullElse(result, bean);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             String target = (propertyValue != null) ? propertyValue.getClass().getName() : "Undefined";
             throw new IllegalStateException(
@@ -105,7 +102,7 @@ public class PropertyUtil {
      *         access-methods, then it tries to directly access the field, and if that fails it uses
      *         the first read method found, {@link Optional#empty()} otherwise.
      */
-    public static final Optional<Class<?>> resolvePropertyType(Class<?> beanType, String propertyName) {
+    public static Optional<Class<?>> resolvePropertyType(Class<?> beanType, String propertyName) {
         Optional<Method> retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanType, propertyName);
         if (retrieveAccessMethod.isPresent()) {
             log.trace("Found read-method on class '%s' for property-name '%s'", beanType, propertyName);

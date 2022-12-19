@@ -1,13 +1,5 @@
 package io.cui.util.formatting.template.lexer;
 
-import static io.cui.util.base.Preconditions.checkArgument;
-import static io.cui.util.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import io.cui.util.formatting.template.FormatterSupport;
 import io.cui.util.formatting.template.token.ActionToken;
 import io.cui.util.formatting.template.token.StringToken;
@@ -16,6 +8,14 @@ import io.cui.util.string.MoreStrings;
 import io.cui.util.string.Splitter;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static io.cui.util.base.Preconditions.checkArgument;
+import static io.cui.util.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Simple lexer which supports parsing of template pattern where attributes are separated by
@@ -75,7 +75,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     private static final Pattern SPACE_CLEANER_PATTERN = Pattern.compile("\\,");
-    
+
     private final Brackets brackets;
 
     private final boolean strict;
@@ -194,7 +194,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         return chunk.substring(startPoint + 1);
     }
 
-    private class Candidate {
+    private static class Candidate {
 
         private static final int HUGE_NUMBER = 999999;
 

@@ -10,7 +10,8 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
+
+import io.cui.util.string.MoreStrings;
 
 /**
  * Unit tests for {@link LocaleUtils}.
@@ -191,7 +192,7 @@ class LocaleUtilsTest {
             final Locale locale = LocaleUtils.toLocale(str);
             assertNotNull(locale);
             assertEquals(str, locale.getLanguage());
-            assertTrue(StringUtils.isBlank(locale.getCountry()));
+            assertTrue(MoreStrings.isBlank(locale.getCountry()));
             assertEquals(new Locale(str), locale);
         }
     }

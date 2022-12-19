@@ -142,8 +142,7 @@ public final class BooleanOperations {
      * @return true, if the given value represents a boolean value i.e. "true" or "false" ignoring case.
      */
     public static boolean isValidBoolean(String value) {
-        return null != value &&
-            (Boolean.TRUE.toString().equalsIgnoreCase(value)
-                || Boolean.FALSE.toString().equalsIgnoreCase(value));
+        return (Boolean.TRUE.toString().equalsIgnoreCase(value)
+            || Boolean.FALSE.toString().equalsIgnoreCase(value));
     }
 }

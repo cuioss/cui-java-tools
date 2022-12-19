@@ -1,19 +1,19 @@
 package io.cui.util.formatting.template.lexer;
 
-import static io.cui.util.base.Preconditions.checkArgument;
-import static io.cui.util.collect.CollectionLiterals.immutableList;
-import static io.cui.util.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
-import java.io.Serializable;
-import java.util.List;
-
 import io.cui.util.formatting.template.FormatterSupport;
 import io.cui.util.formatting.template.token.Token;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.util.List;
+
+import static io.cui.util.base.Preconditions.checkArgument;
+import static io.cui.util.collect.CollectionLiterals.immutableList;
+import static io.cui.util.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Functionality of scanning plain text and split this to tokens
@@ -44,7 +44,7 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
         this.tokenList = immutableList(requireNonNull(source.getSupportedPropertyNames()));
         for (final String attribute : this.tokenList) {
             checkArgument(!isEmpty(attribute), "Attributes must not be null or empty. '"
-                    + this.tokenList.toString() + "'");
+                    + this.tokenList + "'");
         }
     }
 

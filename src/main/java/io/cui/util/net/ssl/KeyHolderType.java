@@ -17,5 +17,5 @@ public enum KeyHolderType {
     /**
      * The byte-array represents a single key. This is the default for {@link KeyMaterialHolder}
      */
-    SINGLE_KEY;
+    SINGLE_KEY
 }

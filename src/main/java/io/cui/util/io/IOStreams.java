@@ -1,25 +1,13 @@
 package io.cui.util.io;
 
-import static io.cui.util.string.MoreStrings.nullToEmpty;
+import io.cui.util.base.Preconditions;
+import lombok.experimental.UtilityClass;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import io.cui.util.base.Preconditions;
-import lombok.experimental.UtilityClass;
+import static io.cui.util.string.MoreStrings.nullToEmpty;
 
 /**
  * Provides a number of utilities in context {@link InputStream} and {@link OutputStream}s. The
@@ -117,7 +105,6 @@ public class IOStreams {
      * @throws NullPointerException if either input is null
      * @throws IOException if an I/O error occurs
      */
-    @SuppressWarnings("resource") // owolff: assuming resource is handled correctly from the caller
     public static boolean contentEquals(Reader input1, Reader input2)
         throws IOException {
         if (input1 == input2) {
@@ -147,7 +134,7 @@ public class IOStreams {
      * @param input to be wrapped, may be null or empty
      * @return the created {@link InputStream}
      */
-    public static final InputStream toInputStream(String input) {
+    public static InputStream toInputStream(String input) {
         return new ByteArrayInputStream(nullToEmpty(input).getBytes(StandardCharsets.UTF_8));
     }
 
