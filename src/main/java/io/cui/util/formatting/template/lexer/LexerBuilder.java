@@ -55,7 +55,7 @@ public final class LexerBuilder {
             final Brackets type;
             switch (expl) {
                 case SIMPLE_SQUARED_BRACKTES:
-                    type = Brackets.SQUARED_BRACKTES;
+                    type = Brackets.SQUARED_BRACKETS;
                     break;
                 case SIMPLE_CURLY_BRACKETS:
                     type = Brackets.CURLY_BRACKETS;

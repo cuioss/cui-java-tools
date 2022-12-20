@@ -41,7 +41,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         /**
          * squared brackets [ ]
          */
-        SQUARED_BRACKTES('[', ']'),
+        SQUARED_BRACKETS('[', ']'),
         /**
          * curly brackets { }
          */
@@ -82,7 +82,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
     /**
      * Constructor of BracketParser initialize its parse behavior.
-     * Source provide information of "tokens" which he supports. Therefore
+     * Source provide information of "tokens" which he supports. Therefore,
      * FormatterSupport.getSupportedPropertyNames() of the source will be used.
      * The template input should include Bracket separated attributes. Everything else caused
      * exception.
@@ -96,7 +96,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
     /**
      * Constructor of BracketParser initialize its parse behavior.
-     * Source provide information of "tokens" which he supports. Therefore
+     * Source provide information of "tokens" which he supports. Therefore,
      * FormatterSupport.getSupportedPropertyNames() of the source will be used.
      * The template input should include Bracket separated attributes. Everything else caused
      * exception.
@@ -165,7 +165,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         }
     }
 
-    private String getBestFittingToken(final String cleanedChunk, final List<String> tokens) {
+    private static String getBestFittingToken(final String cleanedChunk, final List<String> tokens) {
         Candidate mostFittingCandidate = new Candidate(cleanedChunk, null);
         for (final String token : tokens) {
             if (!isEmpty(token) && cleanedChunk.contains(token)) {
