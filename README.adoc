@@ -8,7 +8,6 @@ image:https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml/badge
 image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
 image:https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-tools/badge.svg[Maven Central,link=https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/ccui-java-tools]
 
-
 == What is it?
 
 Provides a number of useful utilities for java, similar to googles guava
