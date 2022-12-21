@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.cuioss</groupId>
-        <artifactId>cui-parent-pom</artifactId>
-        <version>0.0.3</version>
+        <artifactId>cui-java-parent</artifactId>
+        <version>0.0.5-SNAPSHOT</version>
         <relativePath />
     </parent>
     <artifactId>cui-java-utils</artifactId>
@@ -22,22 +22,8 @@
         <url>https://github.com/cuioss/cui-java-utils/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
-    <properties>
-        <cui.bom.version>0.0.3</cui.bom.version>
-        <sonar.organization>cuioss-github</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.maven.plugin.version>3.9.1.2184</sonar.maven.plugin.version>
-        <jacoco.maven.plugin.version>0.8.8</jacoco.maven.plugin.version>
-    </properties>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>io.github.cuioss</groupId>
-                <artifactId>cui-java-bom</artifactId>
-                <version>${cui.bom.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- owolff: Kept locally, because solely used for module testing -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -76,61 +62,5 @@
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.sonarsource.scanner.maven</groupId>
-                    <artifactId>sonar-maven-plugin</artifactId>
-                    <version>${sonar.maven.plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco.maven.plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <formats>
-                                    <format>XML</format>
-                                </formats>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-    <profiles>
-        <profile>
-            <id>coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                    </plugin>
-                <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <argLine>@{argLine} -Xms64m -Xmx1024m</argLine>
-                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                        <printSummary>true</printSummary>
-                        <trimStackTrace>false</trimStackTrace>
-                    </configuration>
-                </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+
 </project>

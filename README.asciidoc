@@ -1,11 +1,11 @@
-== cui-java-util
+= cui-java-util
 
-=== Status
+== Status
 
 https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-utils[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-utils&metric=alert_status[Quality
 Gate Status]]
 
-=== What is it?
+== What is it?
 
 Provides a number of useful utilities for java, similar to googles guava
 
@@ -209,8 +209,8 @@ within `addNullValues(boolean)`.
 Provides a number of methods simplifying the task of creating populated
 Collections. In essence its doing the same compared to the corresponding
 com.google.common.collect types but with different semantics (like
-naming, types) and is designed as a one stop utility class. It
-differentiates between the sub-types and mutability / immutability. This
+naming, types) and is designed as a one-stop utility class. It
+differentiates between the subtypes and mutability / immutability. This
 class is complementary to the corresponding guava types.
 
 ===== Lists
@@ -317,7 +317,7 @@ IllegalArgumentException.
 
 The method `MoreCollections.difference(Map, Map)` creates a
 MapDifference view on the two given maps in order to check, well whether
-the are equal or not and if not which elements are differing.
+they are equal or not and if not which elements are differing.
 
 ===== Map contains key
 
@@ -382,7 +382,7 @@ methods:
 
 * `FormatterSupport.getSupportedPropertyNames()`:Provides the property
 names that can be used for formatting
-* `FormatterSupport.getAvailablePropertyValues()`:Provides a name with
+* `FormatterSupport.getAvailablePropertyValues()`:Provides a name
 with the supported names and values.
 
 The other interface needed is
@@ -435,7 +435,7 @@ from it.
 ===== requireType()
 
 Checks and returns the given Object if it is assignable to the given
-targetType.Otherwise it throws an IllegalArgumentException. This will be
+targetType. Otherwise it throws an IllegalArgumentException. This will be
 thrown also if one of the parameters is null.
 
 [source,java]
@@ -469,7 +469,7 @@ thrown also if one of the parameters is null.
 
 Although small in size, our logging framework is the most precious part
 of this library. It is a wrapper around java-util Logger that simplifies
-its usage. In addition it provides an api similar to slf4j. It is not
+its usage. In addition, it provides an api similar to slf4j. It is not
 meant to act as logging-facade like slf4j or jakarta-commons-logging. It
 only provides a little syntactic sugar for the built-in logger.
 
@@ -508,7 +508,7 @@ log.trace(() -> "I will only be evaluated if the trace-level for is enabled");
 ==== Formatting
 
 Like slf4j there is a simple way of formatting log-messages. In addition
-to `{}` the formatting supports `%s` as well. At runtime it replaces the
+to `{}` the formatting supports `%s` as well. At runtime, it replaces the
 `{}` tokens with `%s` and passes the data to
 `MoreStrings.lenientFormat(String, Object)` for creating the actual
 log-message. As a variant providing a Supplier works as well.
