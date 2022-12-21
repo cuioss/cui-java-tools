@@ -4,6 +4,10 @@
 
 https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-utils[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-utils&metric=alert_status[Quality
 Gate Status]]
+image:https://github.com/cuioss/cui-java-util/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-util/actions/workflows/maven.yml]
+image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
+image:https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-util/badge.svg[Maven Central,link=https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-util]
+
 
 == What is it?
 
