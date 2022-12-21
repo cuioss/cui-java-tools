@@ -2,7 +2,7 @@
 
 == Status
 
-https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-tools[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-toolss&metric=alert_status[Quality
+https://sonarcloud.io/summary/new_code?id=cuioss_cui-java-tools[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cui-java-toolss&metric=alert_status[Quality
 Gate Status]]
 image:https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml]
 image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
