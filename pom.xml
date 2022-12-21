@@ -8,21 +8,21 @@
         <version>0.0.5</version>
         <relativePath />
     </parent>
-    <artifactId>cui-java-utils</artifactId>
-    <name>cui java utils</name>
+    <artifactId>cui-java-tools</artifactId>
+    <name>cui java tools</name>
     <version>0.1.0-SNAPHSOT</version>
     <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging facades/frameworks.</description>
-    <url>https://github.com/cuioss/cuioss-java-utils/</url>
+    <url>https://github.com/cuioss/cui-java-tools/</url>
     <properties>
         <cui.bom.version>0.0.5</cui.bom.version>
     </properties>
     <scm>
-        <url>https://github.com/cuioss/cui-java-utils/</url>
-        <connection>scm:git:https://github.com/cuioss/cui-java-utils.git</connection>
-        <developerConnection>scm:git:https://github.com/cuioss/cui-java-utils/</developerConnection>
+        <url>https://github.com/cuioss/cui-java-tools/</url>
+        <connection>scm:git:https://github.com/cuioss/cui-java-tools.git</connection>
+        <developerConnection>scm:git:https://github.com/cuioss/cui-java-tools/</developerConnection>
     </scm>
     <issueManagement>
-        <url>https://github.com/cuioss/cui-java-utils/issues</url>
+        <url>https://github.com/cuioss/cui-java-tools/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
     <dependencyManagement>

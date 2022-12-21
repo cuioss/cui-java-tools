@@ -65,7 +65,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify -Psonar -Dsonar.projectKey=cuioss_cuioss-java-utils
+      run: mvn -B verify -Psonar -Dsonar.projectKey=cuioss_cui-java-tools
 
   deploy-snapshot:
     needs: sonar-build

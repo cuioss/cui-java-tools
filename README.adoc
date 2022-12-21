@@ -1,12 +1,12 @@
-= cui-java-util
+= cui-java-tools
 
 == Status
 
-https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-utils[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-utils&metric=alert_status[Quality
+https://sonarcloud.io/summary/new_code?id=cuioss_cuioss-java-tools[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cuioss-java-toolss&metric=alert_status[Quality
 Gate Status]]
-image:https://github.com/cuioss/cui-java-utils/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-utils/actions/workflows/maven.yml]
+image:https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml]
 image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
-image:https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-utils/badge.svg[Maven Central,link=https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-utils]
+image:https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java-tools/badge.svg[Maven Central,link=https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/ccui-java-tools]
 
 
 == What is it?
@@ -19,7 +19,7 @@ Provides a number of useful utilities for java, similar to googles guava
 ----
     <dependency>
         <groupId>io.github.cuioss</groupId>
-        <name>cui-java-util</name>
+        <name>cui-java-tools</name>
     </dependency>
 ----
 
@@ -32,8 +32,8 @@ it became too big and the messy library split up, just saying
 the push to move on. We started to find or create something more
 suitable for our needs. Our first approach was to create a stripped
 version of guava removing all stuff we do not need. Not being happy with
-the result we created our own called library "cui-java-util". In
-addition to the stuff derived from guava we picked some elements from
+the result we created our own called library "cui-java-tools".
+In addition to the stuff derived from guava we picked some elements from
 other open-source libraries. Much of the code we implemented ourselves.
 The goal was not create a complete general purpose java-util-library but
 a library for our needs. It contains a lot of ideas and code of some
@@ -55,24 +55,24 @@ convenience API for standard Java implementations
 === Comparison to Guava
 
 * Guava is huge with vast amounts of functionality
-* Guava provides a big number of implementations, while cui-java-util
+* Guava provides a big number of implementations, while cui-java-tools
 acts more like a facade / decorator on java-standard elements
 * Many of Guavas Collection-implementations are said to be faster
 compared to JRE variants. But usually this should not be a problem.
-* The size of Guava is about 15 times compared to cui-java-util
+* The size of Guava is about 15 times compared to cui-java-tools.
 
 == Provided Features
 
 So, what's in the box, lets see by package:
 
 [[iocuiutilbase]]
-=== io.cui.util.base
+=== io.cui.tools.base
 
 Provides some basic utilities, inspired by googles package
 'com.google.common.base'
 
 [[iocuiutilbasebooleanoperations]]
-==== io.cui.util.base.BooleanOperations
+==== io.cui.tools.base.BooleanOperations
 
 Provides some minimal tooling for checking some `or` / `and` conditions,
 e.g.
@@ -124,7 +124,7 @@ e.g.
 ----
 
 [[iocuiutilbasepreconditions]]
-==== io.cui.util.base.Preconditions
+==== io.cui.tools.base.Preconditions
 
 Provide some basic checks for states and arguments like
 
@@ -137,15 +137,15 @@ Provide some basic checks for states and arguments like
 ----
 
 [[iocuiutilcodec]]
-=== io.cui.util.codec
+=== io.cui.tools.codec
 
 Provides types and structures similar to
 https://github.com/apache/commons-codec[https://github.com/apache/commons-codec].
 Currently it provides the capability for encoding / decoding Hex-values,
-see io.cui.util.codec.Hex
+see io.cui.tools.codec.Hex
 
 [[iocuiutilcodechex]]
-==== io.cui.util.codec.Hex
+==== io.cui.tools.codec.Hex
 
 Converts hexadecimal Strings. The Charset can be set explicitly, the
 default is `StandardCharsets.UTF_8`.
@@ -158,12 +158,12 @@ default is `StandardCharsets.UTF_8`.
 ----
 
 [[iocuiutilcollect]]
-=== io.cui.util.collect
+=== io.cui.tools.collect
 
 Provides a number of utilities in the context of java.util.Collections
 
 [[iocuiutilcollectcollectionbuilder]]
-==== io.cui.util.collect.CollectionBuilder
+==== io.cui.tools.collect.CollectionBuilder
 
 Builder for creating Collections providing some convenience methods. The
 class writes everything through into the contained collector. Using the
@@ -208,7 +208,7 @@ within `addNullValues(boolean)`.
 ----
 
 [[iocuiutilcollectcollectionliterals]]
-==== io.cui.util.collect.CollectionLiterals
+==== io.cui.tools.collect.CollectionLiterals
 
 Provides a number of methods simplifying the task of creating populated
 Collections. In essence its doing the same compared to the corresponding
@@ -266,7 +266,7 @@ class is complementary to the corresponding guava types.
 ----
 
 [[iocuiutilcollectmapbuilder]]
-==== io.cui.util.collect.MapBuilder
+==== io.cui.tools.collect.MapBuilder
 
 Builder for creating Maps providing some convenience methods. The class
 writes everything through into the contained collector. Using the
@@ -298,7 +298,7 @@ This methods can be used for ensuring a real copy.
 ----
 
 [[iocuiutilcollectmorecollections]]
-==== io.cui.util.collect.MoreCollections
+==== io.cui.tools.collect.MoreCollections
 
 Utility Methods for Collections and some types to be used in the context
 of Collections.
@@ -329,7 +329,7 @@ Check whether the given Map contains at least one of the given keys
 (varags)
 
 [[iocuiutilcollectpartialcollection]]
-==== io.cui.util.collect.PartialCollection
+==== io.cui.tools.collect.PartialCollection
 
 Represents a partial collection / sub-collection. It extends the
 Collection interface with isMoreAvailable() flag. This indicates that
@@ -340,7 +340,7 @@ provides convenient methods for instantiation, like
 `PartialArrayList.of(java.util.List, int)`.
 
 [[iocuiutilconcurrent]]
-=== io.cui.util.concurrent
+=== io.cui.tools.concurrent
 
 Some tooling for concurrent operations.
 
@@ -353,7 +353,7 @@ Well, sends the thread to sleep while taking care of the possible
 interrupts
 
 [[iocuiutilconcurrentstopwatch]]
-==== io.cui.util.concurrent.StopWatch
+==== io.cui.tools.concurrent.StopWatch
 
 An object that measures elapsed time in nanoseconds.
 
@@ -370,7 +370,7 @@ log.info("time: " + stopwatch); // formatted string like "12.3 ms"
 ----
 
 [[iocuiutilformatting]]
-=== io.cui.util.formatting
+=== io.cui.tools.formatting
 
 ==== The Problem
 
@@ -380,8 +380,8 @@ language.
 
 ==== The Solution
 
-The io.cui.util.formatting framework presented here. The starting point
-is `io.cui.util.formatting.template.FormatterSupport` providing two
+The io.cui.tools.formatting framework presented here. The starting point
+is `io.cui.tools.formatting.template.FormatterSupport` providing two
 methods:
 
 * `FormatterSupport.getSupportedPropertyNames()`:Provides the property
@@ -390,14 +390,14 @@ names that can be used for formatting
 with the supported names and values.
 
 The other interface needed is
-`io.cui.util.formatting.template.TemplateFormatter` defining the method
+`io.cui.tools.formatting.template.TemplateFormatter` defining the method
 `TemplateFormatter.format(FormatterSupport)` doing the actual
 formatting.
 
 ==== Sample
 
 Dto PersonName implementing
-`io.cui.util.formatting.template.FormatterSupport`
+`io.cui.tools.formatting.template.FormatterSupport`
 
 [source,java]
 ----
@@ -416,25 +416,25 @@ assertEquals("Fischers, Fritz, Felix Dr.", formatter.format(personName));
 ----
 
 [[iocuiutilio]]
-=== io.cui.util.io
+=== io.cui.tools.io
 
 Provides some IO-related tooling especially for `java.io.File`,
 `java.nio.file.Path` `java.io.InputStream` and `java.io.OutputStream`.
 
 [[iocuiutillang]]
-=== io.cui.util.lang
+=== io.cui.tools.lang
 
 Provides utils for arbitrary objects and locales.
 
 [[iocuiutillanglocaleutils]]
-==== io.cui.util.lang.LocaleUtils
+==== io.cui.tools.lang.LocaleUtils
 
 `LocaleUtils.toLocale("us_EN")` Converts a String to a Locale. This
 method takes the string format of a locale and creates the locale object
 from it.
 
 [[iocuiutillangmoreobjects]]
-==== io.cui.util.lang.MoreObjects
+==== io.cui.tools.lang.MoreObjects
 
 ===== requireType()
 
@@ -469,7 +469,7 @@ thrown also if one of the parameters is null.
 ----
 
 [[iocuiutillogging]]
-=== io.cui.util.logging
+=== io.cui.tools.logging
 
 Although small in size, our logging framework is the most precious part
 of this library. It is a wrapper around java-util Logger that simplifies
@@ -518,12 +518,12 @@ to `{}` the formatting supports `%s` as well. At runtime, it replaces the
 log-message. As a variant providing a Supplier works as well.
 
 [[iocuiutilstring]]
-=== io.cui.util.string
+=== io.cui.tools.string
 
 Provides a number of String related utilities
 
 [[iocuiutilstringjoiner]]
-==== io.cui.util.string.Joiner
+==== io.cui.tools.string.Joiner
 
 Inspired by Googles Joiner. It uses internally the
 `String.join(CharSequence, Iterable)` implementation of java and
@@ -557,7 +557,7 @@ In addition to `skipEmptyStrings()` it provides a variant
 `skipBlankStrings()`
 
 [[iocuiutilstringmorestrings]]
-==== io.cui.util.string.MoreStrings
+==== io.cui.tools.string.MoreStrings
 
 Provides a number basic String tooling scraped from commons-lang3,
 spring and guava.
