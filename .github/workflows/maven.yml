@@ -62,11 +62,19 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
         
+    - uses: radcortez/project-metadata-action@main
+      name: Retrieve project metadata from '.github/project.yml'
+      id: metadata
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        metadata-file-path: '.github/project.yml'
+        local-file: true
+        
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify -Psonar -Dsonar.projectKey=cuioss_cui-java-tools
+      run: mvn -B verify -Psonar -Dsonar.projectKey=${{steps.metadata.outputs.sonar-project-key}}
 
   deploy-snapshot:
     needs: sonar-build
