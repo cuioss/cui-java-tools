@@ -10,7 +10,7 @@
     </parent>
     <artifactId>cui-java-tools</artifactId>
     <name>cui java tools</name>
-    <version>1.0.0-SNAPHSOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging facades/frameworks.</description>
     <url>https://github.com/cuioss/cui-java-tools/</url>
     <properties>
