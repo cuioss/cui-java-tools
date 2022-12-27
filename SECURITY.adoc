@@ -14,6 +14,7 @@ software. We appreciate your efforts and responsible disclosure and will
 make every effort to acknowledge your contributions.
 
 Report security vulnerabilities by using the github security reporting mechanism:
+
 * https://github.com/cuioss/cui-java-tools/security
 * -> "Private vulnerability reporting"
 * -> "Report a vulnerability"
