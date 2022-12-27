@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
-        <version>0.0.5</version>
+        <version>0.0.6</version>
         <relativePath />
     </parent>
     <artifactId>cui-java-tools</artifactId>
@@ -14,7 +14,7 @@
     <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging facades/frameworks.</description>
     <url>https://github.com/cuioss/cui-java-tools/</url>
     <properties>
-        <cui.bom.version>0.0.5</cui.bom.version>
+        <cui.bom.version>0.0.6</cui.bom.version>
     </properties>
     <scm>
         <url>https://github.com/cuioss/cui-java-tools/</url>
