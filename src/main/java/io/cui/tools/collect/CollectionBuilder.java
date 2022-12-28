@@ -137,6 +137,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
         return collector.iterator();
     }
 
+    /**
+     * @return a {@link Stream} on the contained objects
+     */
     public Stream<E> stream() {
         return collector.stream();
     }

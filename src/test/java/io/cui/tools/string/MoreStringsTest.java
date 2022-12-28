@@ -19,7 +19,7 @@ class MoreStringsTest {
     private static final String MESSAGE = "Message";
     private static final String NON_EMPTY_STRING = "a";
     private static final List<String> QUOTED_STRINGS = immutableList("\"\"", "\"abc\"", "''", "'abc'");
-    private static final List<String> NOT_QUOTED_STRINGS = immutableList("\"\'", "\'abc\"", "'\"", "\"abc'");
+    private static final List<String> NOT_QUOTED_STRINGS = immutableList("\"'", "'abc\"", "'\"", "\"abc'");
 
     private static final String WHITESPACE;
     private static final String NON_WHITESPACE;

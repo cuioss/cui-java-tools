@@ -15,7 +15,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -350,7 +349,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void shouldHandleSingleEntryKeyStore() throws KeyStoreException, Exception, NoSuchAlgorithmException {
+    void shouldHandleSingleEntryKeyStore() throws Exception {
         KeyStoreProvider provider =
             KeyStoreProvider.builder().location(KeystoreInformation.SINGLE_KEY_STORE.toFile())
                     .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();

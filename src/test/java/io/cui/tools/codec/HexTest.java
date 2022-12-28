@@ -1,9 +1,9 @@
 package io.cui.tools.codec;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.UnsupportedEncodingException;
@@ -175,7 +175,7 @@ class HexTest {
         String expectedHexString = Hex.encodeHexString(sourceBytes);
         // ... and get the bytes in the expected charset
         final byte[] expectedHexStringBytes = expectedHexString.getBytes(name);
-        assertTrue(Arrays.equals(expectedHexStringBytes, actualEncodedBytes));
+        assertArrayEquals(expectedHexStringBytes, actualEncodedBytes);
         // test 2
         String actualStringFromBytes = new String(actualEncodedBytes, name);
         assertEquals(expectedHexString, actualStringFromBytes,
@@ -223,12 +223,12 @@ class HexTest {
 
     @Test
     void testDecodeByteArrayEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], new Hex().decode(new byte[0])));
+        assertArrayEquals(new byte[0], new Hex().decode(new byte[0]));
     }
 
     @Test
     void testDecodeByteArrayObjectEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], (byte[]) new Hex().decode((Object) new byte[0])));
+        assertArrayEquals(new byte[0], (byte[]) new Hex().decode((Object) new byte[0]));
     }
 
     @Test
@@ -243,7 +243,7 @@ class HexTest {
 
     @Test
     void testDecodeByteBufferEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], new Hex().decode(allocate(0))));
+        assertArrayEquals(new byte[0], new Hex().decode(allocate(0)));
     }
 
     @Test
@@ -251,13 +251,13 @@ class HexTest {
         final ByteBuffer bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
-        assertTrue(Arrays.equals(new byte[0], new Hex().decode(bb)));
+        assertArrayEquals(new byte[0], new Hex().decode(bb));
         assertEquals(0, bb.remaining());
     }
 
     @Test
     void testDecodeByteBufferObjectEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], (byte[]) new Hex().decode((Object) allocate(0))));
+        assertArrayEquals(new byte[0], (byte[]) new Hex().decode((Object) allocate(0)));
     }
 
     @Test
@@ -279,12 +279,12 @@ class HexTest {
 
     @Test
     void testDecodeHexCharArrayEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], Hex.decodeHex(new char[0])));
+        assertArrayEquals(new byte[0], Hex.decodeHex(new char[0]));
     }
 
     @Test
     void testDecodeHexStringEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], Hex.decodeHex("")));
+        assertArrayEquals(new byte[0], Hex.decodeHex(""));
     }
 
     @Test
@@ -329,7 +329,7 @@ class HexTest {
 
     @Test
     void testDecodeStringEmpty() throws DecoderException {
-        assertTrue(Arrays.equals(new byte[0], (byte[]) new Hex().decode("")));
+        assertArrayEquals(new byte[0], (byte[]) new Hex().decode(""));
     }
 
     @Test
@@ -347,17 +347,17 @@ class HexTest {
 
     @Test
     void testEncodeByteArrayEmpty() {
-        assertTrue(Arrays.equals(new byte[0], new Hex().encode(new byte[0])));
+        assertArrayEquals(new byte[0], new Hex().encode(new byte[0]));
     }
 
     @Test
     void testEncodeByteArrayObjectEmpty() throws EncoderException {
-        assertTrue(Arrays.equals(new char[0], (char[]) new Hex().encode((Object) new byte[0])));
+        assertArrayEquals(new char[0], (char[]) new Hex().encode((Object) new byte[0]));
     }
 
     @Test
     void testEncodeByteBufferEmpty() {
-        assertTrue(Arrays.equals(new byte[0], new Hex().encode(allocate(0))));
+        assertArrayEquals(new byte[0], new Hex().encode(allocate(0)));
     }
 
     @Test
@@ -365,13 +365,13 @@ class HexTest {
         final ByteBuffer bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
-        assertTrue(Arrays.equals(new byte[0], new Hex().encode(bb)));
+        assertArrayEquals(new byte[0], new Hex().encode(bb));
         assertEquals(0, bb.remaining());
     }
 
     @Test
     void testEncodeByteBufferObjectEmpty() throws EncoderException {
-        assertTrue(Arrays.equals(new char[0], (char[]) new Hex().encode((Object) allocate(0))));
+        assertArrayEquals(new char[0], (char[]) new Hex().encode((Object) allocate(0)));
     }
 
     @Test
@@ -396,31 +396,31 @@ class HexTest {
             // static API
             final char[] encodedChars = Hex.encodeHex(data);
             byte[] decodedBytes = Hex.decodeHex(encodedChars);
-            assertTrue(Arrays.equals(data, decodedBytes));
+            assertArrayEquals(data, decodedBytes);
 
             // instance API with array parameter
             final byte[] encodedStringBytes = hex.encode(data);
             decodedBytes = hex.decode(encodedStringBytes);
-            assertTrue(Arrays.equals(data, decodedBytes));
+            assertArrayEquals(data, decodedBytes);
 
             // instance API with char[] (Object) parameter
             String dataString = new String(encodedChars);
             char[] encodedStringChars = (char[]) hex.encode(dataString);
             decodedBytes = (byte[]) hex.decode(encodedStringChars);
-            assertTrue(Arrays.equals(getBytesUtf8(dataString), decodedBytes));
+            assertArrayEquals(getBytesUtf8(dataString), decodedBytes);
 
             // instance API with String (Object) parameter
             dataString = new String(encodedChars);
             encodedStringChars = (char[]) hex.encode(dataString);
             decodedBytes = (byte[]) hex.decode(new String(encodedStringChars));
-            assertTrue(Arrays.equals(getBytesUtf8(dataString), decodedBytes));
+            assertArrayEquals(getBytesUtf8(dataString), decodedBytes);
         }
     }
 
     @Test
     void testEncodeHexByteArrayEmpty() {
-        assertTrue(Arrays.equals(new char[0], Hex.encodeHex(new byte[0])));
-        assertTrue(Arrays.equals(new byte[0], new Hex().encode(new byte[0])));
+        assertArrayEquals(new char[0], Hex.encodeHex(new byte[0]));
+        assertArrayEquals(new byte[0], new Hex().encode(new byte[0]));
     }
 
     @Test
@@ -433,7 +433,7 @@ class HexTest {
         actual = Hex.encodeHex(b, true);
         assertEquals(expected, new String(actual));
         actual = Hex.encodeHex(b, false);
-        assertFalse(expected.equals(new String(actual)));
+        assertNotEquals(expected, new String(actual));
     }
 
     @Test
@@ -442,11 +442,11 @@ class HexTest {
         final String expected = "48656C6C6F20576F726C64";
         char[] actual;
         actual = Hex.encodeHex(b);
-        assertFalse(expected.equals(new String(actual)));
+        assertNotEquals(expected, new String(actual));
         actual = Hex.encodeHex(b, true);
-        assertFalse(expected.equals(new String(actual)));
+        assertNotEquals(expected, new String(actual));
         actual = Hex.encodeHex(b, false);
-        assertTrue(expected.equals(new String(actual)));
+        assertEquals(expected, new String(actual));
     }
 
     @Test
@@ -457,8 +457,8 @@ class HexTest {
 
     @Test
     void testEncodeHexByteBufferEmpty() {
-        assertTrue(Arrays.equals(new char[0], Hex.encodeHex(allocate(0))));
-        assertTrue(Arrays.equals(new byte[0], new Hex().encode(allocate(0))));
+        assertArrayEquals(new char[0], Hex.encodeHex(allocate(0)));
+        assertArrayEquals(new byte[0], new Hex().encode(allocate(0)));
     }
 
     @Test
@@ -608,7 +608,7 @@ class HexTest {
 
     @Test
     void testEncodeStringEmpty() throws EncoderException {
-        assertTrue(Arrays.equals(new char[0], (char[]) new Hex().encode("")));
+        assertArrayEquals(new char[0], (char[]) new Hex().encode(""));
     }
 
     @Test

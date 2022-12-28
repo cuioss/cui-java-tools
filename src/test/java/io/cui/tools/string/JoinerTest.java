@@ -4,6 +4,8 @@ import static io.cui.tools.collect.CollectionLiterals.mutableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledForJreRange;
@@ -19,11 +21,11 @@ class JoinerTest {
     private static final Joiner J = Joiner.on("-");
 
     // <Integer> needed to prevent warning :(
-    private static final Iterable<Integer> ITERABLE_EMPTY = Arrays.asList();
-    private static final Iterable<Integer> ITERABLE_1 = Arrays.asList(1);
+    private static final Iterable<Integer> ITERABLE_EMPTY = List.of();
+    private static final Iterable<Integer> ITERABLE_1 = List.of(1);
     private static final Iterable<Integer> ITERABLE_12 = Arrays.asList(1, 2);
     private static final Iterable<Integer> ITERABLE_123 = Arrays.asList(1, 2, 3);
-    private static final Iterable<Integer> ITERABLE_NULL = Arrays.asList((Integer) null);
+    private static final Iterable<Integer> ITERABLE_NULL = Collections.singletonList((Integer) null);
     private static final Iterable<Integer> ITERABLE_NULL_NULL = Arrays.asList(null, null);
     private static final Iterable<Integer> ITERABLE_NULL_1 = Arrays.asList(null, 1);
     private static final Iterable<Integer> ITERABLE_1_NULL = Arrays.asList(1, null);

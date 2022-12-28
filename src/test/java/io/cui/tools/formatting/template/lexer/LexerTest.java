@@ -51,7 +51,7 @@ class LexerTest {
     void shouldFailwithInvalidSourceType() {
         Builder builder = LexerBuilder.useSimpleElWithSquaredBrackets();
         assertThrows(IllegalStateException.class,
-                () -> builder.<NoPublicZeroArgConstructor> build(NoPublicZeroArgConstructor.class));
+                () -> builder.build(NoPublicZeroArgConstructor.class));
     }
 
 }

@@ -226,7 +226,7 @@ class MorePathsTest {
         Path existingFile = playGroundBase.resolve(POM_XML);
         Files.copy(EXISTING_FILE, existingFile, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
-        assertTrue(!Files.exists(playGroundBackup), "File could not be created");
+        assertFalse(Files.exists(playGroundBackup), "File could not be created");
         return existingFile;
     }
 

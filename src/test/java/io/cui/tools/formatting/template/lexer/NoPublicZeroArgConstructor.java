@@ -8,6 +8,7 @@ import io.cui.tools.formatting.template.FormatterSupport;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@SuppressWarnings("javadoc")
 @RequiredArgsConstructor
 public class NoPublicZeroArgConstructor implements FormatterSupport {
 

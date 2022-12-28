@@ -54,7 +54,7 @@ class MoreCollectionsTest {
 
         requireNotEmpty((Iterable<String>) mutableList("1"));
         requireNotEmpty((Iterable<String>) mutableList("1"), MESSAGE);
-        Iterable<String> emptyIterable = Collections.<String> emptyList();
+        Iterable<String> emptyIterable = Collections.emptyList();
         assertThrows(IllegalArgumentException.class, () -> {
             requireNotEmpty(emptyIterable);
         });
@@ -73,7 +73,7 @@ class MoreCollectionsTest {
 
         requireNotEmpty(mutableList("1"));
         requireNotEmpty(mutableList("1"), MESSAGE);
-        List<String> emptyList = Collections.<String> emptyList();
+        List<String> emptyList = Collections.emptyList();
         assertThrows(IllegalArgumentException.class, () -> {
             requireNotEmpty(emptyList);
         });
@@ -102,12 +102,12 @@ class MoreCollectionsTest {
     void shouldDetermineEmptinessForIterator() {
         assertFalse(isEmpty(mutableList("1").iterator()));
         assertFalse(isEmpty(mutableList("1", "2").iterator()));
-        assertTrue(isEmpty(Collections.emptyList().iterator()));
+        assertTrue(isEmpty(Collections.emptyIterator()));
         assertTrue(isEmpty((Iterator<?>) null));
 
         requireNotEmpty(mutableList("1").iterator());
         requireNotEmpty(mutableList("1").iterator(), MESSAGE);
-        Iterator<String> emptyIterator = Collections.<String> emptyList().iterator();
+        Iterator<String> emptyIterator = Collections.emptyIterator();
         assertThrows(IllegalArgumentException.class, () -> {
             requireNotEmpty(emptyIterator);
         });

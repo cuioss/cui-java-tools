@@ -20,7 +20,7 @@ public class StringCaseShuffler {
      * @param toShuffle if {@code null} or empty the given String will be returned
      * @return the shuffled string
      */
-    public static final String shuffleCase(String toShuffle) {
+    public static String shuffleCase(String toShuffle) {
         if (isEmpty(toShuffle)) {
             return toShuffle;
         }

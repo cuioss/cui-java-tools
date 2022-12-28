@@ -78,8 +78,8 @@ class UrlParameterTest {
         assertTrue(getUrlParameterFromMap(new HashMap<>(), null, true).isEmpty());
         final Map<String, List<String>> testMap = new HashMap<>();
         testMap.put("name1", null);
-        testMap.put("name2", mutableList(new String()));
-        testMap.put("name3", mutableList(new String(), new String()));
+        testMap.put("name2", mutableList(""));
+        testMap.put("name3", mutableList("", ""));
         assertEquals(3, getUrlParameterFromMap(testMap, null, true).size());
         testMap.clear();
         testMap.put("name1", mutableList("value"));

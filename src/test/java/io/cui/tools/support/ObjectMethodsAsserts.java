@@ -1,7 +1,6 @@
 package io.cui.tools.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,19 +87,19 @@ public class ObjectMethodsAsserts {
         final String msgNotEqualsNull =
             "Expected result for equals(null) will be 'false'. Class was : " + underTest.getClass();
 
-        assertFalse(underTest.equals(null), msgNotEqualsNull);
+        assertNotEquals(null, underTest, msgNotEqualsNull);
 
         final String msgNotEqualsObject =
             "Expected result for equals(new Object()) will be 'false'. Class was : "
                     + underTest.getClass();
 
-        assertFalse(underTest.equals(new Object()), msgNotEqualsObject);
+        assertNotEquals(underTest, new Object(), msgNotEqualsObject);
 
         final String msgEqualsToSelf =
             "Expected result for equals(underTest) will be 'true'. Class was : "
                     + underTest.getClass();
 
-        assertTrue(underTest.equals(underTest), msgEqualsToSelf);
+        assertEquals(underTest, underTest, msgEqualsToSelf);
 
     }
 

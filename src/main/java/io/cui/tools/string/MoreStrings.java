@@ -288,8 +288,8 @@ public final class MoreStrings {
      * MoreStrings.isBlank("  bob  ") = true
      * </pre>
      *
-     * @param cs
-     * @return
+     * @param cs to be checked
+     * @return {@code true} if the given string is no blank, {@code false} otherwise
      */
     public static boolean isNotBlank(final CharSequence cs) {
         return !isBlank(cs);

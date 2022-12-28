@@ -1,9 +1,9 @@
 package io.cui.tools.io;
 
 import static io.cui.tools.io.IOStreams.copyLarge;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -90,7 +91,7 @@ class IOStreamsCopyTest {
 
         assertEquals(0, in.available(), "Not all bytes were read");
         assertEquals(inData.length, baout.size(), "Sizes differ");
-        assertTrue(Arrays.equals(inData, baout.toByteArray()), "Content differs");
+        assertArrayEquals(inData, baout.toByteArray(), "Content differs");
         assertEquals(inData.length, count);
     }
 
@@ -117,7 +118,7 @@ class IOStreamsCopyTest {
     void testCopy_inputStreamToOutputStream_nullIn() throws Exception {
         final OutputStream out = new ByteArrayOutputStream();
         assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy((InputStream) null, out);
+            IOStreams.copy(null, out);
         });
     }
 
@@ -125,7 +126,7 @@ class IOStreamsCopyTest {
     void testCopy_inputStreamToOutputStream_nullOut() throws Exception {
         final InputStream in = new ByteArrayInputStream(inData);
         assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(in, (OutputStream) null);
+            IOStreams.copy(in, null);
         });
     }
 
@@ -159,7 +160,7 @@ class IOStreamsCopyTest {
 
         assertEquals(0, in.available(), "Not all bytes were read");
         assertEquals(inData.length, baout.size(), "Sizes differ");
-        assertTrue(Arrays.equals(inData, baout.toByteArray()), "Content differs");
+        assertArrayEquals(inData, baout.toByteArray(), "Content differs");
         assertEquals(inData.length, count);
     }
 
@@ -171,7 +172,7 @@ class IOStreamsCopyTest {
 
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        final Writer writer = new OutputStreamWriter(baout, "US-ASCII");
+        final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
         IOStreams.copy(in, writer, "UTF8");
         out.off();
@@ -179,8 +180,8 @@ class IOStreamsCopyTest {
 
         assertEquals(0, in.available(), "Not all bytes were read");
         byte[] bytes = baout.toByteArray();
-        bytes = new String(bytes, "UTF8").getBytes("US-ASCII");
-        assertTrue(Arrays.equals(inData, bytes), "Content differs");
+        bytes = new String(bytes, StandardCharsets.UTF_8).getBytes(StandardCharsets.US_ASCII);
+        assertArrayEquals(inData, bytes, "Content differs");
     }
 
     @Test
@@ -190,7 +191,7 @@ class IOStreamsCopyTest {
 
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        final Writer writer = new OutputStreamWriter(baout, "US-ASCII");
+        final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
         IOStreams.copy(in, writer, (String) null);
         out.off();
@@ -198,14 +199,14 @@ class IOStreamsCopyTest {
 
         assertEquals(0, in.available(), "Not all bytes were read");
         assertEquals(inData.length, baout.size(), "Sizes differ");
-        assertTrue(Arrays.equals(inData, baout.toByteArray()), "Content differs");
+        assertArrayEquals(inData, baout.toByteArray(), "Content differs");
     }
 
     @Test
     void testCopy_inputStreamToWriter_Encoding_nullIn() throws Exception {
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        final Writer writer = new OutputStreamWriter(out, "US-ASCII");
+        final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
             IOStreams.copy(null, writer, "UTF8");
         });
@@ -224,7 +225,7 @@ class IOStreamsCopyTest {
     void testCopy_readerToOutputStream_Encoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
-        final Reader reader = new InputStreamReader(in, "US-ASCII");
+        final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
@@ -234,15 +235,15 @@ class IOStreamsCopyTest {
         // note: we don't flush here; this IOUtils method does it for us
 
         byte[] bytes = baout.toByteArray();
-        bytes = new String(bytes, "UTF16").getBytes("US-ASCII");
-        assertTrue(Arrays.equals(inData, bytes), "Content differs");
+        bytes = new String(bytes, StandardCharsets.UTF_16).getBytes(StandardCharsets.US_ASCII);
+        assertArrayEquals(inData, bytes, "Content differs");
     }
 
     @Test
     void testCopy_readerToOutputStream_Encoding_nullEncoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
-        final Reader reader = new InputStreamReader(in, "US-ASCII");
+        final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
@@ -252,7 +253,7 @@ class IOStreamsCopyTest {
         // note: we don't flush here; this IOUtils method does it for us
 
         assertEquals(inData.length, baout.size(), "Sizes differ");
-        assertTrue(Arrays.equals(inData, baout.toByteArray()), "Content differs");
+        assertArrayEquals(inData, baout.toByteArray(), "Content differs");
     }
 
     @Test
@@ -268,7 +269,7 @@ class IOStreamsCopyTest {
     void testCopy_readerToOutputStream_Encoding_nullOut() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
-        final Reader reader = new InputStreamReader(in, "US-ASCII");
+        final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
             IOStreams.copy(reader, null, "UTF16");
         });
@@ -279,18 +280,18 @@ class IOStreamsCopyTest {
     void testCopy_readerToWriter() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
-        final Reader reader = new InputStreamReader(in, "US-ASCII");
+        final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        final Writer writer = new OutputStreamWriter(baout, "US-ASCII");
+        final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
         final int count = IOStreams.copy(reader, writer);
         out.off();
         writer.flush();
         assertEquals(inData.length, count, "The number of characters returned by copy is wrong");
         assertEquals(inData.length, baout.size(), "Sizes differ");
-        assertTrue(Arrays.equals(inData, baout.toByteArray()), "Content differs");
+        assertArrayEquals(inData, baout.toByteArray(), "Content differs");
     }
 
     /*
@@ -317,9 +318,9 @@ class IOStreamsCopyTest {
     void testCopy_readerToWriter_nullIn() throws Exception {
         final ByteArrayOutputStream baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        final Writer writer = new OutputStreamWriter(out, "US-ASCII");
+        final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy((Reader) null, writer);
+            IOStreams.copy(null, writer);
         });
     }
 
@@ -327,9 +328,9 @@ class IOStreamsCopyTest {
     void testCopy_readerToWriter_nullOut() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
-        final Reader reader = new InputStreamReader(in, "US-ASCII");
+        final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(reader, (Writer) null);
+            IOStreams.copy(reader, null);
         });
     }
 

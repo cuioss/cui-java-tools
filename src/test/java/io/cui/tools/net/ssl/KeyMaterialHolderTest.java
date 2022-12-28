@@ -5,9 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -58,8 +55,7 @@ class KeyMaterialHolderTest {
         final byte[] roundtripResult = KeyMaterialHolder.deserializeKeyMaterial(
                 KeyMaterialHolder.serializeKeyMaterial(
                         kmh.getKeyMaterial()));
-        assertTrue(Arrays.equals(kmh.getKeyMaterial(), roundtripResult),
-                "byte arrays should be equal");
+        assertArrayEquals(kmh.getKeyMaterial(), roundtripResult, "byte arrays should be equal");
     }
 
     private byte[] randomKeyMaterial() {
