@@ -23,8 +23,8 @@ import lombok.ToString;
  *
  * @author Sven Haag
  */
-@EqualsAndHashCode(of = {"url"})
-@ToString(of = {"url"})
+@EqualsAndHashCode(of = { "url" })
+@ToString(of = { "url" })
 public class UrlLoader implements FileLoader {
 
     private static final long serialVersionUID = -8758614099334823819L;

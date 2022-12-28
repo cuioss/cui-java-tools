@@ -707,7 +707,7 @@ public final class MoreStrings {
      * {@code String} is not {@code null}, its length is greater than 0,
      * and it contains at least one non-whitespace character.
      *
-     * @param str the {@code String} to check (may be {@code null})
+     * @param str the {@code String} to check (maybe {@code null})
      *
      * @return {@code true} if the {@code String} is not {@code null}, its
      *         length is greater than 0, and it does not contain whitespace only
@@ -728,7 +728,7 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non null and not empty (checks without trimming) Throws an
+     * Checks a string for being non-null and not empty (checks without trimming) Throws an
      * {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
@@ -740,7 +740,7 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non null and not empty (checks without trimming) Throws an
+     * Checks a string for being non-null and not empty (checks without trimming) Throws an
      * {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
@@ -753,7 +753,7 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non null and not empty (checks with trimming) Throws an
+     * Checks a string for being non-null and not empty (checks with trimming) Throws an
      * {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
@@ -765,7 +765,7 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non null and not empty (checks with trimming) Throws an
+     * Checks a string for being non-null and not empty (checks with trimming) Throws an
      * {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
@@ -922,9 +922,11 @@ public final class MoreStrings {
     }
 
     /**
-     * @param checker the predicate to check each given value against. it decides if a value qualifies to be returned.
-     * @param values  to be evaluated
-     * @return first string that is accepted by the given {@link Predicate} or {@link Optional#empty()}
+     * @param checker the predicate to check each given value against. it decides if a value
+     *            qualifies to be returned.
+     * @param values to be evaluated
+     * @return first string that is accepted by the given {@link Predicate} or
+     *         {@link Optional#empty()}
      */
     public static Optional<String> coalesce(Predicate<String> checker, String... values) {
         if (null != values) {

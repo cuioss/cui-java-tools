@@ -9,7 +9,7 @@ package io.cui.tools.net.ssl;
 public enum KeyHolderType {
 
     /**
-     * The byte[] represents a serialized keyStore. Therefore the optional
+     * The byte[] represents a serialized keyStore. Therefore, the optional
      * {@link KeyMaterialHolder#getKeyPassword()} represents the store-password.
      */
     KEY_STORE,

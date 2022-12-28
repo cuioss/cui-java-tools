@@ -28,7 +28,7 @@ public enum LogLevel {
 
     /**
      * Trace Level, maps to {@link Level#FINER}.
-     *
+     * <p>
      * Attention: This is a derivation to
      * http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html.
      * But in fact this works...
@@ -65,7 +65,7 @@ public enum LogLevel {
 
     /**
      * @param logger to be checked, must not be null
-     * @return {@code true} if the log-level is enable on the logger, false otherwise
+     * @return {@code true} if the log-level is enabled on the logger, false otherwise
      */
     boolean isEnabled(final Logger logger) {
         return logger.isLoggable(getJuliLevel());

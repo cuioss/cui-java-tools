@@ -2,8 +2,8 @@ package io.cui.tools.codec;
 
 /**
  * Thrown when there is a failure condition during the encoding process. This exception is thrown
- * when an Encoder encounters a encoding specific exception such as invalid data, inability to
- * calculate a checksum, characters outside of the expected range.
+ * when an Encoder encounters an encoding specific exception such as invalid data, inability to
+ * calculate a checksum, characters outside the expected range.
  *
  * @author https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/EncoderException.java
  */

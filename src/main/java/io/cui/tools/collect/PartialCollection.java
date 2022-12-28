@@ -7,7 +7,7 @@ import java.util.Collection;
  * Represents a partial collection / sub-collection. It extends the {@link Collection} interface
  * with {@link #isMoreAvailable()} flag. This indicates that the original {@link Collection}
  * provides more data than the current {@link PartialCollection}. It defines the lower bound for the
- * contained types to {@link Serializable}. Currently the only implementation is
+ * contained types to {@link Serializable}. Currently, the only implementation is
  * {@link PartialArrayList}. It provides convenient methods for instantiation, like
  * {@link PartialArrayList#of(java.util.List, int)}
  *

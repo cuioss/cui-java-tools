@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 
 /**
  * Copied from commons.io:org.apache.commons.io.FilenameUtils
- *
+ * <p>
  * General filename and filepath manipulation utilities.
  * <p>
  * When dealing with filenames you can hit problems when moving from a Windows
@@ -66,7 +66,7 @@ import lombok.experimental.UtilityClass;
  * currently running on.
  * <p>
  * Origin of code: Excalibur, Alexandria, Tomcat, Commons-Utils.
- *
+ * <p>
  *
  */
 @UtilityClass
@@ -605,8 +605,8 @@ public class FilenameUtils {
      * </pre>
      * <p>
      * The output will be the same irrespective of the machine that the code is running on.
-     * ie. both Unix and Windows prefixes are matched regardless.
-     *
+     * i.e. both Unix and Windows prefixes are matched regardless.
+     * <p>
      * Note that a leading // (or \\) is used to indicate a UNC name on Windows.
      * These must be followed by a server name, so double-slashes are not collapsed
      * to a single slash at the start of the filename.
@@ -744,7 +744,7 @@ public class FilenameUtils {
      * </pre>
      * <p>
      * The output will be the same irrespective of the machine that the code is running on.
-     * ie. both Unix and Windows prefixes are matched regardless.
+     * i.e. both Unix and Windows prefixes are matched regardless.
      *
      * @param filename the filename to query, null returns null
      * @return the prefix of the file, null if invalid. Null bytes inside string will be removed
@@ -971,9 +971,9 @@ public class FilenameUtils {
     }
 
     /**
-     * Check the input for null bytes, a sign of unsanitized data being passed to to file level
+     * Check the input for null bytes, a sign of unsanitized data being passed to file level
      * functions.
-     *
+     * <p>
      * This may be used for poison byte attacks.
      *
      * @param path the path to check
@@ -1381,7 +1381,7 @@ public class FilenameUtils {
                     } else {
                         // matching from current position
                         if (!caseSensitivity.checkRegionMatches(filename, textIdx, wcs[wcsIdx])) {
-                            // couldnt match token
+                            // couldn't match token
                             break;
                         }
                     }

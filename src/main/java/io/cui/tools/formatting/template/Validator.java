@@ -23,7 +23,7 @@ public class Validator<F extends FormatterSupport> implements Serializable {
     }
 
     /**
-     * @param template must not be null, throws {@link javax.xml.bind.ValidationException}
+     * @param template must not be null
      *            if template doesn't fit to el-expression or use tokens
      *            which are not supported.
      */
@@ -69,7 +69,7 @@ public class Validator<F extends FormatterSupport> implements Serializable {
 
     /**
      * This method provide validation for template of specific expression
-     * language. Therefore you need to provide a fitting Lexer.
+     * language. Therefore, you need to provide a fitting Lexer.
      *
      * @param template input which should be validated
      * @param lexer {@link Lexer} for usage of specific expression language on

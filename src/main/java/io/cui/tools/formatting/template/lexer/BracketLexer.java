@@ -38,6 +38,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
      * @author Eugen Fischer
      */
     enum Brackets {
+
         /**
          * squared brackets [ ]
          */
@@ -87,7 +88,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
      * The template input should include Bracket separated attributes. Everything else caused
      * exception.
      *
-     * @param source   must not be null
+     * @param source must not be null
      * @param brackets as separators of attributes. must nut be null
      */
     BracketLexer(final T source, final Brackets brackets) {
@@ -101,9 +102,10 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
      * The template input should include Bracket separated attributes. Everything else caused
      * exception.
      *
-     * @param source   must not be null
+     * @param source must not be null
      * @param brackets as separators of attributes. must nut be null
-     * @param strict   use strict mode for pattern matching (only match exact name) instead of best fitting
+     * @param strict use strict mode for pattern matching (only match exact name) instead of best
+     *            fitting
      */
     BracketLexer(final T source, final Brackets brackets, final boolean strict) {
         super(source);
@@ -125,9 +127,9 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
             boolean bracketCountEven = leftBracketCount == rightBracketCount;
             // Assumption: Static elements are implicitly filtered
             checkArgument(chunkCountEven && bracketCountEven,
-                "pattern '%s' is unbalanced for %s, left-hand:%s, right-hand:%s", input, brackets,
-                chunksSplitByLeftBracket,
-                chunksSplitByRightBracket);
+                    "pattern '%s' is unbalanced for %s, left-hand:%s, right-hand:%s", input, brackets,
+                    chunksSplitByLeftBracket,
+                    chunksSplitByRightBracket);
 
             for (final String chunk : chunksSplitByRightBracket) {
                 if (!isEmpty(chunk)) {

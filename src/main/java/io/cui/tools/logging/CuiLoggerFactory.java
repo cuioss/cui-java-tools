@@ -19,7 +19,7 @@ public class CuiLoggerFactory {
 
     private static final Supplier<IllegalStateException> ILLEGAL_STATE_EXCEPTION_SUPPLIER =
         () -> new IllegalStateException(
-            "Unable to detect caller class name. Make sure '" + MARKER_CLASS_NAMES + "' was used for creation.");
+                "Unable to detect caller class name. Make sure '" + MARKER_CLASS_NAMES + "' was used for creation.");
 
     /**
      * Automatic determine the caller class.
@@ -32,7 +32,7 @@ public class CuiLoggerFactory {
     }
 
     /**
-     * Create logger and use the hand over class name as logger name
+     * Create logger and use the hand-over class name as logger name
      *
      * @param className must not be null
      * @return {@link CuiLogger}
@@ -42,7 +42,7 @@ public class CuiLoggerFactory {
     }
 
     /**
-     * Create logger and use the hand over class name as logger name
+     * Create logger and use the hand-over class name as logger name
      *
      * @param clazz must not be null
      * @return {@link CuiLogger}

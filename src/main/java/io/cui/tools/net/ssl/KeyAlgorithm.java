@@ -12,7 +12,7 @@ public enum KeyAlgorithm {
     /** {@code null} value. */
     UNDEFINED,
 
-    /** A concrete algorithm that is not not this enum / list. */
+    /** A concrete algorithm that is not this enum / list. */
     OTHER,
 
     /** https://en.wikipedia.org/wiki/Advanced_Encryption_Standard */

@@ -44,7 +44,8 @@ import lombok.ToString;
  * </ul>
  * <p>
  * So: In theory the statements made by the Java Cryptography Architecture guide
- * ("http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html#PBEEx")
+ * ("<a href=
+ * "http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html#PBEEx">...</a>")
  * are correct but in our scenarios they will increase security only a small amount and introduce
  * potential bugs and will therefore be ignored for this keyStoreType.
  * </p>
@@ -52,7 +53,7 @@ import lombok.ToString;
  * It is more important to avoid accidental printing on logs and such, what is handled by this
  * keyStoreType.
  * </p>
- * Therefore this class uses String-based handling of credentials, for simplification and provide
+ * Therefore, this class uses String-based handling of credentials, for simplification and provide
  * shortcuts for creating char[], see {@link #getStorePasswordAsCharArray()} and
  * {@link #getKeyPasswordAsCharArray()}
  *
@@ -198,7 +199,7 @@ public class KeyStoreProvider implements Serializable {
 
     /**
      * @return NPE-safe char-array representation of {@link #getStorePassword()}. If storePassword
-     *         is {@code null} or empty it returns a an empty char[], never {@code null}
+     *         is {@code null} or empty it returns an empty char[], never {@code null}
      */
     public char[] getStorePasswordAsCharArray() {
         return toCharArray(storePassword);
@@ -206,7 +207,7 @@ public class KeyStoreProvider implements Serializable {
 
     /**
      * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If keyPassword is
-     *         {@code null} or empty it returns a an empty char[], never {@code null}
+     *         {@code null} or empty it returns an empty char[], never {@code null}
      */
     public char[] getKeyPasswordAsCharArray() {
         return toCharArray(keyPassword);
@@ -229,7 +230,7 @@ public class KeyStoreProvider implements Serializable {
     /**
      * @param password to be converted. May be {@code null} or empty
      * @return NPE-safe char-array representation of given password. If password is
-     *         {@code null} or empty it returns a an empty char[], never {@code null}
+     *         {@code null} or empty it returns an empty char[], never {@code null}
      */
     static final char[] toCharArray(String password) {
         if (isEmpty(password)) {

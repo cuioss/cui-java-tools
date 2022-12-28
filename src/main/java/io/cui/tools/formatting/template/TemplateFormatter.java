@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * The formatter should be able to convert complex type based on {@link FormatterSupport} into text
  * by using a defined template.
- *
+ * <p>
  * See {@link io.cui.tools.formatting} for details.
  *
  * @param <T> bounded type based on {@link FormatterSupport}

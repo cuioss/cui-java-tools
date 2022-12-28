@@ -12,6 +12,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Optional;
 
 import io.cui.tools.base.Preconditions;
@@ -115,7 +116,7 @@ public class PropertyHolder {
     /**
      * @param bean instance to be read from, must not be null
      * @param propertyValue to be set
-     * @return In case the property set method is void the given bean will be returned. Otherwise
+     * @return In case the property set method is void the given bean will be returned. Otherwise,
      *         the return value of the method invocation, assuming the setMethods is a builder /
      *         fluent-api type.
      * @throws IllegalStateException in case the property can not be read, see
@@ -129,11 +130,7 @@ public class PropertyHolder {
         if (null != writeMethod) {
             try {
                 Object result = writeMethod.invoke(bean, propertyValue);
-                if (null == result) {
-                    return bean;
-                } else {
-                    return result;
-                }
+                return Objects.requireNonNullElse(result, bean);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException(
                         MoreStrings.lenientFormat(PropertyUtil.UNABLE_TO_WRITE_PROPERTY_RUNTIME, name,

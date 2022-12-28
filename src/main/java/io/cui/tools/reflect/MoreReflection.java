@@ -66,7 +66,8 @@ public final class MoreReflection {
      * @return an {@link Optional} {@link Field} if it can be found
      */
     @Synchronized
-    @SuppressWarnings("java:S3824") // owolff: computeIfAbsent is not an option because we add null to the field
+    @SuppressWarnings("java:S3824") // owolff: computeIfAbsent is not an option because we add null
+                                    // to the field
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
@@ -96,7 +97,7 @@ public final class MoreReflection {
 
     /**
      * Determines the public not static methods of a given {@link Class}. {@link Object#getClass()}
-     * will implicitly ignored
+     * will implicitly ignore
      *
      * @param clazz to be checked
      * @return the found public-methods.
@@ -389,14 +390,15 @@ public final class MoreReflection {
     @SuppressWarnings("unchecked") // owolff: The unchecked casting is necessary
     public static <T> Class<T> extractFirstGenericTypeArgument(final Class<?> typeToBeExtractedFrom) {
         final ParameterizedType parameterizedType = extractParameterizedType(typeToBeExtractedFrom).orElseThrow(
-                () -> new IllegalArgumentException("Given type defines no generic KeyStoreType: " + typeToBeExtractedFrom));
+                () -> new IllegalArgumentException(
+                        "Given type defines no generic KeyStoreType: " + typeToBeExtractedFrom));
 
         requireNotEmpty(parameterizedType.getActualTypeArguments(),
                 "No type argument found for " + typeToBeExtractedFrom.getName());
 
         final Class<?> firstType =
-                extractGenericTypeCovariantly(parameterizedType.getActualTypeArguments()[0]).orElseThrow(
-                        () -> new IllegalArgumentException("Unable to determine genric type for " + typeToBeExtractedFrom));
+            extractGenericTypeCovariantly(parameterizedType.getActualTypeArguments()[0]).orElseThrow(
+                    () -> new IllegalArgumentException("Unable to determine genric type for " + typeToBeExtractedFrom));
 
         try {
             return (Class<T>) firstType;
@@ -410,7 +412,8 @@ public final class MoreReflection {
      * @param type to be extracted from
      * @return if applicable the actual type argument for the given type. If the type represents
      *         already a {@link Class}
-     *         it will be returned directly. Otherwise the super-type will be checked by calling the
+     *         it will be returned directly. Otherwise, the super-type will be checked by calling
+     *         the
      *         superclass
      */
     @SuppressWarnings("rawtypes")
@@ -458,13 +461,14 @@ public final class MoreReflection {
      * Returns a proxy instance that implements {@code interfaceType} by dispatching method
      * invocations to {@code handler}. The class loader of {@code interfaceType} will be used to
      * define the proxy class. To implement multiple
-     * interfaces or specify a class loader, use Proxy#newProxyInstance(Class, Constructor, InvocationHandler).
+     * interfaces or specify a class loader, use Proxy#newProxyInstance(Class, Constructor,
+     * InvocationHandler).
      *
      * @param interfaceType must not be null
      * @param handler
      * @param <T>
      * @return the created Proxy-instance
-     * @throws IllegalArgumentException if {@code interfaceType} does not specify the type of a Java
+     * @throws IllegalArgumentException if {@code interfaceType} does not specify the type of Java
      *             interface
      * @author https://github.com/google/guava/blob/master/guava/src/com/google/common/reflect/Reflection.java
      */
@@ -472,8 +476,8 @@ public final class MoreReflection {
         requireNonNull(handler);
         Preconditions.checkArgument(interfaceType.isInterface(), "%s is not an interface", interfaceType);
         final Object object =
-                Proxy.newProxyInstance(
-                        interfaceType.getClassLoader(), new Class<?>[] { interfaceType }, handler);
+            Proxy.newProxyInstance(
+                    interfaceType.getClassLoader(), new Class<?>[] { interfaceType }, handler);
         return interfaceType.cast(object);
     }
 

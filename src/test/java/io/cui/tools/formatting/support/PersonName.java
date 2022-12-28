@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  * <p/>
  *
  * Mapping of properties will be done during construction. Properties which
- * can't be mapped will be initialize to null.
+ * can't be mapped will be initialized to null.
  *
  * @author Eugen Fischer
  */

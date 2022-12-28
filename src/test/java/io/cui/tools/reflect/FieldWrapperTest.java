@@ -149,7 +149,7 @@ class FieldWrapperTest {
         return optionalFieldWrapper.get();
     }
 
-    private Field getMyFieldField(){
+    private Field getMyFieldField() {
         Optional<Field> optionalField = MoreReflection.accessField(FieldNameClass.class, "myField");
         assertTrue(optionalField.isPresent(), "myField should be accessible");
         return optionalField.get();

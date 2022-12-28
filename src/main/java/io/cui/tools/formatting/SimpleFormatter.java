@@ -16,7 +16,7 @@ import lombok.ToString;
 /**
  * Provide concatenation of strings by using
  * {@linkplain String#join(CharSequence, CharSequence...)}.<br/>
- * Furthermore formatter supports different strategies for values handling. (see
+ * Furthermore, formatter supports different strategies for values handling. (see
  * {@link ValueHandling})
  *
  * @author Eugen Fischer
@@ -53,7 +53,7 @@ public class SimpleFormatter implements Serializable {
      *
      * @param values ellipses of string values
      *
-     * @return {@code null} if nothing to put a in parentheses
+     * @return {@code null} if nothing to put in parentheses
      */
     public String formatParentheses(final String... values) {
         return format(cleanUp(values));

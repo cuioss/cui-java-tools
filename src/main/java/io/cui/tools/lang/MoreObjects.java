@@ -18,16 +18,16 @@ public class MoreObjects {
 
     /**
      * Checks and returns the given Object if it is assignable to the given targetType.
-     * Otherwise it throws an {@link IllegalArgumentException}. This will be thrown also if
+     * Otherwise, it throws an {@link IllegalArgumentException}. This will be thrown also if
      * one of the parameters is {@code null}.
      *
      * @param <T> defining the type to be returned.
      *
-     * @param underCheck KeyStoreType to be checked / casted. If it is null or is not assignable to
+     * @param underCheck KeyStoreType to be checked / cast. If it is null or is not assignable to
      *            expectedType an {@link IllegalArgumentException} will be thrown.
      * @param expectedType checks the type . If it is null an {@link IllegalArgumentException} will
      *            be thrown
-     * @return the casted Objected of type T if applicable.
+     * @return the cast Objected of type T if applicable.
      * @throws IllegalArgumentException if the given type is either null or not the expected type
      */
     @SuppressWarnings("unchecked") // owolff: It is actually checked before.

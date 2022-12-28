@@ -215,7 +215,7 @@ public final class MorePaths {
     }
 
     /**
-     * Backups the file, identified by the given path into the back-up directory, derived with
+     * Backups the file, identified by the given path into the backup directory, derived with
      * {@link #getBackupDirectoryForPath(Path)}. The original file attributes will be applied to the
      * copied filed, See {@link StandardCopyOption#COPY_ATTRIBUTES}.
      *
@@ -238,7 +238,7 @@ public final class MorePaths {
     }
 
     /**
-     * Creates a a temp-copy of the given file, identified by the given path. The original file
+     * Creates a temp-copy of the given file, identified by the given path. The original file
      * attributes will be applied to the
      * copied filed, See {@link StandardCopyOption#COPY_ATTRIBUTES}.
      * <h2>Caution: Security-Impact</h2>
@@ -296,7 +296,7 @@ public final class MorePaths {
 
     /**
      * Deletes a file, never throwing an exception. If file is a directory, delete it and all
-     * sub-directories.
+     * subdirectories.
      * Inspired by org.apache.commons.io.FileUtils#deleteQuietly
      * <p>
      * The difference between File.delete() and this method are:
@@ -449,11 +449,11 @@ public final class MorePaths {
 
     /**
      * Checks, if the two given paths are pointing to the same location.
-     *
+     * <p>
      * If both paths are not {@code null} and do {@link File#exists()}, the
      * {@link Files#isSameFile(Path, Path)}
      * method is used to check if both paths are pointing to the same location.
-     * Otherwise, if one of the paths does not exists, the {@link Paths#equals(Object)} method is
+     * Otherwise, if one of the paths does not exist, the {@link Paths#equals(Object)} method is
      * used.
      *
      * @param path to be compared with path2

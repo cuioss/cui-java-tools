@@ -47,7 +47,7 @@ class ConcurrentToolsTest {
     }
 
     /**
-     * Wrapper around {@link Stopwatch} which also contains an "expected completion time." Creating
+     * Wrapper around {@link StopWatch} which also contains an "expected completion time." Creating
      * a
      * {@code Completion} starts the underlying stopwatch.
      */

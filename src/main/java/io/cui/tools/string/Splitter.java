@@ -88,7 +88,7 @@ public final class Splitter {
      * If either {@code trimResults} option is also specified when creating a splitter, that
      * splitter always trims results first before checking for emptiness. So, for example, {@code
      * Splitter.on(':').omitEmptyStrings().trimResults().split(": : : ")} returns an empty iterable.
-     *
+     * <p>
      *
      * @return a splitter with the desired configuration
      */

@@ -148,33 +148,32 @@ class CollectionLiteralsTest {
     @Test
     void shouldHandleStreamToImmutableMap() {
         final Map<String, String> result = immutableMap(
-            immutableMap("1", "1-1", "2", "")
-                .entrySet().stream()
-                .filter(entry -> !"".equals(entry.getValue()))
-        );
+                immutableMap("1", "1-1", "2", "")
+                        .entrySet().stream()
+                        .filter(entry -> !"".equals(entry.getValue())));
         assertEquals(1, result.size());
         assertTrue(result.containsKey("1"));
     }
 
-    static final void assertMutable(Collection<String> collection) {
+    static void assertMutable(Collection<String> collection) {
         assertNotNull(collection);
         collection.add("I am mutable");
     }
 
-    static final void assertImmutable(Collection<String> collection) {
+    static void assertImmutable(Collection<String> collection) {
         assertNotNull(collection);
         assertThrows(UnsupportedOperationException.class, () -> {
             collection.add("i am not mutable");
         });
     }
 
-    static final void assertMutable(Map<String, String> map) {
+    static void assertMutable(Map<String, String> map) {
         assertNotNull(map);
         map.put("I am", "mutable");
 
     }
 
-    static final void assertImmutable(Map<String, String> map) {
+    static void assertImmutable(Map<String, String> map) {
         assertNotNull(map);
         assertThrows(UnsupportedOperationException.class, () -> {
             map.put("i am", "not mutable");

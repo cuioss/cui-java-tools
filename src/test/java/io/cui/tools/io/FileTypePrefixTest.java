@@ -25,6 +25,6 @@ class FileTypePrefixTest {
 
     @Test
     void toStringEqualsPrefix() {
-        assertEquals(CLASSPATH.getPrefix(),CLASSPATH.toString());
+        assertEquals(CLASSPATH.getPrefix(), CLASSPATH.toString());
     }
 }

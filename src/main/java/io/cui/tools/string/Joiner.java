@@ -110,7 +110,7 @@ public final class Joiner {
 
     /**
      * @return a joiner with the same behavior as this one, except automatically skipping
-     *         String-values that evaluate to an blank String as defined within
+     *         String-values that evaluate to a blank String as defined within
      *         {@link MoreStrings#isBlank(CharSequence)}
      */
     public Joiner skipBlankStrings() {
@@ -171,7 +171,8 @@ public final class Joiner {
         }
         if (joinerConfig.isSkipEmpty()) {
             builder =
-                builder.stream().filter(element -> !MoreStrings.isEmpty(element)).collect(Collectors.toCollection(ArrayList::new));
+                builder.stream().filter(element -> !MoreStrings.isEmpty(element))
+                        .collect(Collectors.toCollection(ArrayList::new));
         }
 
         if (joinerConfig.isSkipBlank()) {

@@ -23,7 +23,7 @@ public enum PropertyReadWrite {
     READ_ONLY(true, false),
     /** The property can be read and written to. */
     READ_WRITE(true, true),
-    /** The property can only written to. */
+    /** The property can only be written to. */
     WRITE_ONLY(false, true),
     /** The property can neither be read nor written to. */
     NONE(false, false);

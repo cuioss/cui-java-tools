@@ -21,8 +21,8 @@ import lombok.experimental.UtilityClass;
 /**
  * Provides a number of methods simplifying the task of creating populated {@link Collection}s. In
  * essence its doing the same compared to the corresponding com.google.common.collect types
- * but with different semantics (like naming, types) and is designed as a one stop utility class.
- * It differentiates between the sub-types and mutability / immutability. This class is
+ * but with different semantics (like naming, types) and is designed as a one-stop utility class.
+ * It differentiates between the subtypes and mutability / immutability. This class is
  * complementary to the corresponding guava types.
  * <h3>Lists</h3>
  *
@@ -670,7 +670,8 @@ public class CollectionLiterals {
     }
 
     /**
-     * Copies the entries of the given map stream into a new map which is then returned as an unmodifiable map.
+     * Copies the entries of the given map stream into a new map which is then returned as an
+     * unmodifiable map.
      *
      * @param elements to be copied
      * @param <K> key type

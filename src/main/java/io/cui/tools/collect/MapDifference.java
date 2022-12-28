@@ -58,7 +58,7 @@ public interface MapDifference<K, V> {
      * <pre>
      * {@code
      * Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(),
-     *     entriesInCommon(), entriesDiffering())
+     *         entriesInCommon(), entriesDiffering())
      * }
      * </pre>
      */

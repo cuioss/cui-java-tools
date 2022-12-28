@@ -49,7 +49,7 @@ class PropertyReadWriteTest {
     }
 
     private PropertyReadWrite resolveWithPropertyDescriptor(Class<?> type, String attributeName)
-            throws IntrospectionException {
+        throws IntrospectionException {
         BeanInfo info = Introspector.getBeanInfo(type);
         Optional<PropertyDescriptor> descriptor = mutableList(info.getPropertyDescriptors()).stream()
                 .filter(desc -> attributeName.equalsIgnoreCase(desc.getName())).findFirst();

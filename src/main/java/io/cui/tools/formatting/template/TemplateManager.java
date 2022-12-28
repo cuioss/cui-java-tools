@@ -34,6 +34,7 @@ public class TemplateManager<T extends FormatterSupport> {
 
     /**
      * Builder inner class for the template manager
+     * 
      * @param <B>
      */
     public static class TemplateManagerBuilder<B extends FormatterSupport> {

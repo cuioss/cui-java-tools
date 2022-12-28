@@ -37,9 +37,6 @@ class JoinerConfig {
     @Getter
     private final String useForNull = "null";
 
-    /**
-     * @return a copy Builder in order to reuse an existing configuration.
-     */
     JoinerConfigBuilder copy() {
         JoinerConfigBuilder copyBuilder = builder();
         copyBuilder.separator(getSeparator()).useForNull(getUseForNull()).skipEmpty(isSkipEmpty())

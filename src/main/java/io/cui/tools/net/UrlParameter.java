@@ -88,12 +88,12 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         super();
         requireNotEmptyTrimmed(name, "Parameter name must not be empty");
         if (encode) {
-                this.name = encode(name, StandardCharsets.UTF_8);
-                if (MoreStrings.isEmpty(value)) {
-                    this.value = null;
-                } else {
-                    this.value = encode(value, StandardCharsets.UTF_8);
-                }
+            this.name = encode(name, StandardCharsets.UTF_8);
+            if (MoreStrings.isEmpty(value)) {
+                this.value = null;
+            } else {
+                this.value = encode(value, StandardCharsets.UTF_8);
+            }
         } else {
             this.name = name;
             this.value = value;
@@ -283,11 +283,11 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     private static UrlParameter createDecoded(final String name, final String value) {
         requireNonNull(name);
         String decodedKey;
-            decodedKey = URLDecoder.decode(name, StandardCharsets.UTF_8);
+        decodedKey = URLDecoder.decode(name, StandardCharsets.UTF_8);
 
         String decodedValue = null;
         if (null != value) {
-                decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
+            decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
         }
 
         return new UrlParameter(decodedKey, decodedValue, false);

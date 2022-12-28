@@ -13,7 +13,7 @@ import lombok.ToString;
 
 /**
  * Defines a filter identifying which parameters are not to be included within
- * url parameter handling. Therefore it filters parameter prefixed with
+ * url parameter handling. Therefore, it filters parameter prefixed with
  * "javax.faces", depending on <code>excludeFacesParameter</code> and
  * additionally a given list of parameter names.
  * <p>
@@ -32,7 +32,7 @@ public class ParameterFilter implements Serializable {
     /**
      * The list of string to be excluded from the parameter-list. Because the
      * test utilizes toLowerCase() the members of the list must all be
-     * lowercase. Otherwise they are not considered.
+     * lowercase. Otherwise, they are not considered.
      */
     @NonNull
     @Getter

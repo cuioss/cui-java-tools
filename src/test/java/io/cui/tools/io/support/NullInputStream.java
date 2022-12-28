@@ -10,7 +10,7 @@ import java.io.InputStream;
  * A functional, light weight {@link InputStream} that emulates
  * a stream of a specified size.
  * <p>
- * This implementation provides a light weight
+ * This implementation provides a lightweight
  * object for testing with an {@link InputStream}
  * where the contents don't matter.
  * <p>
@@ -231,7 +231,7 @@ public class NullInputStream extends InputStream {
      *
      * @throws UnsupportedOperationException if mark is not supported.
      * @throws IOException If no position has been marked
-     *             or the read limit has been exceed since the last position was
+     *             or the read limit has been exceeded since the last position was
      *             marked.
      */
     @Override

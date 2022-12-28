@@ -363,7 +363,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void returnsFirstNonEmpty(){
+    void returnsFirstNonEmpty() {
         assertEquals(" ", MoreStrings.firstNonEmpty(null, "", " ", "b", "a").orElseThrow());
     }
 

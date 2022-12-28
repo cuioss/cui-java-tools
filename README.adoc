@@ -140,7 +140,7 @@ Provide some basic checks for states and arguments like
 
 Provides types and structures similar to
 https://github.com/apache/commons-codec[https://github.com/apache/commons-codec].
-Currently it provides the capability for encoding / decoding Hex-values,
+Currently, it provides the capability for encoding / decoding Hex-values,
 see io.cui.tools.codec.Hex
 
 [[iocuiutilcodechex]]
@@ -334,7 +334,7 @@ Represents a partial collection / sub-collection. It extends the
 Collection interface with isMoreAvailable() flag. This indicates that
 the original Collection provides more data than the current
 PartialCollection. It defines the lower bound for the contained types to
-Serializable. Currently the only implementation is PartialArrayList. It
+Serializable. Currently, the only implementation is PartialArrayList. It
 provides convenient methods for instantiation, like
 `PartialArrayList.of(java.util.List, int)`.
 
@@ -438,7 +438,7 @@ from it.
 ===== requireType()
 
 Checks and returns the given Object if it is assignable to the given
-targetType. Otherwise it throws an IllegalArgumentException. This will be
+targetType. Otherwise, it throws an IllegalArgumentException. This will be
 thrown also if one of the parameters is null.
 
 [source,java]
@@ -519,7 +519,7 @@ log-message. As a variant providing a Supplier works as well.
 [[iocuiutilstring]]
 === io.cui.tools.string
 
-Provides a number of String related utilities
+Provides a number of String-related utilities
 
 [[iocuiutilstringjoiner]]
 ==== io.cui.tools.string.Joiner

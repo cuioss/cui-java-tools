@@ -19,7 +19,8 @@ import lombok.experimental.UtilityClass;
 
 /**
  * Helper class providing some convenience method for interacting with {@link SecurityManager}
- * related stuff. In essence it uses {@link AccessController#doPrivileged(PrivilegedAction)} for its
+ * related stuff. In essence, it uses {@link AccessController#doPrivileged(PrivilegedAction)} for
+ * its
  * method in case a {@link SecurityManager} is set.
  *
  * @author Oliver Wolff

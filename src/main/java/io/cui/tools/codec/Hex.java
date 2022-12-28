@@ -277,7 +277,7 @@ public class Hex {
     }
 
     /**
-     * Convert the byte buffer to a a byte array. All bytes identified by
+     * Convert the byte buffer to a byte array. All bytes identified by
      * {@link ByteBuffer#remaining()} will be used.
      *
      * @param byteBuffer the byte buffer

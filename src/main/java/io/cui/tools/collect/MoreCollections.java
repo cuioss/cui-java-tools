@@ -24,7 +24,8 @@ import lombok.experimental.UtilityClass;
  *
  * <h3>Map Difference</h3>
  * The method {@link MoreCollections#difference(Map, Map)} creates an {@link MapDifference} view on
- * the two given maps in order to check, well whether the are equal or not and if not which elements
+ * the two given maps in order to check, well whether they are equal or not and if not which
+ * elements
  * are differing.
  *
  * <h3>Map contains key</h3>
@@ -247,8 +248,8 @@ public final class MoreCollections {
      *            {@code false}
      * @param keys to be checked. If it is {@code null} or empty the method will always return
      *            {@code false}
-     * @return {@code true} if the map contains at lest one of the given keys, {@code false} other
-     *         wise
+     * @return {@code true} if the map contains at lest one of the given keys, {@code false}
+     *         otherwise
      */
     public static boolean containsKey(Map<?, ?> map, Object... keys) {
         if (isEmpty(map) || isEmpty(keys)) {

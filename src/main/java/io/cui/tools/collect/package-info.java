@@ -4,7 +4,8 @@
  * <ul>
  * <li>{@link io.cui.tools.collect.CollectionBuilder}: Unified builder for building arbitrary
  * Collections.</li>
- * <li>{@link io.cui.tools.collect.CollectionLiterals}: Provides literal-forms for creating populated
+ * <li>{@link io.cui.tools.collect.CollectionLiterals}: Provides literal-forms for creating
+ * populated
  * collection instances. In essence its doing the same compared to the corresponding
  * com.google.common.collect types but with different semantics (like naming, types) and is designed
  * as a one stop utility class for all kind of Collection implementations including Sets and

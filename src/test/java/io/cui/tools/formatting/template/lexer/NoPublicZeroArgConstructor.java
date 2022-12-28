@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NoPublicZeroArgConstructor implements FormatterSupport {
 
-
     @Getter
     private final String name;
 
@@ -27,4 +26,3 @@ public class NoPublicZeroArgConstructor implements FormatterSupport {
         return null;
     }
 }
-

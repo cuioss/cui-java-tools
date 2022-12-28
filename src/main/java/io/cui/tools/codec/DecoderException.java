@@ -3,7 +3,7 @@ package io.cui.tools.codec;
 /**
  * Thrown when there is a failure condition during the decoding process. This exception is thrown
  * when a Decoder encounters a decoding specific exception such as invalid data, or characters
- * outside of the expected range.
+ * outside the expected range.
  *
  * @author https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/DecoderException.java
  */

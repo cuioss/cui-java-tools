@@ -71,8 +71,8 @@ class PropertyHolderTest {
     @Test
     void shouldHandleBuilderLikeAccess() {
         PropertyHolder underTest =
-                from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER)
-                .get();
+            from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER)
+                    .get();
         assertEquals(READ_WRITE, underTest.getReadWrite());
         assertEquals(PropertyMemberInfo.DEFAULT, underTest.getMemberInfo());
         assertEquals(ATTRIBUTE_READ_WRITE_WITH_BUILDER, underTest.getName());

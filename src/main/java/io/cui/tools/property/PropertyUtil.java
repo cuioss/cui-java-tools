@@ -71,7 +71,7 @@ public class PropertyUtil {
      * @param bean instance to be read from, must not be null
      * @param propertyName to be read, must not be null nor empty nor blank
      * @param propertyValue to be set
-     * @return In case the property set method is void the given bean will be returned. Otherwise
+     * @return In case the property set method is void the given bean will be returned. Otherwise,
      *         the return value of the method invocation, assuming the setMethods is a builder type.
      * @throws IllegalArgumentException in case the property does not exist (determined by a write
      *             method)
@@ -94,7 +94,7 @@ public class PropertyUtil {
     }
 
     /**
-     * Tries to determine the type of a given property
+     * Tries to determine the type of given property
      *
      * @param beanType to be checked, must not be null
      * @param propertyName to be checked, must not be null

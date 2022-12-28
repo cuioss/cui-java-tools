@@ -57,8 +57,8 @@ public class IOStreams {
      *
      * N.B. there is no need to synchronize when creating these because:
      * - we don't care if the buffer is created multiple times (the data is ignored)
-     * - we always use the same size buffer, so if it it is recreated it will still be OK
-     * (if the buffer size were variable, we would need to synch. to ensure some other thread
+     * - we always use the same size buffer, so if it is recreated it will still be OK
+     * (if the buffer size were variable, we would need to sync. to ensure some other thread
      * did not create a smaller one)
      */
     private static char[] skipCharBuffer;
@@ -318,9 +318,9 @@ public class IOStreams {
      *
      * @param input the <code>InputStream</code> to read from
      * @param output the <code>OutputStream</code> to write to
-     * @param inputOffset : number of bytes to skip from input before copying
+     * @param inputOffset number of bytes to skip from input before copying
      *            -ve values are ignored
-     * @param length : number of bytes to copy. -ve means all
+     * @param length number of bytes to copy. -ve means all
      * @return the number of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
@@ -348,9 +348,9 @@ public class IOStreams {
      *
      * @param input the <code>InputStream</code> to read from
      * @param output the <code>OutputStream</code> to write to
-     * @param inputOffset : number of bytes to skip from input before copying
+     * @param inputOffset number of bytes to skip from input before copying
      *            -ve values are ignored
-     * @param length : number of bytes to copy. -ve means all
+     * @param length number of bytes to copy. -ve means all
      * @param buffer the buffer to use for the copy
      * @return the number of bytes copied
      * @throws NullPointerException if the input or output is null
@@ -541,9 +541,9 @@ public class IOStreams {
      *
      * @param input the <code>Reader</code> to read from
      * @param output the <code>Writer</code> to write to
-     * @param inputOffset : number of chars to skip from input before copying
+     * @param inputOffset number of chars to skip from input before copying
      *            -ve values are ignored
-     * @param length : number of chars to copy. -ve means all
+     * @param length number of chars to copy. -ve means all
      * @return the number of chars copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
@@ -564,9 +564,9 @@ public class IOStreams {
      *
      * @param input the <code>Reader</code> to read from
      * @param output the <code>Writer</code> to write to
-     * @param inputOffset : number of chars to skip from input before copying
+     * @param inputOffset number of chars to skip from input before copying
      *            -ve values are ignored
-     * @param length : number of chars to copy. -ve means all
+     * @param length number of chars to copy. -ve means all
      * @param buffer the buffer to be used for the copy
      * @return the number of chars copied
      * @throws NullPointerException if the input or output is null
@@ -692,7 +692,7 @@ public class IOStreams {
         /*
          * N.B. no need to synchronize this because: - we don't care if the buffer is created
          * multiple times (the data
-         * is ignored) - we always use the same size buffer, so if it it is recreated it will still
+         * is ignored) - we always use the same size buffer, so if it is recreated it will still
          * be OK (if the buffer
          * size were variable, we would need to synch. to ensure some other thread did not create a
          * smaller one)
@@ -743,9 +743,9 @@ public class IOStreams {
         /*
          * N.B. no need to synchronize this because: - we don't care if the buffer is created
          * multiple times (the data
-         * is ignored) - we always use the same size buffer, so if it it is recreated it will still
+         * is ignored) - we always use the same size buffer, so if it is recreated it will still
          * be OK (if the buffer
-         * size were variable, we would need to synch. to ensure some other thread did not create a
+         * size were variable, we would need to sync. to ensure some other thread did not create a
          * smaller one)
          */
         if (skipCharBuffer == null) {

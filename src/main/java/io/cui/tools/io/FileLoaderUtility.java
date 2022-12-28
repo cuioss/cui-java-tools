@@ -30,8 +30,9 @@ public final class FileLoaderUtility {
      *
      * @param pathName must not be null or empty.
      * @return a configured implementation of {@link FileLoader}. In case the pathName is prefixed
-     *         with {@link FileTypePrefix#CLASSPATH} it returns a {@link ClassPathLoader}. If prefixed with
-     *         {@link FileTypePrefix#URL} it returns a {@link UrlLoader}. Otherwise it returns a
+     *         with {@link FileTypePrefix#CLASSPATH} it returns a {@link ClassPathLoader}. If
+     *         prefixed with
+     *         {@link FileTypePrefix#URL} it returns a {@link UrlLoader}. Otherwise, it returns a
      *         {@link FileSystemLoader}.
      */
     public static FileLoader getLoaderForPath(final String pathName) {
@@ -54,7 +55,7 @@ public final class FileLoaderUtility {
      * Creating a temp-file might introduce a security issue. Never ever use this location for
      * sensitive information that might be of interest for an attacker
      *
-     * @param source must not be null and represent an an accessible file, saying
+     * @param source must not be null and represent an accessible file, saying
      *            {@link FileLoader#isReadable()}
      * @param markDeleteOnExit if <code>true</code> the file will be marked to delete on Exit.
      * @return a reference on a file copied in the temp folder

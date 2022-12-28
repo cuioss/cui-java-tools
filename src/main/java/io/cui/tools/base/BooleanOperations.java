@@ -3,7 +3,7 @@ package io.cui.tools.base;
 import lombok.experimental.UtilityClass;
 
 /**
- * Utility Class providing some boolean operations. In essence it simplifies 'or' and 'and'
+ * Utility Class providing some boolean operations. In essence, it simplifies 'or' and 'and'
  * operations.
  * Some examples from the unit-tests:
  *
@@ -100,10 +100,10 @@ public final class BooleanOperations {
     }
 
     /**
-     * Shorthand for checking if all of the given booleans are {@code true}
+     * Shorthand for checking if all the given booleans are {@code true}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all of parameters are {@code true} or no parameter is given ratio: no
+     * @return {@code true} if all parameters are {@code true} or no parameter is given ratio: no
      *         given false, {@code false} otherwise
      */
     public static boolean areAllTrue(final boolean... parameter) {
@@ -114,10 +114,10 @@ public final class BooleanOperations {
     }
 
     /**
-     * Shorthand for checking if all of the given booleans are {@code false}
+     * Shorthand for checking if all given booleans are {@code false}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all of parameters are {@code false}, {@code true} otherwise.
+     * @return {@code true} if all parameters are {@code false}, {@code true} otherwise.
      *         {@code false} if no parameter is passed, ratio: no given false
      */
     public static boolean areAllFalse(final boolean... parameter) {
@@ -139,10 +139,11 @@ public final class BooleanOperations {
 
     /**
      * @param value to be checked
-     * @return true, if the given value represents a boolean value i.e. "true" or "false" ignoring case.
+     * @return true, if the given value represents a boolean value i.e. "true" or "false" ignoring
+     *         case.
      */
     public static boolean isValidBoolean(String value) {
         return (Boolean.TRUE.toString().equalsIgnoreCase(value)
-            || Boolean.FALSE.toString().equalsIgnoreCase(value));
+                || Boolean.FALSE.toString().equalsIgnoreCase(value));
     }
 }

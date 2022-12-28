@@ -23,7 +23,7 @@ import lombok.ToString;
  * <ul>
  * </ul>
  * Mapping of properties will be done during construction. Properties which
- * can't be mapped will be initialize to null.
+ * can't be mapped will be initialized to null.
  */
 @ToString
 @EqualsAndHashCode
@@ -85,7 +85,7 @@ public class PersonAddress implements FormatterSupport, Serializable {
     /**
      * Use data from address object to copy this to PersonAddress.<br/>
      * Because this is just a stupid bean and AddressDto use CodeDto for some
-     * properties they must be set separate. Otherwise CodeResolverService and
+     * properties they must be set separate. Otherwise, CodeResolverService and
      * locale must be passed throw.
      *
      * @param address must not be null.

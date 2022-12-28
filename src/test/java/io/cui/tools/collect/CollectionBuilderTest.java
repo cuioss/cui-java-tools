@@ -214,12 +214,12 @@ class CollectionBuilderTest {
 
     }
 
-    static final void assertMutable(final Collection<String> collection) {
+    static void assertMutable(final Collection<String> collection) {
         assertNotNull(collection);
         collection.add("I am mutable");
     }
 
-    static final void assertImmutable(final Collection<String> collection) {
+    static void assertImmutable(final Collection<String> collection) {
         assertNotNull(collection);
         assertThrows(UnsupportedOperationException.class, () -> {
             collection.add("i am not mutable");

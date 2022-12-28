@@ -66,7 +66,7 @@ public class CuiLogger {
 
     /**
      * @param clazz to be used for acquiring a concrete {@link Logger} instance.
-     *            Must no be null
+     *            Must not be null
      */
     public CuiLogger(Class<?> clazz) {
         requireNonNull(clazz);
@@ -75,7 +75,7 @@ public class CuiLogger {
 
     /**
      * @param name to be used for acquiring a concrete {@link Logger} instance.
-     *            Must no be null
+     *            Must not be null
      */
     public CuiLogger(String name) {
         requireNonNull(nullToEmpty(name));
@@ -471,7 +471,8 @@ public class CuiLogger {
 
     /**
      * @return CUI log level derived from JUL log level.
-     *         E.g. FINEST(300) matches TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches TRACE.
+     *         E.g. FINEST(300) matches TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches
+     *         TRACE.
      */
     public LogLevel getLogLevel() {
         return LogLevel.from(delegate.getLevel());

@@ -20,7 +20,8 @@ import org.junit.jupiter.api.Test;
  * @author https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java
  *
  */
-@SuppressWarnings("java:S5785") // owolff: I will not change because I want to stay ins sync with original test-case
+@SuppressWarnings("java:S5785") // owolff: I will not change because I want to stay ins sync with
+                                // original test-case
 class HexTest {
 
     private static final String BAD_ENCODING_NAME = "UNKNOWN";

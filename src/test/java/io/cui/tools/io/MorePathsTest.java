@@ -327,6 +327,6 @@ class MorePathsTest {
         assertFalse(MorePaths.isSameFile(EXISTING_FILE, NOT_THERE_PATH));
         assertFalse(MorePaths.isSameFile(EXISTING_FILE, NOT_EXISTING_DIRECTORY));
         assertTrue(MorePaths.isSameFile(NOT_THERE_PATH, NOT_THERE_PATH),
-            "expected two equal non-existing paths to be the same");
+                "expected two equal non-existing paths to be the same");
     }
 }

@@ -32,7 +32,7 @@ class LexerTest {
         assertThrows(IllegalArgumentException.class, () -> new TestImplLexer<>(source));
     }
 
-    class TestImplLexer<T extends FormatterSupport> extends Lexer<T> {
+    static class TestImplLexer<T extends FormatterSupport> extends Lexer<T> {
 
         private static final long serialVersionUID = -7653785743419231265L;
 

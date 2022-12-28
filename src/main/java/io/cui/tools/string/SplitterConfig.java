@@ -37,9 +37,6 @@ class SplitterConfig {
     @Getter
     private final boolean doNotModifySeparatorString = false;
 
-    /**
-     * @return a copy Builder in order to reuse an existing configuration.
-     */
     SplitterConfigBuilder copy() {
         SplitterConfigBuilder copyBuilder = builder();
         copyBuilder.separator(getSeparator()).maxItems(getMaxItems())

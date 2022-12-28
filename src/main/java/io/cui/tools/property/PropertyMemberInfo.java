@@ -42,7 +42,7 @@ public enum PropertyMemberInfo {
     /**
      * Resolves {@link PropertyMemberInfo} for a given property with {@link MoreReflection}. This
      * method can solely distinguish between the states {@link #UNDEFINED}, {@link #DEFAULT} and
-     * {@link #TRANSIENT}. {@link #NO_IDENTITY} must defined from the caller if necessary;
+     * {@link #TRANSIENT}. {@link #NO_IDENTITY} must be defined from the caller if necessary;
      *
      * @param beanType to be checked, must not be null
      * @param propertyName to be checked, must not be null

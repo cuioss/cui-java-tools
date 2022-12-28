@@ -46,8 +46,8 @@ public class FileSystemLoader implements FileReaderWriter {
     /**
      * @param pathName must not be null nor empty, must not start with the prefix
      *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite
-     *            of the prefix. On all other cases a {@link IllegalArgumentException} will be
+     *            "file:" and contain at least one character despite the prefix. On all other cases
+     *            a {@link IllegalArgumentException} will be
      *            thrown.
      */
     public FileSystemLoader(final String pathName) {
@@ -89,8 +89,8 @@ public class FileSystemLoader implements FileReaderWriter {
      *
      * @param pathName must not be null nor empty, must not start with the prefix
      *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite
-     *            of the prefix. On all other cases a {@link IllegalArgumentException} will be
+     *            "file:" and contain at least one character despite the prefix. On all other cases
+     *            a {@link IllegalArgumentException} will be
      *            thrown.
      *
      * @return the normalized pathname without prefix

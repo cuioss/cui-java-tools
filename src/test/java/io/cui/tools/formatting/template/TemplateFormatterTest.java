@@ -18,10 +18,10 @@ class TemplateFormatterTest {
     void completeFormatting() {
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .build();
 
         final TemplateFormatter<PersonName> formatter = getPersonNameFormatter();
 
@@ -32,10 +32,10 @@ class TemplateFormatterTest {
     void completeFormattingWithStrict() {
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(PERSON_NAME_FORMAT, PersonName.class, true);
@@ -49,17 +49,17 @@ class TemplateFormatterTest {
         final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .givenNameSuffix("GivenNameSuffix")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .givenNameSuffix("GivenNameSuffix")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
 
         assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
-            formatter.format(personName));
+                formatter.format(personName));
     }
 
     @Test
@@ -68,17 +68,17 @@ class TemplateFormatterTest {
         final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .givenNameSuffix("GivenNameSuffix")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .givenNameSuffix("GivenNameSuffix")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class, true);
 
         assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
-            formatter.format(personName));
+                formatter.format(personName));
     }
 
     @Test
@@ -87,17 +87,17 @@ class TemplateFormatterTest {
         final String myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .givenNameSuffix("GivenNameSuffix")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .givenNameSuffix("GivenNameSuffix")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
 
         assertEquals("FamilyNamee, GivenNamenn, MiddleNameö GivenNameSuffix-",
-            formatter.format(personName));
+                formatter.format(personName));
     }
 
     @Test
@@ -106,17 +106,17 @@ class TemplateFormatterTest {
         final String myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .givenNameSuffix("GivenNameSuffix")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .givenNameSuffix("GivenNameSuffix")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class, true);
 
         assertThrows(IllegalArgumentException.class, () -> {
-                formatter.format(personName);
+            formatter.format(personName);
         });
     }
 
@@ -125,10 +125,10 @@ class TemplateFormatterTest {
         final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
         final PersonName personName = PersonName.builder()
-            .familyName("FamilyName")
-            .givenName("GivenName")
-            .middleName("MiddleName")
-            .build();
+                .familyName("FamilyName")
+                .givenName("GivenName")
+                .middleName("MiddleName")
+                .build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);

@@ -100,10 +100,10 @@ class MapBuilderTest {
     @Test
     void shouldOnlyAddIfNotNull() {
         final Map<String, String> map = new MapBuilder<String, String>()
-            .put(KEY_1, null)
-            .putIfNotNull(KEY_2, null)
-            .putIfNotNull(KEY_3, "")
-            .toImmutableMap();
+                .put(KEY_1, null)
+                .putIfNotNull(KEY_2, null)
+                .putIfNotNull(KEY_3, "")
+                .toImmutableMap();
         assertTrue(map.containsKey(KEY_1));
         assertFalse(map.containsKey(KEY_2));
         assertTrue(map.containsKey(KEY_3));

@@ -70,11 +70,13 @@ class MoreObjectsTest {
         assertEquals("123", MoreObjects.firstNonNull("123", null, "456", null));
         assertEquals(Boolean.TRUE, MoreObjects.firstNonNull(Boolean.TRUE));
 
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of unchecked generic
+        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of
+        // unchecked generic
         // array creation
         assertNull(MoreObjects.firstNonNull());
 
-        // Cast to Object in line below ensures compiler doesn't complain of unchecked generic array creation
+        // Cast to Object in line below ensures compiler doesn't complain of unchecked generic array
+        // creation
         assertNull(MoreObjects.firstNonNull(null, null));
 
         assertNull(MoreObjects.firstNonNull((Object) null));
@@ -83,17 +85,18 @@ class MoreObjectsTest {
 
     @Test
     void testGetFirstNonNull() {
-        // first non null
+        // first non-null
         assertEquals("", MoreObjects.getFirstNonNull(() -> null, () -> ""));
         // first encountered value is used
         assertEquals("1", MoreObjects.getFirstNonNull(() -> null, () -> "1", () -> "2", () -> null));
         assertEquals("123", MoreObjects.getFirstNonNull(() -> "123", () -> null, () -> "456"));
         // don't evaluate suppliers after first value is found
         assertEquals("123", MoreObjects.getFirstNonNull(() -> null, () -> "123",
-            () -> fail("Supplier after first non-null value should not be evaluated")));
+                () -> fail("Supplier after first non-null value should not be evaluated")));
         // supplier returning null and null supplier both result in null
         assertNull(MoreObjects.getFirstNonNull(null, () -> null));
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of unchecked generic
+        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of
+        // unchecked generic
         // array creation
         assertNull(MoreObjects.getFirstNonNull());
         // supplier is null

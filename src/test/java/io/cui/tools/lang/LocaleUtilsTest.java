@@ -15,7 +15,7 @@ import io.cui.tools.string.MoreStrings;
 
 /**
  * Unit tests for {@link LocaleUtils}.
- *
+ * <p>
  * COPIED FROM:
  * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/LocaleUtilsTest.java
  */

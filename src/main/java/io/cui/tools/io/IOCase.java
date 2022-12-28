@@ -18,12 +18,12 @@ package io.cui.tools.io;
 enum IOCase {
 
     /**
-     * The constant for case sensitive regardless of operating system.
+     * The constant for case-sensitive regardless of operating system.
      */
     SENSITIVE("Sensitive", true),
 
     /**
-     * The constant for case insensitive regardless of operating system.
+     * The constant for case-insensitive regardless of operating system.
      */
     INSENSITIVE("Insensitive", false),
 
@@ -32,7 +32,7 @@ enum IOCase {
      * Windows is case-insensitive when comparing filenames, Unix is case-sensitive.
      * <p>
      * <strong>Note:</strong> This only caters for Windows and Unix. Other operating
-     * systems (e.g. OSX and OpenVMS) are treated as case sensitive if they use the
+     * systems (e.g. OSX and OpenVMS) are treated as case-sensitive if they use the
      * Unix file separator and case-insensitive if they use the Windows file separator
      * (see {@link java.io.File#separatorChar}).
      * <p>
@@ -41,13 +41,18 @@ enum IOCase {
      */
     SYSTEM("System", !FilenameUtils.isSystemWindows());
 
-    /** The enumeration name. */
+    /**
+     * The enumeration name.
+     */
     private final String name;
 
-    /** The sensitivity flag. */
+    /**
+     * The sensitivity flag.
+     */
     private final transient boolean sensitive;
 
     // -----------------------------------------------------------------------
+
     /**
      * Factory method to create an IOCase from a name.
      *
@@ -65,6 +70,7 @@ enum IOCase {
     }
 
     // -----------------------------------------------------------------------
+
     /**
      * Private constructor.
      *
@@ -87,6 +93,7 @@ enum IOCase {
     }
 
     // -----------------------------------------------------------------------
+
     /**
      * Gets the name of the constant.
      *
@@ -97,15 +104,16 @@ enum IOCase {
     }
 
     /**
-     * Does the object represent case sensitive comparison.
+     * Does the object represent case-sensitive comparison.
      *
-     * @return true if case sensitive
+     * @return true if case-sensitive
      */
     public boolean isCaseSensitive() {
         return sensitive;
     }
 
     // -----------------------------------------------------------------------
+
     /**
      * Compares two strings using the case-sensitivity rule.
      * <p>
@@ -114,7 +122,9 @@ enum IOCase {
      *
      * @param str1 the first string to compare, not null
      * @param str2 the second string to compare, not null
-     * @return true if equal using the case rules
+     * @return the value 0 if the argument string is equal to this string; a value less than 0 if
+     *         this string is lexicographically less than the string argument; and a value greater
+     *         than 0 if this string is lexicographically greater than the string argument.
      * @throws NullPointerException if either string is null
      */
     public int checkCompareTo(final String str1, final String str2) {
@@ -216,6 +226,7 @@ enum IOCase {
     }
 
     // -----------------------------------------------------------------------
+
     /**
      * Gets a string describing the sensitivity.
      *

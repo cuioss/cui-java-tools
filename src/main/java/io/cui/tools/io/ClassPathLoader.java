@@ -41,8 +41,8 @@ public class ClassPathLoader implements FileLoader {
     /**
      * @param pathName must not be null nor empty, may start with the prefix
      *            {@link FileTypePrefix#CLASSPATH} but not with
-     *            {@link FileTypePrefix#FILE} and contain at least one character despite
-     *            of the prefix. On all other cases a {@link IllegalArgumentException} will be
+     *            {@link FileTypePrefix#FILE} and contain at least one character despite the prefix.
+     *            On all other cases a {@link IllegalArgumentException} will be
      *            thrown.
      */
     public ClassPathLoader(final String pathName) {
@@ -58,7 +58,7 @@ public class ClassPathLoader implements FileLoader {
      * @param pathName must not be null nor empty, may start with the prefix
      *            {@link FileTypePrefix#CLASSPATH} but not with
      *            {@link FileTypePrefix#FILE} and contain at least one character despite
-     *            of the prefix. On all other cases a {@link IllegalArgumentException} will be
+     *            the prefix. On all other cases a {@link IllegalArgumentException} will be
      *            thrown.
      * @return the normalized pathname without prefix but with a leading '/'
      */
