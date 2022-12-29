@@ -31,7 +31,7 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
     private final List<String> tokenList;
 
     /**
-     * Constructor of Lexer.</br>
+     * Constructor of Lexer.
      * Source provide information of "tokens" which he supports.
      * Therefore {@link FormatterSupport#getSupportedPropertyNames()} will be used.
      *
@@ -51,8 +51,8 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
     /**
      * Throw IllegalArgumentException with information about wrong token and supported tokens
      *
-     * @param wrongToken
-     * @param allowedTokens
+     * @param wrongToken must not be null
+     * @param allowedTokens must not be null
      */
     protected static final void throwUnsupportedTokenException(final String wrongToken,
             final List<String> allowedTokens) {
@@ -87,11 +87,11 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
      * Supported expression language
      */
     public enum ExpressionLanguage {
-        /** [attribute1][attribute2]..[attribute n] */
+        /** {@code [attribute1][attribute2]..[attribute n]} */
         SIMPLE_SQUARED_BRACKTES,
         /** {attribute1}{attribute2}..{attribute n} */
         SIMPLE_CURLY_BRACKETS,
-        /** <attribute1><attribute2>..<attribute n> */
+        /** {@code <attribute1><attribute2>..<attribute n>} */
         SIMPLE_ANGLE_BRACKET,
         /**
          * usage of String Template Expression Language

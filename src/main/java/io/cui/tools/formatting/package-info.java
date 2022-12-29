@@ -18,7 +18,6 @@
  * Provides a name with with the supported names and values.</li>
  * </ul>
  * <p>
- * <p>
  * The other interface needed is {@link io.cui.tools.formatting.template.TemplateFormatter} defining
  * the method
  * {@link io.cui.tools.formatting.template.TemplateFormatter#format(io.cui.tools.formatting.template.FormatterSupport)}

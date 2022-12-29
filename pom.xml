@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
         <version>0.0.6</version>
-        <relativePath />
+        <relativePath/>
     </parent>
     <artifactId>cui-java-tools</artifactId>
     <name>cui java tools</name>
     <version>1.0.0-SNAPSHOT</version>
-    <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging facades/frameworks.</description>
+    <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging
+        facades/frameworks.
+    </description>
     <url>https://github.com/cuioss/cui-java-tools/</url>
     <properties>
         <cui.bom.version>0.0.6</cui.bom.version>
+        <!--Javadoc-generation -->
+        <delombok.output>${project.basedir}/target/delombok</delombok.output>
+        <!--https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#BEJEFABE-->
+        <maven-javadoc-plugin.doclint>html</maven-javadoc-plugin.doclint>
+        <!-- see https://bugs.openjdk.org/browse/JDK-8212233 -->
+        <maven-javadoc-plugin.source>8</maven-javadoc-plugin.source>
+        <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
     </properties>
     <scm>
         <url>https://github.com/cuioss/cui-java-tools/</url>
@@ -67,4 +76,65 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok-maven-plugin</artifactId>
+                        <configuration>
+                            <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                            <outputDirectory>${delombok.output}</outputDirectory>
+                            <addOutputDirectory>false</addOutputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>delombok</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <!-- see https://bugs.openjdk.org/browse/JDK-8212233 -->
+                            <source>${maven-javadoc-plugin.source}</source>
+                            <linksource>true</linksource>
+                            <quiet>true</quiet>
+                            <notimestamp>true</notimestamp>
+                            <splitindex>true</splitindex>
+                            <doctitle>${project.name}</doctitle>
+                            <!--https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#BEJEFABE-->
+                            <doclint>${maven-javadoc-plugin.doclint}</doclint>
+                            <sourcepath>${delombok.output}</sourcepath>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok-maven-plugin</artifactId>
+                    <version>${lombok-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
