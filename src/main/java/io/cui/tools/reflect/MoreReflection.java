@@ -29,7 +29,7 @@ import lombok.experimental.UtilityClass;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based access.
- * <h2>Caution:</h2>
+ * <h2>Caution</h2>
  * <p>
  * Use reflection only if there is no other way. Even if some of the problems are
  * minimized by using this type. It should be used either in test-code, what is we actually do, and
@@ -54,7 +54,7 @@ public final class MoreReflection {
     /**
      * Tries to access a field on a given type. If none can be found it recursively calls itself
      * with the corresponding parent until {@link Object}.
-     * <h2>Caution:</h2>
+     * <em>Caution:</em>
      * <p>
      * The field elements are shared between requests (cached), therefore you must
      * ensure that changes to the instance, like {@link Field#setAccessible(boolean)} are reseted
@@ -191,8 +191,8 @@ public final class MoreReflection {
     }
 
     /**
-     * @param assignableSource
-     * @param queryType
+     * @param assignableSource the type to be checked
+     * @param queryType to be checked for
      * @return boolean indicating whether the given parameter, identified by their class attributes
      *         match
      */
@@ -251,12 +251,11 @@ public final class MoreReflection {
 
     /**
      * Determines the modifier methods of a given class for a property. A modifier method is defined
-     * as being a public
-     * not static single-argument method that is prefixed with either "set" or consists of the
-     * propertyName only. This
-     * will implicitly return all possible setter or builder methods, e.g. setPropertyName(String
-     * name),
-     * propertyName(String name) and setPropertyName(Collection<String> name) will all be part of
+     * as being a public not static single-argument method that is prefixed with either "set" or
+     * consists of the ropertyName only. This
+     * will implicitly return all possible setter or builder methods, e.g.
+     * {@code setPropertyName(String name)}, {@code propertyName(String name)} and
+     * {@code setPropertyName(Collection<String> name)} will all be part of
      * the result.
      *
      * @param clazz to be checked
@@ -289,8 +288,8 @@ public final class MoreReflection {
      * {@link #retrieveAccessMethods(Class)} for the
      * definition of an access-method
      *
-     * @param clazz
-     * @param propertyName
+     * @param clazz must not be null
+     * @param propertyName to be accessed
      * @return {@link Optional#empty()} in case no method could be found, an {@link Optional} with
      *         the found method
      *         otherwise.
@@ -337,6 +336,7 @@ public final class MoreReflection {
      * Helper class for extracting <em>all</em> annotations of a given class including from their
      * ancestors.
      *
+     * @param <A> the concrete annotation type
      * @param annotatedType the (possibly) annotated type. If it is null or
      *            {@link Object#getClass()} it will return an
      *            empty list
@@ -361,13 +361,13 @@ public final class MoreReflection {
     /**
      * Helper class for extracting an annotation of a given class including from their ancestors.
      *
+     * @param <A> the concrete annotation type
      * @param annotatedType the (possibly) annotated type. If it is null or
      *            {@link Object#getClass()} {@link
      *            Optional#empty()}
      * @param annotation the annotation to be extracted, must not be null
      * @return an {@link Optional} on the annotated Object if the annotation can be found. In case
-     *         the annotation is
-     *         found multiple times the first element will be returned.
+     *         the annotation is found multiple times the first element will be returned.
      */
     public static <A extends Annotation> Optional<A> extractAnnotation(
             final Class<?> annotatedType, final Class<A> annotation) {
@@ -413,8 +413,7 @@ public final class MoreReflection {
      * @return if applicable the actual type argument for the given type. If the type represents
      *         already a {@link Class}
      *         it will be returned directly. Otherwise, the super-type will be checked by calling
-     *         the
-     *         superclass
+     *         the superclass
      */
     @SuppressWarnings("rawtypes")
     public static Optional<Class<?>> extractGenericTypeCovariantly(final Type type) {
@@ -465,8 +464,8 @@ public final class MoreReflection {
      * InvocationHandler).
      *
      * @param interfaceType must not be null
-     * @param handler
-     * @param <T>
+     * @param handler the invocation handler
+     * @param <T> the target type of the proxy
      * @return the created Proxy-instance
      * @throws IllegalArgumentException if {@code interfaceType} does not specify the type of Java
      *             interface

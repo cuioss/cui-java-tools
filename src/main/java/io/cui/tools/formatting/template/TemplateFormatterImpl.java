@@ -17,7 +17,7 @@ import lombok.ToString;
  * Formatter which is able to replace parameter inside the template based on
  * {@link FormatterSupport} information. See {@link io.cui.tools.formatting} for details.
  *
- * @param <T>
+ * @param <T> at least {@link FormatterSupport}
  *
  * @author Eugen Fischer
  */

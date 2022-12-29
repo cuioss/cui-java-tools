@@ -9,8 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author Sven Haag
- * @param <T>
- *            This should any value, which extends FormatterSupport interface
+ * @param <T> This should any value, which extends FormatterSupport interface
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -35,7 +34,7 @@ public class TemplateManager<T extends FormatterSupport> {
     /**
      * Builder inner class for the template manager
      *
-     * @param <B>
+     * @param <B> at least {@link FormatterSupport}
      */
     public static class TemplateManagerBuilder<B extends FormatterSupport> {
 

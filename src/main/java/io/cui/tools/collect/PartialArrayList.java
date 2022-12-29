@@ -11,13 +11,14 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
+ * <h2>Overview</h2>
  * Default implementation of {@link PartialCollection} based on {@link ArrayList}.
  * <h3>Usage</h3>
  * <p>
  * See {@link PartialArrayList#of(List, int)}
  * </p>
  *
- * @param <T>
+ * @param <T> at least {@link Serializable}
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

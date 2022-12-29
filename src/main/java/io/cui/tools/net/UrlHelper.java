@@ -25,7 +25,7 @@ public final class UrlHelper {
     private static final CuiLogger LOGGER = new CuiLogger(UrlHelper.class);
 
     /**
-     * @param url
+     * @param url to be adapted
      * @return the given url if it already suffixed with '/' or null / empty. The given url suffixed
      *         with '/' otherwise
      */
@@ -37,7 +37,7 @@ public final class UrlHelper {
     }
 
     /**
-     * @param url
+     * @param url to be adapted
      * @return the given url if it is not suffixed with '/' or null / empty. The given url
      *         '/' removed otherwise. Multiple trailing slashes will be removed as well
      */
@@ -49,7 +49,7 @@ public final class UrlHelper {
     }
 
     /**
-     * @param path
+     * @param path to be adapted
      * @return the given path if it already prefixed with '/'. The given path
      *         prefixed with '/' otherwise. In case of being null or empty it will return "/"
      */

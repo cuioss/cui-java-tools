@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
 /**
+ * <h2>Overview</h2>
  * Utility Methods for Collections and some types to be used in the context of Collections.
  *
  * <h3>isEmpty()</h3>
@@ -91,6 +92,7 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @return the given parameter
      * @throws IllegalArgumentException in case the given elements are {@code null} or empty
@@ -103,7 +105,8 @@ public final class MoreCollections {
 
     /**
      * Shorthand for checking whether the given elements are empty or not.
-     *
+     * 
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @return the given parameter
      * @throws IllegalArgumentException in case the given elements are {@code null} or empty
@@ -116,6 +119,7 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @param message to be set in error-case
      * @return the given parameter
@@ -129,6 +133,8 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <K> the type for the key
+     * @param <V> the type for the value
      * @param elements to be checked
      * @return the given parameter
      * @throws IllegalArgumentException in case the given elements are {@code null} or empty
@@ -141,6 +147,8 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <K> the type for the key
+     * @param <V> the type for the value
      * @param elements to be checked
      * @param message to be set in error-case
      * @return the given parameter
@@ -154,6 +162,7 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @return the given parameter
      * @throws IllegalArgumentException in case the given elements are {@code null} or empty
@@ -166,6 +175,7 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @param message to be set in error-case
      * @return the given parameter
@@ -191,6 +201,7 @@ public final class MoreCollections {
     /**
      * Shorthand for checking whether the given elements are empty or not.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @param message to be set in error-case
      * @return the given parameter
@@ -205,6 +216,7 @@ public final class MoreCollections {
      * Shorthand for checking whether the given elements are empty or not.
      * <em>Caution: </em> In order not to consume the stream only a null check will be performed.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @return the given parameter
      * @throws IllegalArgumentException in case the given elements are {@code null}
@@ -218,6 +230,7 @@ public final class MoreCollections {
      * Shorthand for checking whether the given elements are empty or not.
      * <em>Caution: </em> In order not to consume the stream only a null check will be performed.
      *
+     * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @param message to be set in error-case
      * @return the given parameter
@@ -276,6 +289,8 @@ public final class MoreCollections {
      * <b>Note:</b>If you only need to know whether two maps have the same mappings, call {@code
      * left.equals(right)} instead of this method.
      *
+     * @param <K> the type for the key
+     * @param <V> the type for the value
      * @param left the map to treat as the "left" map for purposes of comparison, must not be null
      * @param right the map to treat as the "right" map for purposes of comparison , must not be
      *            null

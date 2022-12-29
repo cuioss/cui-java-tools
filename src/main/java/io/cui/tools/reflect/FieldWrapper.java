@@ -81,8 +81,8 @@ public class FieldWrapper {
      * Reads the value from the field in the given object. It implicitly sets and resets the
      * {@link Field#isAccessible()} flag.
      *
-     * @param fieldName
-     * @param object
+     * @param fieldName to be read
+     * @param object to be read from
      *
      * @return the field value. {@link Optional#empty()} if the field cannot be read.
      */

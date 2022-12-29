@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
+ * <h2>Overview</h2>
  * Converts hexadecimal Strings. The Charset used for certain operation can be set, the default is
  * set in {@link StandardCharsets#UTF_8}
  *

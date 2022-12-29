@@ -15,7 +15,7 @@ import io.cui.tools.string.MoreStrings;
  * addition it provides a similar api like slf4j. It is not meant to act as logging-facade like
  * slf4j or jakarta-commons-logging. It only provides a little syntactic sugar for the built-in
  * logger.
- * <p/>
+ * </p>
  * <h2>Obtaining a logger</h2>
  * <p>
  * {@code private static final CuiLogger log = new CuiLogger(SomeClass.class);}

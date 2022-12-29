@@ -12,20 +12,21 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * <h2>Overview</h2>
  * <p>
- * Builder for creating {@link Map}s providing some convenience methods. The class writes
+ * Builder for creating {@link java.util.Map}s providing some convenience methods. The class writes
  * everything through into the contained collector. Using the default constructor a newly created
- * {@link HashMap} will be used as collector, but you can pass you own collector as
+ * {@link java.util.HashMap} will be used as collector, but you can pass you own collector as
  * constructor-argument. Of course this should be mutable in order to work.
  * </p>
  * <p>
- * Although not being a {@link Map} itself it provides the same methods with different semantics ->
- * Builder approach.
+ * Although not being a {@link java.util.Map} itself it provides the same methods with different
+ * semantics -&gt; Builder approach.
  * </p>
  * <h3>Standard Usage</h3>
  *
  * <pre>
- * MapBuilder&lt;String, String&gt; builder = new MapBuilder<>();
+ * MapBuilder&lt;String, String&gt; builder = new MapBuilder&lt;&gt;();
  * builder.put("key1", "value1").put("key2", "value2");
  * assertEquals(2, builder.size());
  * assertMutable(builder.toMutableMap());
@@ -36,13 +37,12 @@ import lombok.ToString;
  * This methods can be used for ensuring a real copy
  *
  * <pre>
- *    assertEquals(4, MapBuilder.from("key1", 1, "key2", 2, "key3", 3, "key4", 4).size()); *
+ *    assertEquals(4, MapBuilder.from("key1", 1, "key2", 2, "key3", 3, "key4", 4).size());
  * </pre>
  *
  * @author Oliver Wolff
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
- *
  */
 @EqualsAndHashCode
 @ToString
@@ -51,14 +51,17 @@ public final class MapBuilder<K, V> {
     private final Map<K, V> collector;
 
     /**
-     * Default Constructor initializing the collector with an {@link HashMap}
-     *
+     * Default Constructor initializing the collector with an {@link java.util.HashMap}
      */
     public MapBuilder() {
         this(new HashMap<>());
     }
 
     /**
+     * <p>
+     * Constructor for MapBuilder.
+     * </p>
+     *
      * @param collector to be used for storage. Must not be null
      */
     public MapBuilder(Map<K, V> collector) {
@@ -66,6 +69,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * size.
+     * </p>
+     *
      * @return the number of key-value mappings in this map
      * @see Map#size()
      */
@@ -74,6 +81,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * isEmpty.
+     * </p>
+     *
      * @return true if this map contains no key-value mappings
      * @see Map#isEmpty()
      */
@@ -82,14 +93,14 @@ public final class MapBuilder<K, V> {
     }
 
     /**
-     * Returns <tt>true</tt> if this map contains a mapping for the specified
-     * key. More formally, returns <tt>true</tt> if and only if
-     * this map contains a mapping for a key <tt>k</tt> such that
-     * <tt>(key==null ? k==null : key.equals(k))</tt>. (There can be
+     * Returns {@code true} if this map contains a mapping for the specified
+     * key. More formally, returns {@code true} if and only if
+     * this map contains a mapping for a key {@code k} such that
+     * {@code (key==null ? k==null : key.equals(k))}. (There can be
      * at most one such mapping.)
      *
      * @param key key whose presence in this map is to be tested
-     * @return <tt>true</tt> if this map contains a mapping for the specified
+     * @return {@code true} if this map contains a mapping for the specified
      *         key
      * @see Map#containsKey(Object)
      */
@@ -98,15 +109,15 @@ public final class MapBuilder<K, V> {
     }
 
     /**
-     * Returns <tt>true</tt> if this map maps one or more keys to the
-     * specified value. More formally, returns <tt>true</tt> if and only if
-     * this map contains at least one mapping to a value <tt>v</tt> such that
-     * <tt>(value==null ? v==null : value.equals(v))</tt>. This operation
+     * Returns {@code true} if this map maps one or more keys to the
+     * specified value. More formally, returns {@code true} if and only if
+     * this map contains at least one mapping to a value {@code v} such that
+     * {@code (value==null ? v==null : value.equals(v))}. This operation
      * will probably require time linear in the map size for most
-     * implementations of the <tt>Map</tt> interface.
+     * implementations of the {@code Map} interface.
      *
      * @param value value whose presence in this map is to be tested
-     * @return <tt>true</tt> if this map maps one or more keys to the
+     * @return {@code true} if this map maps one or more keys to the
      *         specified value
      * @see Map#containsValue(Object)
      */
@@ -115,6 +126,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * put.
+     * </p>
+     *
      * @param key to be put as key, must not be empty
      * @param value to be put as value, must not be empty
      * @return the instance itself in order to use it in a fluent way.
@@ -139,6 +154,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * put.
+     * </p>
+     *
      * @param entry to be put, must not {@code null}
      * @return the instance itself in order to use it in a fluent way.
      */
@@ -148,6 +167,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * remove.
+     * </p>
+     *
      * @param key to be removed
      * @return the instance itself in order to use it in a fluent way.
      */
@@ -157,6 +180,10 @@ public final class MapBuilder<K, V> {
     }
 
     /**
+     * <p>
+     * putAll.
+     * </p>
+     *
      * @param map to be put
      * @return the instance itself in order to use it in a fluent way.
      */
@@ -176,47 +203,61 @@ public final class MapBuilder<K, V> {
     }
 
     /**
-     * @return a mutable {@link Map} representation of the builders content, the actual
-     *         implementation is a {@link HashMap}
+     * <p>
+     * toMutableMap.
+     * </p>
+     *
+     * @return a mutable {@link java.util.Map} representation of the builders content, the actual
+     *         implementation is a {@link java.util.HashMap}
      */
     public Map<K, V> toMutableMap() {
         return new HashMap<>(collector);
     }
 
     /**
-     * @return an immutable {@link Map} representation of the builders content, the actual
+     * <p>
+     * toImmutableMap.
+     * </p>
+     *
+     * @return an immutable {@link java.util.Map} representation of the builders content, the actual
      *         implementation does not create a copy but provides an unmodifiable view using
-     *         {@link Collections#unmodifiableMap(Map)}
+     *         {@link java.util.Collections#unmodifiableMap(Map)}
      */
     public Map<K, V> toImmutableMap() {
         return Collections.unmodifiableMap(collector);
     }
 
     /**
+     * <p>
+     * copyFrom.
+     * </p>
+     *
      * @param <K> the type of keys maintained by this map
      * @param <V> the type of mapped values
      * @param original map used to initialize the contained collector
-     * @return an instance of {@link MapBuilder} initialized with a copy of the given Map.
+     * @return an instance of {@link io.cui.tools.collect.MapBuilder} initialized with a copy of the
+     *         given Map.
      */
     public static <K, V> MapBuilder<K, V> copyFrom(Map<K, V> original) {
         return new MapBuilder<>(new HashMap<>(original));
     }
 
     /**
-     * Shorthand for creating a {@link MapBuilder} from a given key/value pair
+     * Shorthand for creating a {@link io.cui.tools.collect.MapBuilder} from a given key/value pair
      *
      * @param <K> the type of keys maintained by this map
      * @param <V> the type of mapped values
      * @param k1 key to be added
      * @param v1 value to be added
-     * @return an instance of {@link MapBuilder} initialized with the given key/value pair.
+     * @return an instance of {@link io.cui.tools.collect.MapBuilder} initialized with the given
+     *         key/value pair.
      */
     public static <K, V> MapBuilder<K, V> from(K k1, V v1) {
         return new MapBuilder<>(mutableMap(k1, v1));
     }
 
     /**
-     * Shorthand for creating a {@link MapBuilder} from given key/value pairs
+     * Shorthand for creating a {@link io.cui.tools.collect.MapBuilder} from given key/value pairs
      *
      * @param <K> the type of keys maintained by this map
      * @param <V> the type of mapped values
@@ -224,14 +265,15 @@ public final class MapBuilder<K, V> {
      * @param v1 value to be added
      * @param k2 key to be added
      * @param v2 value to be added
-     * @return an instance of {@link MapBuilder} initialized with the given key/value pairs.
+     * @return an instance of {@link io.cui.tools.collect.MapBuilder} initialized with the given
+     *         key/value pairs.
      */
     public static <K, V> MapBuilder<K, V> from(K k1, V v1, K k2, V v2) {
         return new MapBuilder<>(mutableMap(k1, v1, k2, v2));
     }
 
     /**
-     * Shorthand for creating a {@link MapBuilder} from given key/value pairs
+     * Shorthand for creating a {@link io.cui.tools.collect.MapBuilder} from given key/value pairs
      *
      * @param <K> the type of keys maintained by this map
      * @param <V> the type of mapped values
@@ -241,14 +283,15 @@ public final class MapBuilder<K, V> {
      * @param v2 value to be added
      * @param k3 key to be added
      * @param v3 value to be added
-     * @return an instance of {@link MapBuilder} initialized with the given key/value pairs.
+     * @return an instance of {@link io.cui.tools.collect.MapBuilder} initialized with the given
+     *         key/value pairs.
      */
     public static <K, V> MapBuilder<K, V> from(K k1, V v1, K k2, V v2, K k3, V v3) {
         return new MapBuilder<>(mutableMap(k1, v1, k2, v2, k3, v3));
     }
 
     /**
-     * Shorthand for creating a {@link MapBuilder} from given key/value pairs
+     * Shorthand for creating a {@link io.cui.tools.collect.MapBuilder} from given key/value pairs
      *
      * @param <K> the type of keys maintained by this map
      * @param <V> the type of mapped values
@@ -260,7 +303,8 @@ public final class MapBuilder<K, V> {
      * @param v3 value to be added
      * @param k4 key to be added
      * @param v4 value to be added
-     * @return an instance of {@link MapBuilder} initialized with the given key/value pairs.
+     * @return an instance of {@link io.cui.tools.collect.MapBuilder} initialized with the given
+     *         key/value pairs.
      */
     @SuppressWarnings("squid:S00107") // owolff: Number of parameters match to the use-case
     public static <K, V> MapBuilder<K, V> from(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {

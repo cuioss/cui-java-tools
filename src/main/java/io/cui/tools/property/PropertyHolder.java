@@ -24,6 +24,7 @@ import lombok.NonNull;
 import lombok.Value;
 
 /**
+ * <h2>Overview</h2>
  * An instance of {@link PropertyHolder} provides runtime information for a specific BeanProperty.
  * Under the hood it uses {@link Beans} tooling provided by the JDK and the utilities
  * {@link PropertyUtil} an and {@link MoreReflection}. Compared to the standard tooling it is

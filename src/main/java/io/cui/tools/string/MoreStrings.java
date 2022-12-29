@@ -848,10 +848,8 @@ public final class MoreStrings {
      *     null} is treated as the four-character string {@code "null"}.
      * @param args the arguments to be substituted into the message template. The first argument
      *            specified is substituted for the first occurrence of {@code "%s"} in the template,
-     *            and so
-     *            forth. A {@code null} argument is converted to the four-character string
-     *            {@code "null"};
-     *            non-null values are converted to strings using {@link Object#toString()}.
+     *            and so forth. A {@code null} argument is converted to the four-character string
+     *            {@code "null"}; non-null values are converted to strings using {@link Object#toString()}.
      * @return the resulting formatting String
      */
     public static String lenientFormat(String template, Object... args) {

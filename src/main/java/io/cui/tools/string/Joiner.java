@@ -146,10 +146,6 @@ public final class Joiner {
         return doJoin(mutableList(parts));
     }
 
-    /**
-     * @param parts
-     * @return
-     */
     private String doJoin(Iterable<?> parts) {
         log.trace("Joining elements with configuration {}", joinerConfig);
         if (isEmpty(parts)) {

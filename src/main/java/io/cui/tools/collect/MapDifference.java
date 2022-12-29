@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * An object representing the differences between two maps.
  *
- * @author com.google.common.collect.MapDifference<K, V>
+ * @author com.google.common.collect.MapDifference
  * @param <K> identifying the type of the key
  * @param <V> identifying the type of the value
  *
@@ -14,8 +14,7 @@ public interface MapDifference<K, V> {
 
     /**
      * @return {@code true} if there are no differences between the two maps; that is, if the maps
-     *         are
-     *         equal.
+     *         are equal.
      */
     boolean areEqual();
 
