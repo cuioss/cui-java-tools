@@ -19,7 +19,7 @@ import lombok.ToString;
 
 /**
  * Simple lexer which supports parsing of template pattern where attributes are separated by
- * brackets.<br/>
+ * brackets.
  * Package private because LexerBuilder exists which must be used
  *
  * @param <T> bounded type for lexer

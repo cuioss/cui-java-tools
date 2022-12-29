@@ -15,7 +15,7 @@ import lombok.ToString;
 
 /**
  * Provide concatenation of strings by using
- * {@linkplain String#join(CharSequence, CharSequence...)}.<br/>
+ * {@linkplain String#join(CharSequence, CharSequence...)}.
  * Furthermore, formatter supports different strategies for values handling. (see
  * {@link ValueHandling})
  *

@@ -19,9 +19,11 @@ import io.cui.tools.string.MoreStrings;
  * <h2>Obtaining a logger</h2>
  * <p>
  * {@code private static final CuiLogger log = new CuiLogger(SomeClass.class);}
- * <br />
+ * </p>
+ * <p>
  * {@code private static final CuiLogger log = new CuiLogger("SomeLoggerName");}
- * <br />
+ * </p>
+ * <p>
  * {@code private static final CuiLogger log = CuiLoggerFactory.getLogger();}
  * </p>
  * <h2>Logging</h2>
@@ -31,20 +33,33 @@ import io.cui.tools.string.MoreStrings;
  * actual log-message. For other means of creating a message you still can use code guards.
  * </p>
  * <p>
- * {@code log.trace("Parameter-type matches exactly '%s'", assignableSource);} <br />
- * {@code log.debug("Adding found method '%s' on class '%s'", name, clazz);}<br />
+ * {@code log.trace("Parameter-type matches exactly '%s'", assignableSource);}
+ * </p>
+ * <p>
+ * {@code log.debug("Adding found method '%s' on class '%s'", name, clazz);}
+ * </p>
+ * <p>
  * {@code log.info("Starting up application");}
  * </p>
  * <p>
- * {@code // In order not to mess up with the ellipsis parameter}<br/>
- * {@code // exceptions must be the first parameter}<br/>
+ * {@code // In order not to mess up with the ellipsis parameter}
+ * </p>
+ * <p>
+ * {@code // exceptions must be the first parameter}
+ * </p>
+ * <p>
  * {@code log.warn(e, "Exception during lenientFormat for '%s'", objectToString); }
+ * </p>
+ * <p>
  * {@code log.error(e, "Caught an exception"); }
  * </p>
  * <p>
- * {@code log.info(() -> "Supplier can be used as well");}<br/>
+ * {@code log.info(() -> "Supplier can be used as well");}
+ * </p>
+ * <p>
  * {@code log.error(e, () -> "Even with exceptions");}
- * <br/>
+ * </p>
+ * <p>
  * {@code log.trace(() -> "I will only be evaluated if the trace-level for is enabled");}
  * </p>
  * <h2>Formatting</h2>
