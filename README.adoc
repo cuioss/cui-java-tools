@@ -24,8 +24,6 @@ Provides a number of useful utilities for java, similar to googles guava
     </dependency>
 ----
 
-:toc:
-
 === History
 
 First of all: We love guava and enjoyed working with it. While doing so
