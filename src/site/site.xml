@@ -17,7 +17,7 @@
     <body>
         <links>
             <item name="Home"
-                href="https://cuioss.github.io/cui-java-tools/index.html" />
+                href="https://github.com/cuioss/cui-java-tools" />
         </links>
         <menu name="Overview">
         <item name="About" href="about.html"></item>
