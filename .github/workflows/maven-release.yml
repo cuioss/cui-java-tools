@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [closed]
     paths:
-      - '.github/project.yml-disabled'
+      - '.github/project.yml'
   workflow_dispatch:
 
 jobs:
