@@ -1,5 +1,4 @@
 = cui-java-tools
-:toc:
 
 == Status
 
@@ -25,6 +24,7 @@ Provides a number of useful utilities for java, similar to googles guava
     </dependency>
 ----
 
+:toc:
 
 === History
 
