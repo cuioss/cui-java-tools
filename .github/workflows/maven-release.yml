@@ -47,7 +47,7 @@ jobs:
         mvn -B -Prelease javadoc:javadoc site:site site:stage
         git checkout ${{github.base_ref}}
         git rebase release
-        mvn -B -Prelease release:perform -DskipTests
+       # mvn -B -Prelease release:perform -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.OSS_SONATYPE_PASSWORD }}
@@ -56,23 +56,23 @@ jobs:
     - name: Deploy Maven Site to cuioss.github.io -> ${{steps.metadata.outputs.pages-reference}}🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
-        folder: target/staging
+        folder: target/site
         repository-name: cuioss/cuioss.github.io
         target-folder: ${{steps.metadata.outputs.pages-reference}}
         branch: main
         token:  ${{ secrets.PAGES_DEPLOY_TOKEN }}
-        
-    - name: Push changes to ${{github.base_ref}}
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{github.base_ref}}
-        force: true
-
-    - name: Push tags
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        branch: ${{github.base_ref}}
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        tags: true
-        force: true
+#        
+#    - name: Push changes to ${{github.base_ref}}
+#      uses: ad-m/github-push-action@v0.6.0
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
+#        branch: ${{github.base_ref}}
+#        force: true
+#
+#    - name: Push tags
+#      uses: ad-m/github-push-action@v0.6.0
+#      with:
+#        branch: ${{github.base_ref}}
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
+#        tags: true
+#        force: true
