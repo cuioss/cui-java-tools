@@ -10,16 +10,18 @@
         <artifactId>maven-fluido-skin</artifactId>
         <version>${maven.site.fluido.skin.version}</version>
     </skin>
-    
+
     <publishDate position="left" />
     <version position="left" />
 
     <body>
         <links>
-            <item name="Home" href="https://cuioss.github.io/cui-java-tools/index.html" />
+            <item name="Home"
+                href="https://cuioss.github.io/cui-java-tools/index.html" />
         </links>
-        <menu ref="parent" />
-        <menu ref="modules" />
+        <menu name="Overview">
+            <item name="JavaDoc" href="apidocs/index.html" />
+        </menu>
         <menu ref="reports" />
     </body>
 </project>
