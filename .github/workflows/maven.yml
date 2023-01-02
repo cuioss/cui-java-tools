@@ -53,7 +53,7 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: Set up JDK 11
+    - name: Set up JDK 11 for Sonar-build
       uses: actions/setup-java@v3
       with:
         java-version: '11'
@@ -87,7 +87,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 11
+    - name: Set up JDK 11 for snapshot release
       uses: actions/setup-java@v3
       with:
         java-version: '11'
@@ -95,6 +95,8 @@ jobs:
         server-id: sonatype-nexus-snapshots
         server-username: MAVEN_USERNAME
         server-password: MAVEN_CENTRAL_TOKEN
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
         cache: maven
 
     - name: Extract project version
@@ -104,8 +106,9 @@ jobs:
     - name: Deploy Snapshot with Maven, version ${{ steps.project.outputs.version }}
       if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
       run: |
-        mvn -B -Pjavadoc javadoc:javadoc
+        mvn -B javadoc:javadoc
         mvn -B -Prelease-snapshot deploy -Dmaven.test.skip=true
       env:
         MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
