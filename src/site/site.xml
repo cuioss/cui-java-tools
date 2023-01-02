@@ -20,6 +20,7 @@
                 href="https://cuioss.github.io/cui-java-tools/index.html" />
         </links>
         <menu name="Overview">
+        <item name="About" href="about.html"></item>
             <item name="JavaDoc" href="apidocs/index.html" />
         </menu>
         <menu ref="reports" />

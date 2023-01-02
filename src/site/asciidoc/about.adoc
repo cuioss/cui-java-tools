@@ -1,0 +1,37 @@
+== History
+
+First of all: We love guava and enjoyed working with it. While doing so
+we learned a lot about java and software-engineering. But over the time
+it became too big and the messy library split up, just saying
+"listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" gave us
+the push to move on. We started to find or create something more
+suitable for our needs. Our first approach was to create a stripped
+version of guava removing all stuff we do not need. Not being happy with
+the result we created our own called library "cui-java-tools".
+In addition to the stuff derived from guava we picked some elements from
+other open-source libraries. Much of the code we implemented ourselves.
+The goal was not create a complete general purpose java-util-library but
+a library for our needs. It contains a lot of ideas and code of some
+great open-source projects:
+
+* https://github.com/google/guava[Google Guava]
+* https://github.com/apache/commons-codec[Apache Commons Codec]
+* https://github.com/apache/commons-io[Apache Commons IO]
+* https://github.com/apache/commons-lang[Apache Commons Lang]
+* https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/[Spring-Core]
+
+== Design Goals
+
+* Zero Dependencies
+* Extensive Tests, Documentation, Sonar loves us
+* Use standard java where possible: Most structures provide a
+convenience API for standard Java implementations
+
+== Comparison to Guava
+
+* Guava is huge with vast amounts of functionality
+* Guava provides a big number of implementations, while cui-java-tools
+acts more like a facade / decorator on java-standard elements
+* Many of Guavas Collection-implementations are said to be faster
+compared to JRE variants. But usually this should not be a problem.
+* The size of Guava is about 15 times compared to cui-java-tools.
