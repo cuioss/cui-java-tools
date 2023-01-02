@@ -22,7 +22,7 @@ Provides a number of useful utilities for java, similar to googles guava
     </dependency>
 ----
 
-include::src/site/asciidoc/about.adoc[]s
+include::src/site/asciidoc/about.adoc[]
 
 == Provided Features
 
