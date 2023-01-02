@@ -10,7 +10,7 @@ image:https://maven-badges.herokuapp.com/maven-central/io.github.cuioss/cui-java
 
 === Generated Documentation
 
-<<https://github.com/cuioss/cui-java-tools,Generated Documentation>> 
+https://cuioss.github.io/cui-java-tools/index.html[Generated Documentation]
 
 == What is it?
 
