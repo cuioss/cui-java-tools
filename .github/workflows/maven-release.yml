@@ -43,18 +43,17 @@ jobs:
     - name: Maven release ${{steps.metadata.outputs.current-version}}
       run: |
         git checkout -b release
-        mvn -Prelease -B release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
-        mvn javadoc:javadoc
-        mvn -Prelease site:site site:stage
+        mvn -B -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
+        mvn -B -Prelease javadoc:javadoc site:site site:stage
         git checkout ${{github.base_ref}}
         git rebase release
-        mvn -Prelease -B release:perform -DskipTests
+        mvn -B -Prelease release:perform -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.OSS_SONATYPE_PASSWORD }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-    - name: Deploy Maven Site to cuioss.github.io🚀
+    - name: Deploy Maven Site to cuioss.github.io -> ${{steps.metadata.outputs.pages-reference}}🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: target/staging
