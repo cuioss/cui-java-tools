@@ -95,7 +95,7 @@ jobs:
     - name: Deploy Snapshot with Maven, version ${{ steps.project.outputs.version }}
       if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
       run: |
-        mvn -B javadoc:javadoc
+        mvn -B -Prelease-snapshot javadoc:javadoc
         mvn -B -Prelease-snapshot deploy -Dmaven.test.skip=true
       env:
         MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
