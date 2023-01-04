@@ -13,13 +13,14 @@
     <description>Utility Library acting as a replacement for googles guava, certain apache-commons libraries and logging
         facades/frameworks.
     </description>
+    <packaging>jar</packaging>
     <url>https://github.com/cuioss/cui-java-tools/</url>
     <scm>
         <url>https://github.com/cuioss/cui-java-tools/</url>
         <connection>scm:git:https://github.com/cuioss/cui-java-tools.git</connection>
         <developerConnection>scm:git:https://github.com/cuioss/cui-java-tools/</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <issueManagement>
         <url>https://github.com/cuioss/cui-java-tools/issues</url>
         <system>GitHub Issues</system>
