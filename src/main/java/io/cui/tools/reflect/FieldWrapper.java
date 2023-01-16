@@ -1,6 +1,7 @@
 package io.cui.tools.reflect;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.util.Optional;
 
 import io.cui.tools.lang.SecuritySupport;
@@ -27,14 +28,15 @@ public class FieldWrapper {
     @NonNull
     private final Field field;
 
-    private final boolean initialAccessible;
+    private final Class<?> declaringClass;
+
 
     /**
      * @param field must not be null
      */
     public FieldWrapper(Field field) {
         this.field = field;
-        initialAccessible = field.isAccessible();
+        this.declaringClass = ((Member) field).getDeclaringClass();
     }
 
     /**
@@ -52,11 +54,16 @@ public class FieldWrapper {
      *         </ul>
      */
     public Optional<Object> readValue(Object object) {
-        log.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
-        if (null == object) {
+        if(null == object) {
             log.trace("No Object given, returning Optional#empty()");
             return Optional.empty();
         }
+        if (!declaringClass.isAssignableFrom(object.getClass())) {
+            log.trace("Given Object is improper type, returning Optional#empty()");
+            return Optional.empty();
+        }
+        boolean initialAccessible = field.canAccess(object);
+        log.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
                 log.trace("Explicitly setting accessible flag");
@@ -108,6 +115,7 @@ public class FieldWrapper {
      * @throws IllegalStateException wrapping an {@link IllegalAccessException}
      */
     public void writeValue(@NonNull Object object, Object value) {
+        boolean initialAccessible = field.canAccess(object);
         log.trace("Writing to field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
