@@ -22,6 +22,7 @@ public class NullWriter extends Writer {
      * Constructs a new NullWriter.
      */
     public NullWriter() {
+        // Intentionally not calling super
     }
 
     /**
