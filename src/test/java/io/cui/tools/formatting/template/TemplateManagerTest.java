@@ -28,26 +28,26 @@ class TemplateManagerTest {
         // expected result givenName, familyName
         assertEquals("Hans, M\00FCller", actual);
 
-        final String resultUS = manager.format(targetToFormat, Locale.US);
+        final var resultUS = manager.format(targetToFormat, Locale.US);
         // expected result familyName, givenName
         assertEquals("M\00FCller, Hans", resultUS);
 
         // expect fallback to default formatter
-        final String resultDefault = manager.format(targetToFormat, Locale.CHINA);
+        final var resultDefault = manager.format(targetToFormat, Locale.CHINA);
         // expected result familyName
         assertEquals("M\00FCller", resultDefault);
 
     }
 
     private static PersonName anyPersonName() {
-        final PersonName person = new PersonName();
+        final var person = new PersonName();
         person.setFamilyName("M\00FCller");
         person.setGivenName("Hans");
         return person;
     }
 
     private static TemplateManager<PersonName> templateManagerWithTwoLanguagesSupport() {
-        final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
+        final var builder = new TemplateManagerBuilder<PersonName>();
 
         return builder.useAsDefault(getDeafultFormatter()).with(Locale.GERMANY, getFormatterForGermany())
                 .with(Locale.US, getFormatterFoUs()).build();
@@ -110,21 +110,21 @@ class TemplateManagerTest {
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation() {
-        final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
+        final var builder = new TemplateManagerBuilder<PersonName>();
         return builder.useAsDefault(getDeafultFormatter()).with(null).build();
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutOneLocation() {
-        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>(0);
+        final var map = new HashMap<Locale, TemplateFormatter<PersonName>>(0);
         map.put(Locale.GERMANY, getFormatterForGermany());
-        final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
+        final var builder = new TemplateManagerBuilder<PersonName>();
         return builder.useAsDefault(getDeafultFormatter()).with(map).build();
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation2() {
-        final HashMap<Locale, TemplateFormatter<PersonName>> map = new HashMap<>(0);
+        final var map = new HashMap<Locale, TemplateFormatter<PersonName>>(0);
         map.put(null, null);
-        final TemplateManagerBuilder<PersonName> builder = new TemplateManager.TemplateManagerBuilder<>();
+        final var builder = new TemplateManagerBuilder<PersonName>();
         return builder.useAsDefault(getDeafultFormatter()).with(map).build();
     }
 

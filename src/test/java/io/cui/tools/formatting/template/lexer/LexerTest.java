@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import io.cui.tools.formatting.template.FormatterSupport;
-import io.cui.tools.formatting.template.lexer.LexerBuilder.Builder;
 import io.cui.tools.formatting.template.token.Token;
 
 class LexerTest {
@@ -19,7 +18,7 @@ class LexerTest {
 
     @Test
     void shouldFailOnMissingAttributes() {
-        final WrongFormatterSupportImplWithMissingAttributeList source =
+        final var source =
             new WrongFormatterSupportImplWithMissingAttributeList();
 
         assertThrows(NullPointerException.class, () -> new TestImplLexer<>(source));
@@ -27,7 +26,7 @@ class LexerTest {
 
     @Test
     void shouldFailOnEmptyAttributes() {
-        final WrongFormatterSupportImplWithEmptyAttributeList source =
+        final var source =
             new WrongFormatterSupportImplWithEmptyAttributeList();
         assertThrows(IllegalArgumentException.class, () -> new TestImplLexer<>(source));
     }
@@ -49,7 +48,7 @@ class LexerTest {
 
     @Test
     void shouldFailwithInvalidSourceType() {
-        Builder builder = LexerBuilder.useSimpleElWithSquaredBrackets();
+        var builder = LexerBuilder.useSimpleElWithSquaredBrackets();
         assertThrows(IllegalStateException.class,
                 () -> builder.build(NoPublicZeroArgConstructor.class));
     }

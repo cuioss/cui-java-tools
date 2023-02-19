@@ -67,24 +67,24 @@ public class LocaleUtils {
         if (str.contains("#")) { // LANG-879 - Cannot handle Java 7 script & extensions
             throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
         }
-        final int len = str.length();
+        final var len = str.length();
         if (len < 2) {
             throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
         }
-        final char ch0 = str.charAt(0);
+        final var ch0 = str.charAt(0);
         if (ch0 == '_') {
             if (len < 3) {
                 throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
             }
-            final char ch1 = str.charAt(1);
-            final char ch2 = str.charAt(2);
+            final var ch1 = str.charAt(1);
+            final var ch2 = str.charAt(2);
             if (!Character.isUpperCase(ch1) || !Character.isUpperCase(ch2)) {
                 throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
             }
             if (len == 3) {
                 return new Locale(MoreStrings.EMPTY, str.substring(1, 3));
             }
-            if ((len < 5) || (str.charAt(3) != '_')) {
+            if (len < 5 || str.charAt(3) != '_') {
                 throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
             }
             return new Locale(MoreStrings.EMPTY, str.substring(1, 3), str.substring(4));
@@ -106,17 +106,17 @@ public class LocaleUtils {
             return new Locale(str);
         }
 
-        final String[] segments = str.split("_", -1);
-        final String language = segments[0];
+        final var segments = str.split("_", -1);
+        final var language = segments[0];
         if (segments.length == 2) {
-            final String country = segments[1];
+            final var country = segments[1];
             if (isISO639LanguageCode(language) && isISO3166CountryCode(country) ||
                     isNumericAreaCode(country)) {
                 return new Locale(language, country);
             }
         } else if (segments.length == 3) {
-            final String country = segments[1];
-            final String variant = segments[2];
+            final var country = segments[1];
+            final var variant = segments[2];
             if (isISO639LanguageCode(language) &&
                     (country.isEmpty() || isISO3166CountryCode(country) || isNumericAreaCode(country)) &&
                     !variant.isEmpty()) {

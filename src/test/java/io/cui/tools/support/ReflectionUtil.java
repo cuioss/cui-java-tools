@@ -33,8 +33,8 @@ public final class ReflectionUtil {
         args1[0] = Object.class;
 
         // get equals method of the class
-        final Method method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_EQUALS, args1);
-        final String assertText =
+        final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_EQUALS, args1);
+        final var assertText =
             "Method 'equals' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }
@@ -46,8 +46,8 @@ public final class ReflectionUtil {
      *            class to be checked, must not be null
      */
     public static void assertHashCodeMethodIsOverriden(final Class<?> clazz) {
-        final Method method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_HASH_CODE, null);
-        final String assertText =
+        final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_HASH_CODE, null);
+        final var assertText =
             "Method 'hashCode' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }
@@ -59,8 +59,8 @@ public final class ReflectionUtil {
      *            class to be checked, must not be null
      */
     public static void assertToStringMethodIsOverriden(final Class<?> clazz) {
-        final Method method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_TO_STRING, null);
-        final String assertText =
+        final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_TO_STRING, null);
+        final var assertText =
             "Method 'toString' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }

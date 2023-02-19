@@ -44,8 +44,8 @@ public enum PropertyReadWrite {
      * @return the corresponding {@link PropertyReadWrite} for a given property
      */
     public static PropertyReadWrite resolveForBean(final Class<?> beanType, final String propertyName) {
-        final boolean readable = MoreReflection.retrieveAccessMethod(beanType, propertyName).isPresent();
-        final boolean writeable = !MoreReflection.retrieveWriteMethodCandidates(beanType, propertyName).isEmpty();
+        final var readable = MoreReflection.retrieveAccessMethod(beanType, propertyName).isPresent();
+        final var writeable = !MoreReflection.retrieveWriteMethodCandidates(beanType, propertyName).isEmpty();
         if (readable && writeable) {
             return READ_WRITE;
         }

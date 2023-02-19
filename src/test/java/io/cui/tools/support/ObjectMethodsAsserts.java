@@ -72,9 +72,9 @@ public class ObjectMethodsAsserts {
                 underTest instanceof Serializable,
                 underTest.getClass().getName() + " does not implement java.io.Serializable");
 
-        final String serializationFailedMessage =
+        final var serializationFailedMessage =
             underTest.getClass().getName() + " is not equal after serialization";
-        Object serializeAndDeserialize = serializeAndDeserialize(underTest);
+        var serializeAndDeserialize = serializeAndDeserialize(underTest);
 
         assertEquals(underTest, serializeAndDeserialize, serializationFailedMessage);
     }
@@ -84,18 +84,18 @@ public class ObjectMethodsAsserts {
         ReflectionUtil.assertEqualsMethodIsOverriden(underTest.getClass());
 
         // basic checks to equals implementation
-        final String msgNotEqualsNull =
+        final var msgNotEqualsNull =
             "Expected result for equals(null) will be 'false'. Class was : " + underTest.getClass();
 
         assertNotEquals(null, underTest, msgNotEqualsNull);
 
-        final String msgNotEqualsObject =
+        final var msgNotEqualsObject =
             "Expected result for equals(new Object()) will be 'false'. Class was : "
                     + underTest.getClass();
 
         assertNotEquals(underTest, new Object(), msgNotEqualsObject);
 
-        final String msgEqualsToSelf =
+        final var msgEqualsToSelf =
             "Expected result for equals(underTest) will be 'true'. Class was : "
                     + underTest.getClass();
 
@@ -127,7 +127,7 @@ public class ObjectMethodsAsserts {
      */
     public static final Object serializeAndDeserialize(final Object object) {
         assertNotNull(object, "Given Object must not be null");
-        final byte[] serialized = serializeObject(object);
+        final var serialized = serializeObject(object);
         return deserializeObject(serialized);
     }
 
@@ -140,8 +140,8 @@ public class ObjectMethodsAsserts {
      */
     public static final byte[] serializeObject(final Object object) {
         assertNotNull(object, "Given Object must not be null");
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-        try (ObjectOutputStream oas = new ObjectOutputStream(baos)) {
+        final var baos = new ByteArrayOutputStream(1024);
+        try (var oas = new ObjectOutputStream(baos)) {
             oas.writeObject(object);
             oas.flush();
         } catch (final Exception e) {
@@ -160,8 +160,8 @@ public class ObjectMethodsAsserts {
      */
     public static final Object deserializeObject(final byte[] bytes) {
         assertNotNull(bytes, "Given byte-array must not be null");
-        final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+        final var bais = new ByteArrayInputStream(bytes);
+        try (var ois = new ObjectInputStream(bais)) {
             return ois.readObject();
         } catch (final Exception e) {
             throw new AssertionError("Unable to deserialize, due to "

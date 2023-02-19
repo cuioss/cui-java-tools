@@ -17,13 +17,13 @@ class TemplateFormatterTest {
     @Test
     void completeFormatting() {
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
                 .build();
 
-        final TemplateFormatter<PersonName> formatter = getPersonNameFormatter();
+        final var formatter = getPersonNameFormatter();
 
         assertEquals("FamilyName, GivenName MiddleName", formatter.format(personName));
     }
@@ -31,7 +31,7 @@ class TemplateFormatterTest {
     @Test
     void completeFormattingWithStrict() {
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -46,9 +46,9 @@ class TemplateFormatterTest {
     @Test
     void formatWithLikelySoundsProperties() {
 
-        final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
+        final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -65,9 +65,9 @@ class TemplateFormatterTest {
     @Test
     void formatWithLikelySoundsPropertiesAndStrict() {
 
-        final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
+        final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -84,9 +84,9 @@ class TemplateFormatterTest {
     @Test
     void formatWithPropertiesWithSuffixes() {
 
-        final String myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
+        final var myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -103,9 +103,9 @@ class TemplateFormatterTest {
     @Test
     void formatWithPropertiesWithSuffixesAndStrict() {
 
-        final String myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
+        final var myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -122,9 +122,9 @@ class TemplateFormatterTest {
 
     @Test
     void formatWithLikelySoundsMissingProperties() {
-        final String myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
+        final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final PersonName personName = PersonName.builder()
+        final var personName = PersonName.builder()
                 .familyName("FamilyName")
                 .givenName("GivenName")
                 .middleName("MiddleName")
@@ -137,58 +137,58 @@ class TemplateFormatterTest {
 
     @Test
     void formatWithFirstMissing() {
-        final PersonName personName = PersonName.builder().givenName("Given").middleName("Middle").build();
-        final TemplateFormatter<PersonName> formatter = getPersonNameFormatterByLexer();
+        final var personName = PersonName.builder().givenName("Given").middleName("Middle").build();
+        final var formatter = getPersonNameFormatterByLexer();
         assertEquals("Given Middle", formatter.format(personName));
     }
 
     @Test
     void specialFormatForOnlyOneValue() {
-        final PersonName personName = PersonName.builder().givenName("Otto").build();
-        final TemplateFormatter<PersonName> formatter = getPersonNameFormatter();
+        final var personName = PersonName.builder().givenName("Otto").build();
+        final var formatter = getPersonNameFormatter();
         assertEquals("Otto", formatter.format(personName));
     }
 
     @Test
     void createdFormatterCanBeReused() {
-        final String familyName = "Famname";
-        final String givenName = "Given";
+        final var familyName = "Famname";
+        final var givenName = "Given";
 
-        final PersonName object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
-        final PersonName object2 =
+        final var object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
+        final var object2 =
             PersonName.builder().familyName(familyName).givenName(givenName).givenBirthName("other one").build();
 
         assertNotEquals(object1, object2);
 
-        final TemplateFormatter<PersonName> formatter = createFormatterForSource(object1);
-        final String expected = familyName + ", " + givenName + " ";
+        final var formatter = createFormatterForSource(object1);
+        final var expected = familyName + ", " + givenName + " ";
         assertEquals(expected, formatter.format(object1));
         assertEquals(expected, formatter.format(object2));
     }
 
     @Test
     void shouldRemoveUselessDelimiter() {
-        final String familyName = anyValidString();
-        final String givenName = anyValidString();
-        final String myTemplate = "[familyName], [givenName], [middleName]";
-        final PersonName object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
+        final var familyName = anyValidString();
+        final var givenName = anyValidString();
+        final var myTemplate = "[familyName], [givenName], [middleName]";
+        final var object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
-        final String expected = familyName + ", " + givenName;
+        final var expected = familyName + ", " + givenName;
         assertEquals(expected, formatter.format(object1));
     }
 
     @Test
     void shouldRemoveDelimiterAtBeginning() {
-        final String middle = anyValidString();
-        final String givenName = anyValidString();
-        final String myTemplate = "[familyName], [givenName], [middleName]";
-        final PersonName object1 = PersonName.builder().middleName(middle).givenName(givenName).build();
+        final var middle = anyValidString();
+        final var givenName = anyValidString();
+        final var myTemplate = "[familyName], [givenName], [middleName]";
+        final var object1 = PersonName.builder().middleName(middle).givenName(givenName).build();
 
         final TemplateFormatter<PersonName> formatter =
             TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
-        final String expected = givenName + ", " + middle;
+        final var expected = givenName + ", " + middle;
         assertEquals(expected, formatter.format(object1));
     }
 

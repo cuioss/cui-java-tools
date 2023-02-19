@@ -71,17 +71,17 @@ public class Hex {
     @SuppressWarnings("squid:ForLoopCounterChangedCheck") // owolff: original code
     public static byte[] decodeHex(final char[] data) throws DecoderException {
 
-        final int len = data.length;
+        final var len = data.length;
 
         if ((len & 0x01) != 0) {
             throw new DecoderException("Odd number of characters.");
         }
 
-        final byte[] out = new byte[len >> 1];
+        final var out = new byte[len >> 1];
 
         // two characters form the hex value.
         for (int i = 0, j = 0; j < len; i++) {
-            int f = toDigit(data[j], j) << 4;
+            var f = toDigit(data[j], j) << 4;
             j++;
             f = f | toDigit(data[j], j);
             j++;
@@ -176,11 +176,12 @@ public class Hex {
      */
     @SuppressWarnings("squid:ForLoopCounterChangedCheck") // owolff: original code
     protected static char[] encodeHex(final byte[] data, final char[] toDigits) {
-        final int l = data.length;
-        final char[] out = new char[l << 1];
+        final var l = data.length;
+        final var out = new char[l << 1];
         // two characters form the hex value.
         for (int i = 0, j = 0; i < l; i++) {
-            out[j++] = toDigits[(0xF0 & data[i]) >>> 4];
+            out[j] = toDigits[(0xF0 & data[i]) >>> 4];
+            j++;
             out[j++] = toDigits[0x0F & data[i]];
         }
         return out;
@@ -285,17 +286,17 @@ public class Hex {
      * @return the byte[]
      */
     private static byte[] toByteArray(final ByteBuffer byteBuffer) {
-        final int remaining = byteBuffer.remaining();
+        final var remaining = byteBuffer.remaining();
         // Use the underlying buffer if possible
         if (byteBuffer.hasArray()) {
-            final byte[] byteArray = byteBuffer.array();
+            final var byteArray = byteBuffer.array();
             if (remaining == byteArray.length) {
                 byteBuffer.position(remaining);
                 return byteArray;
             }
         }
         // Copy the bytes
-        final byte[] byteArray = new byte[remaining];
+        final var byteArray = new byte[remaining];
         byteBuffer.get(byteArray);
         return byteArray;
     }
@@ -309,7 +310,7 @@ public class Hex {
      * @throws DecoderException Thrown if ch is an illegal hex character
      */
     protected static int toDigit(final char ch, final int index) throws DecoderException {
-        final int digit = Character.digit(ch, 16);
+        final var digit = Character.digit(ch, 16);
         if (digit == -1) {
             throw new DecoderException("Illegal hexadecimal character " + ch + " at index " + index);
         }
@@ -409,7 +410,8 @@ public class Hex {
     public Object decode(final Object object) throws DecoderException {
         if (object instanceof String) {
             return decode(((String) object).toCharArray());
-        } else if (object instanceof byte[]) {
+        }
+        if (object instanceof byte[]) {
             return decode((byte[]) object);
         } else if (object instanceof ByteBuffer) {
             return decode((ByteBuffer) object);

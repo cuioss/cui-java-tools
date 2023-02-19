@@ -32,7 +32,7 @@ public class WrongDataObject implements FormatterSupport {
     @Override
     public List<String> getSupportedPropertyNames() {
         final List<String> result = new ArrayList<>();
-        final Field[] fields = this.getClass().getDeclaredFields();
+        final var fields = this.getClass().getDeclaredFields();
         for (final Field field : fields) {
             result.add(field.getName());
         }

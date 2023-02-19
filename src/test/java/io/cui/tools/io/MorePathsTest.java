@@ -59,11 +59,11 @@ class MorePathsTest {
 
     @BeforeEach
     void before() throws IOException {
-        Path playGround = Paths.get("target/playground");
+        var playGround = Paths.get("target/playground");
         if (!Files.exists(playGround)) {
             Files.createDirectories(playGround);
         }
-        String stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.randomString();
+        var stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.randomString();
         playGroundBase = playGround.resolve(stamp);
         Files.createDirectories(playGroundBase);
         playGroundBackup = playGroundBase.resolve(BACKUP_DIR_NAME);
@@ -123,7 +123,7 @@ class MorePathsTest {
         assertFalse(checkExecutablePath(NOT_EXISTING_DIRECTORY, true));
         assertFalse(checkExecutablePath(NOT_EXISTING_DIRECTORY, false));
 
-        Path testFile = copyTestFileToPlayground();
+        var testFile = copyTestFileToPlayground();
         // testFile.toFile().setExecutable(false);
         // assertFalse(checkExecutablePath(testFile, true));
         // assertFalse(checkExecutablePath(testFile, false));
@@ -150,7 +150,7 @@ class MorePathsTest {
 
     @Test
     void shouldBackupExisitingFile() throws IOException {
-        Path exisiting = copyPomFileToPlayground();
+        var exisiting = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
         backupFile(exisiting);
@@ -158,7 +158,7 @@ class MorePathsTest {
 
         final List<Path> children = Files.list(playGroundBackup).collect(Collectors.toList());
         assertEquals(1, children.size());
-        final String fileName = children.iterator().next().getFileName().toString();
+        final var fileName = children.iterator().next().getFileName().toString();
         assertTrue(fileName.startsWith(POM_XML + BACKUP_FILE_SUFFIX));
 
         MorePaths.contentEquals(exisiting, children.get(0));
@@ -167,10 +167,10 @@ class MorePathsTest {
 
     @Test
     void shouldCreateTempFile() throws IOException {
-        Path exisiting = copyPomFileToPlayground();
+        var exisiting = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
-        Path temp = copyToTempLocation(exisiting);
+        var temp = copyToTempLocation(exisiting);
         assertTrue(Files.exists(temp));
 
         MorePaths.contentEquals(exisiting, temp);
@@ -188,14 +188,14 @@ class MorePathsTest {
     void shouldDetermineFilename() throws IOException {
         final List<Path> children = Files.list(playGroundBase).collect(Collectors.toList());
         assertTrue(children.isEmpty());
-        String filename = "filename";
-        Path newFilePath = createNonExistingPath(playGroundBase, filename);
+        var filename = "filename";
+        var newFilePath = createNonExistingPath(playGroundBase, filename);
         assertFalse(Files.exists(newFilePath));
         assertEquals(filename, newFilePath.getFileName().toString());
         Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
         assertTrue(Files.exists(newFilePath));
-        for (int counter = 1; counter < 20; counter++) {
+        for (var counter = 1; counter < 20; counter++) {
             newFilePath = createNonExistingPath(playGroundBase, filename);
             assertFalse(Files.exists(newFilePath));
             assertEquals(filename + "_" + counter, newFilePath.getFileName().toString());
@@ -214,7 +214,7 @@ class MorePathsTest {
 
     @Test
     void shouldSaveAndBackup() throws IOException {
-        Path existingFile = copyPomFileToPlayground();
+        var existingFile = copyPomFileToPlayground();
 
         saveAndBackup(existingFile,
                 filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
@@ -223,7 +223,7 @@ class MorePathsTest {
     }
 
     private Path copyPomFileToPlayground() throws IOException {
-        Path existingFile = playGroundBase.resolve(POM_XML);
+        var existingFile = playGroundBase.resolve(POM_XML);
         Files.copy(EXISTING_FILE, existingFile, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
         assertFalse(Files.exists(playGroundBackup), "File could not be created");
@@ -231,7 +231,7 @@ class MorePathsTest {
     }
 
     private Path copyTestFileToPlayground() throws IOException {
-        Path path = playGroundBase.resolve(TEST_FILE_NAME);
+        var path = playGroundBase.resolve(TEST_FILE_NAME);
         if (path.toFile().exists()) {
             return path;
         }
@@ -252,9 +252,9 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyDir() throws IOException {
-        Path existingFile = copyPomFileToPlayground();
+        var existingFile = copyPomFileToPlayground();
 
-        Path testDirectory = playGroundBackup.resolve("directory");
+        var testDirectory = playGroundBackup.resolve("directory");
         testDirectory.toFile().mkdirs();
 
         assertTrue(testDirectory.toFile().exists());
@@ -266,7 +266,7 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyFile() throws IOException {
-        Path existingFile = copyPomFileToPlayground();
+        var existingFile = copyPomFileToPlayground();
 
         assertTrue(existingFile.toFile().exists());
         assertTrue(deleteQuietly(playGroundBase));
@@ -276,7 +276,7 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyNonExistent() {
-        Path testFile = playGroundBase.resolve(POM_XML);
+        var testFile = playGroundBase.resolve(POM_XML);
         assertFalse(testFile.toFile().exists());
 
         try {
@@ -290,8 +290,8 @@ class MorePathsTest {
     void testContentEquals() throws Exception {
 
         // Non-existent files
-        Path notThere1 = playGroundBase.resolve(POM_XML);
-        Path notThere2 = playGroundBase.resolve("2" + POM_XML);
+        var notThere1 = playGroundBase.resolve(POM_XML);
+        var notThere2 = playGroundBase.resolve("2" + POM_XML);
         // both don't exist
         assertTrue(MorePaths.contentEquals(notThere1, notThere1));
         assertTrue(MorePaths.contentEquals(notThere1, notThere2));
@@ -307,8 +307,8 @@ class MorePathsTest {
         }
 
         // Different files
-        Path existing1 = copyPomFileToPlayground();
-        Path existing2 = copyTestFileToPlayground();
+        var existing1 = copyPomFileToPlayground();
+        var existing2 = copyTestFileToPlayground();
 
         assertFalse(MorePaths.contentEquals(existing1, existing2));
         assertTrue(MorePaths.contentEquals(existing1, POM_PATH));

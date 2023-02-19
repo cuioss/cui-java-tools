@@ -52,14 +52,14 @@ class PropertyHolderTest {
 
     @Test
     void shouldHandleHappyCase() {
-        PropertyHolder underTest = from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE).get();
+        var underTest = from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE).get();
         assertEquals(READ_WRITE, underTest.getReadWrite());
         assertEquals(PropertyMemberInfo.DEFAULT, underTest.getMemberInfo());
         assertEquals(ATTRIBUTE_READ_WRITE, underTest.getName());
         assertEquals(Integer.class, underTest.getType());
         assertNotNull(underTest.getReadMethod());
         assertNotNull(underTest.getWriteMethod());
-        BeanWithReadWriteProperties bean = new BeanWithReadWriteProperties();
+        var bean = new BeanWithReadWriteProperties();
         assertNull(underTest.readFrom(bean));
         Integer number = Generators.randomInt(0, 1024);
         assertNotNull(underTest.writeTo(bean, number));
@@ -70,7 +70,7 @@ class PropertyHolderTest {
 
     @Test
     void shouldHandleBuilderLikeAccess() {
-        PropertyHolder underTest =
+        var underTest =
             from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER)
                     .get();
         assertEquals(READ_WRITE, underTest.getReadWrite());
@@ -79,7 +79,7 @@ class PropertyHolderTest {
         assertEquals(Integer.class, underTest.getType());
         assertNotNull(underTest.getReadMethod());
         assertNotNull(underTest.getWriteMethod());
-        BeanWithReadWriteProperties bean = new BeanWithReadWriteProperties();
+        var bean = new BeanWithReadWriteProperties();
         assertNull(underTest.readFrom(bean));
         Integer number = Generators.randomInt(0, 1024);
         assertNotNull(underTest.writeTo(bean, number));
@@ -91,8 +91,8 @@ class PropertyHolderTest {
 
     @Test
     void shouldFailOnOnRuntimeExceptionProperty() {
-        ExplodingBean underTest = new ExplodingBean();
-        PropertyHolder holder = from(ExplodingBean.class, PROPERTY_NAME).get();
+        var underTest = new ExplodingBean();
+        var holder = from(ExplodingBean.class, PROPERTY_NAME).get();
 
         underTest.illegalArgumentException();
         assertThrows(IllegalStateException.class, () -> {
@@ -105,9 +105,9 @@ class PropertyHolderTest {
 
     @Test
     void shouldSupportBuilderLikeAccess() {
-        BeanWithBuilderStyleAccessor bean = new BeanWithBuilderStyleAccessor();
+        var bean = new BeanWithBuilderStyleAccessor();
         assertTrue(from(BeanWithBuilderStyleAccessor.class, PROPERTY_NAME).isPresent());
-        PropertyHolder underTest = from(BeanWithBuilderStyleAccessor.class, PROPERTY_NAME).get();
+        var underTest = from(BeanWithBuilderStyleAccessor.class, PROPERTY_NAME).get();
 
         assertEquals(WRITE_ONLY, underTest.getReadWrite());
         assertEquals(PropertyMemberInfo.DEFAULT, underTest.getMemberInfo());
@@ -122,19 +122,19 @@ class PropertyHolderTest {
 
     @Test
     void shouldHandleOverloadedMethods() {
-        PropertyHolder holder = from(BeanWithMethodOverload.class, PROPERTY_NAME).get();
+        var holder = from(BeanWithMethodOverload.class, PROPERTY_NAME).get();
         assertEquals(Integer.class, holder.getType());
     }
 
     @Test
     void shouldHandleLowerBoundGenerics() {
-        PropertyHolder holder = from(GenericTypeWithLowerBoundType.class, "key").get();
+        var holder = from(GenericTypeWithLowerBoundType.class, "key").get();
         assertEquals(Serializable.class, holder.getType());
     }
 
     @Test
     void shouldHandleBoundGenerics() {
-        PropertyHolder holder = from(StringTypedGenericType.class, "key").get();
+        var holder = from(StringTypedGenericType.class, "key").get();
         assertEquals(String.class, holder.getType());
     }
 }

@@ -35,15 +35,15 @@ public final class KeyMaterialHolder implements Serializable {
 
     /** Optional: An arbitrary name for displaying the key in an ui or logging context. */
     @Getter
-    private String name;
+    private final String name;
 
     /** Optional: additional information transporting some context-information. */
     @Getter
-    private String description;
+    private final String description;
 
     /** Optional: An alias name for a given key. */
     @Getter
-    private String keyAlias;
+    private final String keyAlias;
 
     @Getter
     @Builder.Default

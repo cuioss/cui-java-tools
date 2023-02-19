@@ -227,7 +227,7 @@ public class FilenameUtils {
      * @return the normalized filename, or null if invalid. Null bytes inside string will be removed
      */
     public static String normalize(final String filename, final boolean unixSeparator) {
-        final char separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
+        final var separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
         return doNormalize(filename, separator, true);
     }
 
@@ -323,7 +323,7 @@ public class FilenameUtils {
      * @return the normalized filename, or null if invalid. Null bytes inside string will be removed
      */
     public static String normalizeNoEndSeparator(final String filename, final boolean unixSeparator) {
-        final char separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
+        final var separator = unixSeparator ? UNIX_SEPARATOR : WINDOWS_SEPARATOR;
         return doNormalize(filename, separator, false);
     }
 
@@ -345,35 +345,36 @@ public class FilenameUtils {
 
         failIfNullBytePresent(filename);
 
-        int size = filename.length();
+        var size = filename.length();
         if (size == 0) {
             return filename;
         }
-        final int prefix = getPrefixLength(filename);
+        final var prefix = getPrefixLength(filename);
         if (prefix < 0) {
             return null;
         }
 
-        final char[] array = new char[size + 2]; // +1 for possible extra slash, +2 for arraycopy
+        final var array = new char[size + 2]; // +1 for possible extra slash, +2 for arraycopy
         filename.getChars(0, filename.length(), array, 0);
 
         // fix separators throughout
-        final char otherSeparator = separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR;
-        for (int i = 0; i < array.length; i++) {
+        final var otherSeparator = separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR;
+        for (var i = 0; i < array.length; i++) {
             if (array[i] == otherSeparator) {
                 array[i] = separator;
             }
         }
 
         // add extra separator on the end to simplify code below
-        boolean lastIsDirectory = true;
+        var lastIsDirectory = true;
         if (array[size - 1] != separator) {
-            array[size++] = separator;
+            array[size] = separator;
+            size++;
             lastIsDirectory = false;
         }
 
         // adjoining slashes
-        for (int i = prefix + 1; i < size; i++) {
+        for (var i = prefix + 1; i < size; i++) {
             if (array[i] == separator && array[i - 1] == separator) {
                 System.arraycopy(array, i, array, i - 1, size - i);
                 size--;
@@ -382,7 +383,7 @@ public class FilenameUtils {
         }
 
         // dot slash
-        for (int i = prefix + 1; i < size; i++) {
+        for (var i = prefix + 1; i < size; i++) {
             if (array[i] == separator && array[i - 1] == '.' &&
                     (i == prefix + 1 || array[i - 2] == separator)) {
                 if (i == size - 1) {
@@ -395,7 +396,7 @@ public class FilenameUtils {
         }
 
         // double dot slash
-        outer: for (int i = prefix + 2; i < size; i++) {
+        outer: for (var i = prefix + 2; i < size; i++) {
             if (array[i] == separator && array[i - 1] == '.' && array[i - 2] == '.' &&
                     (i == prefix + 2 || array[i - 3] == separator)) {
                 if (i == prefix + 2) {
@@ -424,7 +425,7 @@ public class FilenameUtils {
         if (size <= 0) { // should never be less than 0
             return "";
         }
-        if ((size <= prefix) || (lastIsDirectory && keepSeparator)) {
+        if (size <= prefix || lastIsDirectory && keepSeparator) {
             return new String(array, 0, size); // keep trailing separator
         }
         return new String(array, 0, size - 1); // lose trailing separator
@@ -474,7 +475,7 @@ public class FilenameUtils {
      * @return the concatenated path, or null if invalid. Null bytes inside string will be removed
      */
     public static String concat(final String basePath, final String fullFilenameToAdd) {
-        final int prefix = getPrefixLength(fullFilenameToAdd);
+        final var prefix = getPrefixLength(fullFilenameToAdd);
         if (prefix < 0) {
             return null;
         }
@@ -484,16 +485,15 @@ public class FilenameUtils {
         if (basePath == null) {
             return null;
         }
-        final int len = basePath.length();
+        final var len = basePath.length();
         if (len == 0) {
             return normalize(fullFilenameToAdd);
         }
-        final char ch = basePath.charAt(len - 1);
+        final var ch = basePath.charAt(len - 1);
         if (isSeparator(ch)) {
             return normalize(basePath + fullFilenameToAdd);
-        } else {
-            return normalize(basePath + '/' + fullFilenameToAdd);
         }
+        return normalize(basePath + '/' + fullFilenameToAdd);
     }
 
     /**
@@ -523,7 +523,7 @@ public class FilenameUtils {
             throw new IllegalArgumentException("Directory must not be null");
         }
 
-        if ((canonicalChild == null) || IOCase.SYSTEM.checkEquals(canonicalParent, canonicalChild)) {
+        if (canonicalChild == null || IOCase.SYSTEM.checkEquals(canonicalParent, canonicalChild)) {
             return false;
         }
 
@@ -569,9 +569,8 @@ public class FilenameUtils {
         }
         if (isSystemWindows()) {
             return separatorsToWindows(path);
-        } else {
-            return separatorsToUnix(path);
         }
+        return separatorsToUnix(path);
     }
 
     // -----------------------------------------------------------------------
@@ -619,11 +618,11 @@ public class FilenameUtils {
         if (filename == null) {
             return NOT_FOUND;
         }
-        final int len = filename.length();
+        final var len = filename.length();
         if (len == 0) {
             return 0;
         }
-        char ch0 = filename.charAt(0);
+        var ch0 = filename.charAt(0);
         if (ch0 == ':') {
             return NOT_FOUND;
         }
@@ -632,42 +631,41 @@ public class FilenameUtils {
                 return 2; // return a length greater than the input
             }
             return isSeparator(ch0) ? 1 : 0;
-        } else {
-            if (ch0 == '~') {
-                int posUnix = filename.indexOf(UNIX_SEPARATOR, 1);
-                int posWin = filename.indexOf(WINDOWS_SEPARATOR, 1);
-                if (posUnix == NOT_FOUND && posWin == NOT_FOUND) {
-                    return len + 1; // return a length greater than the input
-                }
-                posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
-                posWin = posWin == NOT_FOUND ? posUnix : posWin;
-                return Math.min(posUnix, posWin) + 1;
+        }
+        if (ch0 == '~') {
+            var posUnix = filename.indexOf(UNIX_SEPARATOR, 1);
+            var posWin = filename.indexOf(WINDOWS_SEPARATOR, 1);
+            if (posUnix == NOT_FOUND && posWin == NOT_FOUND) {
+                return len + 1; // return a length greater than the input
             }
-            final char ch1 = filename.charAt(1);
-            if (ch1 == ':') {
-                ch0 = Character.toUpperCase(ch0);
-                if (ch0 >= 'A' && ch0 <= 'Z') {
-                    if (len == 2 || !isSeparator(filename.charAt(2))) {
-                        return 2;
-                    }
-                    return 3;
-                } else if (ch0 == UNIX_SEPARATOR) {
-                    return 1;
+            posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
+            posWin = posWin == NOT_FOUND ? posUnix : posWin;
+            return Math.min(posUnix, posWin) + 1;
+        }
+        final var ch1 = filename.charAt(1);
+        if (ch1 == ':') {
+            ch0 = Character.toUpperCase(ch0);
+            if (ch0 >= 'A' && ch0 <= 'Z') {
+                if (len == 2 || !isSeparator(filename.charAt(2))) {
+                    return 2;
                 }
-                return NOT_FOUND;
+                return 3;
+            } else if (ch0 == UNIX_SEPARATOR) {
+                return 1;
+            }
+            return NOT_FOUND;
 
-            } else if (isSeparator(ch0) && isSeparator(ch1)) {
-                int posUnix = filename.indexOf(UNIX_SEPARATOR, 2);
-                int posWin = filename.indexOf(WINDOWS_SEPARATOR, 2);
-                if (posUnix == NOT_FOUND && posWin == NOT_FOUND || posUnix == 2 || posWin == 2) {
-                    return NOT_FOUND;
-                }
-                posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
-                posWin = posWin == NOT_FOUND ? posUnix : posWin;
-                return Math.min(posUnix, posWin) + 1;
-            } else {
-                return isSeparator(ch0) ? 1 : 0;
+        } else if (isSeparator(ch0) && isSeparator(ch1)) {
+            var posUnix = filename.indexOf(UNIX_SEPARATOR, 2);
+            var posWin = filename.indexOf(WINDOWS_SEPARATOR, 2);
+            if (posUnix == NOT_FOUND && posWin == NOT_FOUND || posUnix == 2 || posWin == 2) {
+                return NOT_FOUND;
             }
+            posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
+            posWin = posWin == NOT_FOUND ? posUnix : posWin;
+            return Math.min(posUnix, posWin) + 1;
+        } else {
+            return isSeparator(ch0) ? 1 : 0;
         }
     }
 
@@ -687,8 +685,8 @@ public class FilenameUtils {
         if (filename == null) {
             return NOT_FOUND;
         }
-        final int lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
-        final int lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
+        final var lastUnixPos = filename.lastIndexOf(UNIX_SEPARATOR);
+        final var lastWindowsPos = filename.lastIndexOf(WINDOWS_SEPARATOR);
         return Math.max(lastUnixPos, lastWindowsPos);
     }
 
@@ -713,8 +711,8 @@ public class FilenameUtils {
         if (filename == null) {
             return NOT_FOUND;
         }
-        final int extensionPos = filename.lastIndexOf(EXTENSION_SEPARATOR);
-        final int lastSeparator = indexOfLastSeparator(filename);
+        final var extensionPos = filename.lastIndexOf(EXTENSION_SEPARATOR);
+        final var lastSeparator = indexOfLastSeparator(filename);
         return lastSeparator > extensionPos ? NOT_FOUND : extensionPos;
     }
 
@@ -753,7 +751,7 @@ public class FilenameUtils {
         if (filename == null) {
             return null;
         }
-        final int len = getPrefixLength(filename);
+        final var len = getPrefixLength(filename);
         if (len < 0) {
             return null;
         }
@@ -761,7 +759,7 @@ public class FilenameUtils {
             failIfNullBytePresent(filename + UNIX_SEPARATOR);
             return filename + UNIX_SEPARATOR;
         }
-        final String path = filename.substring(0, len);
+        final var path = filename.substring(0, len);
         failIfNullBytePresent(path);
         return path;
     }
@@ -834,16 +832,16 @@ public class FilenameUtils {
         if (filename == null) {
             return null;
         }
-        final int prefix = getPrefixLength(filename);
+        final var prefix = getPrefixLength(filename);
         if (prefix < 0) {
             return null;
         }
-        final int index = indexOfLastSeparator(filename);
-        final int endIndex = index + separatorAdd;
+        final var index = indexOfLastSeparator(filename);
+        final var endIndex = index + separatorAdd;
         if (prefix >= filename.length() || index < 0 || prefix >= endIndex) {
             return "";
         }
-        final String path = filename.substring(prefix, endIndex);
+        final var path = filename.substring(prefix, endIndex);
         failIfNullBytePresent(path);
         return path;
     }
@@ -920,22 +918,21 @@ public class FilenameUtils {
         if (filename == null) {
             return null;
         }
-        final int prefix = getPrefixLength(filename);
+        final var prefix = getPrefixLength(filename);
         if (prefix < 0) {
             return null;
         }
         if (prefix >= filename.length()) {
             if (includeSeparator) {
                 return getPrefix(filename); // add end slash if necessary
-            } else {
-                return filename;
             }
+            return filename;
         }
-        final int index = indexOfLastSeparator(filename);
+        final var index = indexOfLastSeparator(filename);
         if (index < 0) {
             return filename.substring(0, prefix);
         }
-        int end = index + (includeSeparator ? 1 : 0);
+        var end = index + (includeSeparator ? 1 : 0);
         if (end == 0) {
             end++;
         }
@@ -966,7 +963,7 @@ public class FilenameUtils {
             return null;
         }
         failIfNullBytePresent(filename);
-        final int index = indexOfLastSeparator(filename);
+        final var index = indexOfLastSeparator(filename);
         return filename.substring(index + 1);
     }
 
@@ -979,8 +976,8 @@ public class FilenameUtils {
      * @param path the path to check
      */
     private static void failIfNullBytePresent(final String path) {
-        final int len = path.length();
-        for (int i = 0; i < len; i++) {
+        final var len = path.length();
+        for (var i = 0; i < len; i++) {
             if (path.charAt(i) == 0) {
                 throw new IllegalArgumentException("Null byte present in file/path name. There are no " +
                         "known legitimate use cases for such data, but several injection attacks may use it");
@@ -1035,12 +1032,11 @@ public class FilenameUtils {
         if (filename == null) {
             return null;
         }
-        final int index = indexOfExtension(filename);
+        final var index = indexOfExtension(filename);
         if (index == NOT_FOUND) {
             return "";
-        } else {
-            return filename.substring(index + 1);
         }
+        return filename.substring(index + 1);
     }
 
     // -----------------------------------------------------------------------
@@ -1068,12 +1064,11 @@ public class FilenameUtils {
         }
         failIfNullBytePresent(filename);
 
-        final int index = indexOfExtension(filename);
+        final var index = indexOfExtension(filename);
         if (index == NOT_FOUND) {
             return filename;
-        } else {
-            return filename.substring(0, index);
         }
+        return filename.substring(0, index);
     }
 
     // -----------------------------------------------------------------------
@@ -1189,7 +1184,7 @@ public class FilenameUtils {
         if (extension == null || extension.isEmpty()) {
             return indexOfExtension(filename) == NOT_FOUND;
         }
-        final String fileExt = getExtension(filename);
+        final var fileExt = getExtension(filename);
         return fileExt.equals(extension);
     }
 
@@ -1214,7 +1209,7 @@ public class FilenameUtils {
         if (extensions == null || extensions.length == 0) {
             return indexOfExtension(filename) == NOT_FOUND;
         }
-        final String fileExt = getExtension(filename);
+        final var fileExt = getExtension(filename);
         for (final String extension : extensions) {
             if (fileExt.equals(extension)) {
                 return true;
@@ -1244,7 +1239,7 @@ public class FilenameUtils {
         if (extensions == null || extensions.isEmpty()) {
             return indexOfExtension(filename) == NOT_FOUND;
         }
-        final String fileExt = getExtension(filename);
+        final var fileExt = getExtension(filename);
         for (final String extension : extensions) {
             if (fileExt.equals(extension)) {
                 return true;
@@ -1332,16 +1327,16 @@ public class FilenameUtils {
         if (caseSensitivity == null) {
             caseSensitivity = IOCase.SENSITIVE;
         }
-        final String[] wcs = splitOnTokens(wildcardMatcher);
-        boolean anyChars = false;
-        int textIdx = 0;
-        int wcsIdx = 0;
+        final var wcs = splitOnTokens(wildcardMatcher);
+        var anyChars = false;
+        var textIdx = 0;
+        var wcsIdx = 0;
         final Deque<int[]> backtrack = new ArrayDeque<>();
 
         // loop around a backtrack stack, to handle complex * matching
         do {
             if (!backtrack.isEmpty()) {
-                final int[] array = backtrack.pop();
+                final var array = backtrack.pop();
                 wcsIdx = array[0];
                 textIdx = array[1];
                 anyChars = true;
@@ -1374,16 +1369,14 @@ public class FilenameUtils {
                             // token not found
                             break;
                         }
-                        final int repeat = caseSensitivity.checkIndexOf(filename, textIdx + 1, wcs[wcsIdx]);
+                        final var repeat = caseSensitivity.checkIndexOf(filename, textIdx + 1, wcs[wcsIdx]);
                         if (repeat >= 0) {
                             backtrack.push(new int[] { wcsIdx, repeat });
                         }
-                    } else {
-                        // matching from current position
-                        if (!caseSensitivity.checkRegionMatches(filename, textIdx, wcs[wcsIdx])) {
-                            // couldn't match token
-                            break;
-                        }
+                    } else // matching from current position
+                    if (!caseSensitivity.checkRegionMatches(filename, textIdx, wcs[wcsIdx])) {
+                        // couldn't match token
+                        break;
                     }
 
                     // matched text token, move text index to end of matched token
@@ -1420,9 +1413,9 @@ public class FilenameUtils {
             return new String[] { text };
         }
 
-        final char[] array = text.toCharArray();
-        final ArrayList<String> list = new ArrayList<>();
-        final StringBuilder buffer = new StringBuilder();
+        final var array = text.toCharArray();
+        final var list = new ArrayList<String>();
+        final var buffer = new StringBuilder();
         char prevChar = 0;
         for (final char ch : array) {
             if (ch == '?' || ch == '*') {

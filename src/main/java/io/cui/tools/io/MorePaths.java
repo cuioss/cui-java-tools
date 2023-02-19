@@ -100,8 +100,8 @@ public final class MorePaths {
         if (!checkReadablePath(path, checkForDirectory, verbose)) {
             return false;
         }
-        final File pathFile = path.toFile();
-        final String absolutePath = pathFile.getAbsolutePath();
+        final var pathFile = path.toFile();
+        final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.canWrite()) {
             if (verbose) {
                 log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Writable");
@@ -124,8 +124,8 @@ public final class MorePaths {
      */
     public static boolean checkReadablePath(final @NonNull Path path, final boolean checkForDirectory,
             final boolean verbose) {
-        final File pathFile = path.toFile();
-        final String absolutePath = pathFile.getAbsolutePath();
+        final var pathFile = path.toFile();
+        final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
                 log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
@@ -166,8 +166,8 @@ public final class MorePaths {
      */
     public static boolean checkExecutablePath(final @NonNull Path path,
             final boolean verbose) {
-        final File pathFile = path.toFile();
-        final String absolutePath = pathFile.getAbsolutePath();
+        final var pathFile = path.toFile();
+        final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
                 log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
@@ -204,8 +204,8 @@ public final class MorePaths {
                     String.format("Given path '%s' does not denote an existing writable directory",
                             directory.toFile().getAbsolutePath()));
         }
-        final Path backup = directory.resolve(BACKUP_DIR_NAME);
-        final File backupAsFile = backup.toFile();
+        final var backup = directory.resolve(BACKUP_DIR_NAME);
+        final var backupAsFile = backup.toFile();
         if (!backupAsFile.exists() && !backupAsFile.mkdir()) {
             throw new IllegalStateException(String.format("Unable to create directory '%s'",
                     backup.toFile().getAbsolutePath()));
@@ -225,9 +225,9 @@ public final class MorePaths {
      */
     public static Path backupFile(final Path path) throws IOException {
         assertAccessibleFile(path);
-        Path backupDir = getBackupDirectoryForPath(path.getParent());
+        var backupDir = getBackupDirectoryForPath(path.getParent());
 
-        Path backupFile =
+        var backupFile =
             createNonExistingPath(backupDir, path.getFileName() + BACKUP_FILE_SUFFIX +
                     new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
 
@@ -252,8 +252,8 @@ public final class MorePaths {
     @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyToTempLocation(final Path path) throws IOException {
         assertAccessibleFile(path);
-        StructuredFilename filename = new StructuredFilename(path.getFileName());
-        Path tempFile = Files.createTempFile(filename.getNamePart(), filename.getSuffix());
+        var filename = new StructuredFilename(path.getFileName());
+        var tempFile = Files.createTempFile(filename.getNamePart(), filename.getSuffix());
 
         Files.copy(path, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         log.debug("Created temp-file from '{}' at '{}'", path.toFile().getAbsolutePath(),
@@ -277,14 +277,14 @@ public final class MorePaths {
     }
 
     static Path createNonExistingPath(final Path parentDir, final String fileName) {
-        Path backupFile = parentDir.resolve(fileName);
+        var backupFile = parentDir.resolve(fileName);
         if (!backupFile.toFile().exists()) {
             return backupFile;
         }
 
-        for (int counter = 1; counter < 20; counter++) {
-            String newName = fileName + "_" + counter;
-            Path newBackupFile = parentDir.resolve(newName);
+        for (var counter = 1; counter < 20; counter++) {
+            var newName = fileName + "_" + counter;
+            var newBackupFile = parentDir.resolve(newName);
             if (!newBackupFile.toFile().exists()) {
                 return newBackupFile;
             }
@@ -314,13 +314,13 @@ public final class MorePaths {
         if (path == null) {
             return false;
         }
-        File file = path.toFile();
-        final String absolutePath = file.getAbsolutePath();
+        var file = path.toFile();
+        final var absolutePath = file.getAbsolutePath();
         if (!file.exists()) {
             log.trace("Path {} does not exist", absolutePath);
             return false;
         }
-        boolean recursiveSucceful = true;
+        var recursiveSucceful = true;
         try {
             if (file.isDirectory()) {
                 log.trace("Path {} is directory, checking children", absolutePath);
@@ -368,9 +368,9 @@ public final class MorePaths {
     public static boolean contentEquals(final Path path1, final Path path2) throws IOException {
         requireNonNull(path1);
         requireNonNull(path2);
-        File file1 = path1.toFile();
-        File file2 = path2.toFile();
-        final boolean file1Exists = file1.exists();
+        var file1 = path1.toFile();
+        var file2 = path2.toFile();
+        final var file1Exists = file1.exists();
         if (file1Exists != file2.exists()) {
             return false;
         }
@@ -433,7 +433,7 @@ public final class MorePaths {
      */
     public static void saveAndBackup(final Path filePath, final FileWriteHandler fileWriteHandler) throws IOException {
         // Copy original file to temp
-        final Path temp = copyToTempLocation(filePath);
+        final var temp = copyToTempLocation(filePath);
 
         // Save data to temp file
         fileWriteHandler.write(temp);
@@ -471,16 +471,15 @@ public final class MorePaths {
         }
 
         if (null != path && null != path2) {
-            if (path.toFile().exists() && path2.toFile().exists()) {
-                try {
-                    return Files.isSameFile(path, path2);
-                } catch (final IOException e) {
-                    log.error(e, "Portal-123: Unable to compare path_a={} and path_b={}", path, path2);
-                }
-            } else {
+            if (!path.toFile().exists() || !path2.toFile().exists()) {
                 log.debug("Comparing paths with #equals, as at least one path does not exist. " +
                         "path_a={}, path_b={}", path, path2);
                 return path.equals(path2);
+            }
+            try {
+                return Files.isSameFile(path, path2);
+            } catch (final IOException e) {
+                log.error(e, "Portal-123: Unable to compare path_a={} and path_b={}", path, path2);
             }
         } else {
             log.trace("at least one path is null: path_a={}, path_b={}", path, path2);

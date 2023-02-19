@@ -16,48 +16,48 @@ class StructuredFilenameTest {
 
     @Test
     void testValidFilename() {
-        final StructuredFilename filename = new StructuredFilename("test.suffix");
+        final var filename = new StructuredFilename("test.suffix");
         assertEquals("test", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
     void testNoSuffixFilename() {
-        final StructuredFilename filename = new StructuredFilename("test");
+        final var filename = new StructuredFilename("test");
         assertEquals("test", filename.getNamePart());
         assertNull(filename.getSuffix());
     }
 
     @Test
     void testMultipleDotsFilename() {
-        final StructuredFilename filename = new StructuredFilename("test.dots.suffix");
+        final var filename = new StructuredFilename("test.dots.suffix");
         assertEquals("test.dots", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
     void testGetAppendedName() {
-        final StructuredFilename filename = new StructuredFilename("test.suffix");
+        final var filename = new StructuredFilename("test.suffix");
         assertEquals("test-appended.suffix",
                 filename.getAppendedName("-appended"));
     }
 
     @Test
     void shouldHandleDotOnlyName() {
-        final StructuredFilename filename = new StructuredFilename(".");
+        final var filename = new StructuredFilename(".");
         assertEquals(".", filename.getNamePart());
         assertNull(filename.getSuffix());
     }
 
     @Test
     void shouldResolvePath() {
-        final StructuredFilename filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME));
+        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME));
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 
     @Test
     void shouldResolveFile() {
-        final StructuredFilename filename =
+        final var filename =
             new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }

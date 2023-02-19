@@ -143,7 +143,7 @@ public final class BooleanOperations {
      *         case.
      */
     public static boolean isValidBoolean(String value) {
-        return (Boolean.TRUE.toString().equalsIgnoreCase(value)
-                || Boolean.FALSE.toString().equalsIgnoreCase(value));
+        return Boolean.TRUE.toString().equalsIgnoreCase(value)
+                || Boolean.FALSE.toString().equalsIgnoreCase(value);
     }
 }

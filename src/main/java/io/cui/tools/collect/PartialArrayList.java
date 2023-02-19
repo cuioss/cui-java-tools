@@ -65,12 +65,11 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
         if (MoreCollections.isEmpty(full)) {
             return emptyList();
         }
-        int actualSize = full.size();
+        var actualSize = full.size();
         if (actualSize <= limit) {
             return new PartialArrayList<>(full, false);
-        } else {
-            return new PartialArrayList<>(full.subList(0, limit), true);
         }
+        return new PartialArrayList<>(full.subList(0, limit), true);
     }
 
 }

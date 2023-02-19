@@ -90,16 +90,16 @@ public class IOStreams {
             input2 = new BufferedInputStream(input2);
         }
 
-        int ch = input1.read();
+        var ch = input1.read();
         while (EOF != ch) {
-            final int ch2 = input2.read();
+            final var ch2 = input2.read();
             if (ch != ch2) {
                 return false;
             }
             ch = input1.read();
         }
 
-        final int ch2 = input2.read();
+        final var ch2 = input2.read();
         return ch2 == EOF;
     }
 
@@ -126,16 +126,16 @@ public class IOStreams {
         input1 = toBufferedReader(input1);
         input2 = toBufferedReader(input2);
 
-        int ch = input1.read();
+        var ch = input1.read();
         while (EOF != ch) {
-            final int ch2 = input2.read();
+            final var ch2 = input2.read();
             if (ch != ch2) {
                 return false;
             }
             ch = input1.read();
         }
 
-        final int ch2 = input2.read();
+        final var ch2 = input2.read();
         return ch2 == EOF;
     }
 
@@ -183,7 +183,7 @@ public class IOStreams {
      */
     public static String toString(final InputStream input, final Charset encoding) throws IOException {
         Preconditions.checkArgument(null != input, "InputStream must not be null");
-        try (final StringWriter sw = new StringWriter()) {
+        try (final var sw = new StringWriter()) {
             copy(input, sw, encoding);
             return sw.toString();
         }
@@ -224,7 +224,7 @@ public class IOStreams {
      *
      */
     public static int copy(final InputStream input, final OutputStream output) throws IOException {
-        final long count = copyLarge(input, output);
+        final var count = copyLarge(input, output);
         if (count > Integer.MAX_VALUE) {
             return -1;
         }
@@ -292,7 +292,7 @@ public class IOStreams {
      */
     public static long copyLarge(final InputStream input, final OutputStream output, final byte[] buffer)
         throws IOException {
-        long count = 0;
+        var count = 0L;
         int n;
         while (EOF != (n = input.read(buffer))) {
             output.write(buffer, 0, n);
@@ -366,13 +366,13 @@ public class IOStreams {
         if (length == 0) {
             return 0;
         }
-        final int bufferLength = buffer.length;
-        int bytesToRead = bufferLength;
+        final var bufferLength = buffer.length;
+        var bytesToRead = bufferLength;
         if (length > 0 && length < bufferLength) {
             bytesToRead = (int) length;
         }
         int read;
-        long totalRead = 0;
+        var totalRead = 0L;
         while (bytesToRead > 0 && EOF != (read = input.read(buffer, 0, bytesToRead))) {
             output.write(buffer, 0, read);
             totalRead += read;
@@ -402,7 +402,7 @@ public class IOStreams {
      */
     public static void copy(final InputStream input, final Writer output, final Charset inputEncoding)
         throws IOException {
-        final InputStreamReader in = new InputStreamReader(input, toCharset(inputEncoding));
+        final var in = new InputStreamReader(input, toCharset(inputEncoding));
         copy(in, output);
     }
 
@@ -479,7 +479,7 @@ public class IOStreams {
      *
      */
     public static int copy(final Reader input, final Writer output) throws IOException {
-        final long count = copyLarge(input, output);
+        final var count = copyLarge(input, output);
         if (count > Integer.MAX_VALUE) {
             return -1;
         }
@@ -521,7 +521,7 @@ public class IOStreams {
      *
      */
     public static long copyLarge(final Reader input, final Writer output, final char[] buffer) throws IOException {
-        long count = 0;
+        var count = 0L;
         int n;
         while (EOF != (n = input.read(buffer))) {
             output.write(buffer, 0, n);
@@ -582,12 +582,12 @@ public class IOStreams {
         if (length == 0) {
             return 0;
         }
-        int bytesToRead = buffer.length;
+        var bytesToRead = buffer.length;
         if (length > 0 && length < buffer.length) {
             bytesToRead = (int) length;
         }
         int read;
-        long totalRead = 0;
+        var totalRead = 0L;
         while (bytesToRead > 0 && EOF != (read = input.read(buffer, 0, bytesToRead))) {
             output.write(buffer, 0, read);
             totalRead += read;
@@ -624,7 +624,7 @@ public class IOStreams {
      */
     public static void copy(final Reader input, final OutputStream output, final Charset outputEncoding)
         throws IOException {
-        final OutputStreamWriter out = new OutputStreamWriter(output, toCharset(outputEncoding));
+        final var out = new OutputStreamWriter(output, toCharset(outputEncoding));
         copy(input, out);
         // Unless anyone is planning on rewriting OutputStreamWriter,
         // we have to flush here.
@@ -700,7 +700,7 @@ public class IOStreams {
         if (skipByteBuffer == null) {
             skipByteBuffer = new byte[SKIP_BUFFER_SIZE];
         }
-        long remain = toSkip;
+        var remain = toSkip;
         while (remain > 0) {
             // See https://issues.apache.org/jira/browse/IO-203 for why we use read() rather than
             // delegating to skip()
@@ -751,7 +751,7 @@ public class IOStreams {
         if (skipCharBuffer == null) {
             skipCharBuffer = new char[SKIP_BUFFER_SIZE];
         }
-        long remain = toSkip;
+        var remain = toSkip;
         while (remain > 0) {
             // See https://issues.apache.org/jira/browse/IO-203 for why we use read() rather than
             // delegating to skip()
@@ -788,7 +788,7 @@ public class IOStreams {
         if (toSkip < 0) {
             throw new IllegalArgumentException("Bytes to skip must not be negative: " + toSkip);
         }
-        final long skipped = skip(input, toSkip);
+        final var skipped = skip(input, toSkip);
         if (skipped != toSkip) {
             throw new EOFException("Bytes to skip: " + toSkip + ACTUAL + skipped);
         }
@@ -815,7 +815,7 @@ public class IOStreams {
      *
      */
     public static void skipFully(final Reader input, final long toSkip) throws IOException {
-        final long skipped = skip(input, toSkip);
+        final var skipped = skip(input, toSkip);
         if (skipped != toSkip) {
             throw new EOFException("Chars to skip: " + toSkip + ACTUAL + skipped);
         }
@@ -835,7 +835,7 @@ public class IOStreams {
      * @throws IOException if an I/O error occurs
      */
     public static byte[] toByteArray(final InputStream input) throws IOException {
-        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+        try (final var output = new ByteArrayOutputStream()) {
             copy(input, output);
             return output.toByteArray();
         }

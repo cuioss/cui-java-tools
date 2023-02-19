@@ -4,12 +4,10 @@ import static io.cui.tools.collect.CollectionLiterals.mutableList;
 import static io.cui.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.util.Objects.requireNonNull;
 
-import java.beans.BeanInfo;
 import java.beans.Beans;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -130,7 +128,7 @@ public class PropertyHolder {
         Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, bean);
         if (null != writeMethod) {
             try {
-                Object result = writeMethod.invoke(bean, propertyValue);
+                var result = writeMethod.invoke(bean, propertyValue);
                 return Objects.requireNonNullElse(result, bean);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException(
@@ -156,8 +154,8 @@ public class PropertyHolder {
         requireNonNull(beanType);
         requireNotEmptyTrimmed(attributeName);
         try {
-            BeanInfo info = Introspector.getBeanInfo(beanType);
-            Optional<PropertyDescriptor> descriptor = mutableList(info.getPropertyDescriptors()).stream()
+            var info = Introspector.getBeanInfo(beanType);
+            var descriptor = mutableList(info.getPropertyDescriptors()).stream()
                     .filter(desc -> attributeName.equalsIgnoreCase(desc.getName())).findFirst();
             if (!descriptor.isPresent()) {
                 log.debug(UNABLE_TO_LOAD_PROPERTY_DESCRIPTOR, attributeName, beanType);
@@ -173,7 +171,7 @@ public class PropertyHolder {
 
     private static Optional<PropertyHolder> doBuild(
             PropertyDescriptor propertyDescriptor, Class<?> type, String attributeName) {
-        PropertyHolderBuilder builder = builder();
+        var builder = builder();
         builder.name(attributeName);
         builder.readWrite(PropertyReadWrite.fromPropertyDescriptor(propertyDescriptor, type, attributeName));
         builder.readMethod(propertyDescriptor.getReadMethod());
@@ -185,11 +183,11 @@ public class PropertyHolder {
 
     static Optional<PropertyHolder> buildByReflection(Class<?> beanType, String attributeName) {
         log.trace("Trying reflection for determining attribute '%s' on type '%s'", attributeName, beanType);
-        Optional<Field> field = MoreReflection.accessField(beanType, attributeName);
+        var field = MoreReflection.accessField(beanType, attributeName);
         if (!field.isPresent()) {
             return Optional.empty();
         }
-        PropertyHolderBuilder builder = builder();
+        var builder = builder();
         builder.name(attributeName);
         builder.readWrite(PropertyReadWrite.resolveForBean(beanType, attributeName));
         builder.memberInfo(PropertyMemberInfo.resolveForBean(beanType, attributeName));

@@ -95,8 +95,8 @@ public final class MoreStrings {
         if (isEmpty(cs)) {
             return false;
         }
-        final int sz = cs.length();
-        for (int i = 0; i < sz; i++) {
+        final var sz = cs.length();
+        for (var i = 0; i < sz; i++) {
             if (!Character.isLowerCase(cs.charAt(i))) {
                 return false;
             }
@@ -134,8 +134,8 @@ public final class MoreStrings {
         if (isEmpty(cs)) {
             return false;
         }
-        final int sz = cs.length();
-        for (int i = 0; i < sz; i++) {
+        final var sz = cs.length();
+        for (var i = 0; i < sz; i++) {
             if (!Character.isUpperCase(cs.charAt(i))) {
                 return false;
             }
@@ -225,8 +225,8 @@ public final class MoreStrings {
         if (isEmpty(cs)) {
             return false;
         }
-        final int sz = cs.length();
-        for (int i = 0; i < sz; i++) {
+        final var sz = cs.length();
+        for (var i = 0; i < sz; i++) {
             if (!Character.isDigit(cs.charAt(i))) {
                 return false;
             }
@@ -261,7 +261,7 @@ public final class MoreStrings {
         if (cs == null || (strLen = cs.length()) == 0) {
             return true;
         }
-        for (int i = 0; i < strLen; i++) {
+        for (var i = 0; i < strLen; i++) {
             if (!Character.isWhitespace(cs.charAt(i))) {
                 return false;
             }
@@ -324,8 +324,8 @@ public final class MoreStrings {
         if (isEmpty(str) || isEmpty(sub)) {
             return 0;
         }
-        int count = 0;
-        int idx = 0;
+        var count = 0;
+        var idx = 0;
         while ((idx = indexOf(str, sub, idx)) != INDEX_NOT_FOUND) {
             count++;
             idx += sub.length();
@@ -390,7 +390,7 @@ public final class MoreStrings {
         if (str == null) {
             return null;
         }
-        final int pads = size - str.length();
+        final var pads = size - str.length();
         if (pads <= 0) {
             return str; // returns original String when possible
         }
@@ -435,9 +435,9 @@ public final class MoreStrings {
         if (isEmpty(padStr)) {
             padStr = SPACE;
         }
-        final int padLen = padStr.length();
-        final int strLen = str.length();
-        final int pads = size - strLen;
+        final var padLen = padStr.length();
+        final var strLen = str.length();
+        final var pads = size - strLen;
         if (pads <= 0) {
             return str; // returns original String when possible
         }
@@ -447,12 +447,13 @@ public final class MoreStrings {
 
         if (pads == padLen) {
             return padStr.concat(str);
-        } else if (pads < padLen) {
+        }
+        if (pads < padLen) {
             return padStr.substring(0, pads).concat(str);
         } else {
-            final char[] padding = new char[pads];
-            final char[] padChars = padStr.toCharArray();
-            for (int i = 0; i < pads; i++) {
+            final var padding = new char[pads];
+            final var padChars = padStr.toCharArray();
+            for (var i = 0; i < pads; i++) {
                 padding[i] = padChars[i % padLen];
             }
             return new String(padding).concat(str);
@@ -489,8 +490,8 @@ public final class MoreStrings {
         if (repeat <= 0) {
             return EMPTY;
         }
-        final char[] buf = new char[repeat];
-        for (int i = repeat - 1; i >= 0; i--) {
+        final var buf = new char[repeat];
+        for (var i = repeat - 1; i >= 0; i--) {
             buf[i] = ch;
         }
         return new String(buf);
@@ -658,12 +659,12 @@ public final class MoreStrings {
         if (cs instanceof String) {
             return ((String) cs).indexOf(searchChar, start);
         }
-        final int sz = cs.length();
+        final var sz = cs.length();
         if (start < 0) {
             start = 0;
         }
         if (searchChar < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
-            for (int i = start; i < sz; i++) {
+            for (var i = start; i < sz; i++) {
                 if (cs.charAt(i) == searchChar) {
                     return i;
                 }
@@ -671,10 +672,10 @@ public final class MoreStrings {
         }
         // supplementary characters (LANG1300)
         if (searchChar <= Character.MAX_CODE_POINT) {
-            final char[] chars = Character.toChars(searchChar);
-            for (int i = start; i < sz - 1; i++) {
-                final char high = cs.charAt(i);
-                final char low = cs.charAt(i + 1);
+            final var chars = Character.toChars(searchChar);
+            for (var i = start; i < sz - 1; i++) {
+                final var high = cs.charAt(i);
+                final var low = cs.charAt(i + 1);
                 if (high == chars[0] && low == chars[1]) {
                     return i;
                 }
@@ -718,8 +719,8 @@ public final class MoreStrings {
             return false;
         }
 
-        final int strLen = str.length();
-        for (int i = 0; i < strLen; i++) {
+        final var strLen = str.length();
+        for (var i = 0; i < strLen; i++) {
             if (!Character.isWhitespace(str.charAt(i))) {
                 return true;
             }
@@ -799,7 +800,7 @@ public final class MoreStrings {
      * @return {@code string} itself if it is nonempty; {@code null} if it is empty or null
      */
     public static String emptyToNull(String string) {
-        if ((null == string) || string.isEmpty()) {
+        if (null == string || string.isEmpty()) {
             return null;
         }
         return string;
@@ -858,22 +859,23 @@ public final class MoreStrings {
         if (args == null) {
             args = new Object[] { "(Object[])null" };
         } else {
-            for (int i = 0; i < args.length; i++) {
+            for (var i = 0; i < args.length; i++) {
                 args[i] = lenientToString(args[i]);
             }
         }
 
         // start substituting the arguments into the '%s' placeholders
-        StringBuilder builder = new StringBuilder(template.length() + 16 * args.length);
-        int templateStart = 0;
-        int i = 0;
+        var builder = new StringBuilder(template.length() + 16 * args.length);
+        var templateStart = 0;
+        var i = 0;
         while (i < args.length) {
-            int placeholderStart = template.indexOf("%s", templateStart);
+            var placeholderStart = template.indexOf("%s", templateStart);
             if (placeholderStart == -1) {
                 break;
             }
             builder.append(template, templateStart, placeholderStart);
-            builder.append(args[i++]);
+            builder.append(args[i]);
+            i++;
             templateStart = placeholderStart + 2;
         }
         builder.append(template, templateStart, template.length());
@@ -881,7 +883,8 @@ public final class MoreStrings {
         // if we run out of placeholders, append the extra args in square braces
         if (i < args.length) {
             builder.append(" [");
-            builder.append(args[i++]);
+            builder.append(args[i]);
+            i++;
             while (i < args.length) {
                 builder.append(", ");
                 builder.append(args[i++]);
@@ -912,7 +915,7 @@ public final class MoreStrings {
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            String objectToString =
+            var objectToString =
                 o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
             log.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";

@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Collection;
@@ -126,7 +125,7 @@ public class KeyStoreProvider implements Serializable {
     private Optional<KeyStore> retrieveFromFile() {
         log.debug("Retrieving java.security.KeyStore from configured file '{}'", location);
         try (InputStream input = new BufferedInputStream(new FileInputStream(location))) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(input, getStorePasswordAsCharArray());
             return Optional.of(keyStore);
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
@@ -136,7 +135,7 @@ public class KeyStoreProvider implements Serializable {
 
     private Optional<KeyStore> retrieveFromKeys() {
         log.debug("Retrieving java.security.KeyStore from configured keys");
-        KeyStore keyStore = createEmptyKeyStore();
+        var keyStore = createEmptyKeyStore();
         for (KeyMaterialHolder key : keys) {
             log.debug("Adding Key {}", key);
             requireNonNull(key);
@@ -165,7 +164,7 @@ public class KeyStoreProvider implements Serializable {
         }
 
         try (InputStream certStream = new ByteArrayInputStream(key.getKeyMaterial())) {
-            Certificate cert = cf.generateCertificate(certStream);
+            var cert = cf.generateCertificate(certStream);
             keyStore.setCertificateEntry(key.getKeyAlias(), cert);
         } catch (KeyStoreException | CertificateException | IOException e) {
             throw new IllegalStateException(UNABLE_TO_CREATE_CERTIFICATE, e);
@@ -189,7 +188,7 @@ public class KeyStoreProvider implements Serializable {
 
     private KeyStore createEmptyKeyStore() {
         try {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, getStorePasswordAsCharArray());
             return keyStore;
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {

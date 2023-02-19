@@ -25,7 +25,7 @@ public class Generators {
      */
     public static List<String> randomStrings(int count) {
         List<String> result = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             result.add(randomString());
         }
         return result;
@@ -57,7 +57,7 @@ public class Generators {
 
     public static byte[] generateTestData(final long size) {
         try {
-            final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+            final var baout = new ByteArrayOutputStream();
             generateTestData(baout, size);
             return baout.toByteArray();
         } catch (final IOException ioe) {
@@ -67,7 +67,7 @@ public class Generators {
 
     public static void generateTestData(final OutputStream out, final long size)
         throws IOException {
-        for (int i = 0; i < size; i++) {
+        for (var i = 0; i < size; i++) {
             // output.write((byte)'X');
 
             // nice varied byte pattern compatible with Readers and Writers

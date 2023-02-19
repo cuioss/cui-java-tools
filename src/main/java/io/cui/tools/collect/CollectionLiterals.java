@@ -118,7 +118,7 @@ public class CollectionLiterals {
      * @param <E> a E class
      */
     public static <E> List<E> mutableList(Iterable<? extends E> elements) {
-        ArrayList<E> list = new ArrayList<>();
+        var list = new ArrayList<E>();
         if (isEmpty(elements)) {
             return list;
         }

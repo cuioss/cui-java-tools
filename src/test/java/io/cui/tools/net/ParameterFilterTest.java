@@ -27,7 +27,7 @@ class ParameterFilterTest {
 
     @Test
     void testShouldExludeAndIncludeStrings() {
-        final ParameterFilter filter = new ParameterFilter(EXCLUDES, false);
+        final var filter = new ParameterFilter(EXCLUDES, false);
         for (final String exclude : EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));
         }
@@ -38,7 +38,7 @@ class ParameterFilterTest {
 
     @Test
     void testShouldExludeAndIncludeFacesStrings() {
-        final ParameterFilter filter = new ParameterFilter(EXCLUDES, true);
+        final var filter = new ParameterFilter(EXCLUDES, true);
         for (final String exclude : FACES_EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));
         }

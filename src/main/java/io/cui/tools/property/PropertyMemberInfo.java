@@ -1,9 +1,7 @@
 package io.cui.tools.property;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Optional;
 
 import io.cui.tools.reflect.MoreReflection;
 
@@ -49,7 +47,7 @@ public enum PropertyMemberInfo {
      * @return the corresponding {@link PropertyReadWrite} for a given property
      */
     public static PropertyMemberInfo resolveForBean(final Class<?> beanType, final String propertyName) {
-        Optional<Field> fieldOption = MoreReflection.accessField(beanType, propertyName);
+        var fieldOption = MoreReflection.accessField(beanType, propertyName);
         if (!fieldOption.isPresent()) {
             return UNDEFINED;
         }

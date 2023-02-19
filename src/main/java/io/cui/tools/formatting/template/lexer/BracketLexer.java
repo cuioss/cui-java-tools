@@ -119,12 +119,12 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
         if (!isEmpty(input)) {
 
-            final List<String> chunksSplitByLeftBracket = brackets.splitByLeftBracket(input);
-            final List<String> chunksSplitByRightBracket = brackets.splitByRightBracket(input);
-            int leftBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.leftBracket));
-            int rightBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.rightBracket));
-            boolean chunkCountEven = chunksSplitByLeftBracket.size() == chunksSplitByRightBracket.size();
-            boolean bracketCountEven = leftBracketCount == rightBracketCount;
+            final var chunksSplitByLeftBracket = brackets.splitByLeftBracket(input);
+            final var chunksSplitByRightBracket = brackets.splitByRightBracket(input);
+            var leftBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.leftBracket));
+            var rightBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.rightBracket));
+            var chunkCountEven = chunksSplitByLeftBracket.size() == chunksSplitByRightBracket.size();
+            var bracketCountEven = leftBracketCount == rightBracketCount;
             // Assumption: Static elements are implicitly filtered
             checkArgument(chunkCountEven && bracketCountEven,
                     "pattern '%s' is unbalanced for %s, left-hand:%s, right-hand:%s", input, brackets,
@@ -142,15 +142,15 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     private void parseChunk(final String chunk, final List<Token> tokens) {
-        final String cleaned = disposeStringToken(chunk, tokens);
+        final var cleaned = disposeStringToken(chunk, tokens);
         if (!isEmpty(cleaned)) {
-            boolean tokenRecognized = false;
+            var tokenRecognized = false;
 
             final String token;
             if (!strict) {
                 token = getBestFittingToken(cleaned, getTokenList());
             } else {
-                String spaceCleaned = SPACE_CLEANER_PATTERN.matcher(cleaned).replaceAll("").trim();
+                var spaceCleaned = SPACE_CLEANER_PATTERN.matcher(cleaned).replaceAll("").trim();
                 if (getTokenList().contains(spaceCleaned)) {
                     token = spaceCleaned;
                 } else {
@@ -168,10 +168,10 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     private static String getBestFittingToken(final String cleanedChunk, final List<String> tokens) {
-        Candidate mostFittingCandidate = new Candidate(cleanedChunk, null);
+        var mostFittingCandidate = new Candidate(cleanedChunk, null);
         for (final String token : tokens) {
             if (!isEmpty(token) && cleanedChunk.contains(token)) {
-                final Candidate otherCandidate = new Candidate(cleanedChunk, token);
+                final var otherCandidate = new Candidate(cleanedChunk, token);
                 if (!mostFittingCandidate.fitsMoreThan(otherCandidate)) {
                     mostFittingCandidate = otherCandidate;
                 }
@@ -181,17 +181,15 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     private String disposeStringToken(final String chunk, final List<Token> tokens) {
-        int startPoint = chunk.indexOf(this.brackets.leftBracket);
+        var startPoint = chunk.indexOf(this.brackets.leftBracket);
         if (startPoint > 0) {
             // string token before was found
-            final String value = chunk.substring(0, startPoint);
+            final var value = chunk.substring(0, startPoint);
             tokens.add(new StringToken(value));
-        } else {
-            // last string token found
-            if (startPoint == -1) {
-                startPoint = chunk.length() - 1;
-                tokens.add(new StringToken(chunk));
-            }
+        } else // last string token found
+        if (startPoint == -1) {
+            startPoint = chunk.length() - 1;
+            tokens.add(new StringToken(chunk));
         }
         return chunk.substring(startPoint + 1);
     }
@@ -215,7 +213,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         public Candidate(final String cleanedChunk, final String tokenName) {
             if (null != tokenName) {
                 this.tokenName = tokenName;
-                int difference = cleanedChunk.compareTo(tokenName);
+                var difference = cleanedChunk.compareTo(tokenName);
                 if (0 > difference) {
                     difference = difference * -1;
                 }

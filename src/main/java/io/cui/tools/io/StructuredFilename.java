@@ -3,7 +3,6 @@ package io.cui.tools.io;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.List;
 
 import io.cui.tools.string.Splitter;
 import lombok.EqualsAndHashCode;
@@ -39,7 +38,7 @@ public class StructuredFilename implements Serializable {
                                      // it better readable
     public StructuredFilename(final String filename) {
         originalName = filename;
-        final List<String> list = Splitter.on(".").omitEmptyStrings().splitToList(filename);
+        final var list = Splitter.on(".").omitEmptyStrings().splitToList(filename);
         switch (list.size()) {
             case 0:
                 namePart = filename;
@@ -84,7 +83,7 @@ public class StructuredFilename implements Serializable {
      *         suffix = "suffix" the resulting String will be "namePart.nameSuffix.suffix"
      */
     public String getAppendedName(final String nameSuffix) {
-        final StringBuilder builder = new StringBuilder(namePart);
+        final var builder = new StringBuilder(namePart);
         if (null != nameSuffix) {
             builder.append(nameSuffix);
         }

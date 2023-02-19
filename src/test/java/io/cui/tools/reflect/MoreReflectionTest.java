@@ -67,7 +67,7 @@ class MoreReflectionTest {
 
     @Test
     void shouldDetectAccessMethodsCaseInsensitivly() {
-        String propertyName = StringCaseShuffler.shuffleCase("url");
+        var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(MoreReflection.retrieveAccessMethod(BeanWithUnusualAttributeCasing.class, propertyName).isPresent(),
                 "Looked for " + propertyName);
     }
@@ -88,7 +88,7 @@ class MoreReflectionTest {
 
     @Test
     void shouldDetectModifierMethodsCaseInsensitivly() {
-        String propertyName = StringCaseShuffler.shuffleCase("url");
+        var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(
                 MoreReflection.retrieveWriteMethod(BeanWithUnusualAttributeCasing.class, propertyName, String.class)
                         .isPresent(),

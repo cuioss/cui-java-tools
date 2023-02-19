@@ -17,7 +17,7 @@ class KeyMaterialHolderTest {
     void shouldBuildWithKeyMaterialOnly() {
         assertNotNull(withRandomKeyMaterial());
 
-        KeyMaterialHolderBuilder builder = KeyMaterialHolder.builder();
+        var builder = KeyMaterialHolder.builder();
         assertThrows(NullPointerException.class, () -> {
             builder.build();
         });
@@ -39,20 +39,20 @@ class KeyMaterialHolderTest {
 
     @Test
     void shouldHandlePassword() {
-        KeyMaterialHolder noPassword = withRandomKeyMaterial().build();
+        var noPassword = withRandomKeyMaterial().build();
         assertNull(noPassword.getKeyPassword());
         assertNotNull(noPassword.getKeyPasswordAsCharArray());
 
-        String password = Generators.randomString();
-        KeyMaterialHolder withPassword = withRandomKeyMaterial().keyPassword(password).build();
+        var password = Generators.randomString();
+        var withPassword = withRandomKeyMaterial().keyPassword(password).build();
         assertEquals(password, withPassword.getKeyPassword());
         assertArrayEquals(password.toCharArray(), withPassword.getKeyPasswordAsCharArray());
     }
 
     @Test
     void serializesKeyMaterial() {
-        final KeyMaterialHolder kmh = withRandomKeyMaterial().build();
-        final byte[] roundtripResult = KeyMaterialHolder.deserializeKeyMaterial(
+        final var kmh = withRandomKeyMaterial().build();
+        final var roundtripResult = KeyMaterialHolder.deserializeKeyMaterial(
                 KeyMaterialHolder.serializeKeyMaterial(
                         kmh.getKeyMaterial()));
         assertArrayEquals(kmh.getKeyMaterial(), roundtripResult, "byte arrays should be equal");

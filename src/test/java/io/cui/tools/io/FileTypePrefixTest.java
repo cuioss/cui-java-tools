@@ -13,7 +13,7 @@ class FileTypePrefixTest {
     void removesCorrectPrefix() {
         assertEquals("foo", CLASSPATH.removePrefix("classpath:foo"));
 
-        final String wrongValue = "klasspath:foo";
+        final var wrongValue = "klasspath:foo";
         assertEquals(wrongValue, CLASSPATH.removePrefix(wrongValue));
     }
 

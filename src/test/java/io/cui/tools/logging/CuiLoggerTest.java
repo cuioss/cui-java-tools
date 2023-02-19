@@ -44,7 +44,7 @@ class CuiLoggerTest {
 
     @Test
     void shouldHandleLogGuard() {
-        java.util.logging.Logger reference = java.util.logging.Logger.getLogger(CuiLogger.class.getName());
+        var reference = java.util.logging.Logger.getLogger(CuiLogger.class.getName());
 
         assertEquals(underTest.isTraceEnabled(), reference.isLoggable(Level.FINER));
         assertEquals(underTest.isDebugEnabled(), reference.isLoggable(Level.FINE));

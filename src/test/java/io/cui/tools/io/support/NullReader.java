@@ -200,7 +200,7 @@ public class NullReader extends Reader {
             return doEndOfFile();
         }
         position += length;
-        int returnLength = length;
+        var returnLength = length;
         if (position > size) {
             returnLength = length - (int) (position - size);
             position = size;
@@ -254,7 +254,7 @@ public class NullReader extends Reader {
             return doEndOfFile();
         }
         position += numberOfChars;
-        long returnLength = numberOfChars;
+        var returnLength = numberOfChars;
         if (position > size) {
             returnLength = numberOfChars - (position - size);
             position = size;

@@ -131,13 +131,13 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      */
     public static String createParameterString(final boolean encode,
             final UrlParameter... parameters) {
-        final StringBuilder builder = new StringBuilder();
+        final var builder = new StringBuilder();
         // First parameter to be treated specially.
         if (null != parameters && parameters.length > 0 && null != parameters[0]) {
             builder.append('?').append(parameters[0].createNameValueString(encode));
             if (parameters.length > 1) {
                 // The other parameters are appended with '&'
-                for (int i = 1; i < parameters.length; i++) {
+                for (var i = 1; i < parameters.length; i++) {
                     builder.append('&').append(parameters[i].createNameValueString(encode));
                 }
             }
@@ -172,7 +172,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             if (!MoreCollections.isEmpty(entry.getValue())) {
                 value = entry.getValue().get(0);
             }
-            final String key = entry.getKey();
+            final var key = entry.getKey();
             if (null == parameterFilter || !parameterFilter.isExcluded(key)) {
                 try {
                     extracted.add(new UrlParameter(key, value, encode));
@@ -200,9 +200,9 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         if (toBeFiltered == null || toBeFiltered.isEmpty()) {
             return Collections.emptyList();
         }
-        final ArrayList<UrlParameter> filtered = new ArrayList<>();
+        final var filtered = new ArrayList<UrlParameter>();
         for (final UrlParameter parameter : toBeFiltered) {
-            final String key = parameter.getName();
+            final var key = parameter.getName();
             if (null == parameterFilter || !parameterFilter.isExcluded(key)) {
                 filtered.add(parameter);
             }
@@ -242,7 +242,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         if (MoreStrings.isEmpty(queryString)) {
             return Collections.emptyList();
         }
-        String cleaned = queryString.trim();
+        var cleaned = queryString.trim();
         if (cleaned.startsWith("?")) {
             cleaned = cleaned.substring(1);
         }
@@ -250,11 +250,11 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             log.debug("Given String solely consists of '?' symbol, ignoring");
             return Collections.emptyList();
         }
-        List<String> elements = Splitter.on("&").omitEmptyStrings().splitToList(cleaned);
-        CollectionBuilder<UrlParameter> builder = new CollectionBuilder<>();
+        var elements = Splitter.on("&").omitEmptyStrings().splitToList(cleaned);
+        var builder = new CollectionBuilder<UrlParameter>();
         for (String element : elements) {
             if (element.contains("=")) {
-                List<String> splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
+                var splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
                     case 0:
                         log.debug(

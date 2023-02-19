@@ -179,7 +179,7 @@ enum IOCase {
      * @throws NullPointerException if either string is null
      */
     public boolean checkEndsWith(final String str, final String end) {
-        final int endLen = end.length();
+        final var endLen = end.length();
         return str.regionMatches(!sensitive, str.length() - endLen, end, 0, endLen);
     }
 
@@ -198,9 +198,9 @@ enum IOCase {
      * @throws NullPointerException if either string is null
      */
     public int checkIndexOf(final String str, final int strStartIndex, final String search) {
-        final int endIndex = str.length() - search.length();
+        final var endIndex = str.length() - search.length();
         if (endIndex >= strStartIndex) {
-            for (int i = strStartIndex; i <= endIndex; i++) {
+            for (var i = strStartIndex; i <= endIndex; i++) {
                 if (checkRegionMatches(str, i, search)) {
                     return i;
                 }

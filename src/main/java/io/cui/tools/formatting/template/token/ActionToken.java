@@ -43,7 +43,7 @@ public class ActionToken implements Token {
     }
 
     private static String extractSurrounding(final List<String> splitted, final int index) {
-        String result = "";
+        var result = "";
         if (!splitted.isEmpty() && splitted.size() > index) {
             result = splitted.get(index);
         }
@@ -55,7 +55,7 @@ public class ActionToken implements Token {
         requireNonNull(content, "Content must not be null. ");
         final Map<String, Serializable> attributeValues = requireNonNull(
                 content.getAvailablePropertyValues(), "AvailablePropertyValues must not be null. ");
-        final StringBuilder result = new StringBuilder();
+        final var result = new StringBuilder();
         if (attributeValues.containsKey(attribute)) {
             if (attributeValues.keySet().size() > 1) {
                 result.append(before).append(attributeValues.get(attribute)).append(after);

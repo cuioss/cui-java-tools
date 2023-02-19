@@ -43,7 +43,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
     public int read() throws IOException {
         try {
             beforeRead(1);
-            final int b = in.read();
+            final var b = in.read();
             afterRead(b != EOF ? 1 : EOF);
             return b;
         } catch (final IOException e) {
@@ -63,7 +63,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
     public int read(final byte[] bts) throws IOException {
         try {
             beforeRead(bts != null ? bts.length : 0);
-            final int n = in.read(bts);
+            final var n = in.read(bts);
             afterRead(n);
             return n;
         } catch (final IOException e) {
@@ -85,7 +85,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
     public int read(final byte[] bts, final int off, final int len) throws IOException {
         try {
             beforeRead(len);
-            final int n = in.read(bts, off, len);
+            final var n = in.read(bts, off, len);
             afterRead(n);
             return n;
         } catch (final IOException e) {

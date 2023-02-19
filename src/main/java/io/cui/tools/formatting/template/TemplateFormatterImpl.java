@@ -67,12 +67,12 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
 
         requireNonNull(reference, "Reference must not be null");
 
-        final List<Token> tokenList = getParsedTokens();
+        final var tokenList = getParsedTokens();
 
-        final StringBuilder buffer = new StringBuilder(0);
+        final var buffer = new StringBuilder(0);
 
-        for (int index = 0; index < tokenList.size(); index++) {
-            final Token token = tokenList.get(index);
+        for (var index = 0; index < tokenList.size(); index++) {
+            final var token = tokenList.get(index);
             if (token.isStringToken()) {
                 if (lookUpLastTokenHasValue(tokenList, reference, index)
                         && lookUpNextTokenHasValue(tokenList, reference, index)) {
@@ -89,11 +89,11 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
     private boolean lookUpNextTokenHasValue(final List<Token> tokenList, final T reference,
             final int currentTokenIndex) {
 
-        int nextTokenIndex = currentTokenIndex + 1;
+        var nextTokenIndex = currentTokenIndex + 1;
         while (nextTokenIndex < tokenList.size()) {
-            final Token token = tokenList.get(nextTokenIndex);
+            final var token = tokenList.get(nextTokenIndex);
             if (!token.isStringToken()) {
-                final String value = token.substituteAttribute(reference);
+                final var value = token.substituteAttribute(reference);
                 if (!value.isEmpty()) {
                     return true;
                 }
@@ -106,10 +106,10 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
     private boolean lookUpLastTokenHasValue(final List<Token> tokenList, final T reference,
             final int currentTokenIndex) {
 
-        boolean result = false;
-        final int lastTokenIndex = currentTokenIndex - 1;
+        var result = false;
+        final var lastTokenIndex = currentTokenIndex - 1;
         if (lastTokenIndex >= 0) {
-            final String value = tokenList.get(lastTokenIndex).substituteAttribute(reference);
+            final var value = tokenList.get(lastTokenIndex).substituteAttribute(reference);
             result = !value.isEmpty();
         }
         return result;

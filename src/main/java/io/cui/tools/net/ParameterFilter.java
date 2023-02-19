@@ -48,7 +48,7 @@ public class ParameterFilter implements Serializable {
      */
     public boolean isExcluded(final String value) {
         requireNonNull(value);
-        boolean excluded = false;
+        var excluded = false;
         if (excludeFacesParameter) {
             excluded = value.startsWith(JAVAX_FACES);
         }

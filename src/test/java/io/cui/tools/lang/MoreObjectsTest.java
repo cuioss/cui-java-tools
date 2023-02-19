@@ -65,7 +65,7 @@ class MoreObjectsTest {
     @Test
     void testFirstNonNull() {
         assertEquals("", MoreObjects.firstNonNull(null, ""));
-        final String firstNonNullGenerics = MoreObjects.firstNonNull(null, null, "123", "456");
+        final var firstNonNullGenerics = MoreObjects.firstNonNull(null, null, "123", "456");
         assertEquals("123", firstNonNullGenerics);
         assertEquals("123", MoreObjects.firstNonNull("123", null, "456", null));
         assertEquals(Boolean.TRUE, MoreObjects.firstNonNull(Boolean.TRUE));

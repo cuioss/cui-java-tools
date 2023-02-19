@@ -53,19 +53,19 @@ class HexTest {
      * @return the byte buffer
      */
     private ByteBuffer getByteBufferUtf8(final String string) {
-        final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-        final ByteBuffer bb = allocate(bytes.length);
+        final var bytes = string.getBytes(StandardCharsets.UTF_8);
+        final var bb = allocate(bytes.length);
         bb.put(bytes);
         bb.flip();
         return bb;
     }
 
     private boolean charsetSanityCheck(final String name) {
-        final String source = "the quick brown dog jumped over the lazy fox";
+        final var source = "the quick brown dog jumped over the lazy fox";
         try {
-            final byte[] bytes = source.getBytes(name);
-            final String str = new String(bytes, name);
-            final boolean equals = source.equals(str);
+            final var bytes = source.getBytes(name);
+            final var str = new String(bytes, name);
+            final var equals = source.equals(str);
             if (!equals) {
                 // Here with:
                 //
@@ -90,14 +90,7 @@ class HexTest {
                 log("FAILED charsetSanityCheck=Interesting Java charset oddity: Roundtrip failed for " + name);
             }
             return equals;
-        } catch (final UnsupportedEncodingException e) {
-            // Should NEVER happen since we are getting the name from the Charset class.
-            if (LOG) {
-                log("FAILED charsetSanityCheck=" + name + ", e=" + e);
-                log(e);
-            }
-            return false;
-        } catch (final UnsupportedOperationException e) {
+        } catch (final UnsupportedEncodingException | UnsupportedOperationException e) {
             // Caught here with:
             // x-JISAutoDetect on Windows XP and Java Sun 1.4.2_19 x86 32-bits
             // x-JISAutoDetect on Windows XP and Java Sun 1.5.0_17 x86 32-bits
@@ -164,32 +157,32 @@ class HexTest {
             return;
         }
         log(parent + "=" + name);
-        final Hex customCodec = new Hex(name);
+        final var customCodec = new Hex(name);
         // source data
-        final String sourceString = "Hello World";
-        final byte[] sourceBytes = sourceString.getBytes(name);
+        final var sourceString = "Hello World";
+        final var sourceBytes = sourceString.getBytes(name);
         // test 1
         // encode source to hex string to bytes with charset
-        final byte[] actualEncodedBytes = customCodec.encode(sourceBytes);
+        final var actualEncodedBytes = customCodec.encode(sourceBytes);
         // encode source to hex string...
-        String expectedHexString = Hex.encodeHexString(sourceBytes);
+        var expectedHexString = Hex.encodeHexString(sourceBytes);
         // ... and get the bytes in the expected charset
-        final byte[] expectedHexStringBytes = expectedHexString.getBytes(name);
+        final var expectedHexStringBytes = expectedHexString.getBytes(name);
         assertArrayEquals(expectedHexStringBytes, actualEncodedBytes);
         // test 2
-        String actualStringFromBytes = new String(actualEncodedBytes, name);
+        var actualStringFromBytes = new String(actualEncodedBytes, name);
         assertEquals(expectedHexString, actualStringFromBytes,
                 name + ", expectedHexString=" + expectedHexString + ", actualStringFromBytes=" +
                         actualStringFromBytes);
         // second test:
-        final Hex utf8Codec = new Hex();
+        final var utf8Codec = new Hex();
         expectedHexString = "48656c6c6f20576f726c64";
-        final byte[] decodedUtf8Bytes = (byte[]) utf8Codec.decode(expectedHexString);
+        final var decodedUtf8Bytes = (byte[]) utf8Codec.decode(expectedHexString);
         actualStringFromBytes = new String(decodedUtf8Bytes, utf8Codec.getCharset());
         // sanity check:
         assertEquals(sourceString, actualStringFromBytes, name);
         // actual check:
-        final byte[] decodedCustomBytes = customCodec.decode(actualEncodedBytes);
+        final var decodedCustomBytes = customCodec.decode(actualEncodedBytes);
         actualStringFromBytes = new String(decodedCustomBytes, name);
         assertEquals(sourceString, actualStringFromBytes, name);
     }
@@ -248,7 +241,7 @@ class HexTest {
 
     @Test
     void testDecodeByteBufferAllocatedButEmpty() throws DecoderException {
-        final ByteBuffer bb = allocate(10);
+        final var bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
         assertArrayEquals(new byte[0], new Hex().decode(bb));
@@ -262,7 +255,7 @@ class HexTest {
 
     @Test
     void testDecodeByteBufferOddCharacters() {
-        final ByteBuffer bb = allocate(1);
+        final var bb = allocate(1);
         bb.put((byte) 65);
         bb.flip();
         checkDecodeHexByteBufferOddCharacters(bb);
@@ -270,7 +263,7 @@ class HexTest {
 
     @Test
     void testDecodeByteBufferWithLimitOddCharacters() {
-        final ByteBuffer bb = allocate(10);
+        final var bb = allocate(10);
         bb.put(1, (byte) 65);
         bb.position(1);
         bb.limit(2);
@@ -334,10 +327,10 @@ class HexTest {
 
     @Test
     void testDecodeByteBufferWithLimit() throws DecoderException {
-        final ByteBuffer bb = getByteBufferUtf8("000102030405060708090a0b0c0d0e0f");
+        final var bb = getByteBufferUtf8("000102030405060708090a0b0c0d0e0f");
         final byte[] expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         // Test pairs of bytes
-        for (int i = 0; i < 15; i++) {
+        for (var i = 0; i < 15; i++) {
             bb.position(i * 2);
             bb.limit(i * 2 + 4);
             assertEquals(new String(Arrays.copyOfRange(expected, i, i + 2)), new String(new Hex().decode(bb)));
@@ -362,7 +355,7 @@ class HexTest {
 
     @Test
     void testEncodeByteBufferAllocatedButEmpty() {
-        final ByteBuffer bb = allocate(10);
+        final var bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
         assertArrayEquals(new byte[0], new Hex().encode(bb));
@@ -386,26 +379,26 @@ class HexTest {
 
     @Test
     void testEncodeDecodeHexCharArrayRandom() throws DecoderException, EncoderException {
-        final Random random = new Random();
+        final var random = new Random();
 
-        final Hex hex = new Hex();
-        for (int i = 5; i > 0; i--) {
-            final byte[] data = new byte[random.nextInt(10000) + 1];
+        final var hex = new Hex();
+        for (var i = 5; i > 0; i--) {
+            final var data = new byte[random.nextInt(10000) + 1];
             random.nextBytes(data);
 
             // static API
-            final char[] encodedChars = Hex.encodeHex(data);
-            byte[] decodedBytes = Hex.decodeHex(encodedChars);
+            final var encodedChars = Hex.encodeHex(data);
+            var decodedBytes = Hex.decodeHex(encodedChars);
             assertArrayEquals(data, decodedBytes);
 
             // instance API with array parameter
-            final byte[] encodedStringBytes = hex.encode(data);
+            final var encodedStringBytes = hex.encode(data);
             decodedBytes = hex.decode(encodedStringBytes);
             assertArrayEquals(data, decodedBytes);
 
             // instance API with char[] (Object) parameter
-            String dataString = new String(encodedChars);
-            char[] encodedStringChars = (char[]) hex.encode(dataString);
+            var dataString = new String(encodedChars);
+            var encodedStringChars = (char[]) hex.encode(dataString);
             decodedBytes = (byte[]) hex.decode(encodedStringChars);
             assertArrayEquals(getBytesUtf8(dataString), decodedBytes);
 
@@ -425,8 +418,8 @@ class HexTest {
 
     @Test
     void testEncodeHexByteArrayHelloWorldLowerCaseHex() {
-        final byte[] b = getBytesUtf8("Hello World");
-        final String expected = "48656c6c6f20576f726c64";
+        final var b = getBytesUtf8("Hello World");
+        final var expected = "48656c6c6f20576f726c64";
         char[] actual;
         actual = Hex.encodeHex(b);
         assertEquals(expected, new String(actual));
@@ -438,8 +431,8 @@ class HexTest {
 
     @Test
     void testEncodeHexByteArrayHelloWorldUpperCaseHex() {
-        final byte[] b = getBytesUtf8("Hello World");
-        final String expected = "48656C6C6F20576F726C64";
+        final var b = getBytesUtf8("Hello World");
+        final var expected = "48656C6C6F20576F726C64";
         char[] actual;
         actual = Hex.encodeHex(b);
         assertNotEquals(expected, new String(actual));
@@ -451,7 +444,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteArrayZeroes() {
-        final char[] c = Hex.encodeHex(new byte[36]);
+        final var c = Hex.encodeHex(new byte[36]);
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", new String(c));
     }
 
@@ -463,8 +456,8 @@ class HexTest {
 
     @Test
     void testEncodeHexByteBufferHelloWorldLowerCaseHex() {
-        final ByteBuffer b = getByteBufferUtf8("Hello World");
-        final String expected = "48656c6c6f20576f726c64";
+        final var b = getByteBufferUtf8("Hello World");
+        final var expected = "48656c6c6f20576f726c64";
         char[] actual;
         // Default lower-case
         actual = Hex.encodeHex(b);
@@ -484,8 +477,8 @@ class HexTest {
 
     @Test
     void testEncodeHexByteBufferHelloWorldUpperCaseHex() {
-        final ByteBuffer b = getByteBufferUtf8("Hello World");
-        final String expected = "48656C6C6F20576F726C64";
+        final var b = getByteBufferUtf8("Hello World");
+        final var expected = "48656C6C6F20576F726C64";
         char[] actual;
         // Default lower-case
         actual = Hex.encodeHex(b);
@@ -505,20 +498,20 @@ class HexTest {
 
     @Test
     void testEncodeHex_ByteBufferOfZeroes() {
-        final char[] c = Hex.encodeHex(allocate(36));
+        final var c = Hex.encodeHex(allocate(36));
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", new String(c));
     }
 
     @Test
     void testEncodeHex_ByteBufferWithLimit() {
-        final ByteBuffer bb = allocate(16);
-        for (int i = 0; i < 16; i++) {
+        final var bb = allocate(16);
+        for (var i = 0; i < 16; i++) {
             bb.put((byte) i);
         }
         bb.flip();
-        final String expected = "000102030405060708090a0b0c0d0e0f";
+        final var expected = "000102030405060708090a0b0c0d0e0f";
         // Test pairs of bytes
-        for (int i = 0; i < 15; i++) {
+        for (var i = 0; i < 15; i++) {
             bb.position(i);
             bb.limit(i + 2);
             assertEquals(expected.substring(i * 2, i * 2 + 4), new String(Hex.encodeHex(bb)));
@@ -528,13 +521,13 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteBufferOfZeroes() {
-        final String c = Hex.encodeHexString(allocate(36));
+        final var c = Hex.encodeHexString(allocate(36));
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", c);
     }
 
     @Test
     void testEncodeHexByteString_ByteBufferOfZeroesWithLimit() {
-        final ByteBuffer bb = allocate(36);
+        final var bb = allocate(36);
         bb.limit(3);
         assertEquals("000000", Hex.encodeHexString(bb));
         assertEquals(0, bb.remaining());
@@ -546,7 +539,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteArrayOfZeroes() {
-        final String c = Hex.encodeHexString(new byte[36]);
+        final var c = Hex.encodeHexString(new byte[36]);
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", c);
     }
 
@@ -562,7 +555,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteBufferBoolean_ToLowerCase() {
-        final ByteBuffer bb = allocate(1);
+        final var bb = allocate(1);
         bb.put((byte) 10);
         bb.flip();
         assertEquals("0a", Hex.encodeHexString(bb, true));
@@ -570,7 +563,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteBufferBoolean_ToUpperCase() {
-        final ByteBuffer bb = allocate(1);
+        final var bb = allocate(1);
         bb.put((byte) 10);
         bb.flip();
         assertEquals("0A", Hex.encodeHexString(bb, false));
@@ -578,7 +571,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteBufferWithLimitBoolean_ToLowerCase() {
-        final ByteBuffer bb = allocate(4);
+        final var bb = allocate(4);
         bb.put(1, (byte) 10);
         bb.position(1);
         bb.limit(2);
@@ -588,7 +581,7 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteBufferWithLimitBoolean_ToUpperCase() {
-        final ByteBuffer bb = allocate(4);
+        final var bb = allocate(4);
         bb.put(1, (byte) 10);
         bb.position(1);
         bb.limit(2);
@@ -602,7 +595,7 @@ class HexTest {
      */
     @Test
     void testEncodeHexReadOnlyByteBuffer() {
-        final char[] chars = Hex.encodeHex(ByteBuffer.wrap(new byte[] { 10 }).asReadOnlyBuffer());
+        final var chars = Hex.encodeHex(ByteBuffer.wrap(new byte[] { 10 }).asReadOnlyBuffer());
         assertEquals("0a", String.valueOf(chars));
     }
 
@@ -628,7 +621,7 @@ class HexTest {
 
     @Test
     void shouldRoundTrip() throws Exception {
-        String roundtrip = "roundtrip";
+        var roundtrip = "roundtrip";
         assertEquals(roundtrip, new String(Hex.decodeHex(Hex.encodeHex(roundtrip.getBytes()))));
     }
 

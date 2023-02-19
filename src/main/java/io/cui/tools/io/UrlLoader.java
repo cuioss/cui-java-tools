@@ -39,7 +39,7 @@ public class UrlLoader implements FileLoader {
      * @throws IllegalArgumentException indicating that the given String represents a valid URL
      */
     public UrlLoader(final String url) {
-        String sanitizedUrl = url;
+        var sanitizedUrl = url;
         if (FileTypePrefix.URL.is(url)) {
             sanitizedUrl = FileTypePrefix.URL.removePrefix(url);
         }
@@ -65,7 +65,7 @@ public class UrlLoader implements FileLoader {
     @Override
     public boolean isReadable() {
         try {
-            Optional<URLConnection> con = getConnection();
+            var con = getConnection();
             if (con.isPresent()) {
                 con.get().connect();
                 return true;
@@ -83,7 +83,7 @@ public class UrlLoader implements FileLoader {
 
     @Override
     public InputStream inputStream() throws IOException {
-        Optional<URLConnection> con = getConnection();
+        var con = getConnection();
         if (con.isPresent()) {
             return con.get().getInputStream();
         }

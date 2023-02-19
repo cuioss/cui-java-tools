@@ -105,7 +105,7 @@ public final class MoreCollections {
 
     /**
      * Shorthand for checking whether the given elements are empty or not.
-     * 
+     *
      * @param <T> identifying the type to be checked
      * @param elements to be checked
      * @return the given parameter

@@ -197,9 +197,9 @@ class FilenameUtilsWildcardTest {
 
     @Test
     void testLocaleIndependence() {
-        final Locale orig = Locale.getDefault();
+        final var orig = Locale.getDefault();
 
-        final Locale[] locales = Locale.getAvailableLocales();
+        final var locales = Locale.getAvailableLocales();
 
         final String[][] data = {
             { "I", "i" },
@@ -212,11 +212,11 @@ class FilenameUtilsWildcardTest {
         };
 
         try {
-            for (int i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 for (final Locale locale : locales) {
                     Locale.setDefault(locale);
                     assertTrue(data[i][0].equalsIgnoreCase(data[i][1]), "Test data corrupt: " + i);
-                    final boolean match = FilenameUtils.wildcardMatch(data[i][0], data[i][1], IOCase.INSENSITIVE);
+                    final var match = FilenameUtils.wildcardMatch(data[i][0], data[i][1], IOCase.INSENSITIVE);
                     assertTrue(match, Locale.getDefault().toString() + ": " + i);
                 }
             }

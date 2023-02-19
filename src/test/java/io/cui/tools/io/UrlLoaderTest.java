@@ -15,7 +15,7 @@ class UrlLoaderTest {
 
     @Test
     void niceToString() {
-        final String result = new UrlLoader(UrlLoaderTest.class.getResource("/someTestFile.txt")).toString();
+        final var result = new UrlLoader(UrlLoaderTest.class.getResource("/someTestFile.txt")).toString();
         assertTrue(result.startsWith("UrlLoader(url=file:"));
         assertTrue(result.endsWith("someTestFile.txt)"));
     }

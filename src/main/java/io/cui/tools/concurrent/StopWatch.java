@@ -138,7 +138,7 @@ public final class StopWatch implements Serializable {
      * @throws IllegalStateException if the stopwatch is already stopped.
      */
     public StopWatch stop() {
-        long tick = ticker.read();
+        var tick = ticker.read();
         checkState(isRunning, "This stopwatch is already stopped.");
         isRunning = false;
         elapsedNanos += tick - startTick;
@@ -191,10 +191,10 @@ public final class StopWatch implements Serializable {
     /** Returns a string representation of the current elapsed time. */
     @Override
     public String toString() {
-        long nanos = elapsedNanos();
+        var nanos = elapsedNanos();
 
-        TimeUnit unit = chooseUnit(nanos);
-        double value = (double) nanos / NANOSECONDS.convert(1, unit);
+        var unit = chooseUnit(nanos);
+        var value = (double) nanos / NANOSECONDS.convert(1, unit);
 
         return String.format(Locale.ROOT, "%.4g", value) + " " + abbreviate(unit);
     }

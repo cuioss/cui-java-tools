@@ -151,18 +151,16 @@ public final class Joiner {
         if (isEmpty(parts)) {
             return "";
         }
-        ArrayList<CharSequence> builder = new ArrayList<>();
+        var builder = new ArrayList<CharSequence>();
         for (Object element : parts) {
             if (null == element) {
                 if (!joinerConfig.isSkipNulls()) {
                     builder.add(joinerConfig.getUseForNull());
                 }
+            } else if (element instanceof CharSequence) {
+                builder.add((CharSequence) element);
             } else {
-                if (element instanceof CharSequence) {
-                    builder.add((CharSequence) element);
-                } else {
-                    builder.add(MoreStrings.lenientToString(element));
-                }
+                builder.add(MoreStrings.lenientToString(element));
             }
         }
         if (joinerConfig.isSkipEmpty()) {

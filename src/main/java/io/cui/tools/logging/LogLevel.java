@@ -6,7 +6,6 @@ import static io.cui.tools.string.MoreStrings.nullToEmpty;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,9 +94,9 @@ public enum LogLevel {
         sortedCuiLevels.sort(Comparator.comparing(logLevel -> logLevel.getJuliLevel().intValue()));
         sortedCuiLevels.sort(Comparator.reverseOrder());
 
-        final int juliIntLevel = juliLevel.intValue();
+        final var juliIntLevel = juliLevel.intValue();
         for (LogLevel cuiLevel : sortedCuiLevels) {
-            final int cuiIntLevel = cuiLevel.getJuliLevel().intValue();
+            final var cuiIntLevel = cuiLevel.getJuliLevel().intValue();
             if (cuiIntLevel <= juliIntLevel) {
                 return cuiLevel;
             }
@@ -107,7 +106,7 @@ public enum LogLevel {
 
     private void doLog(final Logger logger, final String message, final Throwable throwable) {
         // We go up the stack-trace until we found the call from CuiLogger.
-        final Optional<StackTraceElement> caller = MoreReflection.findCallerElement(throwable, MARKER_CLASS_NAMES);
+        final var caller = MoreReflection.findCallerElement(throwable, MARKER_CLASS_NAMES);
         if (caller.isPresent()) {
             // This is needed because otherwise LogRecord will assume this class and this method as
             // the source of the log-statement
@@ -121,7 +120,7 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final String replacedTemplate =
+            final var replacedTemplate =
                 io.cui.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template)).replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), null);
         }
@@ -139,7 +138,7 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final Throwable throwable, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final String replacedTemplate =
+            final var replacedTemplate =
                 io.cui.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template)).replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), throwable);
         }

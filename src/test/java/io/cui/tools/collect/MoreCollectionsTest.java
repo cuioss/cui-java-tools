@@ -136,8 +136,8 @@ class MoreCollectionsTest {
 
     @Test
     void shouldHandleMapContainsKey() {
-        String key = "key";
-        String value = "value";
+        var key = "key";
+        var value = "value";
         Map<String, String> map = immutableMap(key, value);
 
         assertFalse(containsKey(null, key));
@@ -156,7 +156,7 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleEmpty() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         MapDifference<String, String> diff = difference(builder.toMutableMap(), builder.toMutableMap());
         assertNotNull(diff);
         assertTrue(diff.areEqual());
@@ -168,7 +168,7 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleEmptyImmutable() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         MapDifference<String, String> diff = difference(builder.toImmutableMap(), builder.toImmutableMap());
         assertNotNull(diff);
         assertTrue(diff.areEqual());
@@ -180,8 +180,8 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleRightOnly() {
-        MapBuilder<String, String> left = new MapBuilder<>();
-        MapBuilder<String, String> right = new MapBuilder<String, String>().put("key", "value");
+        var left = new MapBuilder<String, String>();
+        var right = new MapBuilder<String, String>().put("key", "value");
         MapDifference<String, String> diff = difference(left.toImmutableMap(), right.toImmutableMap());
         assertNotNull(diff);
         assertFalse(diff.areEqual());
@@ -193,8 +193,8 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleLeftOnly() {
-        MapBuilder<String, String> left = new MapBuilder<String, String>().put("key", "value");
-        MapBuilder<String, String> right = new MapBuilder<>();
+        var left = new MapBuilder<String, String>().put("key", "value");
+        var right = new MapBuilder<String, String>();
         MapDifference<String, String> diff = difference(left.toImmutableMap(), right.toImmutableMap());
         assertNotNull(diff);
         assertFalse(diff.areEqual());
@@ -206,7 +206,7 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleEqualMap() {
-        MapBuilder<String, String> left = new MapBuilder<String, String>().put("key", "value");
+        var left = new MapBuilder<String, String>().put("key", "value");
         MapDifference<String, String> diff = difference(left.toImmutableMap(), left.toImmutableMap());
         assertNotNull(diff);
         assertTrue(diff.areEqual());
@@ -218,8 +218,8 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandlevalueDifference() {
-        MapBuilder<String, String> left = new MapBuilder<String, String>().put("key", "value");
-        MapBuilder<String, String> right = new MapBuilder<String, String>().put("key", "value2");
+        var left = new MapBuilder<String, String>().put("key", "value");
+        var right = new MapBuilder<String, String>().put("key", "value2");
         MapDifference<String, String> diff = difference(left.toImmutableMap(), right.toImmutableMap());
         assertNotNull(diff);
         assertFalse(diff.areEqual());
@@ -231,8 +231,8 @@ class MoreCollectionsTest {
 
     @Test
     void differenceMapShouldHandleEntrieWithNull() {
-        MapBuilder<String, String> left = new MapBuilder<String, String>().put("key", "value").put("key2", null);
-        MapBuilder<String, String> right = new MapBuilder<String, String>().put("key", null).put("key2", "value");
+        var left = new MapBuilder<String, String>().put("key", "value").put("key2", null);
+        var right = new MapBuilder<String, String>().put("key", null).put("key2", "value");
         MapDifference<String, String> diff = difference(left.toImmutableMap(), right.toImmutableMap());
         assertNotNull(diff);
         assertFalse(diff.areEqual());

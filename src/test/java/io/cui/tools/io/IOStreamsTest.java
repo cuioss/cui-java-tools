@@ -32,7 +32,7 @@ class IOStreamsTest {
 
     @Test
     void testContentEquals_InputStream_InputStream() throws Exception {
-        ByteArrayInputStream input1 = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+        var input1 = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
         assertTrue(contentEquals(input1, input1));
         input1 = new ByteArrayInputStream("ABC".getBytes(StandardCharsets.UTF_8));
         assertTrue(contentEquals(input1, input1));
@@ -52,7 +52,7 @@ class IOStreamsTest {
 
     @Test
     void testContentEquals_Reader_Reader() throws Exception {
-        StringReader input1 = new StringReader("");
+        var input1 = new StringReader("");
         assertTrue(contentEquals(input1, input1));
 
         input1 = new StringReader("ABC");
@@ -75,7 +75,7 @@ class IOStreamsTest {
     @Test
     void testToByteArray_InputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
-            final byte[] out = IOStreams.toByteArray(fin);
+            final var out = IOStreams.toByteArray(fin);
             assertNotNull(out);
             assertEquals(0, fin.available(), "Not all bytes were read");
             assertArrayEquals(inData, out);
@@ -85,7 +85,7 @@ class IOStreamsTest {
     @Test
     void testToString_InputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
-            String out = IOStreams.toString(fin, StandardCharsets.UTF_8);
+            var out = IOStreams.toString(fin, StandardCharsets.UTF_8);
             assertNotNull(out);
             assertEquals(0, fin.available(), "Not all bytes were read");
             assertArrayEquals(inData, out.getBytes());

@@ -24,7 +24,7 @@ public class StringCaseShuffler {
         if (isEmpty(toShuffle)) {
             return toShuffle;
         }
-        StringBuilder result = new StringBuilder();
+        var result = new StringBuilder();
         for (char c : toShuffle.toCharArray()) {
             result.append(handleSingleCharacter(c));
         }

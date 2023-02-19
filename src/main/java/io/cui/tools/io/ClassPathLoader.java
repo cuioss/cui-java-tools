@@ -8,7 +8,6 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 
 import io.cui.tools.lang.SecuritySupport;
 import io.cui.tools.logging.CuiLogger;
@@ -68,7 +67,7 @@ public class ClassPathLoader implements FileLoader {
             throw new IllegalArgumentException("Invalid path name, must start not start with "
                     + FileTypePrefix.FILE + " but was: " + pathName);
         }
-        String newPathName = pathName;
+        var newPathName = pathName;
         if (FileTypePrefix.CLASSPATH.is(pathName)) {
             newPathName = FileTypePrefix.CLASSPATH.removePrefix(pathName);
         }
@@ -112,12 +111,12 @@ public class ClassPathLoader implements FileLoader {
 
     private static URL resolveUrl(String path) {
         log.debug("Resolving URL for '{}'", path);
-        URL url = ClassPathLoader.class.getResource(path);
+        var url = ClassPathLoader.class.getResource(path);
         if (null != url) {
             log.debug("Resolved '{}' from ClassPathLoader.class", path);
             return url;
         }
-        Optional<ClassLoader> loader = SecuritySupport.getContextClassLoader();
+        var loader = SecuritySupport.getContextClassLoader();
         if (loader.isPresent()) {
             url = loader.get().getResource(path);
             if (null != url) {

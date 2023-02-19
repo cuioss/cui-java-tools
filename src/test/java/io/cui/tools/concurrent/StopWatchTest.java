@@ -24,13 +24,13 @@ class StopWatchTest {
 
     @Test
     void testCreateStarted() {
-        StopWatch startedStopwatch = StopWatch.createStarted();
+        var startedStopwatch = StopWatch.createStarted();
         assertTrue(startedStopwatch.isRunning());
     }
 
     @Test
     void testCreateUnstarted() {
-        StopWatch unstartedStopwatch = StopWatch.createUnstarted();
+        var unstartedStopwatch = StopWatch.createUnstarted();
         assertFalse(unstartedStopwatch.isRunning());
         assertEquals(0, unstartedStopwatch.elapsed(NANOSECONDS));
     }

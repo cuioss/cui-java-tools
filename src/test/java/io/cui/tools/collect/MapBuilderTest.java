@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
 class MapBuilderTest {
@@ -22,14 +20,14 @@ class MapBuilderTest {
 
     @Test
     void shouldHandleEmptyMap() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         assertMutable(builder.toMutableMap());
         assertImmutable(builder.toImmutableMap());
     }
 
     @Test
     void shouldHandleHappyCase() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         builder.put(KEY_1, VALUE_1).put(KEY_2, VALUE_2);
         assertEquals(2, builder.size());
         assertMutable(builder.toMutableMap());
@@ -38,7 +36,7 @@ class MapBuilderTest {
 
     @Test
     void shouldHandleRemove() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         builder.put(KEY_1, VALUE_1).remove(KEY_1);
         assertTrue(builder.isEmpty());
         assertEquals(0, builder.size());
@@ -48,7 +46,7 @@ class MapBuilderTest {
 
     @Test
     void shouldHandleClear() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         assertTrue(builder.isEmpty());
         assertTrue(builder.clear().isEmpty());
         builder.put(KEY_1, VALUE_1);
@@ -58,14 +56,14 @@ class MapBuilderTest {
 
     @Test
     void shouldHandlePutAll() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         builder.putAll(new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap());
         assertFalse(builder.isEmpty());
     }
 
     @Test
     void shouldHandlePutEntry() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         builder.put(
                 new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap().entrySet().iterator().next());
         assertFalse(builder.isEmpty());
@@ -73,7 +71,7 @@ class MapBuilderTest {
 
     @Test
     void shouldHandleContainsKeyValue() {
-        MapBuilder<String, String> builder = new MapBuilder<>();
+        var builder = new MapBuilder<String, String>();
         assertFalse(builder.containsKey(KEY_1));
         assertFalse(builder.containsValue(VALUE_1));
         builder.put(KEY_1, VALUE_1);
@@ -99,7 +97,7 @@ class MapBuilderTest {
 
     @Test
     void shouldOnlyAddIfNotNull() {
-        final Map<String, String> map = new MapBuilder<String, String>()
+        final var map = new MapBuilder<String, String>()
                 .put(KEY_1, null)
                 .putIfNotNull(KEY_2, null)
                 .putIfNotNull(KEY_3, "")

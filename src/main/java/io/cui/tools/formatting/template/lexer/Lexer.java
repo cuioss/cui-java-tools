@@ -56,7 +56,7 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
      */
     protected static final void throwUnsupportedTokenException(final String wrongToken,
             final List<String> allowedTokens) {
-        final StringBuilder builder = new StringBuilder();
+        final var builder = new StringBuilder();
         builder.append("Unsupported token '").append(wrongToken).append("' was detected.\n")
                 .append("Allowed are :\n");
         for (final String allowedToken : allowedTokens) {

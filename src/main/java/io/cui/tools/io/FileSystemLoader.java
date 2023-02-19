@@ -54,7 +54,7 @@ public class FileSystemLoader implements FileReaderWriter {
         requireNonNull(pathName);
         normalizedPathName = checkPathName(pathName);
         Preconditions.checkArgument(!isEmpty(normalizedPathName), "'%s' can not be normalized", pathName);
-        final Path path = getPath();
+        final var path = getPath();
         readable = MorePaths.checkReadablePath(path, false, true);
         writable = MorePaths.checkAccessiblePath(path, false, false);
         fileName = new StructuredFilename(path.toAbsolutePath().getFileName().toString());
@@ -101,7 +101,7 @@ public class FileSystemLoader implements FileReaderWriter {
             throw new IllegalArgumentException("Invalid path name, must start not start with "
                     + FileTypePrefix.CLASSPATH + " but was: " + pathName);
         }
-        String newPathName = pathName;
+        var newPathName = pathName;
         if (pathName.startsWith(FileTypePrefix.FILE.getPrefix())) {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {

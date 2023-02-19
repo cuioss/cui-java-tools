@@ -38,8 +38,8 @@ class PartialArrayListTest {
     @Test
     void shouldHandleLargeLists() {
         // Larger List
-        int count = randomInt(1, 256);
-        int bigger = count + 1;
+        var count = randomInt(1, 256);
+        var bigger = count + 1;
 
         assertFalse(of(randomStrings(bigger), count).isEmpty());
         assertEquals(count, of(randomStrings(bigger), count).size());

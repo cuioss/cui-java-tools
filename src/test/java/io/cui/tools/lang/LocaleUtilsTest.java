@@ -27,7 +27,7 @@ class LocaleUtilsTest {
      * @param language the language string
      */
     private static void assertValidToLocale(final String language) {
-        final Locale locale = LocaleUtils.toLocale(language);
+        final var locale = LocaleUtils.toLocale(language);
         assertNotNull(locale, "valid locale");
         assertEquals(language, locale.getLanguage());
         // country and variant are empty
@@ -43,7 +43,7 @@ class LocaleUtilsTest {
      * @param country of the resulting Locale
      */
     private static void assertValidToLocale(final String localeString, final String language, final String country) {
-        final Locale locale = LocaleUtils.toLocale(localeString);
+        final var locale = LocaleUtils.toLocale(localeString);
         assertNotNull(locale, "valid locale");
         assertEquals(language, locale.getLanguage());
         assertEquals(country, locale.getCountry());
@@ -62,7 +62,7 @@ class LocaleUtilsTest {
     private static void assertValidToLocale(
             final String localeString, final String language,
             final String country, final String variant) {
-        final Locale locale = LocaleUtils.toLocale(localeString);
+        final var locale = LocaleUtils.toLocale(localeString);
         assertNotNull(locale, "valid locale");
         assertEquals(language, locale.getLanguage());
         assertEquals(country, locale.getCountry());
@@ -189,7 +189,7 @@ class LocaleUtilsTest {
     @Test
     void testThreeCharsLocale() {
         for (final String str : Arrays.asList("udm", "tet")) {
-            final Locale locale = LocaleUtils.toLocale(str);
+            final var locale = LocaleUtils.toLocale(str);
             assertNotNull(locale);
             assertEquals(str, locale.getLanguage());
             assertTrue(MoreStrings.isBlank(locale.getCountry()));
@@ -264,16 +264,16 @@ class LocaleUtilsTest {
 
     @Test
     void testParseAllLocales() {
-        final Locale[] locales = Locale.getAvailableLocales();
-        int failures = 0;
+        final var locales = Locale.getAvailableLocales();
+        var failures = 0;
         for (final Locale l : locales) {
             // Check if it's possible to recreate the Locale using just the standard constructor
-            final Locale locale = new Locale(l.getLanguage(), l.getCountry(), l.getVariant());
+            final var locale = new Locale(l.getLanguage(), l.getCountry(), l.getVariant());
             if (l.equals(locale)) { // it is possible for LocaleUtils.toLocale to handle these
                                     // Locales
-                String str = l.toString();
+                var str = l.toString();
                 // Look for the script/extension suffix
-                int suff = str.indexOf("_#");
+                var suff = str.indexOf("_#");
                 if (suff == -1) {
                     suff = str.indexOf("#");
                 }
@@ -288,7 +288,7 @@ class LocaleUtilsTest {
                         str = str.substring(0, suff);
                     }
                 }
-                final Locale loc = LocaleUtils.toLocale(str);
+                final var loc = LocaleUtils.toLocale(str);
                 if (!l.equals(loc)) {
                     System.out.println("Failed to parse: " + str);
                     failures++;

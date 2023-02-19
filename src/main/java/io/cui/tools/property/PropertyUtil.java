@@ -3,10 +3,8 @@ package io.cui.tools.property;
 import static io.cui.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.util.Objects.requireNonNull;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,7 +54,7 @@ public class PropertyUtil {
         log.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
-        Optional<Method> reader = MoreReflection.retrieveAccessMethod(bean.getClass(), propertyName);
+        var reader = MoreReflection.retrieveAccessMethod(bean.getClass(), propertyName);
         Preconditions.checkArgument(reader.isPresent(), UNABLE_TO_READ_PROPERTY, propertyName,
                 bean.getClass());
         try {
@@ -81,12 +79,12 @@ public class PropertyUtil {
         log.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
-        Method writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
+        var writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
         try {
-            Object result = writeMethod.invoke(bean, propertyValue);
+            var result = writeMethod.invoke(bean, propertyValue);
             return Objects.requireNonNullElse(result, bean);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            String target = (propertyValue != null) ? propertyValue.getClass().getName() : "Undefined";
+            var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass(), target),
                     e);
@@ -103,12 +101,12 @@ public class PropertyUtil {
      *         the first read method found, {@link Optional#empty()} otherwise.
      */
     public static Optional<Class<?>> resolvePropertyType(Class<?> beanType, String propertyName) {
-        Optional<Method> retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanType, propertyName);
+        var retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanType, propertyName);
         if (retrieveAccessMethod.isPresent()) {
             log.trace("Found read-method on class '%s' for property-name '%s'", beanType, propertyName);
             return Optional.of(retrieveAccessMethod.get().getReturnType());
         }
-        Optional<Field> field = MoreReflection.accessField(beanType, propertyName);
+        var field = MoreReflection.accessField(beanType, propertyName);
         if (field.isPresent()) {
             log.trace("Found field on class '%s' with name '%s'", beanType, propertyName);
             return Optional.of(field.get().getType());
@@ -116,7 +114,7 @@ public class PropertyUtil {
         log.debug(
                 "Neither read-method nor field found on class '%s' for property-name '%s', checking write methods, returning first type found",
                 beanType, propertyName);
-        Collection<Method> candidates = MoreReflection.retrieveWriteMethodCandidates(beanType, propertyName);
+        var candidates = MoreReflection.retrieveWriteMethodCandidates(beanType, propertyName);
         if (!candidates.isEmpty()) {
             return Optional.of(candidates.iterator().next().getParameterTypes()[0]);
         }
@@ -127,22 +125,21 @@ public class PropertyUtil {
     }
 
     static Method determineWriteMethod(Object bean, String propertyName, Object propertyValue) {
-        Collection<Method> candidates = MoreReflection.retrieveWriteMethodCandidates(bean.getClass(), propertyName);
-        String target = (propertyValue != null) ? propertyValue.getClass().getName() : "Undefined";
+        var candidates = MoreReflection.retrieveWriteMethodCandidates(bean.getClass(), propertyName);
+        var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
         Preconditions.checkArgument(!candidates.isEmpty(),
                 UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), target);
         if (null == propertyValue) {
             log.trace("No / Null propertyValue given, so any method should suffice to write property '%s' to %s",
                     propertyName, bean);
             return candidates.iterator().next();
-        } else {
-            for (Method candidate : candidates) {
-                if (MoreReflection.checkWhetherParameterIsAssignable(candidate.getParameterTypes()[0],
-                        propertyValue.getClass())) {
-                    log.trace("Found method %s to write property '%s' to %s", candidate,
-                            propertyName, bean);
-                    return candidate;
-                }
+        }
+        for (Method candidate : candidates) {
+            if (MoreReflection.checkWhetherParameterIsAssignable(candidate.getParameterTypes()[0],
+                    propertyValue.getClass())) {
+                log.trace("Found method %s to write property '%s' to %s", candidate,
+                        propertyName, bean);
+                return candidate;
             }
         }
         throw new IllegalArgumentException(

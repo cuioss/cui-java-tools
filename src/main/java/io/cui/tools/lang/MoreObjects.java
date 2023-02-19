@@ -147,7 +147,7 @@ public class MoreObjects {
         if (suppliers != null) {
             for (final Supplier<T> supplier : suppliers) {
                 if (supplier != null) {
-                    final T value = supplier.get();
+                    final var value = supplier.get();
                     if (value != null) {
                         return value;
                     }

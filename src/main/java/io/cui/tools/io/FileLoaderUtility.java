@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -67,10 +66,10 @@ public final class FileLoaderUtility {
         checkArgument(null != source, "Attribute with name source must not be null");
         checkArgument(source.isReadable(), "Source must be readable");
 
-        final Path target = Files.createTempFile(source.getFileName().getNamePart(),
+        final var target = Files.createTempFile(source.getFileName().getNamePart(),
                 source.getFileName().getSuffix());
 
-        try (final InputStream inputStream = source.inputStream()) {
+        try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target,
                     StandardCopyOption.REPLACE_EXISTING);
         }
@@ -90,8 +89,8 @@ public final class FileLoaderUtility {
      */
     public static String toString(final FileLoader fileLoader, final Charset charset) throws IOException {
         requireNonNull(fileLoader);
-        final StringWriter writer = new StringWriter();
-        try (final InputStream inputStream = fileLoader.inputStream()) {
+        final var writer = new StringWriter();
+        try (final var inputStream = fileLoader.inputStream()) {
             IOStreams.copy(inputStream, writer, charset);
         }
         return writer.toString();

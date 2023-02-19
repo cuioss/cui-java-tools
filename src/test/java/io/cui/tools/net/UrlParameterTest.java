@@ -61,9 +61,9 @@ class UrlParameterTest {
     @Test
     void testCreateParameterString() {
         assertEquals("", UrlParameter.createParameterString());
-        final UrlParameter parameter1 = new UrlParameter("name1", "value1");
-        final UrlParameter parameter2 = new UrlParameter("name2", "value2");
-        final UrlParameter parameter3 = new UrlParameter("name3", "value3");
+        final var parameter1 = new UrlParameter("name1", "value1");
+        final var parameter2 = new UrlParameter("name2", "value2");
+        final var parameter3 = new UrlParameter("name3", "value3");
         assertEquals("?name1=value1", UrlParameter.createParameterString(parameter1));
         assertEquals("?name1=value1&name2=value2",
                 UrlParameter.createParameterString(parameter1, parameter2));
@@ -84,7 +84,7 @@ class UrlParameterTest {
         testMap.clear();
         testMap.put("name1", mutableList("value"));
         testMap.put("name2", mutableList("value1", "value2"));
-        List<UrlParameter> parameters = getUrlParameterFromMap(testMap, null, true);
+        var parameters = getUrlParameterFromMap(testMap, null, true);
         assertEquals("name1", parameters.get(0).getName());
         assertEquals("value", parameters.get(0).getValue());
         assertEquals("name2", parameters.get(1).getName());
@@ -100,7 +100,7 @@ class UrlParameterTest {
         testMap.clear();
         testMap.put("name2", mutableList("value"));
         testMap.put("name1", mutableList("value1"));
-        final ParameterFilter filter = new ParameterFilter(immutableList("name2"), true);
+        final var filter = new ParameterFilter(immutableList("name2"), true);
         parameters = getUrlParameterFromMap(testMap, filter, true);
         assertEquals(1, parameters.size());
         assertEquals("name1", parameters.get(0).getName());
@@ -131,7 +131,7 @@ class UrlParameterTest {
     @Test
     void testCompareTo() {
         parameter = new UrlParameter("name", "value");
-        final UrlParameter parameter2 = new UrlParameter("name", "value");
+        final var parameter2 = new UrlParameter("name", "value");
 
         assertEquals(0, parameter.compareTo(parameter2));
 
@@ -142,7 +142,7 @@ class UrlParameterTest {
         parameter = new UrlParameter("param1", "#value");
         assertEquals("param1=%23value", parameter.createNameValueString());
 
-        final UrlParameter deserialized =
+        final var deserialized =
             (UrlParameter) ObjectMethodsAsserts.serializeAndDeserialize(parameter);
 
         assertEquals("param1=%23value", deserialized.createNameValueString());
@@ -154,14 +154,14 @@ class UrlParameterTest {
     void shouldFilterCorrectly() {
         final List<UrlParameter> list = new ArrayList<>();
         list.add(new UrlParameter("name1", "value1"));
-        final UrlParameter param2 = new UrlParameter("name2", "value2");
+        final var param2 = new UrlParameter("name2", "value2");
         list.add(param2);
-        final UrlParameter param3 = new UrlParameter("name3", "value3");
+        final var param3 = new UrlParameter("name3", "value3");
         list.add(param3);
         list.add(new UrlParameter("javax.faces.name", "value4"));
-        final ParameterFilter filter = new ParameterFilter(immutableList("name1"), true);
+        final var filter = new ParameterFilter(immutableList("name1"), true);
 
-        final List<UrlParameter> filtered = UrlParameter.filterParameter(list, filter);
+        final var filtered = UrlParameter.filterParameter(list, filter);
         assertEquals(2, filtered.size());
         assertEquals(param2, filtered.get(0));
         assertEquals(param3, filtered.get(1));
@@ -169,18 +169,18 @@ class UrlParameterTest {
 
     @Test
     void shouldReturnEmpty() {
-        final ParameterFilter filter = new ParameterFilter(immutableList("name1"), true);
+        final var filter = new ParameterFilter(immutableList("name1"), true);
 
-        final List<UrlParameter> filtered = UrlParameter.filterParameter(null, filter);
+        final var filtered = UrlParameter.filterParameter(null, filter);
         assertEquals(0, filtered.size());
     }
 
     @Test
     void shouldReturnEmpty2() {
         final List<UrlParameter> list = new ArrayList<>();
-        final ParameterFilter filter = new ParameterFilter(immutableList("name1"), true);
+        final var filter = new ParameterFilter(immutableList("name1"), true);
 
-        final List<UrlParameter> filtered = UrlParameter.filterParameter(list, filter);
+        final var filtered = UrlParameter.filterParameter(list, filter);
         assertEquals(0, filtered.size());
     }
 
@@ -196,18 +196,18 @@ class UrlParameterTest {
 
     @Test
     void parseQueryParameterShouldHandleHappyCaseKeyValue() {
-        List<UrlParameter> fromQueryString = fromQueryString("name1=value1");
+        var fromQueryString = fromQueryString("name1=value1");
         assertEquals(1, fromQueryString.size());
-        UrlParameter urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.get(0);
         assertEquals("name1", urlParameter.getName());
         assertEquals("value1", urlParameter.getValue());
     }
 
     @Test
     void parseQueryParameterShouldHandleHappyCaseKeyOnly() {
-        List<UrlParameter> fromQueryString = fromQueryString("name1=");
+        var fromQueryString = fromQueryString("name1=");
         assertEquals(1, fromQueryString.size());
-        UrlParameter urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.get(0);
         assertEquals("name1", urlParameter.getName());
         assertNull(urlParameter.getValue());
 
@@ -220,9 +220,9 @@ class UrlParameterTest {
 
     @Test
     void parseQueryParameterShouldHandleHappyCaseComlexSample() {
-        List<UrlParameter> fromQueryString = fromQueryString("?name1=value1&name2&name3=&");
+        var fromQueryString = fromQueryString("?name1=value1&name2&name3=&");
         assertEquals(3, fromQueryString.size());
-        UrlParameter urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.get(0);
         assertEquals("name1", urlParameter.getName());
         assertEquals("value1", urlParameter.getValue());
     }

@@ -108,10 +108,11 @@ public class NullInputStream extends InputStream {
      */
     @Override
     public int available() {
-        final long avail = size - position;
+        final var avail = size - position;
         if (avail <= 0) {
             return 0;
-        } else if (avail > Integer.MAX_VALUE) {
+        }
+        if (avail > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
         } else {
             return (int) avail;
@@ -217,7 +218,7 @@ public class NullInputStream extends InputStream {
             return doEndOfFile();
         }
         position += length;
-        int returnLength = length;
+        var returnLength = length;
         if (position > size) {
             returnLength = length - (int) (position - size);
             position = size;
@@ -271,7 +272,7 @@ public class NullInputStream extends InputStream {
             return doEndOfFile();
         }
         position += numberOfBytes;
-        long returnLength = numberOfBytes;
+        var returnLength = numberOfBytes;
         if (position > size) {
             returnLength = numberOfBytes - (position - size);
             position = size;

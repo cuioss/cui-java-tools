@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,10 +35,10 @@ class FileLoaderUtilityTest {
 
     @Test
     void shouldCopyExistingFile() throws IOException {
-        final Path copy = copyFileToTemp(LOADER_EXISTING_FILE_CLASSPATH, true);
+        final var copy = copyFileToTemp(LOADER_EXISTING_FILE_CLASSPATH, true);
         assertNotNull(copy);
         assertTrue(Files.exists(copy));
-        final long size = Files.size(copy);
+        final var size = Files.size(copy);
         assertTrue(size > 40);
     }
 
@@ -61,7 +60,7 @@ class FileLoaderUtilityTest {
 
     @Test
     void shouldReturnContentAsString() throws IOException {
-        String loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH);
+        var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH);
         assertNotNull(loaded);
         assertFalse(loaded.isEmpty());
         assertTrue(loaded.contains("Hello"));

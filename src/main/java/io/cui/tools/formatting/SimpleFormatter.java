@@ -74,7 +74,7 @@ public class SimpleFormatter implements Serializable {
         final List<String> result = new ArrayList<>(0);
         if (null != values) {
             for (final String item : values) {
-                final String value = emptyToNull(item);
+                final var value = emptyToNull(item);
                 if (null == value) {
                     if (ValueHandling.FORMAT_IF_ALL_AVAILABLE.equals(handling)) {
                         result.clear();
@@ -100,7 +100,7 @@ public class SimpleFormatter implements Serializable {
     }
 
     private String format(final List<String> values) {
-        final String joined = getJoined(values);
+        final var joined = getJoined(values);
         if (null != joined) {
             return String.format("(%s)", joined);
         }

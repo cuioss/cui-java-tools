@@ -35,7 +35,7 @@ class PropertyUtilTest {
 
     @Test
     void shouldReadWriteHappyCase() {
-        BeanWithReadWriteProperties underTest = new BeanWithReadWriteProperties();
+        var underTest = new BeanWithReadWriteProperties();
 
         assertNull(readProperty(underTest, ATTRIBUTE_READ_WRITE));
         assertNotNull(readProperty(underTest, ATTRIBUTE_DEFAULT_VALUE));
@@ -54,7 +54,7 @@ class PropertyUtilTest {
 
     @Test
     void shouldHandleOverloadedMethods() {
-        BeanWithMethodOverload underTest = new BeanWithMethodOverload();
+        var underTest = new BeanWithMethodOverload();
 
         assertNull(readProperty(underTest, PROPERTY_NAME));
 
@@ -65,7 +65,7 @@ class PropertyUtilTest {
         assertNotNull(writeProperty(underTest, PROPERTY_NAME, "5"));
         assertEquals(Integer.valueOf(5), readProperty(underTest, PROPERTY_NAME));
 
-        ArrayList<Object> propertyValue = new ArrayList<>();
+        var propertyValue = new ArrayList<Object>();
         assertThrows(IllegalArgumentException.class, () -> {
             writeProperty(underTest, PROPERTY_NAME, propertyValue);
         });
@@ -73,7 +73,7 @@ class PropertyUtilTest {
 
     @Test
     void shouldHandleMethodsWithPrimitives() {
-        BeanWithPrimitives underTest = new BeanWithPrimitives();
+        var underTest = new BeanWithPrimitives();
 
         assertNull(readProperty(underTest, PROPERTY_NAME));
         assertEquals(0, readProperty(underTest, PROPERTY_PRIMITIVE_NAME));
@@ -87,7 +87,7 @@ class PropertyUtilTest {
 
     @Test
     void shouldFailOnInvalidProperty() {
-        BeanWithReadWriteProperties underTest = new BeanWithReadWriteProperties();
+        var underTest = new BeanWithReadWriteProperties();
         assertThrows(IllegalArgumentException.class, () -> {
             readProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE);
         });
@@ -104,7 +104,7 @@ class PropertyUtilTest {
 
     @Test
     void shouldFailOnOnRuntimeExceptionProperty() {
-        ExplodingBean underTest = new ExplodingBean();
+        var underTest = new ExplodingBean();
 
         underTest.illegalArgumentException();
         assertThrows(IllegalStateException.class, () -> {
@@ -117,12 +117,12 @@ class PropertyUtilTest {
 
     @Test
     void shouldBeFlexibleRegardingCaseSensitivity() {
-        BeanWithUnusualAttributeCasing underTest = new BeanWithUnusualAttributeCasing();
+        var underTest = new BeanWithUnusualAttributeCasing();
 
-        String name = StringCaseShuffler.shuffleCase("url");
+        var name = StringCaseShuffler.shuffleCase("url");
         assertNull(readProperty(underTest, name));
 
-        String value = Generators.randomString();
+        var value = Generators.randomString();
         writeProperty(underTest, name, value);
         assertEquals(value, readProperty(underTest, name));
     }

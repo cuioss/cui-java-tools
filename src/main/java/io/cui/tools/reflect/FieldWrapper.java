@@ -62,7 +62,7 @@ public class FieldWrapper {
             log.trace("Given Object is improper type, returning Optional#empty()");
             return Optional.empty();
         }
-        boolean initialAccessible = field.canAccess(object);
+        var initialAccessible = field.canAccess(object);
         log.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
@@ -94,10 +94,10 @@ public class FieldWrapper {
      * @return the field value. {@link Optional#empty()} if the field cannot be read.
      */
     public static final Optional<Object> readValue(final String fieldName, final Object object) {
-        final Optional<FieldWrapper> fieldProvider = from(object.getClass(), fieldName);
+        final var fieldProvider = from(object.getClass(), fieldName);
         log.trace("FieldWrapper: {}", fieldProvider);
         if (fieldProvider.isPresent()) {
-            FieldWrapper fieldWrapper = fieldProvider.get();
+            var fieldWrapper = fieldProvider.get();
             return fieldWrapper.readValue(object);
         }
         return Optional.empty();
@@ -115,7 +115,7 @@ public class FieldWrapper {
      * @throws IllegalStateException wrapping an {@link IllegalAccessException}
      */
     public void writeValue(@NonNull Object object, Object value) {
-        boolean initialAccessible = field.canAccess(object);
+        var initialAccessible = field.canAccess(object);
         log.trace("Writing to field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
@@ -125,7 +125,7 @@ public class FieldWrapper {
             try {
                 field.set(object, value);
             } catch (IllegalAccessException e) {
-                String message = MoreStrings.lenientFormat(
+                var message = MoreStrings.lenientFormat(
                         "Writing to field '{}' with accessible='{}' and parameter ='{}' could not complete",
                         field, initialAccessible, object);
                 throw new IllegalStateException(message, e);
@@ -147,11 +147,10 @@ public class FieldWrapper {
      *         {@link Optional#empty()} otherwise
      */
     public static final Optional<FieldWrapper> from(final Class<?> type, final String fieldName) {
-        Optional<Field> loaded = MoreReflection.accessField(type, fieldName);
+        var loaded = MoreReflection.accessField(type, fieldName);
         if (loaded.isPresent()) {
             return Optional.of(new FieldWrapper(loaded.get()));
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 }

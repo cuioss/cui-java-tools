@@ -133,7 +133,7 @@ public final class MoreReflection {
         final List<Method> found = new ArrayList<>();
         for (final Method method : retrievePublicObjectMethods(clazz)) {
             if (0 == method.getParameterCount()) {
-                final String name = method.getName();
+                final var name = method.getName();
                 if (name.startsWith("get") || name.startsWith("is")) {
                     log.debug("Adding found method '{}' on class '{}'", name, clazz);
                     found.add(method);
@@ -157,7 +157,7 @@ public final class MoreReflection {
     public static List<Method> retrieveAccessMethods(final Class<?> clazz, final Collection<String> ignoreProperties) {
         final List<Method> found = new ArrayList<>();
         for (final Method method : retrieveAccessMethods(clazz)) {
-            final String propertyName = computePropertyNameFromMethodName(method.getName());
+            final var propertyName = computePropertyNameFromMethodName(method.getName());
             if (!ignoreProperties.contains(propertyName)) {
                 found.add(method);
             }
@@ -183,9 +183,8 @@ public final class MoreReflection {
         for (final Method method : retrieveWriteMethodCandidates(clazz, propertyName)) {
             if (checkWhetherParameterIsAssignable(method.getParameterTypes()[0], parameterType)) {
                 return Optional.of(method);
-            } else {
-                log.trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
             }
+            log.trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
         }
         return Optional.empty();
     }
@@ -264,10 +263,10 @@ public final class MoreReflection {
      */
     public static Collection<Method> retrieveWriteMethodCandidates(final Class<?> clazz, final String propertyName) {
         requireNotEmpty(propertyName);
-        final CollectionBuilder<Method> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<Method>();
         for (final Method method : retrievePublicObjectMethods(clazz)) {
             if (1 == method.getParameterCount()) {
-                final String name = method.getName();
+                final var name = method.getName();
                 if (propertyName.equals(name)) {
                     log.debug("Returning found method '{}' on class '{}'", name, clazz);
                     builder.add(method);
@@ -318,16 +317,14 @@ public final class MoreReflection {
         if (methodName.startsWith("get") || methodName.startsWith("set")) {
             if (methodName.length() > 3) {
                 return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
-            } else {
-                log.debug("Name to short for extracting attributeName '{}'", methodName);
             }
+            log.debug("Name to short for extracting attributeName '{}'", methodName);
         }
         if (methodName.startsWith("is")) {
             if (methodName.length() > 2) {
                 return methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
-            } else {
-                log.debug("Name to short for extracting attributeName '{}'", methodName);
             }
+            log.debug("Name to short for extracting attributeName '{}'", methodName);
         }
         return methodName;
     }
@@ -352,7 +349,7 @@ public final class MoreReflection {
             return Collections.emptyList();
         }
 
-        final CollectionBuilder<A> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<A>();
         builder.add(annotatedType.getAnnotationsByType(annotation));
         builder.add(extractAllAnnotations(annotatedType.getSuperclass(), annotation));
         return builder.toImmutableList();
@@ -389,7 +386,7 @@ public final class MoreReflection {
      */
     @SuppressWarnings("unchecked") // owolff: The unchecked casting is necessary
     public static <T> Class<T> extractFirstGenericTypeArgument(final Class<?> typeToBeExtractedFrom) {
-        final ParameterizedType parameterizedType = extractParameterizedType(typeToBeExtractedFrom).orElseThrow(
+        final var parameterizedType = extractParameterizedType(typeToBeExtractedFrom).orElseThrow(
                 () -> new IllegalArgumentException(
                         "Given type defines no generic KeyStoreType: " + typeToBeExtractedFrom));
 
@@ -448,7 +445,7 @@ public final class MoreReflection {
             log.debug("java.lang.Object is not a ParameterizedType");
             return Optional.empty();
         }
-        final Type genericSuperclass = typeToBeExtractedFrom.getGenericSuperclass();
+        final var genericSuperclass = typeToBeExtractedFrom.getGenericSuperclass();
         if (genericSuperclass instanceof ParameterizedType) {
             return Optional.of((ParameterizedType) genericSuperclass);
         }
@@ -474,7 +471,7 @@ public final class MoreReflection {
     public static <T> T newProxy(final Class<T> interfaceType, final InvocationHandler handler) {
         requireNonNull(handler);
         Preconditions.checkArgument(interfaceType.isInterface(), "%s is not an interface", interfaceType);
-        final Object object =
+        final var object =
             Proxy.newProxyInstance(
                     interfaceType.getClassLoader(), new Class<?>[] { interfaceType }, handler);
         return interfaceType.cast(object);
@@ -489,7 +486,7 @@ public final class MoreReflection {
      * @return option of detected caller class name
      */
     public static Optional<String> findCaller(final Collection<String> markerClasses) {
-        final Optional<StackTraceElement> callerElement = findCallerElement(null, markerClasses);
+        final var callerElement = findCallerElement(null, markerClasses);
         return callerElement.map(StackTraceElement::getClassName);
     }
 
@@ -515,14 +512,13 @@ public final class MoreReflection {
         if (null == stackTraceElements || stackTraceElements.length < 5) {
             return Optional.empty();
         }
-        for (int index = 2; index < stackTraceElements.length; index++) {
-            final StackTraceElement element = stackTraceElements[index];
+        for (var index = 2; index < stackTraceElements.length; index++) {
+            final var element = stackTraceElements[index];
             if (markerClasses.contains(element.getClassName())) {
                 if (stackTraceElements.length > index + 1) {
                     return Optional.of(stackTraceElements[index + 1]);
-                } else {
-                    return Optional.empty();
                 }
+                return Optional.empty();
             }
         }
         return Optional.empty();

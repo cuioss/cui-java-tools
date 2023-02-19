@@ -68,12 +68,12 @@ class IOStreamsCopyTest {
         // Create and init a byte array as input data
         iarr = new byte[200];
         Arrays.fill(iarr, (byte) -1);
-        for (int i = 0; i < 80; i++) {
+        for (var i = 0; i < 80; i++) {
             iarr[i] = (byte) i;
         }
         carr = new char[200];
         Arrays.fill(carr, (char) -1);
-        for (int i = 0; i < 80; i++) {
+        for (var i = 0; i < 80; i++) {
             carr[i] = (char) i;
         }
     }
@@ -84,10 +84,10 @@ class IOStreamsCopyTest {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
 
-        final int count = IOStreams.copy(in, out);
+        final var count = IOStreams.copy(in, out);
 
         assertEquals(0, in.available(), "Not all bytes were read");
         assertEquals(inData.length, baout.size(), "Sizes differ");
@@ -100,7 +100,7 @@ class IOStreamsCopyTest {
      */
     @Test
     void testCopy_inputStreamToOutputStream_IO84() throws Exception {
-        final long size = (long) Integer.MAX_VALUE + (long) 1;
+        final var size = (long) Integer.MAX_VALUE + (long) 1;
         final InputStream in = new NullInputStream(size);
         final OutputStream out = new NullOutputStream();
 
@@ -153,10 +153,10 @@ class IOStreamsCopyTest {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
 
-        final long count = IOStreams.copy(in, out, bufferSize);
+        final var count = IOStreams.copy(in, out, bufferSize);
 
         assertEquals(0, in.available(), "Not all bytes were read");
         assertEquals(inData.length, baout.size(), "Sizes differ");
@@ -170,8 +170,8 @@ class IOStreamsCopyTest {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
-        final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
+        final var baout = new ByteArrayOutputStream();
+        final var out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
         IOStreams.copy(in, writer, "UTF8");
@@ -179,7 +179,7 @@ class IOStreamsCopyTest {
         writer.flush();
 
         assertEquals(0, in.available(), "Not all bytes were read");
-        byte[] bytes = baout.toByteArray();
+        var bytes = baout.toByteArray();
         bytes = new String(bytes, StandardCharsets.UTF_8).getBytes(StandardCharsets.US_ASCII);
         assertArrayEquals(inData, bytes, "Content differs");
     }
@@ -189,8 +189,8 @@ class IOStreamsCopyTest {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
-        final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
+        final var baout = new ByteArrayOutputStream();
+        final var out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
         IOStreams.copy(in, writer, (String) null);
@@ -204,7 +204,7 @@ class IOStreamsCopyTest {
 
     @Test
     void testCopy_inputStreamToWriter_Encoding_nullIn() throws Exception {
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
@@ -227,14 +227,14 @@ class IOStreamsCopyTest {
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
 
         IOStreams.copy(reader, out, "UTF16");
         // note: this method *does* flush.
         // note: we don't flush here; this IOUtils method does it for us
 
-        byte[] bytes = baout.toByteArray();
+        var bytes = baout.toByteArray();
         bytes = new String(bytes, StandardCharsets.UTF_16).getBytes(StandardCharsets.US_ASCII);
         assertArrayEquals(inData, bytes, "Content differs");
     }
@@ -245,7 +245,7 @@ class IOStreamsCopyTest {
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, false, true);
 
         IOStreams.copy(reader, out, (String) null);
@@ -258,7 +258,7 @@ class IOStreamsCopyTest {
 
     @Test
     void testCopy_readerToOutputStream_Encoding_nullIn() throws Exception {
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         assertThrows(NullPointerException.class, () -> {
             IOStreams.copy(null, out, "UTF16");
@@ -282,11 +282,11 @@ class IOStreamsCopyTest {
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
 
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
-        final YellOnFlushAndCloseOutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
+        final var baout = new ByteArrayOutputStream();
+        final var out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(baout, StandardCharsets.US_ASCII);
 
-        final int count = IOStreams.copy(reader, writer);
+        final var count = IOStreams.copy(reader, writer);
         out.off();
         writer.flush();
         assertEquals(inData.length, count, "The number of characters returned by copy is wrong");
@@ -299,7 +299,7 @@ class IOStreamsCopyTest {
      */
     @Test
     void testCopy_readerToWriter_IO84() throws Exception {
-        final long size = (long) Integer.MAX_VALUE + (long) 1;
+        final var size = (long) Integer.MAX_VALUE + (long) 1;
         final Reader reader = new NullReader(size);
         final Writer writer = new NullWriter();
 
@@ -316,7 +316,7 @@ class IOStreamsCopyTest {
 
     @Test
     void testCopy_readerToWriter_nullIn() throws Exception {
-        final ByteArrayOutputStream baout = new ByteArrayOutputStream();
+        final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () -> {
@@ -346,7 +346,7 @@ class IOStreamsCopyTest {
             // Test our copy method
             // for extra length, it reads till EOF
             assertEquals(200, copyLarge(is, os, 0, 2000));
-            final char[] oarr = os.toCharArray();
+            final var oarr = os.toCharArray();
 
             // check that output length is correct
             assertEquals(200, oarr.length);
@@ -384,7 +384,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(200, copyLarge(is, os, 0, -1));
-            final char[] oarr = os.toCharArray();
+            final var oarr = os.toCharArray();
 
             // check that output length is correct
             assertEquals(200, oarr.length);
@@ -410,7 +410,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 0, 100));
-            final char[] oarr = os.toCharArray();
+            final var oarr = os.toCharArray();
 
             // check that output length is correct
             assertEquals(100, oarr.length);
@@ -436,7 +436,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 10, 100));
-            final char[] oarr = os.toCharArray();
+            final var oarr = os.toCharArray();
 
             // check that output length is correct
             assertEquals(100, oarr.length);
@@ -482,7 +482,7 @@ class IOStreamsCopyTest {
             // Test our copy method
             // for extra length, it reads till EOF
             assertEquals(200, copyLarge(is, os, 0, 2000));
-            final byte[] oarr = os.toByteArray();
+            final var oarr = os.toByteArray();
 
             // check that output length is correct
             assertEquals(200, oarr.length);
@@ -508,7 +508,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(200, copyLarge(is, os, 0, -1));
-            final byte[] oarr = os.toByteArray();
+            final var oarr = os.toByteArray();
 
             // check that output length is correct
             assertEquals(200, oarr.length);
@@ -534,7 +534,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 0, 100));
-            final byte[] oarr = os.toByteArray();
+            final var oarr = os.toByteArray();
 
             // check that output length is correct
             assertEquals(100, oarr.length);
@@ -560,7 +560,7 @@ class IOStreamsCopyTest {
 
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 10, 100));
-            final byte[] oarr = os.toByteArray();
+            final var oarr = os.toByteArray();
 
             // check that output length is correct
             assertEquals(100, oarr.length);

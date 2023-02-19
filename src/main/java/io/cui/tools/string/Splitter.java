@@ -155,13 +155,13 @@ public final class Splitter {
         if (isEmpty(sequence)) {
             return Collections.emptyList();
         }
-        String[] splitted =
+        var splitted =
             sequence.split(handleSplitCharacter(splitterConfig.getSeparator()), splitterConfig.getMaxItems());
         if (null == splitted || 0 == splitted.length) {
             log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();
         }
-        CollectionBuilder<String> builder = new CollectionBuilder<>();
+        var builder = new CollectionBuilder<String>();
 
         for (String element : splitted) {
             addIfApplicable(builder, element);
@@ -180,7 +180,7 @@ public final class Splitter {
         if (null == element) {
             return;
         }
-        String toDo = element;
+        var toDo = element;
         if (splitterConfig.isTrimResults()) {
             toDo = toDo.trim();
         }

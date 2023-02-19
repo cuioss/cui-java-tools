@@ -53,7 +53,7 @@ public class ProxyOutputStream extends FilterOutputStream {
     @Override
     public void write(final byte[] bts) throws IOException {
         try {
-            final int len = bts != null ? bts.length : 0;
+            final var len = bts != null ? bts.length : 0;
             beforeWrite(len);
             out.write(bts);
             afterWrite(len);

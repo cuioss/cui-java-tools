@@ -368,7 +368,7 @@ public final class CollectionBuilder<E> implements Iterable<E> {
         if (isEmpty()) {
             return (E[]) Array.newInstance(targetType, 0);
         }
-        E[] target = (E[]) Array.newInstance(targetType, size());
+        var target = (E[]) Array.newInstance(targetType, size());
         return collector.toArray(target);
     }
 

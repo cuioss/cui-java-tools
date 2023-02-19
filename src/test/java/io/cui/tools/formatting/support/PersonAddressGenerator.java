@@ -7,7 +7,7 @@ public class PersonAddressGenerator implements TypedGenerator<PersonAddress> {
 
     @Override
     public PersonAddress next() {
-        final AddressDto addressDto = new AddressDto();
+        final var addressDto = new AddressDto();
         addressDto.setCountry("{Deutschland");
         addressDto.setCity("{Walldorf}");
         addressDto.setLine1("{69309}");

@@ -22,7 +22,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldHandleAddMethods() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<String>();
         builder.add("1");
         assertEquals(1, builder.size());
         builder.add("2", "3");
@@ -44,7 +44,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldHandleAddIfPresentMethods() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<String>().addNullValues(true);
+        final var builder = new CollectionBuilder<String>().addNullValues(true);
         builder.add("1");
         assertEquals(1, builder.size());
         builder.add(new String[] { null });
@@ -75,7 +75,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldHandleAddAdditionalMethods() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<String>();
         builder.add("1");
 
         assertEquals(1, builder.size());
@@ -89,7 +89,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldHandleObjectMethods() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<String>();
         builder.add("1");
 
         assertNotNull(builder.toString());
@@ -99,7 +99,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldBuildCollectionVariants() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>(mutableList("1", "2", "3", "4", "4"));
+        final var builder = new CollectionBuilder<String>(mutableList("1", "2", "3", "4", "4"));
 
         assertMutable(builder.toMutableList());
         assertEquals(5, builder.toMutableList().size());
@@ -132,7 +132,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldReturnArray() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>();
+        final var builder = new CollectionBuilder<String>();
         assertNotNull(builder.toArray(String.class));
         assertEquals(0, builder.toArray(String.class).length);
 
@@ -194,7 +194,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldSortNonLists() {
-        final CollectionBuilder<String> builder = new CollectionBuilder<>(mutableSortedSet("3", "2", "1"));
+        final var builder = new CollectionBuilder<String>(mutableSortedSet("3", "2", "1"));
         builder.sort(Comparator.naturalOrder());
         assertEquals(Arrays.asList("1", "2", "3"), builder.toMutableList());
     }
@@ -207,7 +207,7 @@ class CollectionBuilderTest {
         testArray.add(null);
         testArray.add("second");
 
-        final List<String> result = new CollectionBuilder<String>().add(testArray).toImmutableList();
+        final var result = new CollectionBuilder<String>().add(testArray).toImmutableList();
 
         assertEquals(2, result.size(), "Only two entries expected");
         assertNotEquals(testArray, result);

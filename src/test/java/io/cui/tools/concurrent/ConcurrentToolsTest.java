@@ -35,7 +35,7 @@ class ConcurrentToolsTest {
 
     @Test
     void shouldSleepWithDuration() {
-        Completion completed = new Completion(50 - SLEEP_SLACK);
+        var completed = new Completion(50 - SLEEP_SLACK);
         ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(50));
         completed.assertCompletionExpected();
     }
@@ -73,7 +73,7 @@ class ConcurrentToolsTest {
     }
 
     private static void assertAtLeastTimePassed(StopWatch stopwatch, long expectedMillis) {
-        long elapsedMillis = stopwatch.elapsed(MILLISECONDS);
+        var elapsedMillis = stopwatch.elapsed(MILLISECONDS);
         /*
          * The "+ 5" below is to permit, say, sleep(10) to sleep only 9 milliseconds. We see such
          * behavior sometimes when running these tests publicly as part of Guava. "+ 5" is probably
@@ -86,12 +86,12 @@ class ConcurrentToolsTest {
     }
 
     private static void assertTimeNotPassed(StopWatch stopwatch, long timelimitMillis) {
-        long elapsedMillis = stopwatch.elapsed(MILLISECONDS);
+        var elapsedMillis = stopwatch.elapsed(MILLISECONDS);
         assertTrue(elapsedMillis < timelimitMillis);
     }
 
     private static void sleepSuccessfully(long sleepMillis) {
-        Completion completed = new Completion(sleepMillis - SLEEP_SLACK);
+        var completed = new Completion(sleepMillis - SLEEP_SLACK);
         ConcurrentTools.sleepUninterruptibly(sleepMillis, MILLISECONDS);
         completed.assertCompletionExpected();
     }
@@ -99,7 +99,7 @@ class ConcurrentToolsTest {
     /** Interrupts the current thread after sleeping for the specified delay. */
     @SuppressWarnings("squid:S2925") // owolff: ok for testing
     static void requestInterruptIn(final long time) {
-        final Thread interruptee = Thread.currentThread();
+        final var interruptee = Thread.currentThread();
         new Thread(
                 () -> {
                     try {

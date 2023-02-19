@@ -38,7 +38,7 @@ class JoinerConfig {
     private final String useForNull = "null";
 
     JoinerConfigBuilder copy() {
-        JoinerConfigBuilder copyBuilder = builder();
+        var copyBuilder = builder();
         copyBuilder.separator(getSeparator()).useForNull(getUseForNull()).skipEmpty(isSkipEmpty())
                 .skipBlank(isSkipBlank())
                 .skipNulls(isSkipNulls());

@@ -30,7 +30,7 @@ class ClassPathLoaderTest {
 
     @Test
     void shouldComputeCorrectClassPath() {
-        String classpath = ClassPathLoader.checkClasspathName(EXISTING_CLASSPATH_FILE);
+        var classpath = ClassPathLoader.checkClasspathName(EXISTING_CLASSPATH_FILE);
         assertEquals(EXISTING_FILE_PATH, classpath);
 
         classpath = ClassPathLoader.checkClasspathName(EXISTING_CLASSPATH_FILE_WO_SLASH);
@@ -42,7 +42,7 @@ class ClassPathLoaderTest {
 
     @Test
     void shouldHandleExistingFile() {
-        final ClassPathLoader loader = new ClassPathLoader(EXISTING_CLASSPATH_FILE);
+        final var loader = new ClassPathLoader(EXISTING_CLASSPATH_FILE);
         assertTrue(loader.isReadable());
         assertFalse(loader.isFilesystemLoader());
         assertNotNull(loader.inputStream());
@@ -50,20 +50,20 @@ class ClassPathLoaderTest {
 
     @Test
     void shouldHandleExistingFileInJar() {
-        final ClassPathLoader loader = new ClassPathLoader(JAR_LOCATED_CLASSPATH_FILE_NAME);
+        final var loader = new ClassPathLoader(JAR_LOCATED_CLASSPATH_FILE_NAME);
         assertTrue(loader.isReadable());
         assertNotNull(loader.inputStream());
     }
 
     @Test
     void shouldHandleNotExistingFile() {
-        final ClassPathLoader loader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
+        final var loader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
         assertFalse(loader.isReadable());
     }
 
     @Test
     void shouldFailToLoadNotExistingFile() {
-        ClassPathLoader classPathLoader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
+        var classPathLoader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
         assertThrows(IllegalStateException.class,
                 () -> classPathLoader.inputStream());
     }
@@ -75,7 +75,7 @@ class ClassPathLoaderTest {
 
     @Test
     void shouldFailToComputeCorrectClassPathOnClasspathPrefix() {
-        String prefix = FileTypePrefix.CLASSPATH.getPrefix();
+        var prefix = FileTypePrefix.CLASSPATH.getPrefix();
         assertThrows(IllegalArgumentException.class,
                 () -> ClassPathLoader.checkClasspathName(prefix));
     }

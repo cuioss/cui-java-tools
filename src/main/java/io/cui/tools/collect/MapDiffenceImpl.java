@@ -73,10 +73,10 @@ class MapDiffenceImpl<K, V> implements MapDifference<K, V> {
         requireNonNull(left);
         requireNonNull(right);
 
-        MapBuilder<K, V> onlyRight = new MapBuilder<>();
-        MapBuilder<K, V> onlyLeft = new MapBuilder<>();
-        MapBuilder<K, V> common = new MapBuilder<>();
-        MapBuilder<K, ValueDifference<V>> entriesDiffering = new MapBuilder<>();
+        var onlyRight = new MapBuilder<K, V>();
+        var onlyLeft = new MapBuilder<K, V>();
+        var common = new MapBuilder<K, V>();
+        var entriesDiffering = new MapBuilder<K, ValueDifference<V>>();
 
         sortEntriesToBucket(left, right, onlyLeft, common, entriesDiffering);
         // now from the other direction.

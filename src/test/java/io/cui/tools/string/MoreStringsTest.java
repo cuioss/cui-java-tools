@@ -25,20 +25,20 @@ class MoreStringsTest {
     private static final String NON_WHITESPACE;
 
     static {
-        String ws = "";
-        String nws = "";
-        for (int i = 0; i < Character.MAX_VALUE; i++) {
+        var ws = new StringBuilder();
+        var nws = "";
+        for (var i = 0; i < Character.MAX_VALUE; i++) {
             if (Character.isWhitespace((char) i)) {
-                ws += String.valueOf((char) i);
+                ws.append((char) i);
                 if (i > 32) {
                 }
             } else if (i < 40) {
                 nws += String.valueOf((char) i);
             }
         }
-        for (int i = 0; i <= 32; i++) {
+        for (var i = 0; i <= 32; i++) {
         }
-        WHITESPACE = ws;
+        WHITESPACE = ws.toString();
         NON_WHITESPACE = nws;
     }
 
@@ -166,7 +166,7 @@ class MoreStringsTest {
         assertEquals("xxabc", MoreStrings.leftPad("abc", 5, 'x'));
         assertEquals("\uffff\uffffabc", MoreStrings.leftPad("abc", 5, '\uffff'));
         assertEquals("abc", MoreStrings.leftPad("abc", 2, ' '));
-        final String str = MoreStrings.leftPad("aaa", 10000, 'a'); // bigger than pad length
+        final var str = MoreStrings.leftPad("aaa", 10000, 'a'); // bigger than pad length
         assertEquals(10000, str.length());
     }
 
@@ -357,7 +357,7 @@ class MoreStringsTest {
     @Test
     void testLenientFormat_badArgumentToString() {
 
-        String lenientFormat = MoreStrings.lenientFormat("boiler %s plate", new ThrowsOnToString());
+        var lenientFormat = MoreStrings.lenientFormat("boiler %s plate", new ThrowsOnToString());
         assertTrue(lenientFormat.startsWith("boiler <io.cui.tools.string.MoreStringsTest"));
         assertTrue(lenientFormat.endsWith("threw java.lang.UnsupportedOperationException> plate"));
     }

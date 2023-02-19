@@ -18,7 +18,7 @@ class SimpleFormatterTest {
 
     @Test
     void shouldFormatOnMissingElements() {
-        final String formatted = SimpleFormatter.builder()
+        final var formatted = SimpleFormatter.builder()
                 .ignoreMissingValues()
                 .separatesBy(", ")
                 .format("a", null, "c");
@@ -29,7 +29,7 @@ class SimpleFormatterTest {
     @Test
     void shouldNotFormatIfElementsAreMissing() {
 
-        final String formatted = SimpleFormatter.builder()
+        final var formatted = SimpleFormatter.builder()
                 .skipResultIfAnyValueIsMissing()
                 .separatesBy(" - ")
                 .formatParentheses("a", "b", null, "d");
@@ -40,7 +40,7 @@ class SimpleFormatterTest {
 
     @Test
     void shouldFormatParentheses() {
-        final String formatted = SimpleFormatter.builder()
+        final var formatted = SimpleFormatter.builder()
                 .skipResultIfAnyValueIsMissing()
                 .separatesBy(" ")
                 .formatParentheses("a", "b", "c", "d");

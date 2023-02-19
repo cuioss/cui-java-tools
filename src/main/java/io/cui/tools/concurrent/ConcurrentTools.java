@@ -33,10 +33,10 @@ public class ConcurrentTools {
      * @param unit
      */
     public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
-        boolean interrupted = false;
+        var interrupted = false;
         try {
-            long remainingNanos = unit.toNanos(sleepFor);
-            long end = System.nanoTime() + remainingNanos;
+            var remainingNanos = unit.toNanos(sleepFor);
+            var end = System.nanoTime() + remainingNanos;
             while (true) {
                 try {
                     // TimeUnit.sleep() treats negative timeouts just like zero.

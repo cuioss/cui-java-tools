@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -25,20 +24,20 @@ class FieldWrapperTest {
 
     @Test
     void shouldReadWrapperFieldHappyCase() {
-        FieldNameClass nameClass = new FieldNameClass();
-        FieldWrapper wrapper = getMyFieldFieldWrapper();
+        var nameClass = new FieldNameClass();
+        var wrapper = getMyFieldFieldWrapper();
         assertFalse(wrapper.readValue(nameClass).isPresent());
-        String test = Generators.randomString();
+        var test = Generators.randomString();
         nameClass.setMyField(test);
-        Optional<Object> read = wrapper.readValue(nameClass);
+        var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
         assertEquals(test, wrapper.readValue(nameClass).get());
     }
 
     @Test
     void readShouldGracefullyHandleInvalidParameter() {
-        FieldNameClass nameClass = new FieldNameClass();
-        FieldWrapper wrapper = getMyFieldFieldWrapper();
+        var nameClass = new FieldNameClass();
+        var wrapper = getMyFieldFieldWrapper();
         assertFalse(wrapper.readValue(nameClass).isPresent());
         assertFalse(wrapper.readValue(null).isPresent());
         assertFalse(wrapper.readValue(Integer.valueOf(2)).isPresent());
@@ -48,14 +47,14 @@ class FieldWrapperTest {
 
     @Test
     void shouldReadWrapperWithAccessibleFlagSet() {
-        FieldNameClass nameClass = new FieldNameClass();
-        Field field = getMyFieldField();
+        var nameClass = new FieldNameClass();
+        var field = getMyFieldField();
         field.setAccessible(true);
-        FieldWrapper wrapper = new FieldWrapper(field);
+        var wrapper = new FieldWrapper(field);
         assertFalse(wrapper.readValue(nameClass).isPresent());
-        String test = Generators.randomString();
+        var test = Generators.randomString();
         nameClass.setMyField(test);
-        Optional<Object> read = wrapper.readValue(nameClass);
+        var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
         assertEquals(test, wrapper.readValue(nameClass).get());
 
@@ -64,32 +63,32 @@ class FieldWrapperTest {
 
     @Test
     void shouldWriteWrapperFieldHappyCase() {
-        FieldNameClass nameClass = new FieldNameClass();
-        FieldWrapper wrapper = getMyFieldFieldWrapper();
+        var nameClass = new FieldNameClass();
+        var wrapper = getMyFieldFieldWrapper();
 
         assertFalse(wrapper.readValue(nameClass).isPresent());
 
-        String test = Generators.randomString();
+        var test = Generators.randomString();
         wrapper.writeValue(nameClass, test);
 
-        Optional<Object> read = wrapper.readValue(nameClass);
+        var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
         assertEquals(test, wrapper.readValue(nameClass).get());
     }
 
     @Test
     void shouldWriteWrapperWithAccessibleFlagSet() {
-        FieldNameClass nameClass = new FieldNameClass();
-        Field field = getMyFieldField();
+        var nameClass = new FieldNameClass();
+        var field = getMyFieldField();
         field.setAccessible(true);
-        FieldWrapper wrapper = new FieldWrapper(field);
+        var wrapper = new FieldWrapper(field);
 
         assertFalse(wrapper.readValue(nameClass).isPresent());
 
-        String test = Generators.randomString();
+        var test = Generators.randomString();
         wrapper.writeValue(nameClass, test);
 
-        Optional<Object> read = wrapper.readValue(nameClass);
+        var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
         assertEquals(test, wrapper.readValue(nameClass).get());
 
@@ -98,10 +97,10 @@ class FieldWrapperTest {
 
     @Test
     void writeShouldHandleInvalidParameter() {
-        FieldNameClass nameClass = new FieldNameClass();
-        FieldWrapper wrapper = getMyFieldFieldWrapper();
+        var nameClass = new FieldNameClass();
+        var wrapper = getMyFieldFieldWrapper();
 
-        String test = Generators.randomString();
+        var test = Generators.randomString();
 
         assertThrows(NullPointerException.class, () -> wrapper.writeValue(null, null));
 
@@ -117,13 +116,13 @@ class FieldWrapperTest {
     @Test
     @Disabled("Test need to be reviewed")
     void writeShouldHandleInvalidAccess() {
-        FieldNameClass nameClass = new FieldNameClass();
-        Field field = getMyFieldField();
+        var nameClass = new FieldNameClass();
+        var field = getMyFieldField();
         field.setAccessible(true);
-        FieldWrapper wrapper = new FieldWrapper(field);
+        var wrapper = new FieldWrapper(field);
         field.setAccessible(false);
 
-        String test = Generators.randomString();
+        var test = Generators.randomString();
         // TODO : review test access is allowed
         assertThrows(IllegalStateException.class, () -> wrapper.writeValue(nameClass, test));
 
@@ -132,13 +131,13 @@ class FieldWrapperTest {
 
     @Test
     void readValue() {
-        final FieldNameClass nameClass = new FieldNameClass();
-        final String test = Generators.randomString();
+        final var nameClass = new FieldNameClass();
+        final var test = Generators.randomString();
         nameClass.setMyField(test);
-        Field field = getMyFieldField();
-        FieldWrapper wrapper = new FieldWrapper(field);
+        var field = getMyFieldField();
+        var wrapper = new FieldWrapper(field);
         assertFalse(field.isAccessible());
-        Optional<Object> fieldValue = wrapper.readValue(nameClass);
+        var fieldValue = wrapper.readValue(nameClass);
         assertFalse(field.isAccessible());
         assertNotNull(fieldValue);
         assertTrue(fieldValue.isPresent());
@@ -146,13 +145,13 @@ class FieldWrapperTest {
     }
 
     private FieldWrapper getMyFieldFieldWrapper() {
-        Optional<FieldWrapper> optionalFieldWrapper = FieldWrapper.from(FieldNameClass.class, "myField");
+        var optionalFieldWrapper = FieldWrapper.from(FieldNameClass.class, "myField");
         assertTrue(optionalFieldWrapper.isPresent(), "myField should be accessible");
         return optionalFieldWrapper.get();
     }
 
     private Field getMyFieldField() {
-        Optional<Field> optionalField = MoreReflection.accessField(FieldNameClass.class, "myField");
+        var optionalField = MoreReflection.accessField(FieldNameClass.class, "myField");
         assertTrue(optionalField.isPresent(), "myField should be accessible");
         return optionalField.get();
     }

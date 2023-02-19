@@ -38,7 +38,7 @@ class SplitterConfig {
     private final boolean doNotModifySeparatorString = false;
 
     SplitterConfigBuilder copy() {
-        SplitterConfigBuilder copyBuilder = builder();
+        var copyBuilder = builder();
         copyBuilder.separator(getSeparator()).maxItems(getMaxItems())
                 .doNotModifySeparatorString(isDoNotModifySeparatorString())
                 .omitEmptyStrings(isOmitEmptyStrings()).trimResults(isTrimResults());

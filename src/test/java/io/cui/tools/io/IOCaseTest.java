@@ -375,14 +375,14 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     private IOCase serialize(final IOCase value) throws Exception {
-        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        final ObjectOutputStream out = new ObjectOutputStream(buf);
+        final var buf = new ByteArrayOutputStream();
+        final var out = new ObjectOutputStream(buf);
         out.writeObject(value);
         out.flush();
         out.close();
 
-        final ByteArrayInputStream bufin = new ByteArrayInputStream(buf.toByteArray());
-        final ObjectInputStream in = new ObjectInputStream(bufin);
+        final var bufin = new ByteArrayInputStream(buf.toByteArray());
+        final var in = new ObjectInputStream(bufin);
         return (IOCase) in.readObject();
     }
 

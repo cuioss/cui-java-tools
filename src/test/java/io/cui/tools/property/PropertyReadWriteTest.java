@@ -16,11 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -50,8 +47,8 @@ class PropertyReadWriteTest {
 
     private PropertyReadWrite resolveWithPropertyDescriptor(Class<?> type, String attributeName)
         throws IntrospectionException {
-        BeanInfo info = Introspector.getBeanInfo(type);
-        Optional<PropertyDescriptor> descriptor = mutableList(info.getPropertyDescriptors()).stream()
+        var info = Introspector.getBeanInfo(type);
+        var descriptor = mutableList(info.getPropertyDescriptors()).stream()
                 .filter(desc -> attributeName.equalsIgnoreCase(desc.getName())).findFirst();
         assertTrue(descriptor.isPresent());
 
