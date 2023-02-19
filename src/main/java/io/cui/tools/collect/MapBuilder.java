@@ -37,7 +37,7 @@ import lombok.ToString;
  * This methods can be used for ensuring a real copy
  *
  * <pre>
- *    assertEquals(4, MapBuilder.from("key1", 1, "key2", 2, "key3", 3, "key4", 4).size());
+ * assertEquals(4, MapBuilder.from("key1", 1, "key2", 2, "key3", 3, "key4", 4).size());
  * </pre>
  *
  * @author Oliver Wolff

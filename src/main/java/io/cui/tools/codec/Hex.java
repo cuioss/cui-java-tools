@@ -182,7 +182,8 @@ public class Hex {
         for (int i = 0, j = 0; i < l; i++) {
             out[j] = toDigits[(0xF0 & data[i]) >>> 4];
             j++;
-            out[j++] = toDigits[0x0F & data[i]];
+            out[j] = toDigits[0x0F & data[i]];
+            j++;
         }
         return out;
     }
@@ -413,14 +414,14 @@ public class Hex {
         }
         if (object instanceof byte[]) {
             return decode((byte[]) object);
-        } else if (object instanceof ByteBuffer) {
+        }
+        if (object instanceof ByteBuffer) {
             return decode((ByteBuffer) object);
-        } else {
-            try {
-                return decodeHex((char[]) object);
-            } catch (final ClassCastException e) {
-                throw new DecoderException(e.getMessage(), e);
-            }
+        }
+        try {
+            return decodeHex((char[]) object);
+        } catch (final ClassCastException e) {
+            throw new DecoderException(e.getMessage(), e);
         }
     }
 

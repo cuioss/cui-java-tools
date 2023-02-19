@@ -99,7 +99,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldBuildCollectionVariants() {
-        final var builder = new CollectionBuilder<String>(mutableList("1", "2", "3", "4", "4"));
+        final var builder = new CollectionBuilder<>(mutableList("1", "2", "3", "4", "4"));
 
         assertMutable(builder.toMutableList());
         assertEquals(5, builder.toMutableList().size());
@@ -194,7 +194,7 @@ class CollectionBuilderTest {
 
     @Test
     void shouldSortNonLists() {
-        final var builder = new CollectionBuilder<String>(mutableSortedSet("3", "2", "1"));
+        final var builder = new CollectionBuilder<>(mutableSortedSet("3", "2", "1"));
         builder.sort(Comparator.naturalOrder());
         assertEquals(Arrays.asList("1", "2", "3"), builder.toMutableList());
     }

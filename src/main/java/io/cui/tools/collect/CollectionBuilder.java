@@ -26,7 +26,8 @@ import lombok.ToString;
 
 /**
  * <h2>Overview</h2>
- * Builder for creating {@link java.util.Collection}s providing some convenience methods. The class writes
+ * Builder for creating {@link java.util.Collection}s providing some convenience methods. The class
+ * writes
  * everything through into the contained collector. Using the default constructor a newly created
  * {@link java.util.ArrayList} will be used as collector, but you can pass you own collector as
  * constructor-argument. Of course this should be mutable in order to work.
@@ -65,7 +66,8 @@ import lombok.ToString;
  *
  * <h3>Sorting</h3>
  * <p>
- * The contained {@link java.util.Collection} can be sorted any time by calling {@link #sort(Comparator)}
+ * The contained {@link java.util.Collection} can be sorted any time by calling
+ * {@link #sort(Comparator)}
  * </p>
  *
  * @author Oliver Wolff
@@ -85,7 +87,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     private boolean addNullValues = false;
 
     /**
-     * <p>Constructor for CollectionBuilder.</p>
+     * <p>
+     * Constructor for CollectionBuilder.
+     * </p>
      *
      * @param collector to be used for storage. Must not be null
      */
@@ -102,7 +106,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>addNullValues.</p>
+     * <p>
+     * addNullValues.
+     * </p>
      *
      * @param addNullValues If set to {@code true} {@code null} elements are added to the contained
      *            collector, if {@code false}, default value, {@code null} values are ignored.
@@ -114,7 +120,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>size.</p>
+     * <p>
+     * size.
+     * </p>
      *
      * @return the size of the contained Collection
      */
@@ -123,7 +131,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>isEmpty.</p>
+     * <p>
+     * isEmpty.
+     * </p>
      *
      * @return see {@link java.util.Collection#isEmpty()}
      */
@@ -132,7 +142,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>contains.</p>
+     * <p>
+     * contains.
+     * </p>
      *
      * @param o a {@link java.lang.Object} object
      * @return see {@link java.util.Collection#isEmpty()}
@@ -148,7 +160,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>stream.</p>
+     * <p>
+     * stream.
+     * </p>
      *
      * @return a {@link java.util.stream.Stream} on the contained objects
      */
@@ -157,7 +171,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param e the element to be added
      * @return the instance itself in order to use it in a fluent way. <em>Caution:</em> with this
@@ -171,7 +187,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param elements to be added
      * @return the instance itself in order to use it in a fluent way. <em>Caution:</em> with this
@@ -187,7 +205,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param elements to be added
      * @return the instance itself in order to use it in a fluent way. <em>Caution:</em> with this
@@ -201,7 +221,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param elements to be added
      * @return the instance itself in order to use it in a fluent way. <em>Caution:</em> with this
@@ -215,7 +237,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param element to be added if present.
      *            <em>Caution</em>: passing an {@link java.util.Optional}
@@ -230,7 +254,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>add.</p>
+     * <p>
+     * add.
+     * </p>
      *
      * @param elements to be added
      * @return the instance itself in order to use it in a fluent way. <em>Caution:</em> with this
@@ -262,7 +288,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toMutableList.</p>
+     * <p>
+     * toMutableList.
+     * </p>
      *
      * @return a mutable {@link java.util.List} representation of the builders content, the actual
      *         implementation is an {@link java.util.ArrayList}
@@ -272,10 +300,14 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toImmutableList.</p>
+     * <p>
+     * toImmutableList.
+     * </p>
      *
-     * @return an immutable {@link java.util.List} representation of the builders content, the actual
-     *         implementation calls {@link java.util.Collections#unmodifiableList(List)}. The underlying
+     * @return an immutable {@link java.util.List} representation of the builders content, the
+     *         actual
+     *         implementation calls {@link java.util.Collections#unmodifiableList(List)}. The
+     *         underlying
      *         {@link java.util.Collection} will be copied by calling {@link #toMutableList()}
      */
     public List<E> toImmutableList() {
@@ -283,7 +315,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toMutableSet.</p>
+     * <p>
+     * toMutableSet.
+     * </p>
      *
      * @return a mutable {@link java.util.Set} representation of the builders content, the actual
      *         implementation is an {@link java.util.HashSet}
@@ -293,10 +327,13 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toImmutableSet.</p>
+     * <p>
+     * toImmutableSet.
+     * </p>
      *
      * @return an immutable {@link java.util.Set} representation of the builders content, the actual
-     *         implementation calls {@link java.util.Collections#unmodifiableList(List)}. The underlying
+     *         implementation calls {@link java.util.Collections#unmodifiableList(List)}. The
+     *         underlying
      *         {@link java.util.Collection} will be copied by calling {@link #toMutableSet()}
      */
     public Set<E> toImmutableSet() {
@@ -304,9 +341,12 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toConcurrentList.</p>
+     * <p>
+     * toConcurrentList.
+     * </p>
      *
-     * @return a concurrent mutable {@link java.util.List} representation of the builders content, the actual
+     * @return a concurrent mutable {@link java.util.List} representation of the builders content,
+     *         the actual
      *         implementation is an {@link java.util.concurrent.CopyOnWriteArrayList}
      */
     public List<E> toConcurrentList() {
@@ -314,9 +354,12 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toConcurrentSet.</p>
+     * <p>
+     * toConcurrentSet.
+     * </p>
      *
-     * @return a concurrent mutable {@link java.util.Set} representation of the builders content, the actual
+     * @return a concurrent mutable {@link java.util.Set} representation of the builders content,
+     *         the actual
      *         implementation is an {@link java.util.concurrent.CopyOnWriteArraySet}
      */
     public Set<E> toConcurrentSet() {
@@ -324,10 +367,14 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toMutableNavigableSet.</p>
+     * <p>
+     * toMutableNavigableSet.
+     * </p>
      *
-     * @return a mutable {@link java.util.NavigableSet} representation of the builders content, the actual
-     *         implementation is an {@link java.util.TreeSet}. The assumption is that the Actual type is at
+     * @return a mutable {@link java.util.NavigableSet} representation of the builders content, the
+     *         actual
+     *         implementation is an {@link java.util.TreeSet}. The assumption is that the Actual
+     *         type is at
      *         least {@link java.lang.Comparable}
      */
     public NavigableSet<E> toMutableNavigableSet() {
@@ -335,11 +382,15 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toImmutableNavigableSet.</p>
+     * <p>
+     * toImmutableNavigableSet.
+     * </p>
      *
-     * @return an immutable {@link java.util.NavigableSet} representation of the builders content, the actual
+     * @return an immutable {@link java.util.NavigableSet} representation of the builders content,
+     *         the actual
      *         implementation is an {@link java.util.TreeSet} wrapped by
-     *         {@link java.util.Collections#unmodifiableNavigableSet(NavigableSet)}. The assumption is that
+     *         {@link java.util.Collections#unmodifiableNavigableSet(NavigableSet)}. The assumption
+     *         is that
      *         the Actual type is at least {@link java.lang.Comparable}
      */
     public NavigableSet<E> toImmutableNavigableSet() {
@@ -347,10 +398,14 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toConcurrentNavigableSet.</p>
+     * <p>
+     * toConcurrentNavigableSet.
+     * </p>
      *
-     * @return a mutable {@link java.util.NavigableSet} representation of the builders content, the actual
-     *         implementation is an {@link java.util.concurrent.ConcurrentSkipListSet}. The assumption is that the
+     * @return a mutable {@link java.util.NavigableSet} representation of the builders content, the
+     *         actual
+     *         implementation is an {@link java.util.concurrent.ConcurrentSkipListSet}. The
+     *         assumption is that the
      *         actual type is at least {@link java.lang.Comparable}
      */
     public NavigableSet<E> toConcurrentNavigableSet() {
@@ -358,7 +413,9 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * <p>toArray.</p>
+     * <p>
+     * toArray.
+     * </p>
      *
      * @param targetType identifying the concrete ArrayType
      * @return an array representation of the builders content
@@ -383,7 +440,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *
@@ -396,7 +454,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *
@@ -409,7 +468,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *
@@ -422,7 +482,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *
@@ -435,7 +496,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *
@@ -449,7 +511,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
     }
 
     /**
-     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content of the given source
+     * Creates an Instance of {@link io.cui.tools.collect.CollectionBuilder} by copying the content
+     * of the given source
      * <em>Caution:</em> The given source will be used as it is, there will be no filtering as
      * defined within {@link #addNullValues(boolean)}
      *

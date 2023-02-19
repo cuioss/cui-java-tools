@@ -26,20 +26,20 @@ class MoreStringsTest {
 
     static {
         var ws = new StringBuilder();
-        var nws = "";
+        var nws = new StringBuilder();
         for (var i = 0; i < Character.MAX_VALUE; i++) {
             if (Character.isWhitespace((char) i)) {
                 ws.append((char) i);
                 if (i > 32) {
                 }
             } else if (i < 40) {
-                nws += String.valueOf((char) i);
+                nws.append((char) i);
             }
         }
         for (var i = 0; i <= 32; i++) {
         }
         WHITESPACE = ws.toString();
-        NON_WHITESPACE = nws;
+        NON_WHITESPACE = nws.toString();
     }
 
     @Test

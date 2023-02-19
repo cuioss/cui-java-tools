@@ -174,9 +174,8 @@ public class SecuritySupport {
             var e2 = e.getException();
             if (e2 instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException) e2;
-            } else {
-                throw new IllegalStateException(e2);
             }
+            throw new IllegalStateException(e2);
         }
     }
 }

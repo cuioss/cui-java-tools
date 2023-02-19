@@ -114,9 +114,8 @@ public class NullInputStream extends InputStream {
         }
         if (avail > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
-        } else {
-            return (int) avail;
         }
+        return (int) avail;
     }
 
     /**

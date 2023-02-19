@@ -30,7 +30,6 @@ public class FieldWrapper {
 
     private final Class<?> declaringClass;
 
-
     /**
      * @param field must not be null
      */
@@ -54,7 +53,7 @@ public class FieldWrapper {
      *         </ul>
      */
     public Optional<Object> readValue(Object object) {
-        if(null == object) {
+        if (null == object) {
             log.trace("No Object given, returning Optional#empty()");
             return Optional.empty();
         }

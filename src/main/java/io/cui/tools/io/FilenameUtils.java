@@ -650,23 +650,24 @@ public class FilenameUtils {
                     return 2;
                 }
                 return 3;
-            } else if (ch0 == UNIX_SEPARATOR) {
+            }
+            if (ch0 == UNIX_SEPARATOR) {
                 return 1;
             }
             return NOT_FOUND;
 
-        } else if (isSeparator(ch0) && isSeparator(ch1)) {
-            var posUnix = filename.indexOf(UNIX_SEPARATOR, 2);
-            var posWin = filename.indexOf(WINDOWS_SEPARATOR, 2);
-            if (posUnix == NOT_FOUND && posWin == NOT_FOUND || posUnix == 2 || posWin == 2) {
-                return NOT_FOUND;
-            }
-            posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
-            posWin = posWin == NOT_FOUND ? posUnix : posWin;
-            return Math.min(posUnix, posWin) + 1;
-        } else {
+        }
+        if (!isSeparator(ch0) || !isSeparator(ch1)) {
             return isSeparator(ch0) ? 1 : 0;
         }
+        var posUnix = filename.indexOf(UNIX_SEPARATOR, 2);
+        var posWin = filename.indexOf(WINDOWS_SEPARATOR, 2);
+        if (posUnix == NOT_FOUND && posWin == NOT_FOUND || posUnix == 2 || posWin == 2) {
+            return NOT_FOUND;
+        }
+        posUnix = posUnix == NOT_FOUND ? posWin : posUnix;
+        posWin = posWin == NOT_FOUND ? posUnix : posWin;
+        return Math.min(posUnix, posWin) + 1;
     }
 
     /**

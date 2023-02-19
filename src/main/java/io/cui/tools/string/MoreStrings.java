@@ -450,14 +450,13 @@ public final class MoreStrings {
         }
         if (pads < padLen) {
             return padStr.substring(0, pads).concat(str);
-        } else {
-            final var padding = new char[pads];
-            final var padChars = padStr.toCharArray();
-            for (var i = 0; i < pads; i++) {
-                padding[i] = padChars[i % padLen];
-            }
-            return new String(padding).concat(str);
         }
+        final var padding = new char[pads];
+        final var padChars = padStr.toCharArray();
+        for (var i = 0; i < pads; i++) {
+            padding[i] = padChars[i % padLen];
+        }
+        return new String(padding).concat(str);
     }
 
     /**
@@ -850,7 +849,8 @@ public final class MoreStrings {
      * @param args the arguments to be substituted into the message template. The first argument
      *            specified is substituted for the first occurrence of {@code "%s"} in the template,
      *            and so forth. A {@code null} argument is converted to the four-character string
-     *            {@code "null"}; non-null values are converted to strings using {@link Object#toString()}.
+     *            {@code "null"}; non-null values are converted to strings using
+     *            {@link Object#toString()}.
      * @return the resulting formatting String
      */
     public static String lenientFormat(String template, Object... args) {
@@ -887,7 +887,8 @@ public final class MoreStrings {
             i++;
             while (i < args.length) {
                 builder.append(", ");
-                builder.append(args[i++]);
+                builder.append(args[i]);
+                i++;
             }
             builder.append(']');
         }

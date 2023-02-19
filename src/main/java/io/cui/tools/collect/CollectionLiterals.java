@@ -20,7 +20,8 @@ import lombok.experimental.UtilityClass;
 
 /**
  * <h2>Overview</h2>
- * Provides a number of methods simplifying the task of creating populated {@link java.util.Collection}s. In
+ * Provides a number of methods simplifying the task of creating populated
+ * {@link java.util.Collection}s. In
  * essence its doing the same compared to the corresponding com.google.common.collect types
  * but with different semantics (like naming, types) and is designed as a one-stop utility class.
  * It differentiates between the subtypes and mutability / immutability. This class is
@@ -73,7 +74,9 @@ import lombok.experimental.UtilityClass;
 public class CollectionLiterals {
 
     /**
-     * <p>mutableList.</p>
+     * <p>
+     * mutableList.
+     * </p>
      *
      * @return a newly created empty {@link java.util.ArrayList}
      * @param <E> a E class
@@ -234,7 +237,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given elements.
      *
      * @param elements to be wrapped, must not be null
-     * @return the <i>immutable</i> {@link java.util.List} with the given elements. It implicitly creates a
+     * @return the <i>immutable</i> {@link java.util.List} with the given elements. It implicitly
+     *         creates a
      *         copy
      * @param <E> a E class
      */
@@ -276,7 +280,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSet.</p>
+     * <p>
+     * mutableSet.
+     * </p>
      *
      * @return a newly created empty {@link java.util.HashSet}
      * @param <E> a E class
@@ -286,7 +292,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSet.</p>
+     * <p>
+     * mutableSet.
+     * </p>
      *
      * @param element to be added. If it is {@code null} it will not be added
      * @return a newly created empty {@link java.util.HashSet} with the given elements
@@ -302,7 +310,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSet.</p>
+     * <p>
+     * mutableSet.
+     * </p>
      *
      * @param elements to be added
      * @return a newly created empty {@link java.util.HashSet} with the given elements
@@ -369,7 +379,8 @@ public class CollectionLiterals {
      * Creates a <i>mutable</i> {@code Set} instance containing the given elements.
      * <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> {@link java.util.Set} will be
+     * @param elements to be added. If it is null and empty <i>mutable</i> {@link java.util.Set}
+     *            will be
      *            returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -384,7 +395,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>immutableSet.</p>
+     * <p>
+     * immutableSet.
+     * </p>
      *
      * @return a newly created empty {@link java.util.HashSet} Convenience method for
      *         {@link java.util.Collections#emptySet()}
@@ -467,7 +480,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSortedSet.</p>
+     * <p>
+     * mutableSortedSet.
+     * </p>
      *
      * @return a newly created empty {@link java.util.TreeSet}
      * @param <E> a E class
@@ -477,9 +492,12 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSortedSet.</p>
+     * <p>
+     * mutableSortedSet.
+     * </p>
      *
-     * @param element to be added. If it is {@code null} an empty {@link java.util.SortedSet} will be returned
+     * @param element to be added. If it is {@code null} an empty {@link java.util.SortedSet} will
+     *            be returned
      * @return a newly created empty {@link java.util.TreeSet} with the given element
      * @param <E> a E class
      */
@@ -493,7 +511,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableSortedSet.</p>
+     * <p>
+     * mutableSortedSet.
+     * </p>
      *
      * @param elements to be added
      * @return a newly created empty {@link java.util.TreeSet} with the given elements
@@ -561,7 +581,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>immutableSortedSet.</p>
+     * <p>
+     * immutableSortedSet.
+     * </p>
      *
      * @return a newly created empty {@link java.util.SortedSet} Convenience method for
      *         {@link java.util.Collections#emptySortedSet()}
@@ -632,7 +654,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>mutableMap.</p>
+     * <p>
+     * mutableMap.
+     * </p>
      *
      * @return an empty <i>mutable</i> Map
      * @param <K> a K class
@@ -722,7 +746,9 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>immutableMap.</p>
+     * <p>
+     * immutableMap.
+     * </p>
      *
      * @return an empty <i>mutable</i> Map
      * @param <K> a K class
