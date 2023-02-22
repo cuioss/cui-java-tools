@@ -20,8 +20,6 @@ import lombok.ToString;
  * transformation.
  * <p/>
  * Supported Classes:
- * <ul>
- * </ul>
  * Mapping of properties will be done during construction. Properties which
  * can't be mapped will be initialized to null.
  */
