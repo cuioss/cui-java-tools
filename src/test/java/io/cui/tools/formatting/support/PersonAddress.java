@@ -67,7 +67,7 @@ public class PersonAddress implements FormatterSupport, Serializable {
     }
 
     /**
-     * Use data from address object to copy this to PersonAddress.<br/>
+     * Use data from address object to copy this to PersonAddress.
      *
      * @param address must not be null.
      */
@@ -83,7 +83,7 @@ public class PersonAddress implements FormatterSupport, Serializable {
     }
 
     /**
-     * Use data from address object to copy this to PersonAddress.<br/>
+     * Use data from address object to copy this to PersonAddress.
      * Because this is just a stupid bean and AddressDto use CodeDto for some
      * properties they must be set separate. Otherwise, CodeResolverService and
      * locale must be passed throw.
