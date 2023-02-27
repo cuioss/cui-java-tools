@@ -48,7 +48,7 @@ jobs:
         git checkout -b release
         mvn -B -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
         mvn -B -Prelease javadoc:javadoc site:site site:stage
-        git checkout ${{vars.GITHUB_BASE_REF}}
+        git checkout ${{github.ref_name}}
         git rebase release
         mvn -B -Prelease release:perform -DskipTests
       env:
@@ -72,7 +72,7 @@ jobs:
         branch:  ${{github.ref_name}}
         force: true
 
-    - name: Push tags
+    - name: Push tag ${{steps.metadata.outputs.current-version}}
       uses: ad-m/github-push-action@v0.6.0
       with:
         branch:  ${{github.ref_name}}
