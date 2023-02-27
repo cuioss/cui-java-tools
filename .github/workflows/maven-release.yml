@@ -48,9 +48,9 @@ jobs:
         git checkout -b release
         mvn -B -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
         mvn -B -Prelease javadoc:javadoc site:site site:stage
-        git checkout ${{github.ref_name}}
+        git checkout ${{vars.GITHUB_BASE_REF}}
         git rebase release
-        mvn -B -Prelease release:perform -DskipTests
+       # mvn -B -Prelease release:perform -DskipTests
       env:
         MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
         MAVEN_CENTRAL_TOKEN: ${{ secrets.OSS_SONATYPE_PASSWORD }}
