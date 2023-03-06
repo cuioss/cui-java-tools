@@ -24,7 +24,7 @@ Provides a number of useful utilities for java, similar to googles guava
 ----
     <dependency>
         <groupId>de.cuioss</groupId>
-        <name>cui-java-tools</name>
+        <artifactId>cui-java-tools</artifactId>
     </dependency>
 ----
 
