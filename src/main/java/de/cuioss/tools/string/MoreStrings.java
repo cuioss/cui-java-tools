@@ -2,6 +2,8 @@ package de.cuioss.tools.string;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -856,39 +858,40 @@ public final class MoreStrings {
     public static String lenientFormat(String template, Object... args) {
         template = String.valueOf(template); // null -> "null"
 
+        final List<Object> lenientArgs;
+
         if (args == null) {
-            args = new Object[] { "(Object[])null" };
+            lenientArgs= new ArrayList<>(1);
+            lenientArgs.add("(Object[])null");
         } else {
-            for (var i = 0; i < args.length; i++) {
-                args[i] = lenientToString(args[i]);
+            lenientArgs = new ArrayList<>(args.length);
+            for (Object arg : args) {
+                lenientArgs.add(lenientToString(arg));
             }
         }
 
         // start substituting the arguments into the '%s' placeholders
-        var builder = new StringBuilder(template.length() + 16 * args.length);
-        var templateStart = 0;
-        var i = 0;
-        while (i < args.length) {
-            var placeholderStart = template.indexOf("%s", templateStart);
+        StringBuilder builder = new StringBuilder(template.length() + 16 * lenientArgs.size());
+        int templateStart = 0;
+        int i = 0;
+        while (i < lenientArgs.size()) {
+            int placeholderStart = template.indexOf("%s", templateStart);
             if (placeholderStart == -1) {
                 break;
             }
             builder.append(template, templateStart, placeholderStart);
-            builder.append(args[i]);
-            i++;
+            builder.append(lenientArgs.get(i++));
             templateStart = placeholderStart + 2;
         }
         builder.append(template, templateStart, template.length());
 
         // if we run out of placeholders, append the extra args in square braces
-        if (i < args.length) {
+        if (i < lenientArgs.size()) {
             builder.append(" [");
-            builder.append(args[i]);
-            i++;
-            while (i < args.length) {
+            builder.append(lenientArgs.get(i++));
+            while (i < lenientArgs.size()) {
                 builder.append(", ");
-                builder.append(args[i]);
-                i++;
+                builder.append(lenientArgs.get(i++));
             }
             builder.append(']');
         }
