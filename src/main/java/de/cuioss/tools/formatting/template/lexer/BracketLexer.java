@@ -18,9 +18,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Simple lexer which supports parsing of template pattern where attributes are separated by
- * brackets.
- * Package private because LexerBuilder exists which must be used
+ * Simple lexer which supports parsing of template pattern where attributes are
+ * separated by brackets. Package private because LexerBuilder exists which must
+ * be used
  *
  * @param <T> bounded type for lexer
  *
@@ -82,13 +82,13 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     private final boolean strict;
 
     /**
-     * Constructor of BracketParser initialize its parse behavior.
-     * Source provide information of "tokens" which he supports. Therefore,
-     * FormatterSupport.getSupportedPropertyNames() of the source will be used.
-     * The template input should include Bracket separated attributes. Everything else caused
-     * exception.
+     * Constructor of BracketParser initialize its parse behavior. Source provide
+     * information of "tokens" which he supports. Therefore,
+     * FormatterSupport.getSupportedPropertyNames() of the source will be used. The
+     * template input should include Bracket separated attributes. Everything else
+     * caused exception.
      *
-     * @param source must not be null
+     * @param source   must not be null
      * @param brackets as separators of attributes. must nut be null
      */
     BracketLexer(final T source, final Brackets brackets) {
@@ -96,16 +96,16 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     /**
-     * Constructor of BracketParser initialize its parse behavior.
-     * Source provide information of "tokens" which he supports. Therefore,
-     * FormatterSupport.getSupportedPropertyNames() of the source will be used.
-     * The template input should include Bracket separated attributes. Everything else caused
-     * exception.
+     * Constructor of BracketParser initialize its parse behavior. Source provide
+     * information of "tokens" which he supports. Therefore,
+     * FormatterSupport.getSupportedPropertyNames() of the source will be used. The
+     * template input should include Bracket separated attributes. Everything else
+     * caused exception.
      *
-     * @param source must not be null
+     * @param source   must not be null
      * @param brackets as separators of attributes. must nut be null
-     * @param strict use strict mode for pattern matching (only match exact name) instead of best
-     *            fitting
+     * @param strict   use strict mode for pattern matching (only match exact name)
+     *                 instead of best fitting
      */
     BracketLexer(final T source, final Brackets brackets, final boolean strict) {
         super(source);
@@ -128,8 +128,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
             // Assumption: Static elements are implicitly filtered
             checkArgument(chunkCountEven && bracketCountEven,
                     "pattern '%s' is unbalanced for %s, left-hand:%s, right-hand:%s", input, brackets,
-                    chunksSplitByLeftBracket,
-                    chunksSplitByRightBracket);
+                    chunksSplitByLeftBracket, chunksSplitByRightBracket);
 
             for (final String chunk : chunksSplitByRightBracket) {
                 if (!isEmpty(chunk)) {
@@ -181,7 +180,7 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
     }
 
     private String disposeStringToken(final String chunk, final List<Token> tokens) {
-        var startPoint = chunk.indexOf(this.brackets.leftBracket);
+        var startPoint = chunk.indexOf(brackets.leftBracket);
         if (startPoint > 0) {
             // string token before was found
             final var value = chunk.substring(0, startPoint);
@@ -203,11 +202,11 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
         private final int fittingIndex;
 
         public String getTokenName() {
-            return this.tokenName;
+            return tokenName;
         }
 
         public int getFittingIndex() {
-            return this.fittingIndex;
+            return fittingIndex;
         }
 
         public Candidate(final String cleanedChunk, final String tokenName) {
@@ -217,15 +216,15 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
                 if (0 > difference) {
                     difference = difference * -1;
                 }
-                this.fittingIndex = difference;
+                fittingIndex = difference;
             } else {
                 this.tokenName = null;
-                this.fittingIndex = HUGE_NUMBER;
+                fittingIndex = HUGE_NUMBER;
             }
         }
 
         public boolean fitsMoreThan(final Candidate otherCandidate) {
-            return this.fittingIndex < otherCandidate.getFittingIndex();
+            return fittingIndex < otherCandidate.getFittingIndex();
         }
     }
 

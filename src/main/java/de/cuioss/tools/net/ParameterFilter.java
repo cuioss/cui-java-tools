@@ -30,9 +30,9 @@ public class ParameterFilter implements Serializable {
     private static final String JAVAX_FACES = "javax.faces";
 
     /**
-     * The list of string to be excluded from the parameter-list. Because the
-     * test utilizes toLowerCase() the members of the list must all be
-     * lowercase. Otherwise, they are not considered.
+     * The list of string to be excluded from the parameter-list. Because the test
+     * utilizes toLowerCase() the members of the list must all be lowercase.
+     * Otherwise, they are not considered.
      */
     @NonNull
     @Getter
@@ -42,8 +42,7 @@ public class ParameterFilter implements Serializable {
     private final boolean excludeFacesParameter;
 
     /**
-     * @param value
-     *            as key of view parameter. Must not be null
+     * @param value as key of view parameter. Must not be null
      * @return true if value belongs to excluded values
      */
     public boolean isExcluded(final String value) {

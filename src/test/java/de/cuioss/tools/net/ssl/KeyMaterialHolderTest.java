@@ -26,15 +26,15 @@ class KeyMaterialHolderTest {
     @Test
     void shouldHandleHolderType() {
         assertEquals(KeyHolderType.SINGLE_KEY, withRandomKeyMaterial().build().getKeyHolderType());
-        assertEquals(KeyHolderType.KEY_STORE, withRandomKeyMaterial()
-                .keyHolderType(KeyHolderType.KEY_STORE).build().getKeyHolderType());
+        assertEquals(KeyHolderType.KEY_STORE,
+                withRandomKeyMaterial().keyHolderType(KeyHolderType.KEY_STORE).build().getKeyHolderType());
     }
 
     @Test
     void shouldHandleAlgorithm() {
         assertEquals(KeyAlgorithm.UNDEFINED, withRandomKeyMaterial().build().getKeyAlgorithm());
-        assertEquals(KeyAlgorithm.ECDSA_P_256, withRandomKeyMaterial()
-                .keyAlgorithm(KeyAlgorithm.ECDSA_P_256).build().getKeyAlgorithm());
+        assertEquals(KeyAlgorithm.ECDSA_P_256,
+                withRandomKeyMaterial().keyAlgorithm(KeyAlgorithm.ECDSA_P_256).build().getKeyAlgorithm());
     }
 
     @Test
@@ -52,9 +52,8 @@ class KeyMaterialHolderTest {
     @Test
     void serializesKeyMaterial() {
         final var kmh = withRandomKeyMaterial().build();
-        final var roundtripResult = KeyMaterialHolder.deserializeKeyMaterial(
-                KeyMaterialHolder.serializeKeyMaterial(
-                        kmh.getKeyMaterial()));
+        final var roundtripResult = KeyMaterialHolder
+                .deserializeKeyMaterial(KeyMaterialHolder.serializeKeyMaterial(kmh.getKeyMaterial()));
         assertArrayEquals(kmh.getKeyMaterial(), roundtripResult, "byte arrays should be equal");
     }
 
@@ -63,7 +62,6 @@ class KeyMaterialHolderTest {
     }
 
     private KeyMaterialHolderBuilder withRandomKeyMaterial() {
-        return KeyMaterialHolder.builder()
-                .keyMaterial(randomKeyMaterial());
+        return KeyMaterialHolder.builder().keyMaterial(randomKeyMaterial());
     }
 }

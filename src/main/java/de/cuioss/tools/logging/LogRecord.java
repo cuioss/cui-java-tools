@@ -35,8 +35,8 @@ public interface LogRecord {
     Supplier<String> supplier(Object... parameter);
 
     /**
-     * Formats the template with the given object. <em>Important:</em> it implicitly prepends the
-     * identifier, e.g. "CUI-100: " in front of the created message.
+     * Formats the template with the given object. <em>Important:</em> it implicitly
+     * prepends the identifier, e.g. "CUI-100: " in front of the created message.
      *
      * @param parameter optional, used for filling the template
      * @return the formated String.

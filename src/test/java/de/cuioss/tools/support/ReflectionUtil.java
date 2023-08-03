@@ -8,9 +8,9 @@ import java.lang.reflect.Method;
 import lombok.experimental.UtilityClass;
 
 /**
- * Simple Helper for reflection-api.
- * Like many other methods of this test-framework, the methods use rather asserts /
- * {@link AssertionError} to check preconditions and states than {@link Exception}
+ * Simple Helper for reflection-api. Like many other methods of this
+ * test-framework, the methods use rather asserts / {@link AssertionError} to
+ * check preconditions and states than {@link Exception}
  *
  * @author Oliver Wolff
  */
@@ -24,8 +24,7 @@ public final class ReflectionUtil {
     /**
      * Verify the class implements {@link Object#equals(Object)}
      *
-     * @param clazz
-     *            class to be checked, msut not be null
+     * @param clazz class to be checked, msut not be null
      */
     public static void assertEqualsMethodIsOverriden(final Class<?> clazz) {
         // equals method need an object as parameter
@@ -34,47 +33,39 @@ public final class ReflectionUtil {
 
         // get equals method of the class
         final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_EQUALS, args1);
-        final var assertText =
-            "Method 'equals' not implemented in the class : " + clazz.getName();
+        final var assertText = "Method 'equals' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }
 
     /**
      * Verify the class implements {@link Object#hashCode()}
      *
-     * @param clazz
-     *            class to be checked, must not be null
+     * @param clazz class to be checked, must not be null
      */
     public static void assertHashCodeMethodIsOverriden(final Class<?> clazz) {
         final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_HASH_CODE, null);
-        final var assertText =
-            "Method 'hashCode' not implemented in the class : " + clazz.getName();
+        final var assertText = "Method 'hashCode' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }
 
     /**
      * Verify the class implements {@link Object#hashCode()}
      *
-     * @param clazz
-     *            class to be checked, must not be null
+     * @param clazz class to be checked, must not be null
      */
     public static void assertToStringMethodIsOverriden(final Class<?> clazz) {
         final var method = getMethodFromClass(clazz, METHOD_NAME_OBJECT_TO_STRING, null);
-        final var assertText =
-            "Method 'toString' not implemented in the class : " + clazz.getName();
+        final var assertText = "Method 'toString' not implemented in the class : " + clazz.getName();
         assertJavaLangObjectMethodWasOverridden(assertText, method);
     }
 
     /**
      * Check if the method is not a {@link Object} implementation
      *
-     * @param assertText
-     *            text to display on fail
-     * @param method
-     *            {@linkplain Method} to verify
+     * @param assertText text to display on fail
+     * @param method     {@linkplain Method} to verify
      */
-    private static void assertJavaLangObjectMethodWasOverridden(final String assertText,
-            final Method method) {
+    private static void assertJavaLangObjectMethodWasOverridden(final String assertText, final Method method) {
 
         assertNotNull(method, assertText);
         // does java.lang.Object provide the method?
@@ -84,16 +75,12 @@ public final class ReflectionUtil {
     /**
      * Retrieve method from class according parameters
      *
-     * @param clazz
-     *            class object under test
-     * @param methodName
-     *            string name of method
-     * @param args1
-     *            parameter object for method
+     * @param clazz      class object under test
+     * @param methodName string name of method
+     * @param args1      parameter object for method
      * @return {@link Method} if exists. if not an assertionError will be thrown.
      */
-    private static Method getMethodFromClass(final Class<?> clazz, final String methodName,
-            final Class<?>[] args1) {
+    private static Method getMethodFromClass(final Class<?> clazz, final String methodName, final Class<?>[] args1) {
         assertNotNull(clazz, "Target for test is null");
         Method result = null;
         try {

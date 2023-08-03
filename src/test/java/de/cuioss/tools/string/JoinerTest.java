@@ -30,8 +30,7 @@ class JoinerTest {
     private static final Iterable<Integer> ITERABLE_NULL_1 = Arrays.asList(null, 1);
     private static final Iterable<Integer> ITERABLE_1_NULL = Arrays.asList(1, null);
     private static final Iterable<Integer> ITERABLE_1_NULL_2 = Arrays.asList(1, null, 2);
-    private static final Iterable<Integer> ITERABLE_FOUR_NULLS =
-        Arrays.asList(null, null, null, null);
+    private static final Iterable<Integer> ITERABLE_FOUR_NULLS = Arrays.asList(null, null, null, null);
 
     @Test
     void testOnCharOverride() {
@@ -142,15 +141,17 @@ class JoinerTest {
 
     @Test
     // FIXME this is not working in JAVA 11 due to a changed String#join method
-    // FIXME owolff: Hm I'm not sure whether the old behavior is a problem at all. The main
-    // difference is not calling the toString method CharSequence. This code is taken directly from
-    // guava, and may be a problem there, but I do not think it is a problem within our JRE based
+    // FIXME owolff: Hm I'm not sure whether the old behavior is a problem at all.
+    // The main
+    // difference is not calling the toString method CharSequence. This code is
+    // taken directly from
+    // guava, and may be a problem there, but I do not think it is a problem within
+    // our JRE based
     // approach
     @DisabledForJreRange(min = JRE.JAVA_11)
     void testDontConvertCharSequenceToString() {
         assertEquals("foo,foo", Joiner.on(",").join(new DontStringMeBro(), new DontStringMeBro()));
-        assertEquals(
-                "foo,bar,foo",
+        assertEquals("foo,bar,foo",
                 Joiner.on(",").useForNull("bar").join(new DontStringMeBro(), null, new DontStringMeBro()));
     }
 

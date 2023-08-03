@@ -41,10 +41,10 @@ import de.cuioss.tools.support.Generators;
 class IOStreamsCopyTest {
 
     /*
-     * NOTE this is not particularly beautiful code. A better way to check for
-     * flush and close status would be to implement "trojan horse" wrapper
-     * implementations of the various stream classes, which set a flag when
-     * relevant methods are called. (JT)
+     * NOTE this is not particularly beautiful code. A better way to check for flush
+     * and close status would be to implement "trojan horse" wrapper implementations
+     * of the various stream classes, which set a flag when relevant methods are
+     * called. (JT)
      */
 
     private static final int FILE_SIZE = 1024 * 4 + 1;
@@ -52,10 +52,9 @@ class IOStreamsCopyTest {
     private final byte[] inData = Generators.generateTestData(FILE_SIZE);
 
     /*
-     * Note: this is not particularly beautiful code. A better way to check for flush and close
-     * status would be to
-     * implement "trojan horse" wrapper implementations of the various stream classes, which set a
-     * flag when relevant
+     * Note: this is not particularly beautiful code. A better way to check for
+     * flush and close status would be to implement "trojan horse" wrapper
+     * implementations of the various stream classes, which set a flag when relevant
      * methods are called. (JT)
      */
 

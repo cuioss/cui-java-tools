@@ -14,8 +14,8 @@ import lombok.experimental.UtilityClass;
 public class StringCaseShuffler {
 
     /**
-     * Shuffles the case of a given string. Shuffling is done for every Character that is a
-     * {@link Character#isAlphabetic(int)}
+     * Shuffles the case of a given string. Shuffling is done for every Character
+     * that is a {@link Character#isAlphabetic(int)}
      *
      * @param toShuffle if {@code null} or empty the given String will be returned
      * @return the shuffled string

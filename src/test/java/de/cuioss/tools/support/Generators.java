@@ -21,7 +21,8 @@ public class Generators {
 
     /**
      * @param count
-     * @return a {@link List} containing a number random String derived by {@link UUID}
+     * @return a {@link List} containing a number random String derived by
+     *         {@link UUID}
      */
     public static List<String> randomStrings(int count) {
         List<String> result = new ArrayList<>();
@@ -32,7 +33,8 @@ public class Generators {
     }
 
     /**
-     * @return a {@link List} containing a number random String derived by {@link UUID}
+     * @return a {@link List} containing a number random String derived by
+     *         {@link UUID}
      */
     public static String randomString() {
         return UUID.randomUUID().toString();
@@ -65,8 +67,7 @@ public class Generators {
         }
     }
 
-    public static void generateTestData(final OutputStream out, final long size)
-        throws IOException {
+    public static void generateTestData(final OutputStream out, final long size) throws IOException {
         for (var i = 0; i < size; i++) {
             // output.write((byte)'X');
 

@@ -44,10 +44,12 @@ class PropertyHolderTest {
 
     @Test
     void shouldHandlePropertyMemberInfo() {
-        assertEquals(PropertyMemberInfo.DEFAULT, from(BeanWithReadWriteProperties.class,
-                BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE).get().getMemberInfo());
-        assertEquals(PropertyMemberInfo.TRANSIENT, from(BeanWithReadWriteProperties.class,
-                BeanWithReadWriteProperties.ATTRIBUTE_TRANSIENT_VALUE).get().getMemberInfo());
+        assertEquals(PropertyMemberInfo.DEFAULT,
+                from(BeanWithReadWriteProperties.class, BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE).get()
+                        .getMemberInfo());
+        assertEquals(PropertyMemberInfo.TRANSIENT,
+                from(BeanWithReadWriteProperties.class, BeanWithReadWriteProperties.ATTRIBUTE_TRANSIENT_VALUE).get()
+                        .getMemberInfo());
     }
 
     @Test
@@ -70,9 +72,7 @@ class PropertyHolderTest {
 
     @Test
     void shouldHandleBuilderLikeAccess() {
-        var underTest =
-            from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER)
-                    .get();
+        var underTest = from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER).get();
         assertEquals(READ_WRITE, underTest.getReadWrite());
         assertEquals(PropertyMemberInfo.DEFAULT, underTest.getMemberInfo());
         assertEquals(ATTRIBUTE_READ_WRITE_WITH_BUILDER, underTest.getName());

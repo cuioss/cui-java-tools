@@ -37,8 +37,8 @@ public class FakeTicker extends Ticker {
      * Sets the increment applied to the ticker whenever it is queried.
      *
      * <p>
-     * The default behavior is to auto increment by zero. i.e: The ticker is left unchanged when
-     * queried.
+     * The default behavior is to auto increment by zero. i.e: The ticker is left
+     * unchanged when queried.
      */
     @SuppressWarnings("GoodTime") // should accept a java.time.Duration
     public FakeTicker setAutoIncrementStep(long autoIncrementStep, TimeUnit timeUnit) {
@@ -51,8 +51,8 @@ public class FakeTicker extends Ticker {
      * Sets the increment applied to the ticker whenever it is queried.
      *
      * <p>
-     * The default behavior is to auto increment by zero. i.e: The ticker is left unchanged when
-     * queried.
+     * The default behavior is to auto increment by zero. i.e: The ticker is left
+     * unchanged when queried.
      */
     public FakeTicker setAutoIncrementStep(java.time.Duration autoIncrementStep) {
         return setAutoIncrementStep(autoIncrementStep.toNanos(), TimeUnit.NANOSECONDS);

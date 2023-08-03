@@ -18,10 +18,10 @@ import de.cuioss.tools.logging.CuiLogger;
 import lombok.experimental.UtilityClass;
 
 /**
- * Helper class providing some convenience method for interacting with {@link SecurityManager}
- * related stuff. In essence, it uses {@link AccessController#doPrivileged(PrivilegedAction)} for
- * its
- * method in case a {@link SecurityManager} is set.
+ * Helper class providing some convenience method for interacting with
+ * {@link SecurityManager} related stuff. In essence, it uses
+ * {@link AccessController#doPrivileged(PrivilegedAction)} for its method in
+ * case a {@link SecurityManager} is set.
  *
  * @author Oliver Wolff
  *
@@ -34,7 +34,8 @@ public class SecuritySupport {
     private static final CuiLogger LOGGER = new CuiLogger(SecuritySupport.class);
 
     /**
-     * @return the context-classloader if obtainable, {@link Optional#empty()} otherwise
+     * @return the context-classloader if obtainable, {@link Optional#empty()}
+     *         otherwise
      */
     public static Optional<ClassLoader> getContextClassLoader() {
         if (null == System.getSecurityManager()) {
@@ -53,7 +54,7 @@ public class SecuritySupport {
     }
 
     /**
-     * @param object to be set accessible
+     * @param object     to be set accessible
      * @param accessible value
      */
     public static void setAccessible(AccessibleObject object, boolean accessible) {
@@ -75,7 +76,8 @@ public class SecuritySupport {
     }
 
     /**
-     * @param propertyName If is null or empty the method will return {@link Optional#empty()}
+     * @param propertyName If is null or empty the method will return
+     *                     {@link Optional#empty()}
      * @return an {@link Optional} on the requested property
      */
     public static Optional<String> accessSystemProperty(String propertyName) {
@@ -99,8 +101,9 @@ public class SecuritySupport {
     }
 
     /**
-     * @return the {@link Properties} derived by {@link System#getProperties()}. If this can not be
-     *         achieved it returns an empty {@link Properties} object.
+     * @return the {@link Properties} derived by {@link System#getProperties()}. If
+     *         this can not be achieved it returns an empty {@link Properties}
+     *         object.
      */
     public static Properties accessSystemProperties() {
         if (null == System.getSecurityManager()) {
@@ -119,8 +122,8 @@ public class SecuritySupport {
     }
 
     /**
-     * @return the map derived by {@link System#getenv()}. If this can not be achieved it returns an
-     *         empty map.
+     * @return the map derived by {@link System#getenv()}. If this can not be
+     *         achieved it returns an empty map.
      */
     public static Map<String, String> accessSystemEnv() {
         if (null == System.getSecurityManager()) {
@@ -140,17 +143,19 @@ public class SecuritySupport {
 
     /**
      * @param <T>
-     * @param clazz The type of the object
+     * @param clazz      The type of the object
      * @param paramTypes to be used for identifying the constructor
      * @return the found constructor.
-     * @throws NoSuchMethodException to be thrown, if there is no corresponding constructor
-     * @throws IllegalStateException for cases where the {@link PrivilegedAction} fails but is not a
-     *             {@link NoSuchMethodException}
+     * @throws NoSuchMethodException to be thrown, if there is no corresponding
+     *                               constructor
+     * @throws IllegalStateException for cases where the {@link PrivilegedAction}
+     *                               fails but is not a
+     *                               {@link NoSuchMethodException}
      */
     @SuppressWarnings("squid:S1452") // owolff: using wildcards here is the only sensible thing to
                                      // do
     public static <T> Constructor<? extends T> getDeclaredConstructor(Class<T> clazz, Class<?>... paramTypes)
-        throws NoSuchMethodException {
+            throws NoSuchMethodException {
         if (null == System.getSecurityManager()) {
             LOGGER.trace("No SecurityManager configured, accessing declared constructors directly");
             return clazz.getDeclaredConstructor(paramTypes);
@@ -165,8 +170,7 @@ public class SecuritySupport {
                 } catch (SecurityException e) {
                     LOGGER.warn(e,
                             "Unable to call 'getDeclaredConstructor' due to SecurityException, class='{}', paramTypes='{}'",
-                            clazz.toString(),
-                            Arrays.toString(paramTypes));
+                            clazz.toString(), Arrays.toString(paramTypes));
                 }
                 return constructor;
             });

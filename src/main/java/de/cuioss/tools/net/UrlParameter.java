@@ -48,8 +48,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     public static final UrlParameter FACES_REDIRECT = new UrlParameter("faces-redirect", "true");
 
     /** Shortcut constant parameter for includeViewParams. */
-    public static final UrlParameter INCLUDE_VIEW_PARAMETER =
-        new UrlParameter("includeViewParams", "true");
+    public static final UrlParameter INCLUDE_VIEW_PARAMETER = new UrlParameter("includeViewParams", "true");
 
     private static final long serialVersionUID = 634175928228707534L;
 
@@ -64,10 +63,8 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Constructor. Name and value are implicitly encoded using UTF-8.
      *
-     * @param name
-     *            must not be null or empty
-     * @param value
-     *            may be null.
+     * @param name  must not be null or empty
+     * @param value may be null.
      */
     public UrlParameter(final String name, final String value) {
         this(name, value, true);
@@ -76,13 +73,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Constructor.
      *
-     * @param name
-     *            must not be null or empty
-     * @param value
-     *            value may be null.
-     * @param encode
-     *            indicates whether to encode the parameter name and value as
-     *            UTF-8
+     * @param name   must not be null or empty
+     * @param value  value may be null.
+     * @param encode indicates whether to encode the parameter name and value as
+     *               UTF-8
      */
     public UrlParameter(final String name, final String value, final boolean encode) {
         super();
@@ -113,8 +107,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Creates a parameter String for a given number of {@link UrlParameter}.
      *
-     * @param parameters
-     *            to be appended, must not be null
+     * @param parameters to be appended, must not be null
      * @return the concatenated ParameterString in the form
      *         "?parameter1Name=parameter1Value&amp;parameter2Name=parameter2Value"
      */
@@ -129,8 +122,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * @param parameters
      * @return the created parameter String
      */
-    public static String createParameterString(final boolean encode,
-            final UrlParameter... parameters) {
+    public static String createParameterString(final boolean encode, final UrlParameter... parameters) {
         final var builder = new StringBuilder();
         // First parameter to be treated specially.
         if (null != parameters && parameters.length > 0 && null != parameters[0]) {
@@ -148,17 +140,16 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Convert a map of raw Url-parameter into a list of {@link UrlParameter}
      *
-     * @param map
-     *            containing the parameter extracted usually directly from
-     *            servlet request. From the String[] solely the first element
-     *            will be extracted. The others will be ignored.
-     * @param parameterFilter
-     *            defines the parameter to be filtered. May be null or empty.
-     * @param encode
-     *            indicates whether to encode the parameter name and value as
-     *            UTF-8
-     * @return the found List of {@link UrlParameter} or empty list if the given
-     *         map is null or empty. The List is always sorted by #getName()
+     * @param map             containing the parameter extracted usually directly
+     *                        from servlet request. From the String[] solely the
+     *                        first element will be extracted. The others will be
+     *                        ignored.
+     * @param parameterFilter defines the parameter to be filtered. May be null or
+     *                        empty.
+     * @param encode          indicates whether to encode the parameter name and
+     *                        value as UTF-8
+     * @return the found List of {@link UrlParameter} or empty list if the given map
+     *         is null or empty. The List is always sorted by #getName()
      */
     @SuppressWarnings("squid:S1166") // now need to throw exception
     public static final List<UrlParameter> getUrlParameterFromMap(final Map<String, List<String>> map,
@@ -188,12 +179,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Filters the given list of {@link UrlParameter}
      *
-     * @param toBeFiltered
-     *            may be null or empty
-     * @param parameterFilter
-     *            used for filtering, may be null
-     * @return the filtered parameter list or empty List if toBeFiltered is null
-     *         or empty.
+     * @param toBeFiltered    may be null or empty
+     * @param parameterFilter used for filtering, may be null
+     * @return the filtered parameter list or empty List if toBeFiltered is null or
+     *         empty.
      */
     public static List<UrlParameter> filterParameter(final List<UrlParameter> toBeFiltered,
             final ParameterFilter parameterFilter) {
@@ -214,13 +203,11 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Create a parameterMap for a given list of {@link UrlParameter}
      *
-     * @param urlParameters
-     *            may be null or empty
-     * @return parameter Map, may be empty if urlParameters is empty. The list
-     *         of String will solely contain one element.
+     * @param urlParameters may be null or empty
+     * @return parameter Map, may be empty if urlParameters is empty. The list of
+     *         String will solely contain one element.
      */
-    public static final Map<String, List<String>> createParameterMap(
-            final List<UrlParameter> urlParameters) {
+    public static final Map<String, List<String>> createParameterMap(final List<UrlParameter> urlParameters) {
         final Map<String, List<String>> result = new HashMap<>();
         if (null != urlParameters && !urlParameters.isEmpty()) {
             for (final UrlParameter urlParameter : urlParameters) {
@@ -231,11 +218,14 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     }
 
     /**
-     * Helper class that create a list of {@link UrlParameter} from a given query-String
+     * Helper class that create a list of {@link UrlParameter} from a given
+     * query-String
      *
-     * @param queryString if it is null or empty or solely consists of an "?" an empty {@link List}
-     * @return if queryString is null or empty or solely consists of an "?" an empty {@link List}
-     *         will be returned. An immutable {@link List} of {@link UrlParameter} otherwise
+     * @param queryString if it is null or empty or solely consists of an "?" an
+     *                    empty {@link List}
+     * @return if queryString is null or empty or solely consists of an "?" an empty
+     *         {@link List} will be returned. An immutable {@link List} of
+     *         {@link UrlParameter} otherwise
      */
     public static List<UrlParameter> fromQueryString(String queryString) {
         log.trace("Parsing Query String %s", queryString);
@@ -256,22 +246,22 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             if (element.contains("=")) {
                 var splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
-                    case 0:
-                        log.debug(
-                                "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
-                                queryString, element);
-                        break;
-                    case 1:
-                        builder.add(createDecoded(splitted.get(0), null));
-                        break;
-                    case 2:
-                        builder.add(createDecoded(splitted.get(0), splitted.get(1)));
-                        break;
-                    default:
-                        log.debug(
-                                "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
-                                queryString);
-                        break;
+                case 0:
+                    log.debug(
+                            "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
+                            queryString, element);
+                    break;
+                case 1:
+                    builder.add(createDecoded(splitted.get(0), null));
+                    break;
+                case 2:
+                    builder.add(createDecoded(splitted.get(0), splitted.get(1)));
+                    break;
+                default:
+                    log.debug(
+                            "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
+                            queryString);
+                    break;
                 }
             } else {
                 builder.add(createDecoded(element, null));
@@ -303,8 +293,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     }
 
     /**
-     * @param encode
-     *            flag indicate if the result need to be encoded
+     * @param encode flag indicate if the result need to be encoded
      * @return string representation of name + vale
      */
     public String createNameValueString(final boolean encode) {

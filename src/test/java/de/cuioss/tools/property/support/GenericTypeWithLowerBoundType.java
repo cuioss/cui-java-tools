@@ -31,7 +31,7 @@ public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Ser
     }
 
     /**
-     * @param key must not be {@code null}
+     * @param key   must not be {@code null}
      * @param value
      */
     public GenericTypeWithLowerBoundType(final K key, final V value) {

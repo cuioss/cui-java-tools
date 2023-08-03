@@ -39,10 +39,10 @@ public class ClassPathLoader implements FileLoader {
 
     /**
      * @param pathName must not be null nor empty, may start with the prefix
-     *            {@link FileTypePrefix#CLASSPATH} but not with
-     *            {@link FileTypePrefix#FILE} and contain at least one character despite the prefix.
-     *            On all other cases a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 {@link FileTypePrefix#CLASSPATH} but not with
+     *                 {@link FileTypePrefix#FILE} and contain at least one
+     *                 character despite the prefix. On all other cases a
+     *                 {@link IllegalArgumentException} will be thrown.
      */
     public ClassPathLoader(final String pathName) {
         requireNonNull(pathName);
@@ -55,17 +55,17 @@ public class ClassPathLoader implements FileLoader {
      * Checks and modifies a given pathName
      *
      * @param pathName must not be null nor empty, may start with the prefix
-     *            {@link FileTypePrefix#CLASSPATH} but not with
-     *            {@link FileTypePrefix#FILE} and contain at least one character despite
-     *            the prefix. On all other cases a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 {@link FileTypePrefix#CLASSPATH} but not with
+     *                 {@link FileTypePrefix#FILE} and contain at least one
+     *                 character despite the prefix. On all other cases a
+     *                 {@link IllegalArgumentException} will be thrown.
      * @return the normalized pathname without prefix but with a leading '/'
      */
     static String checkClasspathName(final String pathName) {
         requireNotEmpty(pathName);
         if (FileTypePrefix.FILE.is(pathName)) {
-            throw new IllegalArgumentException("Invalid path name, must start not start with "
-                    + FileTypePrefix.FILE + " but was: " + pathName);
+            throw new IllegalArgumentException(
+                    "Invalid path name, must start not start with " + FileTypePrefix.FILE + " but was: " + pathName);
         }
         var newPathName = pathName;
         if (FileTypePrefix.CLASSPATH.is(pathName)) {

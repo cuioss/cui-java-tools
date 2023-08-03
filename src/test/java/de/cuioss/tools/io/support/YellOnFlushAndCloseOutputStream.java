@@ -17,7 +17,7 @@ public class YellOnFlushAndCloseOutputStream extends ProxyOutputStream {
     private boolean yellForClose;
 
     /**
-     * @param proxy OutputStream to delegate to.
+     * @param proxy        OutputStream to delegate to.
      * @param yellForFlush True if flush() is forbidden
      * @param yellForClose True if close() is forbidden
      */

@@ -10,7 +10,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * Helper class for splitting / interacting with Filename and corresponding suffixes.
+ * Helper class for splitting / interacting with Filename and corresponding
+ * suffixes.
  *
  * @author Oliver Wolff
  */
@@ -40,22 +41,22 @@ public class StructuredFilename implements Serializable {
         originalName = filename;
         final var list = Splitter.on(".").omitEmptyStrings().splitToList(filename);
         switch (list.size()) {
-            case 0:
-                namePart = filename;
-                suffix = null;
-                break;
-            case 1:
-                namePart = filename;
-                suffix = null;
-                break;
-            case 2:
-                namePart = list.get(0);
-                suffix = list.get(1);
-                break;
-            default:
-                suffix = list.get(list.size() - 1);
-                namePart = String.join(".", list.subList(0, list.size() - 1));
-                break;
+        case 0:
+            namePart = filename;
+            suffix = null;
+            break;
+        case 1:
+            namePart = filename;
+            suffix = null;
+            break;
+        case 2:
+            namePart = list.get(0);
+            suffix = list.get(1);
+            break;
+        default:
+            suffix = list.get(list.size() - 1);
+            namePart = String.join(".", list.subList(0, list.size() - 1));
+            break;
         }
     }
 
@@ -79,8 +80,9 @@ public class StructuredFilename implements Serializable {
 
     /**
      * @param nameSuffix to be used for appending the name part. may be null
-     * @return the created name string. if namePart = "namePart", nameSuffix=".nameSuffix" and
-     *         suffix = "suffix" the resulting String will be "namePart.nameSuffix.suffix"
+     * @return the created name string. if namePart = "namePart",
+     *         nameSuffix=".nameSuffix" and suffix = "suffix" the resulting String
+     *         will be "namePart.nameSuffix.suffix"
      */
     public String getAppendedName(final String nameSuffix) {
         final var builder = new StringBuilder(namePart);

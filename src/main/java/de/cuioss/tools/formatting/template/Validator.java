@@ -23,13 +23,12 @@ public class Validator<F extends FormatterSupport> implements Serializable {
     }
 
     /**
-     * @param template must not be null
-     *            if template doesn't fit to el-expression or use tokens
-     *            which are not supported.
+     * @param template must not be null if template doesn't fit to el-expression or
+     *                 use tokens which are not supported.
      */
     public void validate(final String template) {
         requireNonNull(template, "Template must not be null.");
-        this.lexer.validateTemplate(template);
+        lexer.validateTemplate(template);
     }
 
     /**
@@ -41,42 +40,39 @@ public class Validator<F extends FormatterSupport> implements Serializable {
 
     /**
      * This method provide only validation of simple expression language with
-     * squared brackets. If some other expression language is used on the
-     * template validation will fail. If there is a need for usage of other
-     * expression language use {@link #validateTemplate(String, Lexer)}
+     * squared brackets. If some other expression language is used on the template
+     * validation will fail. If there is a need for usage of other expression
+     * language use {@link #validateTemplate(String, Lexer)}
      *
      * @param template input which should be validated
-     * @param source source must not be null
+     * @param source   source must not be null
      */
-    public static <E extends FormatterSupport> void validateTemplate(final String template,
-            final E source) {
+    public static <E extends FormatterSupport> void validateTemplate(final String template, final E source) {
         new Validator.ValidatorBuilder<E>().forSource(source).validate(template);
     }
 
     /**
      * This method provide only validation of simple expression language with
-     * squared brackets. If some other expression language is used on the
-     * template validation will fail. If there is a need for usage of other
-     * expression language use {@link #validateTemplate(String, Lexer)}
+     * squared brackets. If some other expression language is used on the template
+     * validation will fail. If there is a need for usage of other expression
+     * language use {@link #validateTemplate(String, Lexer)}
      *
      * @param template input which should be validated
-     * @param source target type must not be null
+     * @param source   target type must not be null
      */
-    public static <E extends FormatterSupport> void validateTemplate(final String template,
-            final Class<E> source) {
+    public static <E extends FormatterSupport> void validateTemplate(final String template, final Class<E> source) {
         new Validator.ValidatorBuilder<E>().forType(source).validate(template);
     }
 
     /**
-     * This method provide validation for template of specific expression
-     * language. Therefore, you need to provide a fitting Lexer.
+     * This method provide validation for template of specific expression language.
+     * Therefore, you need to provide a fitting Lexer.
      *
      * @param template input which should be validated
-     * @param lexer {@link Lexer} for usage of specific expression language on
-     *            template
+     * @param lexer    {@link Lexer} for usage of specific expression language on
+     *                 template
      */
-    public static <E extends FormatterSupport> void validateTemplate(final String template,
-            final Lexer<E> lexer) {
+    public static <E extends FormatterSupport> void validateTemplate(final String template, final Lexer<E> lexer) {
         new Validator.ValidatorBuilder<E>().withLexer(lexer).validate(template);
     }
 
@@ -87,10 +83,10 @@ public class Validator<F extends FormatterSupport> implements Serializable {
         private Lexer<E> lexer;
 
         public Validator<E> forType(final Class<E> source) {
-            if (null == this.lexer) {
-                this.lexer = useSimpleElWithSquaredBrackets(source);
+            if (null == lexer) {
+                lexer = useSimpleElWithSquaredBrackets(source);
             }
-            return new Validator<>(this.lexer);
+            return new Validator<>(lexer);
         }
 
         public Validator<E> withLexer(final Lexer<E> lexerInstance) {
@@ -98,10 +94,10 @@ public class Validator<F extends FormatterSupport> implements Serializable {
         }
 
         public Validator<E> forSource(E source) {
-            if (null == this.lexer) {
-                this.lexer = useSimpleElWithSquaredBrackets(source);
+            if (null == lexer) {
+                lexer = useSimpleElWithSquaredBrackets(source);
             }
-            return new Validator<>(this.lexer);
+            return new Validator<>(lexer);
         }
 
         private Lexer<E> useSimpleElWithSquaredBrackets(final Class<E> source) {

@@ -20,7 +20,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * File-system based variant. Responsible for all non {@link FileTypePrefix#CLASSPATH} files.
+ * File-system based variant. Responsible for all non
+ * {@link FileTypePrefix#CLASSPATH} files.
  *
  * @author Oliver Wolff
  */
@@ -45,10 +46,10 @@ public class FileSystemLoader implements FileReaderWriter {
 
     /**
      * @param pathName must not be null nor empty, must not start with the prefix
-     *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite the prefix. On all other cases
-     *            a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 "classpath:" but may start with the prefix "file:" and
+     *                 contain at least one character despite the prefix. On all
+     *                 other cases a {@link IllegalArgumentException} will be
+     *                 thrown.
      */
     public FileSystemLoader(final String pathName) {
         requireNonNull(pathName);
@@ -88,10 +89,10 @@ public class FileSystemLoader implements FileReaderWriter {
      * Checks and modifies a given pathName
      *
      * @param pathName must not be null nor empty, must not start with the prefix
-     *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite the prefix. On all other cases
-     *            a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 "classpath:" but may start with the prefix "file:" and
+     *                 contain at least one character despite the prefix. On all
+     *                 other cases a {@link IllegalArgumentException} will be
+     *                 thrown.
      *
      * @return the normalized pathname without prefix
      */
@@ -106,8 +107,7 @@ public class FileSystemLoader implements FileReaderWriter {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             try {
-                newPathName =
-                    new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
+                newPathName = new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOG.debug("Loading config file from external path: {}", newPathName);
             } catch (final IOException e) {
                 LOG.error("Retrieving the current dir failed: ", e);
@@ -135,7 +135,8 @@ public class FileSystemLoader implements FileReaderWriter {
     }
 
     /**
-     * Truncate and overwrite an existing file, or create the file if it doesn't initially exist.
+     * Truncate and overwrite an existing file, or create the file if it doesn't
+     * initially exist.
      */
     @Override
     public OutputStream outputStream() throws IOException {

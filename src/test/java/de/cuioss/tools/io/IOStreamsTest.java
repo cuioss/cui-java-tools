@@ -38,10 +38,8 @@ class IOStreamsTest {
         assertTrue(contentEquals(input1, input1));
         assertTrue(contentEquals(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)),
                 new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))));
-        assertTrue(contentEquals(
-                new BufferedInputStream(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))),
-                new BufferedInputStream(
-                        new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)))));
+        assertTrue(contentEquals(new BufferedInputStream(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8))),
+                new BufferedInputStream(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)))));
         assertTrue(contentEquals(new ByteArrayInputStream("ABC".getBytes(StandardCharsets.UTF_8)),
                 new ByteArrayInputStream("ABC".getBytes(StandardCharsets.UTF_8))));
         assertFalse(contentEquals(new ByteArrayInputStream("ABCD".getBytes(StandardCharsets.UTF_8)),
@@ -68,8 +66,8 @@ class IOStreamsTest {
     @SuppressWarnings("resource")
     void shouldProvideInputStream() throws IOException {
         assertTrue(contentEquals(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), toInputStream(null)));
-        assertFalse(contentEquals(new ByteArrayInputStream("ABCD".getBytes(StandardCharsets.UTF_8)),
-                toInputStream("ABC")));
+        assertFalse(
+                contentEquals(new ByteArrayInputStream("ABCD".getBytes(StandardCharsets.UTF_8)), toInputStream("ABC")));
     }
 
     @Test

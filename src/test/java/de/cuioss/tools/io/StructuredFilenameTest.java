@@ -38,8 +38,7 @@ class StructuredFilenameTest {
     @Test
     void testGetAppendedName() {
         final var filename = new StructuredFilename("test.suffix");
-        assertEquals("test-appended.suffix",
-                filename.getAppendedName("-appended"));
+        assertEquals("test-appended.suffix", filename.getAppendedName("-appended"));
     }
 
     @Test
@@ -57,8 +56,7 @@ class StructuredFilenameTest {
 
     @Test
     void shouldResolveFile() {
-        final var filename =
-            new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
+        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 

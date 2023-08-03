@@ -16,15 +16,18 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An object that measures elapsed time in nanoseconds. It is useful to measure elapsed time using
- * this class instead of direct calls to {@link System#nanoTime} for a few reasons:
+ * An object that measures elapsed time in nanoseconds. It is useful to measure
+ * elapsed time using this class instead of direct calls to
+ * {@link System#nanoTime} for a few reasons:
  *
  * <ul>
- * <li>An alternate time source can be substituted, for testing or performance reasons.
- * <li>As documented by {@code nanoTime}, the value returned has no absolute meaning, and can only
- * be interpreted as relative to another timestamp returned by {@code nanoTime} at a different
- * time. {@code StopWatch} is a more effective abstraction because it exposes only these
- * relative values, not the absolute ones.
+ * <li>An alternate time source can be substituted, for testing or performance
+ * reasons.
+ * <li>As documented by {@code nanoTime}, the value returned has no absolute
+ * meaning, and can only be interpreted as relative to another timestamp
+ * returned by {@code nanoTime} at a different time. {@code StopWatch} is a more
+ * effective abstraction because it exposes only these relative values, not the
+ * absolute ones.
  * </ul>
  *
  * <p>
@@ -42,13 +45,13 @@ import java.util.concurrent.TimeUnit;
  * </pre>
  *
  * <p>
- * StopWatch methods are not idempotent; it is an error to start or stop a stopwatch that is
- * already in the desired state.
+ * StopWatch methods are not idempotent; it is an error to start or stop a
+ * stopwatch that is already in the desired state.
  *
  * <p>
- * When testing code that uses this class, use {@link #createUnstarted(Ticker)} or {@link
- * #createStarted(Ticker)} to supply a fake or mock ticker. This allows you to simulate any valid
- * behavior of the stopwatch.
+ * When testing code that uses this class, use {@link #createUnstarted(Ticker)}
+ * or {@link #createStarted(Ticker)} to supply a fake or mock ticker. This
+ * allows you to simulate any valid behavior of the stopwatch.
  *
  * <p>
  * <b>Note:</b> This class is not thread-safe.
@@ -66,8 +69,8 @@ public final class StopWatch implements Serializable {
     private long startTick;
 
     /**
-     * @return a created (but not started) new stopwatch using {@link System#nanoTime} as its time
-     *         source.
+     * @return a created (but not started) new stopwatch using
+     *         {@link System#nanoTime} as its time source.
      *
      */
     public static StopWatch createUnstarted() {
@@ -76,7 +79,8 @@ public final class StopWatch implements Serializable {
 
     /**
      * @param ticker specified time source, must not be null
-     * @return a created (but not started) new stopwatch, using the specified time source.
+     * @return a created (but not started) new stopwatch, using the specified time
+     *         source.
      *
      */
     public static StopWatch createUnstarted(Ticker ticker) {
@@ -84,8 +88,8 @@ public final class StopWatch implements Serializable {
     }
 
     /**
-     * @return a created (and started) new stopwatch using {@link System#nanoTime} as its time
-     *         source.
+     * @return a created (and started) new stopwatch using {@link System#nanoTime}
+     *         as its time source.
      *
      */
     public static StopWatch createStarted() {
@@ -94,7 +98,8 @@ public final class StopWatch implements Serializable {
 
     /**
      * @param ticker specified time source, must not be null
-     * @return a created (and started) new stopwatch, using the specified time source.
+     * @return a created (and started) new stopwatch, using the specified time
+     *         source.
      *
      */
     public static StopWatch createStarted(Ticker ticker) {
@@ -110,8 +115,9 @@ public final class StopWatch implements Serializable {
     }
 
     /**
-     * @return {@code true} if {@link #start()} has been called on this stopwatch, and
-     *         {@link #stop()} has not been called since the last call to {@code start()}.
+     * @return {@code true} if {@link #start()} has been called on this stopwatch,
+     *         and {@link #stop()} has not been called since the last call to
+     *         {@code start()}.
      */
     public boolean isRunning() {
         return isRunning;
@@ -131,8 +137,8 @@ public final class StopWatch implements Serializable {
     }
 
     /**
-     * Stops the stopwatch. Future reads will return the fixed duration that had elapsed up to this
-     * point.
+     * Stops the stopwatch. Future reads will return the fixed duration that had
+     * elapsed up to this point.
      *
      * @return this {@code StopWatch} instance
      * @throws IllegalStateException if the stopwatch is already stopped.
@@ -146,7 +152,8 @@ public final class StopWatch implements Serializable {
     }
 
     /**
-     * Sets the elapsed time for this stopwatch to zero, and places it in a stopped state.
+     * Sets the elapsed time for this stopwatch to zero, and places it in a stopped
+     * state.
      *
      * @return this {@code StopWatch} instance
      */
@@ -162,17 +169,19 @@ public final class StopWatch implements Serializable {
 
     /**
      * @param desiredUnit must not be null
-     * @return the current elapsed time shown on this stopwatch, expressed in the desired time unit,
-     *         with any fraction rounded down.
+     * @return the current elapsed time shown on this stopwatch, expressed in the
+     *         desired time unit, with any fraction rounded down.
      *
      *         <p>
-     *         <b>Note:</b> the overhead of measurement can be more than a microsecond, so it is
-     *         generally not useful to specify {@link TimeUnit#NANOSECONDS} precision here.
+     *         <b>Note:</b> the overhead of measurement can be more than a
+     *         microsecond, so it is generally not useful to specify
+     *         {@link TimeUnit#NANOSECONDS} precision here.
      *
      *         <p>
-     *         It is generally not a good idea to use an ambiguous, unitless {@code long} to
-     *         represent elapsed time. Therefore, we recommend using {@link #elapsed()} instead,
-     *         which returns a strongly-typed {@link Duration} instance.
+     *         It is generally not a good idea to use an ambiguous, unitless
+     *         {@code long} to represent elapsed time. Therefore, we recommend using
+     *         {@link #elapsed()} instead, which returns a strongly-typed
+     *         {@link Duration} instance.
      *
      */
     public long elapsed(TimeUnit desiredUnit) {
@@ -180,8 +189,9 @@ public final class StopWatch implements Serializable {
     }
 
     /**
-     * @return the current elapsed time shown on this stopwatch as a {@link Duration}. Unlike {@link
-     *         #elapsed(TimeUnit)}, this method does not lose any precision due to rounding.
+     * @return the current elapsed time shown on this stopwatch as a
+     *         {@link Duration}. Unlike {@link #elapsed(TimeUnit)}, this method does
+     *         not lose any precision due to rounding.
      *
      */
     public Duration elapsed() {
@@ -223,22 +233,22 @@ public final class StopWatch implements Serializable {
 
     private static String abbreviate(TimeUnit unit) {
         switch (unit) {
-            case NANOSECONDS:
-                return "ns";
-            case MICROSECONDS:
-                return "\u03bcs"; // μs
-            case MILLISECONDS:
-                return "ms";
-            case SECONDS:
-                return "s";
-            case MINUTES:
-                return "min";
-            case HOURS:
-                return "h";
-            case DAYS:
-                return "d";
-            default:
-                throw new AssertionError();
+        case NANOSECONDS:
+            return "ns";
+        case MICROSECONDS:
+            return "\u03bcs"; // μs
+        case MILLISECONDS:
+            return "ms";
+        case SECONDS:
+            return "s";
+        case MINUTES:
+            return "min";
+        case HOURS:
+            return "h";
+        case DAYS:
+            return "d";
+        default:
+            throw new AssertionError();
         }
     }
 }

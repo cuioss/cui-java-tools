@@ -148,9 +148,7 @@ class CollectionLiteralsTest {
     @Test
     void shouldHandleStreamToImmutableMap() {
         final Map<String, String> result = immutableMap(
-                immutableMap("1", "1-1", "2", "")
-                        .entrySet().stream()
-                        .filter(entry -> !"".equals(entry.getValue())));
+                immutableMap("1", "1-1", "2", "").entrySet().stream().filter(entry -> !"".equals(entry.getValue())));
         assertEquals(1, result.size());
         assertTrue(result.containsKey("1"));
     }

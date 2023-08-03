@@ -8,8 +8,7 @@ class LogRecordModelTest {
 
     private static final String PREFIX = "CUI-100";
 
-    private final LogRecord model =
-        LogRecordModel.builder().identifier(100).prefix("CUI").template("{}-%s").build();
+    private final LogRecord model = LogRecordModel.builder().identifier(100).prefix("CUI").template("{}-%s").build();
 
     @Test
     void shouldHandlePrefix() {

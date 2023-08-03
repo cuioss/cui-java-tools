@@ -47,9 +47,8 @@ class ConcurrentToolsTest {
     }
 
     /**
-     * Wrapper around {@link StopWatch} which also contains an "expected completion time." Creating
-     * a
-     * {@code Completion} starts the underlying stopwatch.
+     * Wrapper around {@link StopWatch} which also contains an "expected completion
+     * time." Creating a {@code Completion} starts the underlying stopwatch.
      */
     private static final class Completion {
 
@@ -62,8 +61,8 @@ class ConcurrentToolsTest {
         }
 
         /**
-         * Asserts that the expected completion time has passed (and not "too much" time beyond
-         * that).
+         * Asserts that the expected completion time has passed (and not "too much" time
+         * beyond that).
          */
         void assertCompletionExpected() {
             assertAtLeastTimePassed(stopwatch, expectedCompletionWaitMillis);
@@ -75,9 +74,9 @@ class ConcurrentToolsTest {
     private static void assertAtLeastTimePassed(StopWatch stopwatch, long expectedMillis) {
         var elapsedMillis = stopwatch.elapsed(MILLISECONDS);
         /*
-         * The "+ 5" below is to permit, say, sleep(10) to sleep only 9 milliseconds. We see such
-         * behavior sometimes when running these tests publicly as part of Guava. "+ 5" is probably
-         * more generous than it needs to be.
+         * The "+ 5" below is to permit, say, sleep(10) to sleep only 9 milliseconds. We
+         * see such behavior sometimes when running these tests publicly as part of
+         * Guava. "+ 5" is probably more generous than it needs to be.
          */
         assertTrue(
 
@@ -100,28 +99,27 @@ class ConcurrentToolsTest {
     @SuppressWarnings("squid:S2925") // owolff: ok for testing
     static void requestInterruptIn(final long time) {
         final var interruptee = Thread.currentThread();
-        new Thread(
-                () -> {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(time);
-                    } catch (InterruptedException wontHappen) {
-                        throw new AssertionError(wontHappen);
-                    }
-                    interruptee.interrupt();
-                })
-                        .start();
+        new Thread(() -> {
+            try {
+                TimeUnit.MILLISECONDS.sleep(time);
+            } catch (InterruptedException wontHappen) {
+                throw new AssertionError(wontHappen);
+            }
+            interruptee.interrupt();
+        }).start();
     }
 
     /**
      * Await an interrupt, then clear the interrupt status. Similar to {@code
-     * assertTrue(Thread.interrupted())} except that this version tolerates late interrupts.
+     * assertTrue(Thread.interrupted())} except that this version tolerates late
+     * interrupts.
      */
     @SuppressWarnings("squid:S2925") // owolff: ok for testing
     private static void assertInterrupted() {
         try {
             /*
-             * The sleep() will end immediately if we've already been interrupted or
-             * wait patiently for the interrupt if not.
+             * The sleep() will end immediately if we've already been interrupted or wait
+             * patiently for the interrupt if not.
              */
             Thread.sleep(LONG_DELAY_MS);
             fail("Dude, where's my interrupt?");

@@ -201,15 +201,8 @@ class FilenameUtilsWildcardTest {
 
         final var locales = Locale.getAvailableLocales();
 
-        final String[][] data = {
-            { "I", "i" },
-            { "i", "I" },
-            { "i", "\u0130" },
-            { "i", "\u0131" },
-            { "\u03A3", "\u03C2" },
-            { "\u03A3", "\u03C3" },
-            { "\u03C2", "\u03C3" },
-        };
+        final String[][] data = { { "I", "i" }, { "i", "I" }, { "i", "\u0130" }, { "i", "\u0131" },
+                { "\u03A3", "\u03C2" }, { "\u03A3", "\u03C3" }, { "\u03C2", "\u03C3" }, };
 
         try {
             for (var i = 0; i < data.length; i++) {

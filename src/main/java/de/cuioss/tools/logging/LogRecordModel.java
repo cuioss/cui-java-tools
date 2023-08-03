@@ -10,11 +10,11 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * Represents a log-entry. Especially focuses on enforcing log-entry identifier, see
- * {@link #getPrefix()} and {@link #getIdentifier()}. The template mechanism is the same as with
- * {@link CuiLogger}, saying it accepts as well '%s' and '{}' as placeholder, even mixed.
- * To simplify usage the prefix string will always be prepended on calling
- * {@link #format(Object...)}
+ * Represents a log-entry. Especially focuses on enforcing log-entry identifier,
+ * see {@link #getPrefix()} and {@link #getIdentifier()}. The template mechanism
+ * is the same as with {@link CuiLogger}, saying it accepts as well '%s' and
+ * '{}' as placeholder, even mixed. To simplify usage the prefix string will
+ * always be prepended on calling {@link #format(Object...)}
  *
  * @author Oliver Wolff
  *

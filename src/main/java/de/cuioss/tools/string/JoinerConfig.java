@@ -40,8 +40,7 @@ class JoinerConfig {
     JoinerConfigBuilder copy() {
         var copyBuilder = builder();
         copyBuilder.separator(getSeparator()).useForNull(getUseForNull()).skipEmpty(isSkipEmpty())
-                .skipBlank(isSkipBlank())
-                .skipNulls(isSkipNulls());
+                .skipBlank(isSkipBlank()).skipNulls(isSkipNulls());
         return copyBuilder;
     }
 }

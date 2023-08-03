@@ -26,8 +26,8 @@ public final class UrlHelper {
 
     /**
      * @param url to be adapted
-     * @return the given url if it already suffixed with '/' or null / empty. The given url suffixed
-     *         with '/' otherwise
+     * @return the given url if it already suffixed with '/' or null / empty. The
+     *         given url suffixed with '/' otherwise
      */
     public static String addTrailingSlashToUrl(String url) {
         if (isEmpty(url) || url.endsWith("/")) {
@@ -38,8 +38,9 @@ public final class UrlHelper {
 
     /**
      * @param url to be adapted
-     * @return the given url if it is not suffixed with '/' or null / empty. The given url
-     *         '/' removed otherwise. Multiple trailing slashes will be removed as well
+     * @return the given url if it is not suffixed with '/' or null / empty. The
+     *         given url '/' removed otherwise. Multiple trailing slashes will be
+     *         removed as well
      */
     public static String removeTrailingSlashesFromUrl(String url) {
         if (isEmpty(url) || !url.endsWith("/")) {
@@ -51,7 +52,8 @@ public final class UrlHelper {
     /**
      * @param path to be adapted
      * @return the given path if it already prefixed with '/'. The given path
-     *         prefixed with '/' otherwise. In case of being null or empty it will return "/"
+     *         prefixed with '/' otherwise. In case of being null or empty it will
+     *         return "/"
      */
     public static String addPrecedingSlashToPath(String path) {
         if (isEmpty(path)) {
@@ -65,8 +67,9 @@ public final class UrlHelper {
 
     /**
      * @param path
-     * @return the given path if it is not suffixed with '/' or null / empty. The given path
-     *         '/' removed otherwise. Multiple preceding slashes will be removed as well
+     * @return the given path if it is not suffixed with '/' or null / empty. The
+     *         given path '/' removed otherwise. Multiple preceding slashes will be
+     *         removed as well
      */
     public static String removePrecedingSlashFromPath(String path) {
         if (isEmpty(path) || !path.startsWith("/")) {
@@ -76,8 +79,8 @@ public final class UrlHelper {
     }
 
     /**
-     * Split the given path String in a unified view with a list of {@link String}. The individual
-     * path-elements are implicitly trimmed
+     * Split the given path String in a unified view with a list of {@link String}.
+     * The individual path-elements are implicitly trimmed
      *
      * @param pathString if it is null or empty an empty List will be returned
      * @return the list view on the path elements. never null but may be empty

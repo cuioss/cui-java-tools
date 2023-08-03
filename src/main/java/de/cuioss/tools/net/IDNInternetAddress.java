@@ -13,14 +13,14 @@ import lombok.experimental.UtilityClass;
  * </p>
  * See
  * <ul>
- * <li>
- * <a href="https://docs.oracle.com/javase/tutorial/i18n/network/idn.html">https://docs.oracle.com/
+ * <li><a href=
+ * "https://docs.oracle.com/javase/tutorial/i18n/network/idn.html">https://docs.oracle.com/
  * javase/tutorial/i18n/network/idn.html</a></li>
- * <li>
- * <a href="https://de.wikipedia.org/wiki/Internationalisierter_Domainname">https://de.wikipedia.org
+ * <li><a href=
+ * "https://de.wikipedia.org/wiki/Internationalisierter_Domainname">https://de.wikipedia.org
  * /wiki/Internationalisierter_Domainname</a></li>
- * <li>
- * <a href="https://en.wikipedia.org/wiki/Internationalized_domain_name">https://en.wikipedia.org/
+ * <li><a href=
+ * "https://en.wikipedia.org/wiki/Internationalized_domain_name">https://en.wikipedia.org/
  * wiki/Internationalized_domain_name</a></li>
  * </ul>
  *
@@ -29,8 +29,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class IDNInternetAddress {
 
-    private static final Pattern addressPatternWithDisplayName =
-        Pattern.compile("(.{0,64})<(.{1,64})@(.{1,64})>(.{0,64})");
+    private static final Pattern addressPatternWithDisplayName = Pattern
+            .compile("(.{0,64})<(.{1,64})@(.{1,64})>(.{0,64})");
 
     private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,64})");
 
@@ -45,18 +45,19 @@ public class IDNInternetAddress {
     }
 
     /**
-     * Encodes the given address and sanitizes the elements with the provided sanitizer. It takes
-     * care on the special elements like {@code <>} by not trying to sanitize them.
+     * Encodes the given address and sanitizes the elements with the provided
+     * sanitizer. It takes care on the special elements like {@code <>} by not
+     * trying to sanitize them.
      *
      * @param completeAddress
-     * @param sanitizer to be passed as UnaryOperator
+     * @param sanitizer       to be passed as UnaryOperator
      * @return the sanitized and encoded address.
      */
     public static String encode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
         if (matcher.matches() && matcher.groupCount() == 4) {
-            return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@" + sanitizer
-                    .apply(IDN.toASCII(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
+            return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
+                    + sanitizer.apply(IDN.toASCII(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
         if (matcher.matches() && matcher.groupCount() == 2) {
@@ -76,18 +77,19 @@ public class IDNInternetAddress {
     }
 
     /**
-     * Decodes the given address and sanitizes the elements with the provided sanitizer. It takes
-     * care on the special elements like <> by not trying to sanitize them.
+     * Decodes the given address and sanitizes the elements with the provided
+     * sanitizer. It takes care on the special elements like <> by not trying to
+     * sanitize them.
      *
      * @param completeAddress
-     * @param sanitizer to be passed as UnaryOperator
+     * @param sanitizer       to be passed as UnaryOperator
      * @return the sanitized and decoded address.
      */
     public static String decode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
         if (matcher.matches() && matcher.groupCount() == 4) {
-            return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@" + sanitizer
-                    .apply(IDN.toUnicode(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
+            return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
+                    + sanitizer.apply(IDN.toUnicode(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
         if (matcher.matches() && matcher.groupCount() == 2) {

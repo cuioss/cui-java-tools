@@ -24,8 +24,7 @@ class IDNInternetAddressTest {
     @Test
     void testRoundTripComplete() {
         var orig = "MD KARIN KALLWITZ <user1@müller.com>";
-        assertEquals("MD KARIN KALLWITZ <user1@xn--mller-kva.com>",
-                IDNInternetAddress.encode(orig));
+        assertEquals("MD KARIN KALLWITZ <user1@xn--mller-kva.com>", IDNInternetAddress.encode(orig));
         assertEquals(orig, IDNInternetAddress.decode(IDNInternetAddress.encode(orig)));
 
         orig = "user1@müller.com";

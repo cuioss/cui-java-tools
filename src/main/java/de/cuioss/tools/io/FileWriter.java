@@ -23,9 +23,9 @@ public interface FileWriter extends Serializable {
     StructuredFilename getFileName();
 
     /**
-     * @return an {@link OutputStream} on the corresponding file. It implicitly checks
-     *         {@link #isWritable()} before accessing the file and will throw an
-     *         {@link IllegalStateException} in case it is not readable.
+     * @return an {@link OutputStream} on the corresponding file. It implicitly
+     *         checks {@link #isWritable()} before accessing the file and will throw
+     *         an {@link IllegalStateException} in case it is not readable.
      * @throws IOException
      */
     OutputStream outputStream() throws IOException;

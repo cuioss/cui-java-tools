@@ -30,30 +30,34 @@ import lombok.Singular;
 import lombok.ToString;
 
 /**
- * Provides instances of {@link KeyStore} defined by either given file / storePassword combination
- * or one or more {@link KeyMaterialHolder} containing key-material as a byte-array.
- * <h2>Some words on the String-representation of passwords</h2>
- * <em>No</em> it is not (much) more secure to store them in a char[] because of not being part of
- * the string-pool:
+ * Provides instances of {@link KeyStore} defined by either given file /
+ * storePassword combination or one or more {@link KeyMaterialHolder} containing
+ * key-material as a byte-array.
+ * <h2>Some words on the String-representation of passwords</h2> <em>No</em> it
+ * is not (much) more secure to store them in a char[] because of not being part
+ * of the string-pool:
  * <ul>
- * <li>If an attacker is on your machine debugging the string-pool you are doomed anyway.</li>
- * <li>In most frameworks / user-land code there are some places where input / configuration data is
- * represented as String on the way to the more secure "give me a char[]" parts. So it is usually in
- * the String pool anyway.</li>
+ * <li>If an attacker is on your machine debugging the string-pool you are
+ * doomed anyway.</li>
+ * <li>In most frameworks / user-land code there are some places where input /
+ * configuration data is represented as String on the way to the more secure
+ * "give me a char[]" parts. So it is usually in the String pool anyway.</li>
  * </ul>
  * <p>
  * So: In theory the statements made by the Java Cryptography Architecture guide
  * ("<a href=
  * "http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html#PBEEx">...</a>")
- * are correct but in our scenarios they will increase security only a small amount and introduce
- * potential bugs and will therefore be ignored for this keyStoreType.
- * </p>
- * <p>
- * It is more important to avoid accidental printing on logs and such, what is handled by this
+ * are correct but in our scenarios they will increase security only a small
+ * amount and introduce potential bugs and will therefore be ignored for this
  * keyStoreType.
  * </p>
- * Therefore, this class uses String-based handling of credentials, for simplification and provide
- * shortcuts for creating char[], see {@link #getStorePasswordAsCharArray()} and
+ * <p>
+ * It is more important to avoid accidental printing on logs and such, what is
+ * handled by this keyStoreType.
+ * </p>
+ * Therefore, this class uses String-based handling of credentials, for
+ * simplification and provide shortcuts for creating char[], see
+ * {@link #getStorePasswordAsCharArray()} and
  * {@link #getKeyPasswordAsCharArray()}
  *
  * @author Oliver Wolff
@@ -85,8 +89,8 @@ public class KeyStoreProvider implements Serializable {
     private final String storePassword;
 
     /**
-     * (Optional) password for the keystore-key. Due to its nature this is usually only necessary
-     * for {@link KeyStoreType#KEY_STORE}
+     * (Optional) password for the keystore-key. Due to its nature this is usually
+     * only necessary for {@link KeyStoreType#KEY_STORE}
      */
     @Getter
     private final String keyPassword;
@@ -97,14 +101,15 @@ public class KeyStoreProvider implements Serializable {
 
     /**
      * Instantiates a {@link KeyStore} according to the given parameter. In case of
-     * {@link #getKeys()} and {@link #getLocation()} being present the {@link KeyStore} will
-     * <em>only</em> be created from the {@link #getKeys()}. The file will be ignored.
+     * {@link #getKeys()} and {@link #getLocation()} being present the
+     * {@link KeyStore} will <em>only</em> be created from the {@link #getKeys()}.
+     * The file will be ignored.
      *
-     * @return an {@link Optional} on a {@link KeyStore} created from the configured parameter. In
-     *         case of {@link #getKeys} and {@link #getLocation()} being {@code null} / empty it
-     *         will return {@link Optional#empty()}
-     * @throws IllegalStateException in case the location-file is not null but not readable or of
-     *             the key-store creation did fail.
+     * @return an {@link Optional} on a {@link KeyStore} created from the configured
+     *         parameter. In case of {@link #getKeys} and {@link #getLocation()}
+     *         being {@code null} / empty it will return {@link Optional#empty()}
+     * @throws IllegalStateException in case the location-file is not null but not
+     *                               readable or of the key-store creation did fail.
      */
     public Optional<KeyStore> resolveKeyStore() {
         if (BooleanOperations.areAllTrue(keys.isEmpty(), null == location)) {
@@ -140,16 +145,16 @@ public class KeyStoreProvider implements Serializable {
             log.debug("Adding Key {}", key);
             requireNonNull(key);
             switch (key.getKeyHolderType()) {
-                case SINGLE_KEY:
-                    // adds single certificate to the keyStore
-                    addCertificateToKeyStore(key, keyStore);
-                    break;
-                case KEY_STORE:
-                    checkState(keys.size() == 1, "It is not allowed that there are multiple KeyStores");
-                    keyStore = createKeyStoreFromByteArray(key);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("KeyHolderType is not defined: " + key.getKeyHolderType());
+            case SINGLE_KEY:
+                // adds single certificate to the keyStore
+                addCertificateToKeyStore(key, keyStore);
+                break;
+            case KEY_STORE:
+                checkState(keys.size() == 1, "It is not allowed that there are multiple KeyStores");
+                keyStore = createKeyStoreFromByteArray(key);
+                break;
+            default:
+                throw new UnsupportedOperationException("KeyHolderType is not defined: " + key.getKeyHolderType());
             }
         }
         return Optional.of(keyStore);
@@ -197,25 +202,28 @@ public class KeyStoreProvider implements Serializable {
     }
 
     /**
-     * @return NPE-safe char-array representation of {@link #getStorePassword()}. If storePassword
-     *         is {@code null} or empty it returns an empty char[], never {@code null}
+     * @return NPE-safe char-array representation of {@link #getStorePassword()}. If
+     *         storePassword is {@code null} or empty it returns an empty char[],
+     *         never {@code null}
      */
     public char[] getStorePasswordAsCharArray() {
         return toCharArray(storePassword);
     }
 
     /**
-     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If keyPassword is
-     *         {@code null} or empty it returns an empty char[], never {@code null}
+     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If
+     *         keyPassword is {@code null} or empty it returns an empty char[],
+     *         never {@code null}
      */
     public char[] getKeyPasswordAsCharArray() {
         return toCharArray(keyPassword);
     }
 
     /**
-     * In case of accessing data on the {@link KeyStore} sometimes it is needed to access the
-     * defined key-password. If not present the api needs the store-password instead. This is method
-     * is a convenience method for dealing with that case.
+     * In case of accessing data on the {@link KeyStore} sometimes it is needed to
+     * access the defined key-password. If not present the api needs the
+     * store-password instead. This is method is a convenience method for dealing
+     * with that case.
      *
      * @return the keyPassword, if set or the store-password otherwise
      */

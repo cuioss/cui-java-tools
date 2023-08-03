@@ -10,8 +10,8 @@ import lombok.NonNull;
 import lombok.ToString;
 
 /**
- * Runtime representation of key-material. The actual key is provided as byte[]. An optional
- * keyPassword is available as well.
+ * Runtime representation of key-material. The actual key is provided as byte[].
+ * An optional keyPassword is available as well.
  *
  * @author Oliver Wolff
  *
@@ -28,12 +28,16 @@ public final class KeyMaterialHolder implements Serializable {
     private final byte[] keyMaterial;
 
     /**
-     * (Optional) password for the key, or in case of {@link KeyHolderType#KEY_STORE} for the store.
+     * (Optional) password for the key, or in case of
+     * {@link KeyHolderType#KEY_STORE} for the store.
      */
     @Getter
     private final String keyPassword;
 
-    /** Optional: An arbitrary name for displaying the key in an ui or logging context. */
+    /**
+     * Optional: An arbitrary name for displaying the key in an ui or logging
+     * context.
+     */
     @Getter
     private final String name;
 
@@ -58,8 +62,9 @@ public final class KeyMaterialHolder implements Serializable {
     private final KeyAlgorithm keyAlgorithm = KeyAlgorithm.UNDEFINED;
 
     /**
-     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If keyPassword is
-     *         {@code null} or empty it returns an empty char[], never {@code null}
+     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If
+     *         keyPassword is {@code null} or empty it returns an empty char[],
+     *         never {@code null}
      */
     public char[] getKeyPasswordAsCharArray() {
         return KeyStoreProvider.toCharArray(keyPassword);
@@ -69,7 +74,8 @@ public final class KeyMaterialHolder implements Serializable {
      * @param serializedKeyMaterial the Base64 encoded key material
      *
      * @return Raw i.e. original key material
-     * @throws IllegalArgumentException if serializedKeyMaterial is not Base64 encoded
+     * @throws IllegalArgumentException if serializedKeyMaterial is not Base64
+     *                                  encoded
      */
     public static byte[] deserializeKeyMaterial(final String serializedKeyMaterial) {
         return Base64.getDecoder().decode(serializedKeyMaterial);

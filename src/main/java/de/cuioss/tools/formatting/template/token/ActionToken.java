@@ -13,8 +13,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * String Action Token store template and attribute name, and replace attribute with his value
- * inside the template on execution of {@linkplain #substituteAttribute(FormatterSupport)}
+ * String Action Token store template and attribute name, and replace attribute
+ * with his value inside the template on execution of
+ * {@linkplain #substituteAttribute(FormatterSupport)}
  *
  * @author Eugen Fischer
  */
@@ -53,8 +54,8 @@ public class ActionToken implements Token {
     @Override
     public String substituteAttribute(final FormatterSupport content) {
         requireNonNull(content, "Content must not be null. ");
-        final Map<String, Serializable> attributeValues = requireNonNull(
-                content.getAvailablePropertyValues(), "AvailablePropertyValues must not be null. ");
+        final Map<String, Serializable> attributeValues = requireNonNull(content.getAvailablePropertyValues(),
+                "AvailablePropertyValues must not be null. ");
         final var result = new StringBuilder();
         if (attributeValues.containsKey(attribute)) {
             if (attributeValues.keySet().size() > 1) {

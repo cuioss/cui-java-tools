@@ -41,12 +41,11 @@ class KeyStoreProviderTest {
 
         var x509Certificate = createX509Certificate("RSA", 2048, "SHA256WithRSAEncryption");
 
-        var keyHolder = KeyMaterialHolder.builder().keyAlias("RSA2048")
-                .keyAlgorithm(KeyAlgorithm.RSA_2048).keyMaterial(x509Certificate.getEncoded()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("RSA2048").keyAlgorithm(KeyAlgorithm.RSA_2048)
+                .keyMaterial(x509Certificate.getEncoded()).build();
 
-        var ky =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
-                    .key(keyHolder).build().resolveKeyStore();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
+                .key(keyHolder).build().resolveKeyStore();
         assertTrue(ky.isPresent());
 
         var publicKey = ky.get().getCertificate("RSA2048").getPublicKey();
@@ -65,14 +64,11 @@ class KeyStoreProviderTest {
 
         var x509Certificate = createX509Certificate("DSA", 1024, "SHA224withDSA");
 
-        var keyHolder = KeyMaterialHolder.builder().keyAlias("DSA")
-                .keyAlgorithm(KeyAlgorithm.OTHER).keyMaterial(x509Certificate.getEncoded()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("DSA").keyAlgorithm(KeyAlgorithm.OTHER)
+                .keyMaterial(x509Certificate.getEncoded()).build();
 
-        var ky = KeyStoreProvider.builder()
-                .keyStoreType(KeyStoreType.TRUST_STORE)
-                .storePassword("StorePassword")
-                .key(keyHolder)
-                .build().resolveKeyStore();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
+                .key(keyHolder).build().resolveKeyStore();
         assertTrue(ky.isPresent());
 
         var publicKey = ky.get().getCertificate("DSA").getPublicKey();
@@ -86,12 +82,11 @@ class KeyStoreProviderTest {
 
         var x509Certificate = createX509Certificate("EC", 256, "SHA256withECDSA");
 
-        var keyHolder = KeyMaterialHolder.builder().keyAlias("EC256")
-                .keyAlgorithm(KeyAlgorithm.ECDSA_P_256).keyMaterial(x509Certificate.getEncoded()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("EC256").keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
+                .keyMaterial(x509Certificate.getEncoded()).build();
 
-        var ky =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
-                    .key(keyHolder).build().resolveKeyStore();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
+                .key(keyHolder).build().resolveKeyStore();
         assertTrue(ky.isPresent());
 
         var publicKey = ky.get().getCertificate("EC256").getPublicKey();
@@ -109,13 +104,11 @@ class KeyStoreProviderTest {
         var os = new ByteArrayOutputStream();
         keyStore.store(os, "pass".toCharArray());
 
-        var keyHolder =
-            KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
-                    .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(os.toByteArray()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
+                .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(os.toByteArray()).build();
 
-        var ky =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
-                    .build().resolveKeyStore();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
+                .build().resolveKeyStore();
 
         // check keyStore was created
         assertTrue(ky.isPresent());
@@ -132,16 +125,11 @@ class KeyStoreProviderTest {
         var os = new ByteArrayOutputStream();
         keyStore.store(os, "pass".toCharArray());
 
-        var keyHolder =
-            KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
-                    .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(os.toByteArray()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
+                .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(os.toByteArray()).build();
 
-        var ky = KeyStoreProvider.builder()
-                .keyStoreType(KeyStoreType.KEY_STORE)
-                .storePassword("pass")
-                .key(keyHolder)
-                .key(keyHolder)
-                .build();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
+                .key(keyHolder).build();
 
         assertThrows(IllegalStateException.class, () -> {
             ky.resolveKeyStore();
@@ -150,13 +138,11 @@ class KeyStoreProviderTest {
 
     @Test
     void shouldFailOnemptyKeyStores() throws Exception {
-        var keyHolder =
-            KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
-                    .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(new byte[1]).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
+                .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(new byte[1]).build();
 
-        var ky =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
-                    .build();
+        var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
+                .build();
 
         assertThrows(IllegalStateException.class, () -> {
             ky.resolveKeyStore();
@@ -169,17 +155,16 @@ class KeyStoreProviderTest {
         Collection<KeyMaterialHolder> keyMaterialHolderCollection = new ArrayList<>();
 
         var x509Certificate = createX509Certificate("EC", 256, "SHA256withECDSA");
-        var keyHolder = KeyMaterialHolder.builder().keyAlias("EC256")
-                .keyAlgorithm(KeyAlgorithm.ECDSA_P_256).keyMaterial(x509Certificate.getEncoded()).build();
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("EC256").keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
+                .keyMaterial(x509Certificate.getEncoded()).build();
         keyMaterialHolderCollection.add(keyHolder);
 
         keyHolder = KeyMaterialHolder.builder().keyAlias("test2").keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
                 .keyMaterial(x509Certificate.getEncoded()).build();
         keyMaterialHolderCollection.add(keyHolder);
 
-        var ky =
-            KeyStoreProvider.builder().storePassword("StorePassword").keyStoreType(KeyStoreType.TRUST_STORE)
-                    .keys(keyMaterialHolderCollection).build().resolveKeyStore();
+        var ky = KeyStoreProvider.builder().storePassword("StorePassword").keyStoreType(KeyStoreType.TRUST_STORE)
+                .keys(keyMaterialHolderCollection).build().resolveKeyStore();
         assertTrue(ky.isPresent());
 
         ky.get().getKey("EC256", keyHolder.getKeyPasswordAsCharArray());
@@ -195,14 +180,14 @@ class KeyStoreProviderTest {
     /**
      * Generates a X509Certificate.
      *
-     * @param algorithm used for the creation of the KeyPair
-     * @param keysize of the key
+     * @param algorithm          used for the creation of the KeyPair
+     * @param keysize            of the key
      * @param signatureAlgorithm that was used to create the ContentSigner
      * @return a currently valid X509Certificate
      * @throws Exception on any error
      */
     private X509Certificate createX509Certificate(String algorithm, int keysize, String signatureAlgorithm)
-        throws Exception {
+            throws Exception {
 
         // Set start and end date of certificate
         var startValid = new Date(System.currentTimeMillis() - 24 * 60 * 1000);
@@ -218,11 +203,9 @@ class KeyStoreProviderTest {
 
         var subPubKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
 
-        var x509Builder =
-            new X509v1CertificateBuilder(issuer, serial, startValid, endValid, issuer, subPubKeyInfo);
+        var x509Builder = new X509v1CertificateBuilder(issuer, serial, startValid, endValid, issuer, subPubKeyInfo);
 
-        var signer =
-            new JcaContentSignerBuilder(signatureAlgorithm).build(keyPair.getPrivate());
+        var signer = new JcaContentSignerBuilder(signatureAlgorithm).build(keyPair.getPrivate());
 
         var x509Certificate = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
                 .getCertificate(x509Builder.build(signer));
@@ -238,15 +221,14 @@ class KeyStoreProviderTest {
 
     @Test
     void shouldFailOnInvalidFile() {
-        var provider =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).location(new File("notThere")).build();
+        var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).location(new File("notThere"))
+                .build();
         assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
     }
 
     @Test
     void shouldHandlEmptyPasswordAsCharArray() {
-        var provider =
-            KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).build();
 
         assertNull(provider.getKeyPassword());
         assertNull(provider.getStorePassword());
@@ -263,8 +245,8 @@ class KeyStoreProviderTest {
     void shouldHandleKeyPasswordAsCharArray() {
 
         var generatedKeyPassword = Generators.randomString();
-        var provider =
-            KeyStoreProvider.builder().keyPassword(generatedKeyPassword).keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().keyPassword(generatedKeyPassword).keyStoreType(KeyStoreType.KEY_STORE)
+                .build();
 
         assertEquals(generatedKeyPassword, provider.getKeyPassword());
         assertNull(provider.getStorePassword());
@@ -280,9 +262,8 @@ class KeyStoreProviderTest {
     void shouldHandleStorePasswordAsCharArray() {
 
         var generatedStorePassword = Generators.randomString();
-        var provider =
-            KeyStoreProvider.builder().storePassword(generatedStorePassword).keyStoreType(KeyStoreType.KEY_STORE)
-                    .build();
+        var provider = KeyStoreProvider.builder().storePassword(generatedStorePassword)
+                .keyStoreType(KeyStoreType.KEY_STORE).build();
 
         assertEquals(generatedStorePassword, provider.getStorePassword());
         assertNull(provider.getKeyPassword());
@@ -308,9 +289,8 @@ class KeyStoreProviderTest {
     // File Based Keystore tests
     @Test
     void shouldHandleEmptyKeyStore() throws KeyStoreException {
-        var provider =
-            KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
-                    .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
+                .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
         var keystore = provider.resolveKeyStore();
         assertTrue(keystore.isPresent());
         assertEquals(0, keystore.get().size());
@@ -318,17 +298,15 @@ class KeyStoreProviderTest {
 
     @Test
     void shouldFailEmptyKeyStoreWithoutPassword() {
-        var provider =
-            KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
-                    .keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
+                .keyStoreType(KeyStoreType.KEY_STORE).build();
         assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
     }
 
     @Test
     void shouldHandleUnprotectedEmptyKeyStore() throws KeyStoreException {
-        var provider =
-            KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
-                    .keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
+                .keyStoreType(KeyStoreType.KEY_STORE).build();
         var keystore = provider.resolveKeyStore();
         assertTrue(keystore.isPresent());
         assertEquals(0, keystore.get().size());
@@ -336,18 +314,15 @@ class KeyStoreProviderTest {
 
     @Test
     void shouldFailUnprotectedKeyStore() {
-        var provider =
-            KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
-                    .storePassword(KeystoreInformation.PASSWORD)
-                    .keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
+                .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
         assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
     }
 
     @Test
     void shouldHandleSingleEntryKeyStore() throws Exception {
-        var provider =
-            KeyStoreProvider.builder().location(KeystoreInformation.SINGLE_KEY_STORE.toFile())
-                    .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
+        var provider = KeyStoreProvider.builder().location(KeystoreInformation.SINGLE_KEY_STORE.toFile())
+                .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
         var keystore = provider.resolveKeyStore();
         assertTrue(keystore.isPresent());
         assertEquals(1, keystore.get().size());

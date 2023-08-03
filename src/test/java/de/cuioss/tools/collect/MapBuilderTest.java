@@ -64,8 +64,7 @@ class MapBuilderTest {
     @Test
     void shouldHandlePutEntry() {
         var builder = new MapBuilder<String, String>();
-        builder.put(
-                new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap().entrySet().iterator().next());
+        builder.put(new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap().entrySet().iterator().next());
         assertFalse(builder.isEmpty());
     }
 
@@ -97,11 +96,8 @@ class MapBuilderTest {
 
     @Test
     void shouldOnlyAddIfNotNull() {
-        final var map = new MapBuilder<String, String>()
-                .put(KEY_1, null)
-                .putIfNotNull(KEY_2, null)
-                .putIfNotNull(KEY_3, "")
-                .toImmutableMap();
+        final var map = new MapBuilder<String, String>().put(KEY_1, null).putIfNotNull(KEY_2, null)
+                .putIfNotNull(KEY_3, "").toImmutableMap();
         assertTrue(map.containsKey(KEY_1));
         assertFalse(map.containsKey(KEY_2));
         assertTrue(map.containsKey(KEY_3));

@@ -67,8 +67,7 @@ class SplitterTest {
 
     @Test
     void testCharacterSplitWithMultipleLetters() {
-        final Iterable<String> testCharacteringMotto =
-            Splitter.on('-').splitToList("Testing-rocks-Debugging-sucks");
+        final Iterable<String> testCharacteringMotto = Splitter.on('-').splitToList("Testing-rocks-Debugging-sucks");
         assertEquals(immutableList("Testing", "rocks", "Debugging", "sucks"), testCharacteringMotto);
     }
 
@@ -213,8 +212,8 @@ class SplitterTest {
     @Test
     void shouldMaskSpecialRegularCharacters() {
         // String: .$|()[{^?*+\
-        List<String> character =
-            immutableList("[", "]", "{", "}", ".", "*", "+", "(", ")", "$", "|", "^", "?", "\\", "<", ">");
+        List<String> character = immutableList("[", "]", "{", "}", ".", "*", "+", "(", ")", "$", "|", "^", "?", "\\",
+                "<", ">");
         List<String> elements = immutableList("One", "Two", "Three");
 
         for (String special : character) {
@@ -224,9 +223,8 @@ class SplitterTest {
         }
 
         var splitter = Splitter.on("[").doNotModifySeparatorString();
-        assertThrows(IllegalArgumentException.class,
-                () -> {
-                    splitter.splitToList("[boom]");
-                });
+        assertThrows(IllegalArgumentException.class, () -> {
+            splitter.splitToList("[boom]");
+        });
     }
 }

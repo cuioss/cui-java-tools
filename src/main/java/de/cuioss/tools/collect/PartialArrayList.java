@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * <h2>Overview</h2>
- * Default implementation of {@link PartialCollection} based on {@link ArrayList}.
+ * <h2>Overview</h2> Default implementation of {@link PartialCollection} based
+ * on {@link ArrayList}.
  * <h3>Usage</h3>
  * <p>
  * See {@link PartialArrayList#of(List, int)}
@@ -32,7 +32,7 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
     /**
      * Default constructor.
      *
-     * @param list the list of entities to store.
+     * @param list          the list of entities to store.
      * @param moreAvailable the flag to store.
      */
     public PartialArrayList(Collection<T> list, boolean moreAvailable) {
@@ -51,14 +51,15 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
     }
 
     /**
-     * Convenience method for creating a {@link PartialArrayList} as sublist for the given
-     * collection with setting the {@link PartialCollection#isMoreAvailable()} automatically
+     * Convenience method for creating a {@link PartialArrayList} as sublist for the
+     * given collection with setting the {@link PartialCollection#isMoreAvailable()}
+     * automatically
      *
-     * @param full the complete List to be wrapped, may be larger than the limit. If so, a sublist
-     *            will be used.
+     * @param full  the complete List to be wrapped, may be larger than the limit.
+     *              If so, a sublist will be used.
      * @param limit to be checked against
      *
-     * @param <T> identifying the type of contained elements
+     * @param <T>   identifying the type of contained elements
      * @return a newly created {@link PartialArrayList}.
      */
     public static <T extends Serializable> PartialArrayList<T> of(List<T> full, int limit) {

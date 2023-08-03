@@ -7,8 +7,9 @@ package de.cuioss.tools.net.ssl;
  * https://www.java67.com/2012/12/difference-between-truststore-vs.html.
  * </p>
  * <p>
- * Whats the difference? keystore is used to store server's own certificate while truststore is
- * used to store the certificate of other parties issued by CA.
+ * Whats the difference? keystore is used to store server's own certificate
+ * while truststore is used to store the certificate of other parties issued by
+ * CA.
  * </p>
  *
  * @author Oliver Wolff
@@ -38,11 +39,11 @@ public enum KeyStoreType {
      * A keystore is
      * <ul>
      * <li>used to store your credential (server or client)</li>
-     * <li>needed when you are setting up server side on SSL. It is used to store server's
-     * identity certificate, which server will present to a client on the connection while trust
-     * store setup on client side must contain to make the connection work. If you browser to
-     * connect to any website over SSL it verifies certificate presented by server against its
-     * truststore.</li>
+     * <li>needed when you are setting up server side on SSL. It is used to store
+     * server's identity certificate, which server will present to a client on the
+     * connection while trust store setup on client side must contain to make the
+     * connection work. If you browser to connect to any website over SSL it
+     * verifies certificate presented by server against its truststore.</li>
      * <li>java-property: javax.net.ssl.keyStore</li>
      * </ul>
      * .

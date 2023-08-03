@@ -31,34 +31,33 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
     private final List<String> tokenList;
 
     /**
-     * Constructor of Lexer.
-     * Source provide information of "tokens" which he supports.
-     * Therefore {@link FormatterSupport#getSupportedPropertyNames()} will be used.
+     * Constructor of Lexer. Source provide information of "tokens" which he
+     * supports. Therefore {@link FormatterSupport#getSupportedPropertyNames()} will
+     * be used.
      *
      * @param source must not be null
-     * @throws NullPointerException if source is missing
+     * @throws NullPointerException     if source is missing
      * @throws IllegalArgumentException if attribute is null or empty
      */
     protected Lexer(final T source) {
         requireNonNull(source, "Source must not be null");
-        this.tokenList = immutableList(requireNonNull(source.getSupportedPropertyNames()));
-        for (final String attribute : this.tokenList) {
-            checkArgument(!isEmpty(attribute), "Attributes must not be null or empty. '"
-                    + this.tokenList + "'");
+        tokenList = immutableList(requireNonNull(source.getSupportedPropertyNames()));
+        for (final String attribute : tokenList) {
+            checkArgument(!isEmpty(attribute), "Attributes must not be null or empty. '" + tokenList + "'");
         }
     }
 
     /**
-     * Throw IllegalArgumentException with information about wrong token and supported tokens
+     * Throw IllegalArgumentException with information about wrong token and
+     * supported tokens
      *
-     * @param wrongToken must not be null
+     * @param wrongToken    must not be null
      * @param allowedTokens must not be null
      */
     protected static final void throwUnsupportedTokenException(final String wrongToken,
             final List<String> allowedTokens) {
         final var builder = new StringBuilder();
-        builder.append("Unsupported token '").append(wrongToken).append("' was detected.\n")
-                .append("Allowed are :\n");
+        builder.append("Unsupported token '").append(wrongToken).append("' was detected.\n").append("Allowed are :\n");
         for (final String allowedToken : allowedTokens) {
             builder.append(" - ").append(allowedToken).append("\n");
         }
@@ -69,8 +68,10 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
      * Parse template into Token List according attribute list
      *
      * @param input template string
-     * @return created list of token, list could be empty if input template is null or empty
-     * @throws IllegalArgumentException if template include unknown token, or doesn't fit the rules
+     * @return created list of token, list could be empty if input template is null
+     *         or empty
+     * @throws IllegalArgumentException if template include unknown token, or
+     *                                  doesn't fit the rules
      */
     public abstract List<Token> scan(final String input);
 
@@ -96,8 +97,8 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
         /**
          * usage of String Template Expression Language
          *
-         * @see <a
-         *      href="http://www.antlr.org/wiki/display/ST/StringTemplate+3+Documentation">
+         * @see <a href=
+         *      "http://www.antlr.org/wiki/display/ST/StringTemplate+3+Documentation">
          *      Documentation</a>
          */
         STEL

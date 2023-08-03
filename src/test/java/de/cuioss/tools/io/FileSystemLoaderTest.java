@@ -25,14 +25,11 @@ class FileSystemLoaderTest {
 
     private static final String EXISTING_EXTERNAL_DIRECTORY = "external:/src";
 
-    private static final String EXISTING_FILE_PATH = Paths.get(EXISTING_FILE).toAbsolutePath()
-            .toString();
+    private static final String EXISTING_FILE_PATH = Paths.get(EXISTING_FILE).toAbsolutePath().toString();
 
-    private static final String EXISTING_DIRECTORY_PATH = Paths.get(EXISTING_DIRECTORY)
-            .toAbsolutePath().toString();
+    private static final String EXISTING_DIRECTORY_PATH = Paths.get(EXISTING_DIRECTORY).toAbsolutePath().toString();
 
-    private static final String NOT_EXISTING_FILE_PATH = Paths.get(NOT_EXISTING_FILE)
-            .toAbsolutePath().toString();
+    private static final String NOT_EXISTING_FILE_PATH = Paths.get(NOT_EXISTING_FILE).toAbsolutePath().toString();
 
     @Test
     void shouldHandleExistingFile() throws IOException {
@@ -96,10 +93,9 @@ class FileSystemLoaderTest {
     @Test
     void shouldNotHandleFileOnlyPathname() {
         var prefix = FileTypePrefix.FILE.getPrefix();
-        assertThrows(IllegalArgumentException.class,
-                () -> {
-                    FileSystemLoader.checkPathName(prefix);
-                });
+        assertThrows(IllegalArgumentException.class, () -> {
+            FileSystemLoader.checkPathName(prefix);
+        });
     }
 
     @Test

@@ -34,8 +34,8 @@ public final class PersonName implements FormatterSupport, Serializable {
 
     private static final long serialVersionUID = -6138413254405190225L;
     /**
-     * alternative reflection could provide the same information, but than no filtering for
-     * properties will be possible
+     * alternative reflection could provide the same information, but than no
+     * filtering for properties will be possible
      */
     private static final List<String> SUPPORTED_PROP_LIST = new CollectionBuilder<String>().add("familyNamePrefix")
             .add("familyName").add("familyBirthName").add("givenNamePrefix").add("givenName").add("givenNameSuffix")

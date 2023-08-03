@@ -24,15 +24,14 @@ class TextSplitterTest {
     void shouldRecognizeIfNoAbridgeNeededAtAll() {
         assertEquals("", new TextSplitter(null).getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
 
-        assertEquals("",
-                new TextSplitter(null).getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+        assertEquals("", new TextSplitter(null).getTextWithEnforcedLineBreaks(),
+                TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
 
         assertEquals("", new TextSplitter("").getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
 
         assertThat(valueOf(new TextSplitter("").isAbridged()), is(FALSE));
 
-        assertEquals("",
-                new TextSplitter("").getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+        assertEquals("", new TextSplitter("").getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
     }
 
     @Test
@@ -60,8 +59,7 @@ class TextSplitterTest {
         textSplitter = new TextSplitter(text);
         textSplitter.setAbridgedLength(valueOf(16));
 
-        assertEquals("Myextremlylo ...",
-                textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertEquals("Myextremlylo ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
         assertThat(valueOf(textSplitter.isAbridged()), is(TRUE));
     }
 
@@ -76,32 +74,26 @@ class TextSplitterTest {
 
     @Test
     void shouldProvideWebConformLongText() {
-        final var text =
-            "My-extremly.long;text_with!some usefull:information?andAveryLongDivulgementWithVeryLongComments";
+        final var text = "My-extremly.long;text_with!some usefull:information?andAveryLongDivulgementWithVeryLongComments";
 
-        final var expected =
-            "My-" + INV_SPACE + "extremly." + INV_SPACE + "long;" + INV_SPACE + "text_" + INV_SPACE
-                    + "with!" + INV_SPACE + "some usefull:" + INV_SPACE + "information?" + INV_SPACE
-                    + "andAveryLongDiv"
-                    + INV_SPACE + "ulgementWithVer" + INV_SPACE + "yLongComments";
+        final var expected = "My-" + INV_SPACE + "extremly." + INV_SPACE + "long;" + INV_SPACE + "text_" + INV_SPACE
+                + "with!" + INV_SPACE + "some usefull:" + INV_SPACE + "information?" + INV_SPACE + "andAveryLongDiv"
+                + INV_SPACE + "ulgementWithVer" + INV_SPACE + "yLongComments";
 
         textSplitter = new TextSplitter(text);
         textSplitter.setForceLengthBreak(valueOf(15));
 
-        assertEquals(expected,
-                textSplitter.getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+        assertEquals(expected, textSplitter.getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
     }
 
     @Test
     void shouldProvideTextRepresentationForComputerCreatedTextSequence() {
         final var text = "shouldProvideTextRepresentationForComputerCreatedTextSequence";
         textSplitter = new TextSplitter(text);
-        assertEquals("shouldProvideTex ...",
-                textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertEquals("shouldProvideTex ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
         assertEquals(
-                "shouldProvideTe" + INV_SPACE + "xtRepresentatio"
-                        + INV_SPACE + "nForComputerCre" + INV_SPACE + "atedTextSequenc" + INV_SPACE
-                        + "e",
+                "shouldProvideTe" + INV_SPACE + "xtRepresentatio" + INV_SPACE + "nForComputerCre" + INV_SPACE
+                        + "atedTextSequenc" + INV_SPACE + "e",
                 textSplitter.getTextWithEnforcedLineBreaks(), "Text with enforced linebreaks is wrong. ");
     }
 }

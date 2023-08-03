@@ -40,8 +40,8 @@ class SplitterConfig {
     SplitterConfigBuilder copy() {
         var copyBuilder = builder();
         copyBuilder.separator(getSeparator()).maxItems(getMaxItems())
-                .doNotModifySeparatorString(isDoNotModifySeparatorString())
-                .omitEmptyStrings(isOmitEmptyStrings()).trimResults(isTrimResults());
+                .doNotModifySeparatorString(isDoNotModifySeparatorString()).omitEmptyStrings(isOmitEmptyStrings())
+                .trimResults(isTrimResults());
         return copyBuilder;
     }
 }

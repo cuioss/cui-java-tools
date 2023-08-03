@@ -17,9 +17,9 @@ import lombok.RequiredArgsConstructor;
 /**
  * Inspired by Googles Joiner.
  * <p>
- * It uses internally the {@link String#join(CharSequence, Iterable)} implementation
- * of java and provides a guava like wrapper. It focuses on the simplified Joining
- * and omits the Map based variants.
+ * It uses internally the {@link String#join(CharSequence, Iterable)}
+ * implementation of java and provides a guava like wrapper. It focuses on the
+ * simplified Joining and omits the Map based variants.
  * </p>
  * <h2>Usage</h2>
  *
@@ -33,17 +33,19 @@ import lombok.RequiredArgsConstructor;
  *
  * <h2>Migrating from Guava</h2>
  * <p>
- * In order to migrate for most case you only need to replace the package name on the import.
+ * In order to migrate for most case you only need to replace the package name
+ * on the import.
  * </p>
  * <h2>Changes to Guavas-Joiner</h2>
  * <p>
- * In case of content to be joined containing {@code null}-values and not set to skip nulls,
- * {@link #skipNulls()} it does not throw an
- * {@link NullPointerException} but writes "null" for each {@code null} element. You can define a
- * different String by calling {@link #useForNull(String)}
+ * In case of content to be joined containing {@code null}-values and not set to
+ * skip nulls, {@link #skipNulls()} it does not throw an
+ * {@link NullPointerException} but writes "null" for each {@code null} element.
+ * You can define a different String by calling {@link #useForNull(String)}
  * </p>
  * <p>
- * In addition to {@link #skipEmptyStrings()} it provides a variant {@link #skipBlankStrings()}
+ * In addition to {@link #skipEmptyStrings()} it provides a variant
+ * {@link #skipBlankStrings()}
  * </p>
  *
  * @author Oliver Wolff
@@ -58,7 +60,8 @@ public final class Joiner {
     private final JoinerConfig joinerConfig;
 
     /**
-     * Returns a Joiner that uses the given fixed string as a separator. For example, {@code
+     * Returns a Joiner that uses the given fixed string as a separator. For
+     * example, {@code
      * Joiner.on("-").join("foo", "bar")} returns a String "foo-bar"
      *
      * @param separator the literal, nonempty string to recognize as a separator
@@ -71,7 +74,8 @@ public final class Joiner {
     }
 
     /**
-     * Returns a Joiner that uses the given fixed string as a separator. For example, {@code
+     * Returns a Joiner that uses the given fixed string as a separator. For
+     * example, {@code
      * Joiner.on('-').join("foo", "bar")} returns a String "foo-bar"
      *
      * @param separator the literal, nonempty string to recognize as a separator
@@ -85,7 +89,8 @@ public final class Joiner {
 
     /**
      * @param nullText to be used as substitution for {@code null} elements
-     * @return a joiner with the same behavior as this one, except automatically substituting {@code
+     * @return a joiner with the same behavior as this one, except automatically
+     *         substituting {@code
      * nullText} for any provided null elements.
      */
     public Joiner useForNull(final String nullText) {
@@ -93,25 +98,25 @@ public final class Joiner {
     }
 
     /**
-     * @return a joiner with the same behavior as this one, except automatically skipping
-     *         null-values
+     * @return a joiner with the same behavior as this one, except automatically
+     *         skipping null-values
      */
     public Joiner skipNulls() {
         return new Joiner(joinerConfig.copy().skipNulls(true).build());
     }
 
     /**
-     * @return a joiner with the same behavior as this one, except automatically skipping
-     *         String-values that evaluate to an empty String
+     * @return a joiner with the same behavior as this one, except automatically
+     *         skipping String-values that evaluate to an empty String
      */
     public Joiner skipEmptyStrings() {
         return new Joiner(joinerConfig.copy().skipEmpty(true).build());
     }
 
     /**
-     * @return a joiner with the same behavior as this one, except automatically skipping
-     *         String-values that evaluate to a blank String as defined within
-     *         {@link MoreStrings#isBlank(CharSequence)}
+     * @return a joiner with the same behavior as this one, except automatically
+     *         skipping String-values that evaluate to a blank String as defined
+     *         within {@link MoreStrings#isBlank(CharSequence)}
      */
     public Joiner skipBlankStrings() {
         return new Joiner(joinerConfig.copy().skipBlank(true).build());
@@ -120,8 +125,9 @@ public final class Joiner {
     /**
      * @param parts to be joined
      *
-     * @return a string containing the string representation of each of {@code parts}, using the
-     *         previously configured separator between each.
+     * @return a string containing the string representation of each of
+     *         {@code parts}, using the previously configured separator between
+     *         each.
      */
     public String join(Iterable<?> parts) {
         return doJoin(parts);
@@ -130,8 +136,9 @@ public final class Joiner {
     /**
      * @param parts to be joined
      *
-     * @return a string containing the string representation of each of {@code parts}, using the
-     *         previously configured separator between each.
+     * @return a string containing the string representation of each of
+     *         {@code parts}, using the previously configured separator between
+     *         each.
      */
     public String join(Iterator<?> parts) {
         return doJoin(mutableList(parts));
@@ -139,8 +146,9 @@ public final class Joiner {
 
     /**
      * @param parts to be joined
-     * @return a string containing the string representation of each of {@code parts}, using the
-     *         previously configured separator between each.
+     * @return a string containing the string representation of each of
+     *         {@code parts}, using the previously configured separator between
+     *         each.
      */
     public String join(Object... parts) {
         return doJoin(mutableList(parts));
@@ -164,14 +172,13 @@ public final class Joiner {
             }
         }
         if (joinerConfig.isSkipEmpty()) {
-            builder =
-                builder.stream().filter(element -> !MoreStrings.isEmpty(element))
-                        .collect(Collectors.toCollection(ArrayList::new));
+            builder = builder.stream().filter(element -> !MoreStrings.isEmpty(element))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
 
         if (joinerConfig.isSkipBlank()) {
-            builder =
-                builder.stream().filter(element -> !isBlank(element)).collect(Collectors.toCollection(ArrayList::new));
+            builder = builder.stream().filter(element -> !isBlank(element))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
         return String.join(joinerConfig.getSeparator(), builder);
     }

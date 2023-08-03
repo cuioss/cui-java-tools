@@ -18,10 +18,7 @@ class SimpleFormatterTest {
 
     @Test
     void shouldFormatOnMissingElements() {
-        final var formatted = SimpleFormatter.builder()
-                .ignoreMissingValues()
-                .separatesBy(", ")
-                .format("a", null, "c");
+        final var formatted = SimpleFormatter.builder().ignoreMissingValues().separatesBy(", ").format("a", null, "c");
 
         assertEquals("a, c", formatted);
     }
@@ -29,9 +26,7 @@ class SimpleFormatterTest {
     @Test
     void shouldNotFormatIfElementsAreMissing() {
 
-        final var formatted = SimpleFormatter.builder()
-                .skipResultIfAnyValueIsMissing()
-                .separatesBy(" - ")
+        final var formatted = SimpleFormatter.builder().skipResultIfAnyValueIsMissing().separatesBy(" - ")
                 .formatParentheses("a", "b", null, "d");
 
         assertNull(formatted);
@@ -40,9 +35,7 @@ class SimpleFormatterTest {
 
     @Test
     void shouldFormatParentheses() {
-        final var formatted = SimpleFormatter.builder()
-                .skipResultIfAnyValueIsMissing()
-                .separatesBy(" ")
+        final var formatted = SimpleFormatter.builder().skipResultIfAnyValueIsMissing().separatesBy(" ")
                 .formatParentheses("a", "b", "c", "d");
         assertEquals("(a b c d)", formatted);
     }

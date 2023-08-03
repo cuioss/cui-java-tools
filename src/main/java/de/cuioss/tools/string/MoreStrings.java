@@ -10,8 +10,9 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 /**
- * Provides some extensions to String handling like com.google.common.base.Strings. It was
- * created using different source, see authors
+ * Provides some extensions to String handling like
+ * com.google.common.base.Strings. It was created using different source, see
+ * authors
  *
  * @author Oliver Wolff
  * @author Sven Haag
@@ -48,8 +49,8 @@ public final class MoreStrings {
     public static final int INDEX_NOT_FOUND = -1;
 
     /**
-     * "Unquotes" a String, saying if the given String starts and ends with the token "'" or """ the
-     * quotes will be stripped
+     * "Unquotes" a String, saying if the given String starts and ends with the
+     * token "'" or """ the quotes will be stripped
      *
      * @param original may be null or empty
      * @return the unquoted String or the original in none could be found
@@ -71,8 +72,8 @@ public final class MoreStrings {
      * </p>
      *
      * <p>
-     * {@code null} will return {@code false}.
-     * An empty CharSequence (length()=0) will return {@code false}.
+     * {@code null} will return {@code false}. An empty CharSequence (length()=0)
+     * will return {@code false}.
      * </p>
      *
      * <pre>
@@ -110,8 +111,8 @@ public final class MoreStrings {
      * </p>
      *
      * <p>
-     * {@code null} will return {@code false}.
-     * An empty String (length()=0) will return {@code false}.
+     * {@code null} will return {@code false}. An empty String (length()=0) will
+     * return {@code false}.
      * </p>
      *
      * <pre>
@@ -186,20 +187,20 @@ public final class MoreStrings {
 
     /**
      * <p>
-     * Checks if the CharSequence contains only Unicode digits.
-     * A decimal point is not a Unicode digit and returns false.
+     * Checks if the CharSequence contains only Unicode digits. A decimal point is
+     * not a Unicode digit and returns false.
      * </p>
      *
      * <p>
-     * {@code null} will return {@code false}.
-     * An empty CharSequence (length()=0) will return {@code false}.
+     * {@code null} will return {@code false}. An empty CharSequence (length()=0)
+     * will return {@code false}.
      * </p>
      *
      * <p>
-     * Note that the method does not allow for a leading sign, either positive or negative.
-     * Also, if a String passes the numeric test, it may still generate a NumberFormatException
-     * when parsed by Integer.parseInt or Long.parseLong, e.g. if the value is outside the range
-     * for int or long respectively.
+     * Note that the method does not allow for a leading sign, either positive or
+     * negative. Also, if a String passes the numeric test, it may still generate a
+     * NumberFormatException when parsed by Integer.parseInt or Long.parseLong, e.g.
+     * if the value is outside the range for int or long respectively.
      * </p>
      *
      * <pre>
@@ -273,7 +274,8 @@ public final class MoreStrings {
      * {@code NOT} of {@link #isBlank(CharSequence)}.
      *
      * <p>
-     * Checks if a CharSequence is not empty (""), null or contains whitespaces only.
+     * Checks if a CharSequence is not empty (""), null or contains whitespaces
+     * only.
      * </p>
      *
      * <p>
@@ -351,7 +353,7 @@ public final class MoreStrings {
      * MoreStrings.leftPad("bat", -1) = "bat"
      * </pre>
      *
-     * @param str the String to pad out, may be null
+     * @param str  the String to pad out, may be null
      * @param size the size to pad to
      * @return left padded String or original String if no padding is necessary,
      *         {@code null} if null String input
@@ -379,8 +381,8 @@ public final class MoreStrings {
      * MoreStrings.leftPad("bat", -1, 'z') = "bat"
      * </pre>
      *
-     * @param str the String to pad out, may be null
-     * @param size the size to pad to
+     * @param str     the String to pad out, may be null
+     * @param size    the size to pad to
      * @param padChar the character to pad with
      * @return left padded String or original String if no padding is necessary,
      *         {@code null} if null String input
@@ -421,8 +423,8 @@ public final class MoreStrings {
      * MoreStrings.leftPad("bat", 5, "")    = "  bat"
      * </pre>
      *
-     * @param str the String to pad out, may be null
-     * @param size the size to pad to
+     * @param str    the String to pad out, may be null
+     * @param size   the size to pad to
      * @param padStr the String to pad with, null or empty treated as single space
      * @return left padded String or original String if no padding is necessary,
      *         {@code null} if null String input
@@ -461,8 +463,7 @@ public final class MoreStrings {
 
     /**
      * <p>
-     * Returns padding using the specified delimiter repeated
-     * to a given length.
+     * Returns padding using the specified delimiter repeated to a given length.
      * </p>
      *
      * <pre>
@@ -473,14 +474,13 @@ public final class MoreStrings {
      *
      * <p>
      * Note: this method does not support padding with
-     * <a href="http://www.unicode.org/glossary/#supplementary_character">Unicode Supplementary
-     * Characters</a>
-     * as they require a pair of {@code char}s to be represented.
-     * If you are needing to support full I18N of your applications
+     * <a href="http://www.unicode.org/glossary/#supplementary_character">Unicode
+     * Supplementary Characters</a> as they require a pair of {@code char}s to be
+     * represented. If you are needing to support full I18N of your applications
      * consider using <code>repeat(String, int)</code> instead.
      * </p>
      *
-     * @param ch character to repeat
+     * @param ch     character to repeat
      * @param repeat number of times to repeat char, negative treated as zero
      * @return String with repeated character
      * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
@@ -502,13 +502,13 @@ public final class MoreStrings {
      * </p>
      *
      * <p>
-     * A {@code null} input String returns {@code null}.
-     * An empty string ("") input returns the empty string.
+     * A {@code null} input String returns {@code null}. An empty string ("") input
+     * returns the empty string.
      * </p>
      *
      * <p>
-     * If the stripChars String is {@code null}, whitespace is
-     * stripped as defined by {@link Character#isWhitespace(char)}.
+     * If the stripChars String is {@code null}, whitespace is stripped as defined
+     * by {@link Character#isWhitespace(char)}.
      * </p>
      *
      * <pre>
@@ -524,7 +524,7 @@ public final class MoreStrings {
      * </pre>
      *
      *
-     * @param str the String to remove characters from, may be null
+     * @param str        the String to remove characters from, may be null
      * @param stripChars the set of characters to remove, null treated as whitespace
      * @return the stripped String, {@code null} if null String input
      * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
@@ -550,35 +550,31 @@ public final class MoreStrings {
     }
 
     /**
-     * Returns the index within <code>seq</code> of the first occurrence of
-     * the specified character. If a character with value
-     * <code>searchChar</code> occurs in the character sequence represented by
-     * <code>seq</code> <code>CharSequence</code> object, then the index (in Unicode
-     * code units) of the first such occurrence is returned. For
-     * values of <code>searchChar</code> in the range from 0 to 0xFFFF
-     * (inclusive), this is the smallest value <i>k</i> such that:
-     * <blockquote>
+     * Returns the index within <code>seq</code> of the first occurrence of the
+     * specified character. If a character with value <code>searchChar</code> occurs
+     * in the character sequence represented by <code>seq</code>
+     * <code>CharSequence</code> object, then the index (in Unicode code units) of
+     * the first such occurrence is returned. For values of <code>searchChar</code>
+     * in the range from 0 to 0xFFFF (inclusive), this is the smallest value
+     * <i>k</i> such that: <blockquote>
      *
      * <pre>
      * this.charAt(<i>k</i>) == searchChar
      * </pre>
      *
-     * </blockquote>
-     * is true. For other values of <code>searchChar</code>, it is the
-     * smallest value <i>k</i> such that:
-     * <blockquote>
+     * </blockquote> is true. For other values of <code>searchChar</code>, it is the
+     * smallest value <i>k</i> such that: <blockquote>
      *
      * <pre>
      * this.codePointAt(<i>k</i>) == searchChar
      * </pre>
      *
-     * </blockquote>
-     * is true. In either case, if no such character occurs in <code>seq</code>,
-     * then {@code INDEX_NOT_FOUND (-1)} is returned.
+     * </blockquote> is true. In either case, if no such character occurs in
+     * <code>seq</code>, then {@code INDEX_NOT_FOUND (-1)} is returned.
      *
      * <p>
-     * Furthermore, a {@code null} or empty ("") CharSequence will
-     * return {@code INDEX_NOT_FOUND (-1)}.
+     * Furthermore, a {@code null} or empty ("") CharSequence will return
+     * {@code INDEX_NOT_FOUND (-1)}.
      * </p>
      *
      * <pre>
@@ -589,10 +585,10 @@ public final class MoreStrings {
      * </pre>
      *
      *
-     * @param seq the CharSequence to check, may be null
+     * @param seq        the CharSequence to check, may be null
      * @param searchChar the character to find
-     * @return the first index of the search character,
-     *         -1 if no match or {@code null} string input
+     * @return the first index of the search character, -1 if no match or
+     *         {@code null} string input
      * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
      */
     public static int indexOf(final CharSequence seq, final int searchChar) {
@@ -606,46 +602,40 @@ public final class MoreStrings {
      * Returns the index within <code>cs</code> of the first occurrence of the
      * specified character, starting the search at the specified index.
      * <p>
-     * If a character with value <code>searchChar</code> occurs in the
-     * character sequence represented by the <code>cs</code>
-     * object at an index no smaller than <code>start</code>, then
-     * the index of the first such occurrence is returned. For values
-     * of <code>searchChar</code> in the range from 0 to 0xFFFF (inclusive),
-     * this is the smallest value <i>k</i> such that:
-     * <blockquote>
+     * If a character with value <code>searchChar</code> occurs in the character
+     * sequence represented by the <code>cs</code> object at an index no smaller
+     * than <code>start</code>, then the index of the first such occurrence is
+     * returned. For values of <code>searchChar</code> in the range from 0 to 0xFFFF
+     * (inclusive), this is the smallest value <i>k</i> such that: <blockquote>
      *
      * <pre>
      * (this.charAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= start)
      * </pre>
      *
-     * </blockquote>
-     * is true. For other values of <code>searchChar</code>, it is the
-     * smallest value <i>k</i> such that:
-     * <blockquote>
+     * </blockquote> is true. For other values of <code>searchChar</code>, it is the
+     * smallest value <i>k</i> such that: <blockquote>
      *
      * <pre>
      * (this.codePointAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= start)
      * </pre>
      *
-     * </blockquote>
-     * is true. In either case, if no such character occurs inm <code>cs</code>
-     * at or after position <code>start</code>, then
-     * <code>-1</code> is returned.
+     * </blockquote> is true. In either case, if no such character occurs inm
+     * <code>cs</code> at or after position <code>start</code>, then <code>-1</code>
+     * is returned.
      *
      * <p>
-     * There is no restriction on the value of <code>start</code>. If it
-     * is negative, it has the same effect as if it were zero: the entire
-     * <code>CharSequence</code> may be searched. If it is greater than
-     * the length of <code>cs</code>, it has the same effect as if it were
-     * equal to the length of <code>cs</code>: <code>-1</code> is returned.
+     * There is no restriction on the value of <code>start</code>. If it is
+     * negative, it has the same effect as if it were zero: the entire
+     * <code>CharSequence</code> may be searched. If it is greater than the length
+     * of <code>cs</code>, it has the same effect as if it were equal to the length
+     * of <code>cs</code>: <code>-1</code> is returned.
      *
      * <p>
-     * All indices are specified in <code>char</code> values
-     * (Unicode code units).
+     * All indices are specified in <code>char</code> values (Unicode code units).
      *
-     * @param cs the {@code CharSequence} to be processed, not null
+     * @param cs         the {@code CharSequence} to be processed, not null
      * @param searchChar the char to be searched for
-     * @param start the start index, negative starts at the string start
+     * @param start      the start index, negative starts at the string start
      * @return the index where the search char was found, -1 if not found
      * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
      */
@@ -684,11 +674,12 @@ public final class MoreStrings {
     }
 
     /**
-     * Used by the indexOf(CharSequence methods) as a green implementation of indexOf.
+     * Used by the indexOf(CharSequence methods) as a green implementation of
+     * indexOf.
      *
-     * @param cs the {@code CharSequence} to be processed
+     * @param cs         the {@code CharSequence} to be processed
      * @param searchChar the {@code CharSequence} to be searched for
-     * @param start the start index
+     * @param start      the start index
      * @return the index where the search sequence was found
      *
      * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
@@ -703,14 +694,14 @@ public final class MoreStrings {
     /**
      * Check whether the given {@code String} contains actual <em>text</em>.
      * <p>
-     * More specifically, this method returns {@code true} if the
-     * {@code String} is not {@code null}, its length is greater than 0,
-     * and it contains at least one non-whitespace character.
+     * More specifically, this method returns {@code true} if the {@code String} is
+     * not {@code null}, its length is greater than 0, and it contains at least one
+     * non-whitespace character.
      *
      * @param str the {@code String} to check (maybe {@code null})
      *
-     * @return {@code true} if the {@code String} is not {@code null}, its
-     *         length is greater than 0, and it does not contain whitespace only
+     * @return {@code true} if the {@code String} is not {@code null}, its length is
+     *         greater than 0, and it does not contain whitespace only
      * @author https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java
      */
     public static boolean hasNonWhitespaceChar(final CharSequence str) {
@@ -728,8 +719,8 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non-null and not empty (checks without trimming) Throws an
-     * {@link IllegalArgumentException} if String is null or empty
+     * Checks a string for being non-null and not empty (checks without trimming)
+     * Throws an {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
      * @return the given String
@@ -740,8 +731,8 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non-null and not empty (checks without trimming) Throws an
-     * {@link IllegalArgumentException} if String is null or empty
+     * Checks a string for being non-null and not empty (checks without trimming)
+     * Throws an {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
      * @param attributeName used for the creation of the error text
@@ -753,8 +744,8 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non-null and not empty (checks with trimming) Throws an
-     * {@link IllegalArgumentException} if String is null or empty
+     * Checks a string for being non-null and not empty (checks with trimming)
+     * Throws an {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
      * @return the given String
@@ -765,8 +756,8 @@ public final class MoreStrings {
     }
 
     /**
-     * Checks a string for being non-null and not empty (checks with trimming) Throws an
-     * {@link IllegalArgumentException} if String is null or empty
+     * Checks a string for being non-null and not empty (checks with trimming)
+     * Throws an {@link IllegalArgumentException} if String is null or empty
      *
      * @param underCheck
      * @param attributeName used for the creation of the error text
@@ -796,7 +787,8 @@ public final class MoreStrings {
      *
      * @author com.google.common.base.Strings
      * @param string the string to test and possibly return
-     * @return {@code string} itself if it is nonempty; {@code null} if it is empty or null
+     * @return {@code string} itself if it is nonempty; {@code null} if it is empty
+     *         or null
      */
     public static String emptyToNull(String string) {
         if (null == string || string.isEmpty()) {
@@ -810,47 +802,51 @@ public final class MoreStrings {
      *
      * @param string to be trimmed
      *
-     * @return <code>null</code> if the string is <code>null</code> otherwise the trimmed string
+     * @return <code>null</code> if the string is <code>null</code> otherwise the
+     *         trimmed string
      */
     public static String trimOrNull(final String string) {
         return null != string ? string.trim() : null;
     }
 
     /**
-     * Returns the given {@code template} string with each occurrence of {@code "%s"} replaced with
-     * the corresponding argument value from {@code args}; or, if the placeholder and argument
-     * counts
-     * do not match, returns a best-effort form of that string. Will not throw an exception under
+     * Returns the given {@code template} string with each occurrence of
+     * {@code "%s"} replaced with the corresponding argument value from
+     * {@code args}; or, if the placeholder and argument counts do not match,
+     * returns a best-effort form of that string. Will not throw an exception under
      * normal conditions.
      *
      * <p>
-     * <b>Note:</b> For most string-formatting needs, use {@link String#format String.format},
-     * {@link java.io.PrintWriter#format PrintWriter.format}, and related methods. These support the
-     * full range of <a
-     * href="https://docs.oracle.com/javase/9/docs/api/java/util/Formatter.html#syntax">format
-     * specifiers</a>, and alert you to usage errors by throwing {@link
-     * java.util.IllegalFormatException}.
+     * <b>Note:</b> For most string-formatting needs, use {@link String#format
+     * String.format}, {@link java.io.PrintWriter#format PrintWriter.format}, and
+     * related methods. These support the full range of <a href=
+     * "https://docs.oracle.com/javase/9/docs/api/java/util/Formatter.html#syntax">format
+     * specifiers</a>, and alert you to usage errors by throwing
+     * {@link java.util.IllegalFormatException}.
      *
      * <p>
-     * In certain cases, such as outputting debugging information or constructing a message to be
-     * used for another unchecked exception, an exception during string formatting would serve
-     * little purpose except to supplant the real information you were trying to provide. These are
-     * the cases this method is made for; it instead generates a best-effort string with all
-     * supplied argument values present. This method is also useful in environments such as GWT
-     * where {@code String.format} is not available.
+     * In certain cases, such as outputting debugging information or constructing a
+     * message to be used for another unchecked exception, an exception during
+     * string formatting would serve little purpose except to supplant the real
+     * information you were trying to provide. These are the cases this method is
+     * made for; it instead generates a best-effort string with all supplied
+     * argument values present. This method is also useful in environments such as
+     * GWT where {@code String.format} is not available.
      *
      * <p>
-     * <b>Warning:</b> Only the exact two-character placeholder sequence {@code "%s"} is
-     * recognized.
+     * <b>Warning:</b> Only the exact two-character placeholder sequence
+     * {@code "%s"} is recognized.
      *
      * @author com.google.common.base.Strings
-     * @param template a string containing zero or more {@code "%s"} placeholder sequences. {@code
-     *     null} is treated as the four-character string {@code "null"}.
-     * @param args the arguments to be substituted into the message template. The first argument
-     *            specified is substituted for the first occurrence of {@code "%s"} in the template,
-     *            and so forth. A {@code null} argument is converted to the four-character string
-     *            {@code "null"}; non-null values are converted to strings using
-     *            {@link Object#toString()}.
+     * @param template a string containing zero or more {@code "%s"} placeholder
+     *                 sequences. {@code
+     *     null}    is treated as the four-character string {@code "null"}.
+     * @param args     the arguments to be substituted into the message template.
+     *                 The first argument specified is substituted for the first
+     *                 occurrence of {@code "%s"} in the template, and so forth. A
+     *                 {@code null} argument is converted to the four-character
+     *                 string {@code "null"}; non-null values are converted to
+     *                 strings using {@link Object#toString()}.
      * @return the resulting formatting String
      */
     public static String lenientFormat(String template, Object... args) {
@@ -897,7 +893,7 @@ public final class MoreStrings {
     }
 
     /**
-     * @param value to be processed
+     * @param value  to be processed
      * @param suffix to be present
      * @return value with suffix
      */
@@ -916,17 +912,16 @@ public final class MoreStrings {
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            var objectToString =
-                o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
+            var objectToString = o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
             log.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }
     }
 
     /**
-     * @param checker the predicate to check each given value against. it decides if a value
-     *            qualifies to be returned.
-     * @param values to be evaluated
+     * @param checker the predicate to check each given value against. it decides if
+     *                a value qualifies to be returned.
+     * @param values  to be evaluated
      * @return first string that is accepted by the given {@link Predicate} or
      *         {@link Optional#empty()}
      */

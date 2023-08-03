@@ -89,10 +89,8 @@ class MoreReflectionTest {
     @Test
     void shouldDetectModifierMethodsCaseInsensitivly() {
         var propertyName = StringCaseShuffler.shuffleCase("url");
-        assertTrue(
-                MoreReflection.retrieveWriteMethod(BeanWithUnusualAttributeCasing.class, propertyName, String.class)
-                        .isPresent(),
-                "Looked for " + propertyName);
+        assertTrue(MoreReflection.retrieveWriteMethod(BeanWithUnusualAttributeCasing.class, propertyName, String.class)
+                .isPresent(), "Looked for " + propertyName);
     }
 
     @Test
@@ -108,8 +106,7 @@ class MoreReflectionTest {
         assertEquals(1,
                 MoreReflection.retrieveWriteMethodCandidates(MethodNameClass.class, "builderWriteMethod").size());
 
-        assertEquals(0,
-                MoreReflection.retrieveWriteMethodCandidates(MethodNameClass.class, "notThere").size());
+        assertEquals(0, MoreReflection.retrieveWriteMethodCandidates(MethodNameClass.class, "notThere").size());
 
         assertEquals(0,
                 MoreReflection.retrieveWriteMethodCandidates(MethodNameClass.class, "wrongParameterCount").size());
@@ -138,11 +135,8 @@ class MoreReflectionTest {
         assertTrue(MoreReflection.extractAllAnnotations(Object.class, Resource.class).isEmpty());
         assertTrue(MoreReflection.extractAllAnnotations(List.class, Resource.class).isEmpty());
 
-        assertEquals(1,
-                MoreReflection.extractAllAnnotations(ChildAnnotatedClass.class, Deprecated.class).size());
-        assertEquals(2,
-                MoreReflection.extractAllAnnotations(ChildAnnotatedClass.class, Resource.class)
-                        .size());
+        assertEquals(1, MoreReflection.extractAllAnnotations(ChildAnnotatedClass.class, Deprecated.class).size());
+        assertEquals(2, MoreReflection.extractAllAnnotations(ChildAnnotatedClass.class, Resource.class).size());
 
     }
 
@@ -153,11 +147,8 @@ class MoreReflectionTest {
         assertFalse(MoreReflection.extractAnnotation(Object.class, Resource.class).isPresent());
         assertFalse(MoreReflection.extractAnnotation(List.class, Resource.class).isPresent());
 
-        assertTrue(
-                MoreReflection.extractAnnotation(ChildAnnotatedClass.class, Deprecated.class).isPresent());
-        assertTrue(
-                MoreReflection.extractAnnotation(ChildAnnotatedClass.class, Resource.class)
-                        .isPresent());
+        assertTrue(MoreReflection.extractAnnotation(ChildAnnotatedClass.class, Deprecated.class).isPresent());
+        assertTrue(MoreReflection.extractAnnotation(ChildAnnotatedClass.class, Resource.class).isPresent());
 
     }
 

@@ -32,8 +32,8 @@ class HexTest {
      * Allocate a ByteBuffer.
      *
      * <p>
-     * The default implementation uses {@link ByteBuffer#allocate(int)}.
-     * The method is overridden in AllocateDirectHexTest to use
+     * The default implementation uses {@link ByteBuffer#allocate(int)}. The method
+     * is overridden in AllocateDirectHexTest to use
      * {@link ByteBuffer#allocateDirect(int)}
      *
      * @param capacity the capacity
@@ -151,8 +151,8 @@ class HexTest {
         }
     }
 
-    private void testCustomCharset(final String name, final String parent) throws UnsupportedEncodingException,
-        DecoderException {
+    private void testCustomCharset(final String name, final String parent)
+            throws UnsupportedEncodingException, DecoderException {
         if (!charsetSanityCheck(name)) {
             return;
         }
@@ -172,8 +172,7 @@ class HexTest {
         // test 2
         var actualStringFromBytes = new String(actualEncodedBytes, name);
         assertEquals(expectedHexString, actualStringFromBytes,
-                name + ", expectedHexString=" + expectedHexString + ", actualStringFromBytes=" +
-                        actualStringFromBytes);
+                name + ", expectedHexString=" + expectedHexString + ", actualStringFromBytes=" + actualStringFromBytes);
         // second test:
         final var utf8Codec = new Hex();
         expectedHexString = "48656c6c6f20576f726c64";
@@ -590,8 +589,7 @@ class HexTest {
     }
 
     /**
-     * Test encoding of a read only byte buffer.
-     * See CODEC-261.
+     * Test encoding of a read only byte buffer. See CODEC-261.
      */
     @Test
     void testEncodeHexReadOnlyByteBuffer() {

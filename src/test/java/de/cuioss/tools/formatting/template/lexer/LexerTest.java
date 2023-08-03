@@ -18,16 +18,14 @@ class LexerTest {
 
     @Test
     void shouldFailOnMissingAttributes() {
-        final var source =
-            new WrongFormatterSupportImplWithMissingAttributeList();
+        final var source = new WrongFormatterSupportImplWithMissingAttributeList();
 
         assertThrows(NullPointerException.class, () -> new TestImplLexer<>(source));
     }
 
     @Test
     void shouldFailOnEmptyAttributes() {
-        final var source =
-            new WrongFormatterSupportImplWithEmptyAttributeList();
+        final var source = new WrongFormatterSupportImplWithEmptyAttributeList();
         assertThrows(IllegalArgumentException.class, () -> new TestImplLexer<>(source));
     }
 
@@ -49,8 +47,7 @@ class LexerTest {
     @Test
     void shouldFailwithInvalidSourceType() {
         var builder = LexerBuilder.useSimpleElWithSquaredBrackets();
-        assertThrows(IllegalStateException.class,
-                () -> builder.build(NoPublicZeroArgConstructor.class));
+        assertThrows(IllegalStateException.class, () -> builder.build(NoPublicZeroArgConstructor.class));
     }
 
 }

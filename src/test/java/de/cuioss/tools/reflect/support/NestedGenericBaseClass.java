@@ -1,8 +1,8 @@
 package de.cuioss.tools.reflect.support;
 
 /**
- * This simulates cases where the starting class does not represent a generic but one of its
- * ancestors.
+ * This simulates cases where the starting class does not represent a generic
+ * but one of its ancestors.
  */
 public class NestedGenericBaseClass extends StringTypedArrayList {
 

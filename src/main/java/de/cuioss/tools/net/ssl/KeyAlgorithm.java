@@ -1,8 +1,8 @@
 package de.cuioss.tools.net.ssl;
 
 /**
- * Identifies the key-Algorithm for KeyMaterial-Holder. In order to provide a sensible default-set
- * these are taken from keycloak 11.
+ * Identifies the key-Algorithm for KeyMaterial-Holder. In order to provide a
+ * sensible default-set these are taken from keycloak 11.
  *
  * @author Oliver Wolff
  *

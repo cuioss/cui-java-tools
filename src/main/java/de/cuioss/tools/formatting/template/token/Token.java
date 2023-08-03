@@ -13,8 +13,8 @@ public interface Token extends Serializable {
 
     /**
      * @param content must not be null
-     * @return token specific template with substituted attribute value if attribute exists,
-     *         <code>empty</code> String otherwise
+     * @return token specific template with substituted attribute value if attribute
+     *         exists, <code>empty</code> String otherwise
      */
     String substituteAttribute(FormatterSupport content);
 

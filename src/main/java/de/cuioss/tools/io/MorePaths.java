@@ -32,17 +32,16 @@ public final class MorePaths {
     public static final String BACKUP_DIR_NAME = ".backup";
 
     /** "File or Directory {} is not accessible, reason: {}". */
-    public static final String MSG_DIRECTORY_NOT_ACCESSIBLE =
-        "File or Directory {} is not accessible, reason: {}";
+    public static final String MSG_DIRECTORY_NOT_ACCESSIBLE = "File or Directory {} is not accessible, reason: {}";
 
     /** The prefix to be attached to a backup-file */
     public static final String BACKUP_FILE_SUFFIX = ".bck_";
 
     /**
      * Tries to determine the real-path by calling
-     * {@link Path#toRealPath(java.nio.file.LinkOption...)} with no further parameter passed. In
-     * case the real path can not be resolved it will LOG at warn-level and return
-     * {@link Path#toAbsolutePath()}.
+     * {@link Path#toRealPath(java.nio.file.LinkOption...)} with no further
+     * parameter passed. In case the real path can not be resolved it will LOG at
+     * warn-level and return {@link Path#toAbsolutePath()}.
      *
      * @param path must not be null
      * @return the real-path if applicable, {@link Path#toAbsolutePath()} otherwise.
@@ -59,13 +58,12 @@ public final class MorePaths {
     }
 
     /**
-     * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for details and
-     * {@link Paths#get(String, String...)} for details regarding the parameter
+     * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for
+     * details and {@link Paths#get(String, String...)} for details regarding the
+     * parameter
      *
-     * @param first
-     *            the path string or initial part of the path string
-     * @param more
-     *            additional strings to be joined to form the path string
+     * @param first the path string or initial part of the path string
+     * @param more  additional strings to be joined to form the path string
      * @return the real-path if applicable, {@link Path#toAbsolutePath()} otherwise.
      */
     public static Path getRealPathSafely(String first, String... more) {
@@ -73,7 +71,8 @@ public final class MorePaths {
     }
 
     /**
-     * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for details
+     * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for
+     * details
      *
      * @param file the {@link Path} to be looked up
      *
@@ -85,15 +84,15 @@ public final class MorePaths {
     }
 
     /**
-     * Checks whether the given {@link Path} denotes an existing read and
-     * writable directory or file.
+     * Checks whether the given {@link Path} denotes an existing read and writable
+     * directory or file.
      *
-     * @param path to checked, must not be null
+     * @param path              to checked, must not be null
      * @param checkForDirectory check whether it is a file or directory
-     * @param verbose indicates whether to log errors at warn-level
+     * @param verbose           indicates whether to log errors at warn-level
      *
-     * @return boolean indicating whether the given {@link Path} denotes an existing read and
-     *         writable directory.
+     * @return boolean indicating whether the given {@link Path} denotes an existing
+     *         read and writable directory.
      */
     public static boolean checkAccessiblePath(final @NonNull Path path, final boolean checkForDirectory,
             final boolean verbose) {
@@ -113,14 +112,15 @@ public final class MorePaths {
     }
 
     /**
-     * Checks whether the given {@link Path} denotes an existing readable directory or file.
+     * Checks whether the given {@link Path} denotes an existing readable directory
+     * or file.
      *
-     * @param path to checked, must not be null
+     * @param path              to checked, must not be null
      * @param checkForDirectory check whether it is a file or directory
-     * @param verbose indicates whether to log errors at warn-level
+     * @param verbose           indicates whether to log errors at warn-level
      *
-     * @return boolean indicating whether the given {@link Path} denotes an existing readable
-     *         directory.
+     * @return boolean indicating whether the given {@link Path} denotes an existing
+     *         readable directory.
      */
     public static boolean checkReadablePath(final @NonNull Path path, final boolean checkForDirectory,
             final boolean verbose) {
@@ -158,14 +158,13 @@ public final class MorePaths {
     /**
      * Checks whether the given {@link Path} denotes an existing executable file.
      *
-     * @param path to checked, must not be null
+     * @param path    to checked, must not be null
      * @param verbose indicates whether to log errors at warn-level
      *
-     * @return boolean indicating whether the given {@link Path} denotes an existing readable
-     *         directory.
+     * @return boolean indicating whether the given {@link Path} denotes an existing
+     *         readable directory.
      */
-    public static boolean checkExecutablePath(final @NonNull Path path,
-            final boolean verbose) {
+    public static boolean checkExecutablePath(final @NonNull Path path, final boolean verbose) {
         final var pathFile = path.toFile();
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
@@ -191,11 +190,12 @@ public final class MorePaths {
     }
 
     /**
-     * Creates / or references a backup-directory named ".backup" within the given directory and
-     * returns it
+     * Creates / or references a backup-directory named ".backup" within the given
+     * directory and returns it
      *
-     * @param directory must not null and denote an existing writable directory, otherwise am
-     *            {@link IllegalArgumentException} will be thrown.
+     * @param directory must not null and denote an existing writable directory,
+     *                  otherwise am {@link IllegalArgumentException} will be
+     *                  thrown.
      * @return the ".backup" directory
      */
     public static Path getBackupDirectoryForPath(final Path directory) {
@@ -207,17 +207,18 @@ public final class MorePaths {
         final var backup = directory.resolve(BACKUP_DIR_NAME);
         final var backupAsFile = backup.toFile();
         if (!backupAsFile.exists() && !backupAsFile.mkdir()) {
-            throw new IllegalStateException(String.format("Unable to create directory '%s'",
-                    backup.toFile().getAbsolutePath()));
+            throw new IllegalStateException(
+                    String.format("Unable to create directory '%s'", backup.toFile().getAbsolutePath()));
         }
         return backup;
 
     }
 
     /**
-     * Backups the file, identified by the given path into the backup directory, derived with
-     * {@link #getBackupDirectoryForPath(Path)}. The original file attributes will be applied to the
-     * copied filed, See {@link StandardCopyOption#COPY_ATTRIBUTES}.
+     * Backups the file, identified by the given path into the backup directory,
+     * derived with {@link #getBackupDirectoryForPath(Path)}. The original file
+     * attributes will be applied to the copied filed, See
+     * {@link StandardCopyOption#COPY_ATTRIBUTES}.
      *
      * @param path must not be null and denote an existing read and writable file
      * @return Path on the newly created file
@@ -227,9 +228,8 @@ public final class MorePaths {
         assertAccessibleFile(path);
         var backupDir = getBackupDirectoryForPath(path.getParent());
 
-        var backupFile =
-            createNonExistingPath(backupDir, path.getFileName() + BACKUP_FILE_SUFFIX +
-                    new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+        var backupFile = createNonExistingPath(backupDir,
+                path.getFileName() + BACKUP_FILE_SUFFIX + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
 
         Files.copy(path, backupFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         log.debug("Created backup from '{}' at '{}'", path.toFile().getAbsolutePath(),
@@ -238,12 +238,12 @@ public final class MorePaths {
     }
 
     /**
-     * Creates a temp-copy of the given file, identified by the given path. The original file
-     * attributes will be applied to the
-     * copied filed, See {@link StandardCopyOption#COPY_ATTRIBUTES}.
-     * <h2>Caution: Security-Impact</h2>
-     * Creating a temp-file might introduce a security issue. Never ever use this location for
-     * sensitive information that might be of interest for an attacker
+     * Creates a temp-copy of the given file, identified by the given path. The
+     * original file attributes will be applied to the copied filed, See
+     * {@link StandardCopyOption#COPY_ATTRIBUTES}.
+     * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
+     * security issue. Never ever use this location for sensitive information that
+     * might be of interest for an attacker
      *
      * @param path must not be null and denote an existing read and writable file
      * @return Path on the newly created file
@@ -262,17 +262,17 @@ public final class MorePaths {
     }
 
     /**
-     * Asserts whether a given {@link Path} is accessible, saying it exits as a file and is read
-     * and writable. If not it will throw an {@link IllegalArgumentException}
+     * Asserts whether a given {@link Path} is accessible, saying it exits as a file
+     * and is read and writable. If not it will throw an
+     * {@link IllegalArgumentException}
      *
      * @param path to be checked, must not be null
      */
     public static void assertAccessibleFile(final Path path) {
         requireNonNull(path, "path");
         if (!checkAccessiblePath(path, false, true)) {
-            throw new IllegalArgumentException(
-                    String.format("Given path '%s' does not denote an existing readable file",
-                            path.toFile().getAbsolutePath()));
+            throw new IllegalArgumentException(String.format(
+                    "Given path '%s' does not denote an existing readable file", path.toFile().getAbsolutePath()));
         }
     }
 
@@ -295,9 +295,9 @@ public final class MorePaths {
     }
 
     /**
-     * Deletes a file, never throwing an exception. If file is a directory, delete it and all
-     * subdirectories.
-     * Inspired by org.apache.commons.io.FileUtils#deleteQuietly
+     * Deletes a file, never throwing an exception. If file is a directory, delete
+     * it and all subdirectories. Inspired by
+     * org.apache.commons.io.FileUtils#deleteQuietly
      * <p>
      * The difference between File.delete() and this method are:
      * <ul>
@@ -352,17 +352,17 @@ public final class MorePaths {
      *
      * Compares the contents of two files to determine if they are equal or not.
      * <p>
-     * This method checks to see if the two files are different lengths
-     * or if they point to the same file, before resorting to byte-by-byte
-     * comparison of the contents.
+     * This method checks to see if the two files are different lengths or if they
+     * point to the same file, before resorting to byte-by-byte comparison of the
+     * contents.
      * <p>
-     * Taken from org.apache.commons.io.FileUtils.contentEquals(File, File)
-     * Code origin: Avalon
+     * Taken from org.apache.commons.io.FileUtils.contentEquals(File, File) Code
+     * origin: Avalon
      *
      * @param path1 the first file
      * @param path2 the second file
-     * @return true if the content of the files are equal or they both don't
-     *         exist, false otherwise
+     * @return true if the content of the files are equal or they both don't exist,
+     *         false otherwise
      * @throws IOException in case of an I/O error
      */
     public static boolean contentEquals(final Path path1, final Path path2) throws IOException {
@@ -395,8 +395,7 @@ public final class MorePaths {
             return true;
         }
 
-        try (InputStream input1 = new FileInputStream(file1);
-                InputStream input2 = new FileInputStream(file2)) {
+        try (InputStream input1 = new FileInputStream(file1); InputStream input2 = new FileInputStream(file2)) {
             return IOStreams.contentEquals(input1, input2);
         }
     }
@@ -417,8 +416,8 @@ public final class MorePaths {
     }
 
     /**
-     * Save a file by maintaining all its attributes and permissions. Also creates a backup, see
-     * {@linkplain #backupFile(Path)}.
+     * Save a file by maintaining all its attributes and permissions. Also creates a
+     * backup, see {@linkplain #backupFile(Path)}.
      *
      * <h1>Usage</h1>
      * <p>
@@ -426,9 +425,10 @@ public final class MorePaths {
      * JdomHelper.writeJdomToFile(document, targetPath));
      * </p>
      *
-     * @param filePath path to the original / target file
-     * @param fileWriteHandler do your write operation to the given file path provided by
-     *            {@linkplain FileWriteHandler#write(Path)}.
+     * @param filePath         path to the original / target file
+     * @param fileWriteHandler do your write operation to the given file path
+     *                         provided by
+     *                         {@linkplain FileWriteHandler#write(Path)}.
      * @throws IOException if an I/O error occurs
      */
     public static void saveAndBackup(final Path filePath, final FileWriteHandler fileWriteHandler) throws IOException {
@@ -442,8 +442,7 @@ public final class MorePaths {
         backupFile(filePath);
 
         // Replace original with temp file
-        java.nio.file.Files.copy(temp, filePath,
-                StandardCopyOption.REPLACE_EXISTING,
+        java.nio.file.Files.copy(temp, filePath, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
     }
 
@@ -451,19 +450,18 @@ public final class MorePaths {
      * Checks, if the two given paths are pointing to the same location.
      * <p>
      * If both paths are not {@code null} and do {@link File#exists()}, the
-     * {@link Files#isSameFile(Path, Path)}
-     * method is used to check if both paths are pointing to the same location.
-     * Otherwise, if one of the paths does not exist, the {@link Paths#equals(Object)} method is
-     * used.
+     * {@link Files#isSameFile(Path, Path)} method is used to check if both paths
+     * are pointing to the same location. Otherwise, if one of the paths does not
+     * exist, the {@link Paths#equals(Object)} method is used.
      *
-     * @param path to be compared with path2
+     * @param path  to be compared with path2
      * @param path2 to be compared with path
      *
-     * @return {@code true}, if both paths are {@code null}.
-     *         {@code true}, if both paths not {@code null}, do exist, and
-     *         {@link Files#isSameFile(Path, Path)}.
-     *         {@code true}, if both paths not {@code null} and {@link Paths#equals(Object)}
-     *         {@code false} otherwise.
+     * @return {@code true}, if both paths are {@code null}. {@code true}, if both
+     *         paths not {@code null}, do exist, and
+     *         {@link Files#isSameFile(Path, Path)}. {@code true}, if both paths not
+     *         {@code null} and {@link Paths#equals(Object)} {@code false}
+     *         otherwise.
      */
     public static boolean isSameFile(Path path, Path path2) {
         if (null == path && null == path2) {
@@ -472,8 +470,9 @@ public final class MorePaths {
 
         if (null != path && null != path2) {
             if (!path.toFile().exists() || !path2.toFile().exists()) {
-                log.debug("Comparing paths with #equals, as at least one path does not exist. " +
-                        "path_a={}, path_b={}", path, path2);
+                log.debug(
+                        "Comparing paths with #equals, as at least one path does not exist. " + "path_a={}, path_b={}",
+                        path, path2);
                 return path.equals(path2);
             }
             try {

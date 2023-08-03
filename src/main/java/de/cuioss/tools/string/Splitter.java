@@ -18,24 +18,26 @@ import lombok.RequiredArgsConstructor;
 /**
  * Derived from Googles Splitter.
  * <p>
- * It uses internally the {@link String#split(String)} implementation
- * of java and provides a guava like wrapper. This results in an implicit splitting of the whole
- * String compared to the lazy / deferred splitting of guava. It focuses and RegEx-based splitting
- * and omits the fixedLength and Map based variants.
+ * It uses internally the {@link String#split(String)} implementation of java
+ * and provides a guava like wrapper. This results in an implicit splitting of
+ * the whole String compared to the lazy / deferred splitting of guava. It
+ * focuses and RegEx-based splitting and omits the fixedLength and Map based
+ * variants.
  * </p>
  * <h2>Migrating from Guava</h2>
  * <p>
- * In order to migrate for most case you only need to replace the package name on the import. A
- * major different is that the split method provided is {@link #splitToList(String)}, the variant
- * split() is replaced by it completely.
+ * In order to migrate for most case you only need to replace the package name
+ * on the import. A major different is that the split method provided is
+ * {@link #splitToList(String)}, the variant split() is replaced by it
+ * completely.
  * </p>
  * <h2>Changes to Guavas-Splitter</h2>
  * <p>
- * It is quite similar to the guava variant but behaves a little
- * different in certain details, especially in the context of {@link Splitter#limit(int)} and
- * {@link Splitter#trimResults()}, {@link Splitter#omitEmptyStrings()}.
- * While guavas version will filter the limit elements after the
- * application of omit / trim, this version will do it the other way round, resulting in a different
+ * It is quite similar to the guava variant but behaves a little different in
+ * certain details, especially in the context of {@link Splitter#limit(int)} and
+ * {@link Splitter#trimResults()}, {@link Splitter#omitEmptyStrings()}. While
+ * guavas version will filter the limit elements after the application of omit /
+ * trim, this version will do it the other way round, resulting in a different
  * result compared to the guava version.
  * </p>
  *
@@ -51,8 +53,10 @@ public final class Splitter {
     private final SplitterConfig splitterConfig;
 
     /**
-     * Returns a splitter that uses the given fixed string as a separator. For example, {@code
-     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing {@code ["foo",
+     * Returns a splitter that uses the given fixed string as a separator. For
+     * example, {@code
+     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing
+     * {@code ["foo",
      * "bar,baz"]}.
      *
      * @param separator the literal, nonempty string to recognize as a separator
@@ -65,8 +69,10 @@ public final class Splitter {
     }
 
     /**
-     * Returns a splitter that uses the given fixed string as a separator. For example, {@code
-     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing {@code ["foo",
+     * Returns a splitter that uses the given fixed string as a separator. For
+     * example, {@code
+     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing
+     * {@code ["foo",
      * "bar,baz"]}.
      *
      * @param separator the literal, nonempty string to recognize as a separator
@@ -79,15 +85,17 @@ public final class Splitter {
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter, but automatically
-     * omits empty strings from the results. For example, {@code
-     * Splitter.on(',').omitEmptyStrings().split(",a,,,b,c,,")} returns an iterable containing only
-     * {@code ["a", "b", "c"]}.
+     * Returns a splitter that behaves equivalently to {@code this} splitter, but
+     * automatically omits empty strings from the results. For example, {@code
+     * Splitter.on(',').omitEmptyStrings().split(",a,,,b,c,,")} returns an iterable
+     * containing only {@code ["a", "b", "c"]}.
      *
      * <p>
-     * If either {@code trimResults} option is also specified when creating a splitter, that
-     * splitter always trims results first before checking for emptiness. So, for example, {@code
-     * Splitter.on(':').omitEmptyStrings().trimResults().split(": : : ")} returns an empty iterable.
+     * If either {@code trimResults} option is also specified when creating a
+     * splitter, that splitter always trims results first before checking for
+     * emptiness. So, for example, {@code
+     * Splitter.on(':').omitEmptyStrings().trimResults().split(": : : ")} returns an
+     * empty iterable.
      * <p>
      *
      * @return a splitter with the desired configuration
@@ -98,9 +106,10 @@ public final class Splitter {
 
     /**
      * Usually the separator will be pre-processed before being passed to
-     * {@link String#split(String)}. This is needed to mask special characters that will harm
-     * {@link Pattern#compile(String)}. If you want to disable this behavior and take care for your
-     * self you can change this method by calling this method.
+     * {@link String#split(String)}. This is needed to mask special characters that
+     * will harm {@link Pattern#compile(String)}. If you want to disable this
+     * behavior and take care for your self you can change this method by calling
+     * this method.
      *
      * @return a splitter with the desired configuration
      */
@@ -109,11 +118,11 @@ public final class Splitter {
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter, but automatically
-     * removes leading and trailing whitespace from each
-     * returned substring. For example,
-     * {@code Splitter.on(',').trimResults().split(" a, b ,c ")} returns an iterable containing
-     * {@code ["a", "b", "c"]}.
+     * Returns a splitter that behaves equivalently to {@code this} splitter, but
+     * automatically removes leading and trailing whitespace from each returned
+     * substring. For example,
+     * {@code Splitter.on(',').trimResults().split(" a, b ,c ")} returns an iterable
+     * containing {@code ["a", "b", "c"]}.
      *
      * @return a splitter with the desired configuration
      */
@@ -122,16 +131,18 @@ public final class Splitter {
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter but stops splitting
-     * after it reaches the limit. The limit defines the maximum number of items returned by the
-     * iterator, or the maximum size of the list returned by {@link #splitToList}.
+     * Returns a splitter that behaves equivalently to {@code this} splitter but
+     * stops splitting after it reaches the limit. The limit defines the maximum
+     * number of items returned by the iterator, or the maximum size of the list
+     * returned by {@link #splitToList}.
      *
      * <p>
-     * For example, {@code Splitter.on(',').limit(3).split("a,b,c,d")} returns an iterable
-     * containing {@code ["a", "b", "c,d"]}. When omitting empty strings, the omitted strings do not
-     * count. Hence, {@code Splitter.on(',').limit(3).omitEmptyStrings().split("a,,,b,,,c,d")}
-     * returns an iterable containing {@code ["a", "b", "c,d"}. When trim is requested, all entries
-     * are trimmed, including the last. Hence
+     * For example, {@code Splitter.on(',').limit(3).split("a,b,c,d")} returns an
+     * iterable containing {@code ["a", "b", "c,d"]}. When omitting empty strings,
+     * the omitted strings do not count. Hence,
+     * {@code Splitter.on(',').limit(3).omitEmptyStrings().split("a,,,b,,,c,d")}
+     * returns an iterable containing {@code ["a", "b", "c,d"}. When trim is
+     * requested, all entries are trimmed, including the last. Hence
      * {@code Splitter.on(',').limit(3).trimResults().split(" a , b
      * , c , d ")} results in {@code ["a", "b", "c , d"]}.
      *
@@ -144,7 +155,8 @@ public final class Splitter {
     }
 
     /**
-     * Splits {@code sequence} into string components and returns them as an immutable list.
+     * Splits {@code sequence} into string components and returns them as an
+     * immutable list.
      *
      * @param sequence the sequence of characters to split
      *
@@ -155,8 +167,8 @@ public final class Splitter {
         if (isEmpty(sequence)) {
             return Collections.emptyList();
         }
-        var splitted =
-            sequence.split(handleSplitCharacter(splitterConfig.getSeparator()), splitterConfig.getMaxItems());
+        var splitted = sequence.split(handleSplitCharacter(splitterConfig.getSeparator()),
+                splitterConfig.getMaxItems());
         if (null == splitted || 0 == splitted.length) {
             log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();

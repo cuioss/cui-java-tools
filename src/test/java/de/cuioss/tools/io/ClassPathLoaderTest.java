@@ -64,8 +64,7 @@ class ClassPathLoaderTest {
     @Test
     void shouldFailToLoadNotExistingFile() {
         var classPathLoader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
-        assertThrows(IllegalStateException.class,
-                () -> classPathLoader.inputStream());
+        assertThrows(IllegalStateException.class, () -> classPathLoader.inputStream());
     }
 
     @Test
@@ -76,8 +75,7 @@ class ClassPathLoaderTest {
     @Test
     void shouldFailToComputeCorrectClassPathOnClasspathPrefix() {
         var prefix = FileTypePrefix.CLASSPATH.getPrefix();
-        assertThrows(IllegalArgumentException.class,
-                () -> ClassPathLoader.checkClasspathName(prefix));
+        assertThrows(IllegalArgumentException.class, () -> ClassPathLoader.checkClasspathName(prefix));
     }
 
     @Test

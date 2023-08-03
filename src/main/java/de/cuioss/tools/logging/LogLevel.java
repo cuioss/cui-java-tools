@@ -29,8 +29,8 @@ public enum LogLevel {
      * Trace Level, maps to {@link Level#FINER}.
      * <p>
      * Attention: This is a derivation to
-     * http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html.
-     * But in fact this works...
+     * http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html. But in
+     * fact this works...
      */
     TRACE(Level.FINER),
 
@@ -64,7 +64,8 @@ public enum LogLevel {
 
     /**
      * @param logger to be checked, must not be null
-     * @return {@code true} if the log-level is enabled on the logger, false otherwise
+     * @return {@code true} if the log-level is enabled on the logger, false
+     *         otherwise
      */
     boolean isEnabled(final Logger logger) {
         return logger.isLoggable(getJuliLevel());
@@ -73,8 +74,8 @@ public enum LogLevel {
     /**
      * Logs the message
      *
-     * @param logger to be used, must not be null
-     * @param message must not be null
+     * @param logger    to be used, must not be null
+     * @param message   must not be null
      * @param throwable to be logged, may be null
      */
     void handleActualLog(final Logger logger, final String message, final Throwable throwable) {
@@ -108,7 +109,8 @@ public enum LogLevel {
         // We go up the stack-trace until we found the call from CuiLogger.
         final var caller = MoreReflection.findCallerElement(throwable, MARKER_CLASS_NAMES);
         if (caller.isPresent()) {
-            // This is needed because otherwise LogRecord will assume this class and this method as
+            // This is needed because otherwise LogRecord will assume this class and this
+            // method as
             // the source of the log-statement
             logger.logp(getJuliLevel(), caller.get().getClassName(), caller.get().getMethodName(), message, throwable);
         } else {
@@ -120,8 +122,8 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final var replacedTemplate =
-                de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template)).replaceAll("%s");
+            final var replacedTemplate = de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
+                    .replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), null);
         }
     }
@@ -138,8 +140,8 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final Throwable throwable, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final var replacedTemplate =
-                de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template)).replaceAll("%s");
+            final var replacedTemplate = de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
+                    .replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), throwable);
         }
     }

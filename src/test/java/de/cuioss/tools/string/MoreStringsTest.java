@@ -55,8 +55,7 @@ class MoreStringsTest {
     }
 
     /**
-     * Test for {@link MoreStrings#isAllLowerCase(CharSequence)}.
-     * COPIED FROM:
+     * Test for {@link MoreStrings#isAllLowerCase(CharSequence)}. COPIED FROM:
      * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java
      */
     @Test
@@ -74,8 +73,7 @@ class MoreStringsTest {
     }
 
     /**
-     * Test for {@link MoreStrings#isAllUpperCase(CharSequence)}.
-     * COPIED FROM:
+     * Test for {@link MoreStrings#isAllUpperCase(CharSequence)}. COPIED FROM:
      * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java
      */
     @Test
@@ -236,10 +234,8 @@ class MoreStringsTest {
         assertEquals("", MoreStrings.stripEnd("", null));
         assertEquals("", MoreStrings.stripEnd("        ", null));
         assertEquals("  abc", MoreStrings.stripEnd("  abc  ", null));
-        assertEquals(MoreStringsTest.WHITESPACE + MoreStringsTest.NON_WHITESPACE,
-                MoreStrings.stripEnd(
-                        MoreStringsTest.WHITESPACE + MoreStringsTest.NON_WHITESPACE + MoreStringsTest.WHITESPACE,
-                        null));
+        assertEquals(MoreStringsTest.WHITESPACE + MoreStringsTest.NON_WHITESPACE, MoreStrings.stripEnd(
+                MoreStringsTest.WHITESPACE + MoreStringsTest.NON_WHITESPACE + MoreStringsTest.WHITESPACE, null));
 
         // "" stripEnd
         assertNull(MoreStrings.stripEnd(null, ""));

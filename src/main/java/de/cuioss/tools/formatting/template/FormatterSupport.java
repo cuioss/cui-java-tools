@@ -12,12 +12,11 @@ import java.util.Map;
 public interface FormatterSupport {
 
     /**
-     * Allow easier access to available properties.
-     * Order of available properties and their values has no effect.
+     * Allow easier access to available properties. Order of available properties
+     * and their values has no effect.
      *
-     * @return Map<String, Serializable> of property name -> property Value for <b>non</b>
-     *         {@code null}
-     *         properties
+     * @return Map<String, Serializable> of property name -> property Value for
+     *         <b>non</b> {@code null} properties
      */
     Map<String, Serializable> getAvailablePropertyValues();
 

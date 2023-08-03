@@ -39,8 +39,8 @@ class LocaleUtilsTest {
      * Pass in a valid language, test toLocale.
      *
      * @param localeString to pass to toLocale()
-     * @param language of the resulting Locale
-     * @param country of the resulting Locale
+     * @param language     of the resulting Locale
+     * @param country      of the resulting Locale
      */
     private static void assertValidToLocale(final String localeString, final String language, final String country) {
         final var locale = LocaleUtils.toLocale(localeString);
@@ -55,13 +55,12 @@ class LocaleUtilsTest {
      * Pass in a valid language, test toLocale.
      *
      * @param localeString to pass to toLocale()
-     * @param language of the resulting Locale
-     * @param country of the resulting Locale
-     * @param variant of the resulting Locale
+     * @param language     of the resulting Locale
+     * @param country      of the resulting Locale
+     * @param variant      of the resulting Locale
      */
-    private static void assertValidToLocale(
-            final String localeString, final String language,
-            final String country, final String variant) {
+    private static void assertValidToLocale(final String localeString, final String language, final String country,
+            final String variant) {
         final var locale = LocaleUtils.toLocale(localeString);
         assertNotNull(locale, "valid locale");
         assertEquals(language, locale.getLanguage());
@@ -267,7 +266,8 @@ class LocaleUtilsTest {
         final var locales = Locale.getAvailableLocales();
         var failures = 0;
         for (final Locale l : locales) {
-            // Check if it's possible to recreate the Locale using just the standard constructor
+            // Check if it's possible to recreate the Locale using just the standard
+            // constructor
             final var locale = new Locale(l.getLanguage(), l.getCountry(), l.getVariant());
             if (l.equals(locale)) { // it is possible for LocaleUtils.toLocale to handle these
                                     // Locales

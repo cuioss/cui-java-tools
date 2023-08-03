@@ -65,8 +65,7 @@ class UrlParameterTest {
         final var parameter2 = new UrlParameter("name2", "value2");
         final var parameter3 = new UrlParameter("name3", "value3");
         assertEquals("?name1=value1", UrlParameter.createParameterString(parameter1));
-        assertEquals("?name1=value1&name2=value2",
-                UrlParameter.createParameterString(parameter1, parameter2));
+        assertEquals("?name1=value1&name2=value2", UrlParameter.createParameterString(parameter1, parameter2));
         assertEquals("?name1=value1&name2=value2&name3=value3",
                 UrlParameter.createParameterString(parameter1, parameter2, parameter3));
 
@@ -142,8 +141,7 @@ class UrlParameterTest {
         parameter = new UrlParameter("param1", "#value");
         assertEquals("param1=%23value", parameter.createNameValueString());
 
-        final var deserialized =
-            (UrlParameter) ObjectMethodsAsserts.serializeAndDeserialize(parameter);
+        final var deserialized = (UrlParameter) ObjectMethodsAsserts.serializeAndDeserialize(parameter);
 
         assertEquals("param1=%23value", deserialized.createNameValueString());
 

@@ -15,11 +15,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * This {@link FileLoader} takes a {@link URL} as its parameter which is useful when e.g. iterating
- * over an
- * enumeration of URLs from {@link ClassLoader#getResources(String)}. It converts the given URL to a
- * {@code String}
- * and prefixes it with {@link FileTypePrefix#URL}.
+ * This {@link FileLoader} takes a {@link URL} as its parameter which is useful
+ * when e.g. iterating over an enumeration of URLs from
+ * {@link ClassLoader#getResources(String)}. It converts the given URL to a
+ * {@code String} and prefixes it with {@link FileTypePrefix#URL}.
  *
  * @author Sven Haag
  */
@@ -36,7 +35,8 @@ public class UrlLoader implements FileLoader {
 
     /**
      * @param url representing a valid URL
-     * @throws IllegalArgumentException indicating that the given String represents a valid URL
+     * @throws IllegalArgumentException indicating that the given String represents
+     *                                  a valid URL
      */
     public UrlLoader(final String url) {
         var sanitizedUrl = url;

@@ -192,8 +192,7 @@ class MorePathsTest {
         var newFilePath = createNonExistingPath(playGroundBase, filename);
         assertFalse(Files.exists(newFilePath));
         assertEquals(filename, newFilePath.getFileName().toString());
-        Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES);
+        Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         assertTrue(Files.exists(newFilePath));
         for (var counter = 1; counter < 20; counter++) {
             newFilePath = createNonExistingPath(playGroundBase, filename);
@@ -216,9 +215,8 @@ class MorePathsTest {
     void shouldSaveAndBackup() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
-        saveAndBackup(existingFile,
-                filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
-                        filePath.toAbsolutePath().toString()));
+        saveAndBackup(existingFile, filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
+                filePath.toAbsolutePath().toString()));
         assertTrue(Files.exists(playGroundBackup));
     }
 

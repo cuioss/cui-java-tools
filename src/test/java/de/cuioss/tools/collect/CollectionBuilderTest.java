@@ -157,8 +157,8 @@ class CollectionBuilderTest {
 
     @Test
     void shouldCreateCopyFromIterable() {
-        final CollectionBuilder<String> builder =
-            CollectionBuilder.copyFrom((Iterable<String>) immutableList("1", "2", "3"));
+        final CollectionBuilder<String> builder = CollectionBuilder
+                .copyFrom((Iterable<String>) immutableList("1", "2", "3"));
         builder.add("4");
         assertEquals(4, builder.toConcurrentNavigableSet().size());
     }

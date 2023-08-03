@@ -15,8 +15,8 @@ public final class ExceptionHelper {
     private static final String NO_MESSAGE = "No exception message could be extracted";
 
     /**
-     * Extracts a message from a given throwable in a safe manner. It specially handles
-     * {@link InvocationTargetException}
+     * Extracts a message from a given throwable in a safe manner. It specially
+     * handles {@link InvocationTargetException}
      *
      * @param throwable
      * @return the extract message;
@@ -29,8 +29,8 @@ public final class ExceptionHelper {
     }
 
     /**
-     * Extracts a message from a given throwable in a safe manner. It specially handles
-     * {@link InvocationTargetException}
+     * Extracts a message from a given throwable in a safe manner. It specially
+     * handles {@link InvocationTargetException}
      *
      * @param throwable
      * @return the extract message;
@@ -40,8 +40,7 @@ public final class ExceptionHelper {
             return NO_MESSAGE;
         }
         if (throwable instanceof InvocationTargetException) {
-            return extractMessageFromThrowable(
-                    ((InvocationTargetException) throwable).getTargetException());
+            return extractMessageFromThrowable(((InvocationTargetException) throwable).getTargetException());
         }
         return extractMessageFromThrowable(throwable);
     }

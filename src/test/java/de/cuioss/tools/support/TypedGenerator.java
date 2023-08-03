@@ -1,9 +1,9 @@
 package de.cuioss.tools.support;
 
 /**
- * A generator creates instances of type T.
- * The method {@link #getType()} provides a default implementation using {@link #next()} and reading
- * the concrete {@link Class} of the returned element.
+ * A generator creates instances of type T. The method {@link #getType()}
+ * provides a default implementation using {@link #next()} and reading the
+ * concrete {@link Class} of the returned element.
  *
  * @author Oliver Wolff
  * @param <T> identifying the type of objects to be generated

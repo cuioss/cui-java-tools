@@ -18,9 +18,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * This class provide functionality to
- * transform long text to several html useful representation and encapsulate this as an object.
- * It is implemented as an value-object keeping the calculated text.
+ * This class provide functionality to transform long text to several html
+ * useful representation and encapsulate this as an object. It is implemented as
+ * an value-object keeping the calculated text.
  *
  * @author Eugen Fischer
  */
@@ -33,10 +33,11 @@ public class TextSplitter implements Serializable {
 
     /**
      * Der Browser muss über Sollbruchstellen die Möglichkeit bekommen lange
-     * Wortketten zu trennen/umzubrechen. Dafür gibt es zwei unsichtbare Zeichen, die in den HTML
-     * code eingebaut werden können: "&amp;shy;" und "&amp;#8203;". Der Unterschied zwischen beiden
-     * ist, dass das eine einfach ein Leerzeichen ohne breite ist, welches beim Umbruch keine Spuren
-     * hinterlässt, das andere fügt bei einem Umbruch einen Bindestrich hinzu. Eignet sich also zur
+     * Wortketten zu trennen/umzubrechen. Dafür gibt es zwei unsichtbare Zeichen,
+     * die in den HTML code eingebaut werden können: "&amp;shy;" und "&amp;#8203;".
+     * Der Unterschied zwischen beiden ist, dass das eine einfach ein Leerzeichen
+     * ohne breite ist, welches beim Umbruch keine Spuren hinterlässt, das andere
+     * fügt bei einem Umbruch einen Bindestrich hinzu. Eignet sich also zur
      * Silbentrennung.
      */
     private static final String ZERO_WIDTH_SPACE = "\u200B";
@@ -47,18 +48,13 @@ public class TextSplitter implements Serializable {
 
     private static final int DEFAULT_ABRIDGED_LENGTH = 20;
 
-    private static final Map<Pattern, String> REPLACEMENT_MAP =
-        new MapBuilder<Pattern, String>()
-                .put(Pattern.compile("#"), "#" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("\\+"), "+" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("-"), "-" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("_"), "_" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("\\."), "." + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("\\?"), "?" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile("!"), "!" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile(":"), ":" + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile(","), "," + ZERO_WIDTH_SPACE)
-                .put(Pattern.compile(";"), ";" + ZERO_WIDTH_SPACE).toImmutableMap();
+    private static final Map<Pattern, String> REPLACEMENT_MAP = new MapBuilder<Pattern, String>()
+            .put(Pattern.compile("#"), "#" + ZERO_WIDTH_SPACE).put(Pattern.compile("\\+"), "+" + ZERO_WIDTH_SPACE)
+            .put(Pattern.compile("-"), "-" + ZERO_WIDTH_SPACE).put(Pattern.compile("_"), "_" + ZERO_WIDTH_SPACE)
+            .put(Pattern.compile("\\."), "." + ZERO_WIDTH_SPACE).put(Pattern.compile("\\?"), "?" + ZERO_WIDTH_SPACE)
+            .put(Pattern.compile("!"), "!" + ZERO_WIDTH_SPACE).put(Pattern.compile(":"), ":" + ZERO_WIDTH_SPACE)
+            .put(Pattern.compile(","), "," + ZERO_WIDTH_SPACE).put(Pattern.compile(";"), ";" + ZERO_WIDTH_SPACE)
+            .toImmutableMap();
 
     private final String source;
 
@@ -89,12 +85,12 @@ public class TextSplitter implements Serializable {
     /**
      * Alternative Constructor
      *
-     * @param source target text
-     * @param forceLengthBreakCount count of characters when a text break will forced
-     * @param abridgedLengthCount count of characters
+     * @param source                target text
+     * @param forceLengthBreakCount count of characters when a text break will
+     *                              forced
+     * @param abridgedLengthCount   count of characters
      */
-    public TextSplitter(final String source, final int forceLengthBreakCount,
-            final int abridgedLengthCount) {
+    public TextSplitter(final String source, final int forceLengthBreakCount, final int abridgedLengthCount) {
 
         this.source = source;
         forceLengthBreak = valueOf(forceLengthBreakCount);
@@ -196,8 +192,8 @@ public class TextSplitter implements Serializable {
     }
 
     /**
-     * Try to separate text target on native text breaks. If this is not enough use brute-force on
-     * max allowed length.
+     * Try to separate text target on native text breaks. If this is not enough use
+     * brute-force on max allowed length.
      *
      * @param text target which will be analyzed
      * @return

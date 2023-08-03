@@ -70,12 +70,14 @@ class MoreObjectsTest {
         assertEquals("123", MoreObjects.firstNonNull("123", null, "456", null));
         assertEquals(Boolean.TRUE, MoreObjects.firstNonNull(Boolean.TRUE));
 
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of
+        // Explicitly pass in an empty array of Object type to ensure compiler doesn't
+        // complain of
         // unchecked generic
         // array creation
         assertNull(MoreObjects.firstNonNull());
 
-        // Cast to Object in line below ensures compiler doesn't complain of unchecked generic array
+        // Cast to Object in line below ensures compiler doesn't complain of unchecked
+        // generic array
         // creation
         assertNull(MoreObjects.firstNonNull(null, null));
 
@@ -95,7 +97,8 @@ class MoreObjectsTest {
                 () -> fail("Supplier after first non-null value should not be evaluated")));
         // supplier returning null and null supplier both result in null
         assertNull(MoreObjects.getFirstNonNull(null, () -> null));
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't complain of
+        // Explicitly pass in an empty array of Object type to ensure compiler doesn't
+        // complain of
         // unchecked generic
         // array creation
         assertNull(MoreObjects.getFirstNonNull());

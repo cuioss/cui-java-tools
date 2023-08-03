@@ -1,7 +1,8 @@
 package de.cuioss.tools.net.ssl;
 
 /**
- * Used in the context of {@link KeyMaterialHolder}. Defines the type of the contained Key.
+ * Used in the context of {@link KeyMaterialHolder}. Defines the type of the
+ * contained Key.
  *
  * @author Oliver Wolff
  *
@@ -15,7 +16,8 @@ public enum KeyHolderType {
     KEY_STORE,
 
     /**
-     * The byte-array represents a single key. This is the default for {@link KeyMaterialHolder}
+     * The byte-array represents a single key. This is the default for
+     * {@link KeyMaterialHolder}
      */
     SINGLE_KEY
 }

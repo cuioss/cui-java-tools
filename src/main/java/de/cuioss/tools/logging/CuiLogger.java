@@ -12,9 +12,9 @@ import de.cuioss.tools.string.MoreStrings;
 /**
  * <p>
  * Wrapper around java-util {@link Logger} that simplifies its usage. In
- * addition it provides a similar api like slf4j. It is not meant to act as logging-facade like
- * slf4j or jakarta-commons-logging. It only provides a little syntactic sugar for the built-in
- * logger.
+ * addition it provides a similar api like slf4j. It is not meant to act as
+ * logging-facade like slf4j or jakarta-commons-logging. It only provides a
+ * little syntactic sugar for the built-in logger.
  * </p>
  * <h2>Obtaining a logger</h2>
  * <p>
@@ -28,9 +28,10 @@ import de.cuioss.tools.string.MoreStrings;
  * </p>
  * <h2>Logging</h2>
  * <p>
- * {@link CuiLogger} provides an implicit code guard, if used correctly. Used correctly hereby means
- * to either use formatting with parameter or incorporating {@link Supplier} for generating the
- * actual log-message. For other means of creating a message you still can use code guards.
+ * {@link CuiLogger} provides an implicit code guard, if used correctly. Used
+ * correctly hereby means to either use formatting with parameter or
+ * incorporating {@link Supplier} for generating the actual log-message. For
+ * other means of creating a message you still can use code guards.
  * </p>
  * <p>
  * {@code log.trace("Parameter-type matches exactly '%s'", assignableSource);}
@@ -64,10 +65,11 @@ import de.cuioss.tools.string.MoreStrings;
  * </p>
  * <h2>Formatting</h2>
  * <p>
- * Like slf4j there is a simple way of formatting log-messages. In addition to '{}' the
- * formatting supports '%s' as well. At runtime it replaces the '{}' tokens with
- * '%s' and passes the data to {@link MoreStrings#lenientFormat(String, Object...)} for
- * creating the actual log-message. As a variant providing a {@link Supplier} works as well.
+ * Like slf4j there is a simple way of formatting log-messages. In addition to
+ * '{}' the formatting supports '%s' as well. At runtime it replaces the '{}'
+ * tokens with '%s' and passes the data to
+ * {@link MoreStrings#lenientFormat(String, Object...)} for creating the actual
+ * log-message. As a variant providing a {@link Supplier} works as well.
  * </p>
  *
  * @author Oliver Wolff
@@ -81,7 +83,7 @@ public class CuiLogger {
 
     /**
      * @param clazz to be used for acquiring a concrete {@link Logger} instance.
-     *            Must not be null
+     *              Must not be null
      */
     public CuiLogger(Class<?> clazz) {
         requireNonNull(clazz);
@@ -89,8 +91,8 @@ public class CuiLogger {
     }
 
     /**
-     * @param name to be used for acquiring a concrete {@link Logger} instance.
-     *            Must not be null
+     * @param name to be used for acquiring a concrete {@link Logger} instance. Must
+     *             not be null
      */
     public CuiLogger(String name) {
         requireNonNull(nullToEmpty(name));
@@ -100,8 +102,8 @@ public class CuiLogger {
     /**
      * Is the logger instance enabled for the trace level?
      *
-     * @return {@code true} if this CuiLogger is enabled for the trace level,
-     *         false otherwise.
+     * @return {@code true} if this CuiLogger is enabled for the trace level, false
+     *         otherwise.
      *
      */
     public boolean isTraceEnabled() {
@@ -132,7 +134,7 @@ public class CuiLogger {
      * Log a message at the trace level.
      *
      * @param throwable to be logged
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      *
      */
     public void trace(Throwable throwable, Supplier<String> msg) {
@@ -142,7 +144,7 @@ public class CuiLogger {
     /**
      * Log a message at the trace level.
      *
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      * @param throwable to be logged
      *
      */
@@ -154,7 +156,8 @@ public class CuiLogger {
      * Log a message at the trace level.
      *
      * @param throwable to be logged
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -165,7 +168,8 @@ public class CuiLogger {
     /**
      * Log a message at the trace level.
      *
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -176,8 +180,8 @@ public class CuiLogger {
     /**
      * Is the logger instance enabled for the debug level?
      *
-     * @return {@code true} if this CuiLogger is enabled for the debug level,
-     *         false otherwise.
+     * @return {@code true} if this CuiLogger is enabled for the debug level, false
+     *         otherwise.
      *
      */
     public boolean isDebugEnabled() {
@@ -196,7 +200,7 @@ public class CuiLogger {
     /**
      * Log a message at the debug level.
      *
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      * @param throwable to be logged
      *
      */
@@ -218,7 +222,7 @@ public class CuiLogger {
      * Log a message at the debug level.
      *
      * @param throwable to be logged
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      *
      */
     public void debug(Throwable throwable, Supplier<String> msg) {
@@ -229,7 +233,8 @@ public class CuiLogger {
      * Log a message at the debug level.
      *
      * @param throwable to be logged
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -240,7 +245,8 @@ public class CuiLogger {
     /**
      * Log a message at the debug level.
      *
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -251,8 +257,8 @@ public class CuiLogger {
     /**
      * Is the logger instance enabled for the info level?
      *
-     * @return {@code true} if this CuiLogger is enabled for the info level,
-     *         false otherwise.
+     * @return {@code true} if this CuiLogger is enabled for the info level, false
+     *         otherwise.
      *
      */
     public boolean isInfoEnabled() {
@@ -271,7 +277,7 @@ public class CuiLogger {
     /**
      * Log a message at the info level.
      *
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      * @param throwable to be logged
      *
      */
@@ -293,7 +299,7 @@ public class CuiLogger {
      * Log a message at the info level.
      *
      * @param throwable to be logged
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      *
      */
     public void info(Throwable throwable, Supplier<String> msg) {
@@ -304,7 +310,8 @@ public class CuiLogger {
      * Log a message at the info level.
      *
      * @param throwable to be logged
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -315,7 +322,8 @@ public class CuiLogger {
     /**
      * Log a message at the info level.
      *
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -326,8 +334,8 @@ public class CuiLogger {
     /**
      * Is the logger instance enabled for the warn level?
      *
-     * @return {@code true} if this CuiLogger is enabled for the warn level,
-     *         false otherwise.
+     * @return {@code true} if this CuiLogger is enabled for the warn level, false
+     *         otherwise.
      *
      */
     public boolean isWarnEnabled() {
@@ -346,7 +354,7 @@ public class CuiLogger {
     /**
      * Log a message at the warn level.
      *
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      * @param throwable to be logged
      *
      */
@@ -368,7 +376,7 @@ public class CuiLogger {
      * Log a message at the warn level.
      *
      * @param throwable to be logged
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      *
      */
     public void warn(Throwable throwable, Supplier<String> msg) {
@@ -379,7 +387,8 @@ public class CuiLogger {
      * Log a message at the warn level.
      *
      * @param throwable to be logged
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -390,7 +399,8 @@ public class CuiLogger {
     /**
      * Log a message at the warn level.
      *
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -401,8 +411,8 @@ public class CuiLogger {
     /**
      * Is the logger instance enabled for the error level?
      *
-     * @return {@code true} if this CuiLogger is enabled for the error level,
-     *         false otherwise.
+     * @return {@code true} if this CuiLogger is enabled for the error level, false
+     *         otherwise.
      *
      */
     public boolean isErrorEnabled() {
@@ -421,7 +431,7 @@ public class CuiLogger {
     /**
      * Log a message at the error level.
      *
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      * @param throwable to be logged
      *
      */
@@ -443,7 +453,7 @@ public class CuiLogger {
      * Log a message at the error level.
      *
      * @param throwable to be logged
-     * @param msg the message string to be logged
+     * @param msg       the message string to be logged
      *
      */
     public void error(Throwable throwable, Supplier<String> msg) {
@@ -454,7 +464,8 @@ public class CuiLogger {
      * Log a message at the error level.
      *
      * @param throwable to be logged
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -465,7 +476,8 @@ public class CuiLogger {
     /**
      * Log a message at the error level.
      *
-     * @param template to be used for formatting, see class-documentation for details on formatting
+     * @param template  to be used for formatting, see class-documentation for
+     *                  details on formatting
      * @param parameter to be used for replacing the placeholder
      *
      */
@@ -485,9 +497,8 @@ public class CuiLogger {
     }
 
     /**
-     * @return CUI log level derived from JUL log level.
-     *         E.g. FINEST(300) matches TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches
-     *         TRACE.
+     * @return CUI log level derived from JUL log level. E.g. FINEST(300) matches
+     *         TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches TRACE.
      */
     public LogLevel getLogLevel() {
         return LogLevel.from(delegate.getLevel());

@@ -46,7 +46,7 @@ public class TemplateManager<T extends FormatterSupport> {
          * Constructor
          */
         public TemplateManagerBuilder() {
-            this.map = new HashMap<>();
+            map = new HashMap<>();
         }
 
         /**
@@ -55,22 +55,20 @@ public class TemplateManager<T extends FormatterSupport> {
          */
         public TemplateManagerBuilder<B> with(final Map<Locale, TemplateFormatter<B>> mapValue) {
             if (null != mapValue) {
-                this.map.putAll(mapValue);
+                map.putAll(mapValue);
             }
             return this;
         }
 
         /**
          *
-         * @param locale
-         *            mapValue Map consists of key, which is {@link Locale}
-         * @param formatter
-         *            and a template formatter {@link TemplateFormatter}
+         * @param locale    mapValue Map consists of key, which is {@link Locale}
+         * @param formatter and a template formatter {@link TemplateFormatter}
          *
          * @return This method should add new locale to the current template
          */
         public TemplateManagerBuilder<B> with(final Locale locale, final TemplateFormatter<B> formatter) {
-            this.map.put(locale, formatter);
+            map.put(locale, formatter);
             return this;
         }
 
@@ -79,7 +77,7 @@ public class TemplateManager<T extends FormatterSupport> {
          * @return TemplateManagerBuilder return the default formatter
          */
         public TemplateManagerBuilder<B> useAsDefault(final TemplateFormatter<B> formatter) {
-            this.defFormatter = formatter;
+            defFormatter = formatter;
             return this;
         }
 

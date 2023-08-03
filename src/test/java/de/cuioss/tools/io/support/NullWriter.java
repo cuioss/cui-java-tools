@@ -40,9 +40,9 @@ public class NullWriter extends Writer {
     /**
      * Does nothing - output to <code>/dev/null</code>.
      *
-     * @param csq The character sequence to write
+     * @param csq   The character sequence to write
      * @param start The index of the first character to write
-     * @param end The index of the first character to write (exclusive)
+     * @param end   The index of the first character to write (exclusive)
      * @return this writer
      */
     @Override
@@ -87,7 +87,7 @@ public class NullWriter extends Writer {
      * Does nothing - output to <code>/dev/null</code>.
      *
      * @param chr The characters to write
-     * @param st The start offset
+     * @param st  The start offset
      * @param end The number of characters to write
      */
     @Override
@@ -109,7 +109,7 @@ public class NullWriter extends Writer {
      * Does nothing - output to <code>/dev/null</code>.
      *
      * @param str The string to write
-     * @param st The start offset
+     * @param st  The start offset
      * @param end The number of characters to write
      */
     @Override
