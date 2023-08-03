@@ -49,10 +49,10 @@ class FileLoaderUtilityTest {
 
     @Test
     void shouldReturnLoaderForPaths() {
-        assertEquals(getLoaderForPath(FileTypePrefix.CLASSPATH + EXISTING_FILE_NAME).getClass(), ClassPathLoader.class);
-        assertEquals(getLoaderForPath(FileTypePrefix.FILE + EXISTING_FILE_NAME).getClass(), FileSystemLoader.class);
-        assertEquals(getLoaderForPath(EXISTING_FILE_NAME).getClass(), FileSystemLoader.class);
-        assertEquals(getLoaderForPath(NOT_EXISTING_FILE).getClass(), FileSystemLoader.class);
+        assertEquals(ClassPathLoader.class, getLoaderForPath(FileTypePrefix.CLASSPATH + EXISTING_FILE_NAME).getClass());
+        assertEquals(FileSystemLoader.class, getLoaderForPath(FileTypePrefix.FILE + EXISTING_FILE_NAME).getClass());
+        assertEquals(FileSystemLoader.class, getLoaderForPath(EXISTING_FILE_NAME).getClass());
+        assertEquals(FileSystemLoader.class, getLoaderForPath(NOT_EXISTING_FILE).getClass());
     }
 
     @Test

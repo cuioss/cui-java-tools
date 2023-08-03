@@ -232,7 +232,7 @@ public class TextSplitter implements Serializable {
                 builder.append(tmp, 0, maxLength).append(ZERO_WIDTH_SPACE);
                 tmp = tmp.substring(maxLength);
             }
-            if (tmp.length() > 0) {
+            if (!tmp.isEmpty()) {
                 builder.append(tmp);
             }
             return builder.toString();

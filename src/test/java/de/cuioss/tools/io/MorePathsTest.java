@@ -11,6 +11,7 @@ import static de.cuioss.tools.io.MorePaths.deleteQuietly;
 import static de.cuioss.tools.io.MorePaths.getBackupDirectoryForPath;
 import static de.cuioss.tools.io.MorePaths.getRealPathSafely;
 import static de.cuioss.tools.io.MorePaths.saveAndBackup;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -241,11 +242,9 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyForNull() {
-        try {
+        assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(null));
-        } catch (final Exception ex) {
-            fail(ex.getMessage());
-        }
+        });
     }
 
     @Test
@@ -277,11 +276,9 @@ class MorePathsTest {
         var testFile = playGroundBase.resolve(POM_XML);
         assertFalse(testFile.toFile().exists());
 
-        try {
+        assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(testFile));
-        } catch (final Exception ex) {
-            fail(ex.getMessage());
-        }
+        });
     }
 
     @Test

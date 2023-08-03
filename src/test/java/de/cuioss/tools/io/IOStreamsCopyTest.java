@@ -63,7 +63,7 @@ class IOStreamsCopyTest {
     private byte[] iarr = null;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Create and init a byte array as input data
         iarr = new byte[200];
         Arrays.fill(iarr, (byte) -1);
