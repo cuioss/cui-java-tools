@@ -157,7 +157,7 @@ public class PropertyHolder {
             var info = Introspector.getBeanInfo(beanType);
             var descriptor = mutableList(info.getPropertyDescriptors()).stream()
                     .filter(desc -> attributeName.equalsIgnoreCase(desc.getName())).findFirst();
-            if (!descriptor.isPresent()) {
+            if (descriptor.isEmpty()) {
                 log.debug(UNABLE_TO_LOAD_PROPERTY_DESCRIPTOR, attributeName, beanType);
                 return buildByReflection(beanType, attributeName);
             }
@@ -184,7 +184,7 @@ public class PropertyHolder {
     static Optional<PropertyHolder> buildByReflection(Class<?> beanType, String attributeName) {
         log.trace("Trying reflection for determining attribute '%s' on type '%s'", attributeName, beanType);
         var field = MoreReflection.accessField(beanType, attributeName);
-        if (!field.isPresent()) {
+        if (field.isEmpty()) {
             return Optional.empty();
         }
         var builder = builder();

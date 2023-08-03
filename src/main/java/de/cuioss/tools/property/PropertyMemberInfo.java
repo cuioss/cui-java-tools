@@ -48,7 +48,7 @@ public enum PropertyMemberInfo {
      */
     public static PropertyMemberInfo resolveForBean(final Class<?> beanType, final String propertyName) {
         var fieldOption = MoreReflection.accessField(beanType, propertyName);
-        if (!fieldOption.isPresent()) {
+        if (fieldOption.isEmpty()) {
             return UNDEFINED;
         }
         if (Modifier.isTransient(fieldOption.get().getModifiers())) {
