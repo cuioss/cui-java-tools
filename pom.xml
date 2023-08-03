@@ -79,6 +79,14 @@
                 <configuration>
                     <activeRecipes>
                         <recipe>org.openrewrite.java.migrate.Java8toJava11</recipe>
+                        <recipe>
+                            org.openrewrite.java.migrate.lang.UseStringIsEmptyRecipe</recipe>
+                        <recipe>
+                            org.openrewrite.java.migrate.lang.MigrateClassNewInstanceToGetDeclaredConstructorNewInstance</recipe>
+                        <recipe>org.openrewrite.java.migrate.lang.JavaLangAPIs</recipe>
+                        <recipe>
+                            org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
+                        <recipe>org.openrewrite.java.AddApache2LicenseHeader</recipe>
                     </activeRecipes>
                 </configuration>
                 <dependencies>
@@ -87,6 +95,12 @@
                         <artifactId>rewrite-migrate-java</artifactId>
                         <version>2.0.8</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-testing-frameworks</artifactId>
+                        <version>2.0.8</version>
+                    </dependency>
+
                 </dependencies>
             </plugin>
         </plugins>

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.string;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
@@ -208,19 +223,10 @@ public final class MoreStrings {
      * MoreStrings.isNumeric("")     = false
      * MoreStrings.isNumeric("  ")   = false
      * MoreStrings.isNumeric("123")  = true
-     * MoreStrings.isNumeric("\u0967\u0968\u0969")  = true
-     * MoreStrings.isNumeric("12 3") = false
-     * MoreStrings.isNumeric("ab2c") = false
-     * MoreStrings.isNumeric("12-3") = false
-     * MoreStrings.isNumeric("12.3") = false
-     * MoreStrings.isNumeric("-123") = false
-     * MoreStrings.isNumeric("+123") = false
-     * </pre>
+     * MoreStrings.isNumeric("१२३")  = true MoreStrings.isNumeric("12 3") = false MoreStrings.isNumeric("ab2c") = false MoreStrings.isNumeric("12-3") = false MoreStrings.isNumeric("12.3") = false MoreStrings.isNumeric("-123") = false MoreStrings.isNumeric("+123") = false </pre > @param csthe CharSequence to check, may be null@return{@codetrue if only contains digits, and is non-null@author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
      *
-     * @param cs the CharSequence to check, may be null
      *
-     * @return {@code true} if only contains digits, and is non-null
-     * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
+     *
      */
     public static boolean isNumeric(final CharSequence cs) {
         if (isEmpty(cs)) {
