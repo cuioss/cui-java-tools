@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import static de.cuioss.tools.io.IOStreams.copyLarge;
@@ -41,10 +56,10 @@ import de.cuioss.tools.support.Generators;
 class IOStreamsCopyTest {
 
     /*
-     * NOTE this is not particularly beautiful code. A better way to check for
-     * flush and close status would be to implement "trojan horse" wrapper
-     * implementations of the various stream classes, which set a flag when
-     * relevant methods are called. (JT)
+     * NOTE this is not particularly beautiful code. A better way to check for flush
+     * and close status would be to implement "trojan horse" wrapper implementations
+     * of the various stream classes, which set a flag when relevant methods are
+     * called. (JT)
      */
 
     private static final int FILE_SIZE = 1024 * 4 + 1;
@@ -52,10 +67,9 @@ class IOStreamsCopyTest {
     private final byte[] inData = Generators.generateTestData(FILE_SIZE);
 
     /*
-     * Note: this is not particularly beautiful code. A better way to check for flush and close
-     * status would be to
-     * implement "trojan horse" wrapper implementations of the various stream classes, which set a
-     * flag when relevant
+     * Note: this is not particularly beautiful code. A better way to check for
+     * flush and close status would be to implement "trojan horse" wrapper
+     * implementations of the various stream classes, which set a flag when relevant
      * methods are called. (JT)
      */
 
@@ -64,7 +78,7 @@ class IOStreamsCopyTest {
     private byte[] iarr = null;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Create and init a byte array as input data
         iarr = new byte[200];
         Arrays.fill(iarr, (byte) -1);

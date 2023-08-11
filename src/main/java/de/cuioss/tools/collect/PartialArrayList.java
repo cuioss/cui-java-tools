@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.collect;
 
 import java.io.Serializable;
@@ -11,8 +26,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * <h2>Overview</h2>
- * Default implementation of {@link PartialCollection} based on {@link ArrayList}.
+ * <h2>Overview</h2> Default implementation of {@link PartialCollection} based
+ * on {@link ArrayList}.
  * <h3>Usage</h3>
  * <p>
  * See {@link PartialArrayList#of(List, int)}
@@ -32,7 +47,7 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
     /**
      * Default constructor.
      *
-     * @param list the list of entities to store.
+     * @param list          the list of entities to store.
      * @param moreAvailable the flag to store.
      */
     public PartialArrayList(Collection<T> list, boolean moreAvailable) {
@@ -51,14 +66,15 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
     }
 
     /**
-     * Convenience method for creating a {@link PartialArrayList} as sublist for the given
-     * collection with setting the {@link PartialCollection#isMoreAvailable()} automatically
+     * Convenience method for creating a {@link PartialArrayList} as sublist for the
+     * given collection with setting the {@link PartialCollection#isMoreAvailable()}
+     * automatically
      *
-     * @param full the complete List to be wrapped, may be larger than the limit. If so, a sublist
-     *            will be used.
+     * @param full  the complete List to be wrapped, may be larger than the limit.
+     *              If so, a sublist will be used.
      * @param limit to be checked against
      *
-     * @param <T> identifying the type of contained elements
+     * @param <T>   identifying the type of contained elements
      * @return a newly created {@link PartialArrayList}.
      */
     public static <T extends Serializable> PartialArrayList<T> of(List<T> full, int limit) {

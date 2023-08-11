@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
@@ -28,11 +43,11 @@ public final class FileLoaderUtility {
      * Returns an implementation of {@link FileLoader} matching to the given path.
      *
      * @param pathName must not be null or empty.
-     * @return a configured implementation of {@link FileLoader}. In case the pathName is prefixed
-     *         with {@link FileTypePrefix#CLASSPATH} it returns a {@link ClassPathLoader}. If
-     *         prefixed with
-     *         {@link FileTypePrefix#URL} it returns a {@link UrlLoader}. Otherwise, it returns a
-     *         {@link FileSystemLoader}.
+     * @return a configured implementation of {@link FileLoader}. In case the
+     *         pathName is prefixed with {@link FileTypePrefix#CLASSPATH} it returns
+     *         a {@link ClassPathLoader}. If prefixed with
+     *         {@link FileTypePrefix#URL} it returns a {@link UrlLoader}. Otherwise,
+     *         it returns a {@link FileSystemLoader}.
      */
     public static FileLoader getLoaderForPath(final String pathName) {
         if (isEmpty(pathName)) {
@@ -48,30 +63,28 @@ public final class FileLoaderUtility {
     }
 
     /**
-     * Helper class that copies the content of a {@link FileLoader} to the temp-folder and
-     * references it
-     * <h2>Caution: Security-Impact</h2>
-     * Creating a temp-file might introduce a security issue. Never ever use this location for
-     * sensitive information that might be of interest for an attacker
+     * Helper class that copies the content of a {@link FileLoader} to the
+     * temp-folder and references it
+     * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
+     * security issue. Never ever use this location for sensitive information that
+     * might be of interest for an attacker
      *
-     * @param source must not be null and represent an accessible file, saying
-     *            {@link FileLoader#isReadable()}
-     * @param markDeleteOnExit if <code>true</code> the file will be marked to delete on Exit.
+     * @param source           must not be null and represent an accessible file,
+     *                         saying {@link FileLoader#isReadable()}
+     * @param markDeleteOnExit if <code>true</code> the file will be marked to
+     *                         delete on Exit.
      * @return a reference on a file copied in the temp folder
      * @throws IOException
      */
     @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
-    public static Path copyFileToTemp(final FileLoader source, final boolean markDeleteOnExit)
-        throws IOException {
+    public static Path copyFileToTemp(final FileLoader source, final boolean markDeleteOnExit) throws IOException {
         checkArgument(null != source, "Attribute with name source must not be null");
         checkArgument(source.isReadable(), "Source must be readable");
 
-        final var target = Files.createTempFile(source.getFileName().getNamePart(),
-                source.getFileName().getSuffix());
+        final var target = Files.createTempFile(source.getFileName().getNamePart(), source.getFileName().getSuffix());
 
         try (final var inputStream = source.inputStream()) {
-            Files.copy(new BufferedInputStream(inputStream), target,
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
         }
         if (markDeleteOnExit) {
             target.toFile().deleteOnExit();
@@ -80,11 +93,13 @@ public final class FileLoaderUtility {
     }
 
     /**
-     * Convenience method for reading the content from a given {@link FileLoader} into a String
+     * Convenience method for reading the content from a given {@link FileLoader}
+     * into a String
      *
      * @param fileLoader must not be null
-     * @param charset must not be null
-     * @return The String content of the File represented by the given {@link FileLoader}
+     * @param charset    must not be null
+     * @return The String content of the File represented by the given
+     *         {@link FileLoader}
      * @throws IOException
      */
     public static String toString(final FileLoader fileLoader, final Charset charset) throws IOException {
@@ -97,11 +112,12 @@ public final class FileLoaderUtility {
     }
 
     /**
-     * Convenience method for reading the content from a given {@link FileLoader} into a String read
-     * as UTF-8 String
+     * Convenience method for reading the content from a given {@link FileLoader}
+     * into a String read as UTF-8 String
      *
      * @param fileLoader must not be null
-     * @return The String content of the File represented by the given {@link FileLoader}
+     * @return The String content of the File represented by the given
+     *         {@link FileLoader}
      * @throws IOException
      */
     public static String toString(final FileLoader fileLoader) throws IOException {
@@ -109,13 +125,14 @@ public final class FileLoaderUtility {
     }
 
     /**
-     * Convenience method for reading the content from a given {@link FileLoader} into a String read
-     * as UTF-8 String
+     * Convenience method for reading the content from a given {@link FileLoader}
+     * into a String read as UTF-8 String
      *
      * @param fileLoader must not be null
-     * @return The String content of the File represented by the given {@link FileLoader}
+     * @return The String content of the File represented by the given
+     *         {@link FileLoader}
      * @throws IllegalArgumentException masking the actual {@link IOException}
-     * @throws NullPointerException if <code>fileLoader</code> is null
+     * @throws NullPointerException     if <code>fileLoader</code> is null
      */
     public static String toStringUnchecked(final FileLoader fileLoader) {
         requireNonNull(fileLoader);

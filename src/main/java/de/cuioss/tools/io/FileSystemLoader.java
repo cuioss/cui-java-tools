@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
@@ -20,7 +35,8 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * File-system based variant. Responsible for all non {@link FileTypePrefix#CLASSPATH} files.
+ * File-system based variant. Responsible for all non
+ * {@link FileTypePrefix#CLASSPATH} files.
  *
  * @author Oliver Wolff
  */
@@ -45,10 +61,10 @@ public class FileSystemLoader implements FileReaderWriter {
 
     /**
      * @param pathName must not be null nor empty, must not start with the prefix
-     *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite the prefix. On all other cases
-     *            a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 "classpath:" but may start with the prefix "file:" and
+     *                 contain at least one character despite the prefix. On all
+     *                 other cases a {@link IllegalArgumentException} will be
+     *                 thrown.
      */
     public FileSystemLoader(final String pathName) {
         requireNonNull(pathName);
@@ -88,10 +104,10 @@ public class FileSystemLoader implements FileReaderWriter {
      * Checks and modifies a given pathName
      *
      * @param pathName must not be null nor empty, must not start with the prefix
-     *            "classpath:" but may start with the prefix
-     *            "file:" and contain at least one character despite the prefix. On all other cases
-     *            a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 "classpath:" but may start with the prefix "file:" and
+     *                 contain at least one character despite the prefix. On all
+     *                 other cases a {@link IllegalArgumentException} will be
+     *                 thrown.
      *
      * @return the normalized pathname without prefix
      */
@@ -106,8 +122,7 @@ public class FileSystemLoader implements FileReaderWriter {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             try {
-                newPathName =
-                    new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
+                newPathName = new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOG.debug("Loading config file from external path: {}", newPathName);
             } catch (final IOException e) {
                 LOG.error("Retrieving the current dir failed: ", e);
@@ -135,7 +150,8 @@ public class FileSystemLoader implements FileReaderWriter {
     }
 
     /**
-     * Truncate and overwrite an existing file, or create the file if it doesn't initially exist.
+     * Truncate and overwrite an existing file, or create the file if it doesn't
+     * initially exist.
      */
     @Override
     public OutputStream outputStream() throws IOException {

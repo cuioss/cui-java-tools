@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.collect;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
@@ -64,8 +79,7 @@ class MapBuilderTest {
     @Test
     void shouldHandlePutEntry() {
         var builder = new MapBuilder<String, String>();
-        builder.put(
-                new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap().entrySet().iterator().next());
+        builder.put(new MapBuilder<String, String>().put(KEY_1, VALUE_1).toImmutableMap().entrySet().iterator().next());
         assertFalse(builder.isEmpty());
     }
 
@@ -97,11 +111,8 @@ class MapBuilderTest {
 
     @Test
     void shouldOnlyAddIfNotNull() {
-        final var map = new MapBuilder<String, String>()
-                .put(KEY_1, null)
-                .putIfNotNull(KEY_2, null)
-                .putIfNotNull(KEY_3, "")
-                .toImmutableMap();
+        final var map = new MapBuilder<String, String>().put(KEY_1, null).putIfNotNull(KEY_2, null)
+                .putIfNotNull(KEY_3, "").toImmutableMap();
         assertTrue(map.containsKey(KEY_1));
         assertFalse(map.containsKey(KEY_2));
         assertTrue(map.containsKey(KEY_3));

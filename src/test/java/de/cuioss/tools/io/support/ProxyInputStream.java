@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io.support;
 
 import static de.cuioss.tools.io.IOStreams.EOF;
@@ -7,16 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A Proxy stream which acts as expected, that is it passes the method
- * calls on to the proxied stream and doesn't change which methods are
- * being called.
+ * A Proxy stream which acts as expected, that is it passes the method calls on
+ * to the proxied stream and doesn't change which methods are being called.
  * <p>
- * It is an alternative base class to FilterInputStream
- * to increase reusability, because FilterInputStream changes the
- * methods being called, such as read(byte[]) to read(byte[], int, int).
+ * It is an alternative base class to FilterInputStream to increase reusability,
+ * because FilterInputStream changes the methods being called, such as
+ * read(byte[]) to read(byte[], int, int).
  * <p>
- * See the protected methods for ways in which a subclass can easily decorate
- * a stream with custom pre-, post- or error processing functionality.
+ * See the protected methods for ways in which a subclass can easily decorate a
+ * stream with custom pre-, post- or error processing functionality.
  *
  * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/ProxyInputStream.java
  *
@@ -176,18 +190,17 @@ public abstract class ProxyInputStream extends FilterInputStream {
     }
 
     /**
-     * Invoked by the read methods before the call is proxied. The number
-     * of bytes that the caller wanted to read (1 for the {@link #read()}
-     * method, buffer length for {@link #read(byte[])}, etc.) is given as
-     * an argument.
+     * Invoked by the read methods before the call is proxied. The number of bytes
+     * that the caller wanted to read (1 for the {@link #read()} method, buffer
+     * length for {@link #read(byte[])}, etc.) is given as an argument.
      * <p>
      * Subclasses can override this method to add common pre-processing
-     * functionality without having to override all the read methods.
-     * The default implementation does nothing.
+     * functionality without having to override all the read methods. The default
+     * implementation does nothing.
      * <p>
      * Note this method is <em>not</em> called from {@link #skip(long)} or
-     * {@link #reset()}. You need to explicitly override those methods if
-     * you want to add pre-processing steps also to them.
+     * {@link #reset()}. You need to explicitly override those methods if you want
+     * to add pre-processing steps also to them.
      *
      * @param n number of bytes that the caller asked to be read
      * @throws IOException if the pre-processing fails
@@ -197,17 +210,17 @@ public abstract class ProxyInputStream extends FilterInputStream {
     }
 
     /**
-     * Invoked by the read methods after the proxied call has returned
-     * successfully. The number of bytes returned to the caller (or -1 if
-     * the end of stream was reached) is given as an argument.
+     * Invoked by the read methods after the proxied call has returned successfully.
+     * The number of bytes returned to the caller (or -1 if the end of stream was
+     * reached) is given as an argument.
      * <p>
      * Subclasses can override this method to add common post-processing
-     * functionality without having to override all the read methods.
-     * The default implementation does nothing.
+     * functionality without having to override all the read methods. The default
+     * implementation does nothing.
      * <p>
      * Note this method is <em>not</em> called from {@link #skip(long)} or
-     * {@link #reset()}. You need to explicitly override those methods if
-     * you want to add post-processing steps also to them.
+     * {@link #reset()}. You need to explicitly override those methods if you want
+     * to add post-processing steps also to them.
      *
      * @param n number of bytes read, or -1 if the end of stream was reached
      * @throws IOException if the post-processing fails
@@ -219,8 +232,8 @@ public abstract class ProxyInputStream extends FilterInputStream {
     /**
      * Handle any IOExceptions thrown.
      * <p>
-     * This method provides a point to implement custom exception
-     * handling. The default behaviour is to re-throw the exception.
+     * This method provides a point to implement custom exception handling. The
+     * default behaviour is to re-throw the exception.
      *
      * @param e The IOException thrown
      * @throws IOException if an I/O error occurs

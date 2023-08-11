@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import static de.cuioss.tools.base.Preconditions.checkState;
@@ -39,10 +54,10 @@ public class ClassPathLoader implements FileLoader {
 
     /**
      * @param pathName must not be null nor empty, may start with the prefix
-     *            {@link FileTypePrefix#CLASSPATH} but not with
-     *            {@link FileTypePrefix#FILE} and contain at least one character despite the prefix.
-     *            On all other cases a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 {@link FileTypePrefix#CLASSPATH} but not with
+     *                 {@link FileTypePrefix#FILE} and contain at least one
+     *                 character despite the prefix. On all other cases a
+     *                 {@link IllegalArgumentException} will be thrown.
      */
     public ClassPathLoader(final String pathName) {
         requireNonNull(pathName);
@@ -55,17 +70,17 @@ public class ClassPathLoader implements FileLoader {
      * Checks and modifies a given pathName
      *
      * @param pathName must not be null nor empty, may start with the prefix
-     *            {@link FileTypePrefix#CLASSPATH} but not with
-     *            {@link FileTypePrefix#FILE} and contain at least one character despite
-     *            the prefix. On all other cases a {@link IllegalArgumentException} will be
-     *            thrown.
+     *                 {@link FileTypePrefix#CLASSPATH} but not with
+     *                 {@link FileTypePrefix#FILE} and contain at least one
+     *                 character despite the prefix. On all other cases a
+     *                 {@link IllegalArgumentException} will be thrown.
      * @return the normalized pathname without prefix but with a leading '/'
      */
     static String checkClasspathName(final String pathName) {
         requireNotEmpty(pathName);
         if (FileTypePrefix.FILE.is(pathName)) {
-            throw new IllegalArgumentException("Invalid path name, must start not start with "
-                    + FileTypePrefix.FILE + " but was: " + pathName);
+            throw new IllegalArgumentException(
+                    "Invalid path name, must start not start with " + FileTypePrefix.FILE + " but was: " + pathName);
         }
         var newPathName = pathName;
         if (FileTypePrefix.CLASSPATH.is(pathName)) {

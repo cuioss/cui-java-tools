@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.collect;
 
 import static java.util.Objects.requireNonNull;
@@ -50,26 +65,27 @@ class MapDiffenceImpl<K, V> implements MapDifference<K, V> {
     }
 
     /**
-     * Computes the difference between two maps. This difference is an immutable snapshot of the
-     * state of the maps at the time this method is called. It will never change, even if the maps
-     * change at a later time.
+     * Computes the difference between two maps. This difference is an immutable
+     * snapshot of the state of the maps at the time this method is called. It will
+     * never change, even if the maps change at a later time.
      *
      * <p>
-     * Since this method uses {@code HashMap} instances internally, the keys of the supplied maps
-     * must be well-behaved with respect to {@link Object#equals} and {@link Object#hashCode}.
+     * Since this method uses {@code HashMap} instances internally, the keys of the
+     * supplied maps must be well-behaved with respect to {@link Object#equals} and
+     * {@link Object#hashCode}.
      *
      * <p>
-     * <b>Note:</b>If you only need to know whether two maps have the same mappings, call {@code
+     * <b>Note:</b>If you only need to know whether two maps have the same mappings,
+     * call {@code
      * left.equals(right)} instead of this method.
      *
-     * @param left the map to treat as the "left" map for purposes of comparison
+     * @param left  the map to treat as the "left" map for purposes of comparison
      * @param right the map to treat as the "right" map for purposes of comparison
      * @return the difference between the two maps
      *
      * @author com.google.common.collect.MapDifference<K, V>
      */
-    static <K, V> MapDifference<K, V> from(
-            Map<? extends K, ? extends V> left, Map<? extends K, ? extends V> right) {
+    static <K, V> MapDifference<K, V> from(Map<? extends K, ? extends V> left, Map<? extends K, ? extends V> right) {
         requireNonNull(left);
         requireNonNull(right);
 

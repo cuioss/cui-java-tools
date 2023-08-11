@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.lang;
 
 import java.util.Locale;
@@ -11,9 +26,9 @@ import lombok.experimental.UtilityClass;
  * </p>
  *
  * <p>
- * This class tries to handle {@code null} input gracefully.
- * An exception will not be thrown for a {@code null} input.
- * Each method documents its behavior in more detail.
+ * This class tries to handle {@code null} input gracefully. An exception will
+ * not be thrown for a {@code null} input. Each method documents its behavior in
+ * more detail.
  * </p>
  *
  * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/LocaleUtils.java
@@ -30,8 +45,8 @@ public class LocaleUtils {
      * </p>
      *
      * <p>
-     * This method takes the string format of a locale and creates the
-     * locale object from it.
+     * This method takes the string format of a locale and creates the locale object
+     * from it.
      * </p>
      *
      * <pre>
@@ -43,11 +58,9 @@ public class LocaleUtils {
      * </pre>
      *
      * <p>
-     * This method validates the input strictly.
-     * The language code must be lowercase.
-     * The country code must be uppercase.
-     * The separator must be an underscore.
-     * The length must be correct.
+     * This method validates the input strictly. The language code must be
+     * lowercase. The country code must be uppercase. The separator must be an
+     * underscore. The length must be correct.
      * </p>
      *
      * @param str the locale String to convert, null returns null
@@ -110,16 +123,15 @@ public class LocaleUtils {
         final var language = segments[0];
         if (segments.length == 2) {
             final var country = segments[1];
-            if (isISO639LanguageCode(language) && isISO3166CountryCode(country) ||
-                    isNumericAreaCode(country)) {
+            if (isISO639LanguageCode(language) && isISO3166CountryCode(country) || isNumericAreaCode(country)) {
                 return new Locale(language, country);
             }
         } else if (segments.length == 3) {
             final var country = segments[1];
             final var variant = segments[2];
-            if (isISO639LanguageCode(language) &&
-                    (country.isEmpty() || isISO3166CountryCode(country) || isNumericAreaCode(country)) &&
-                    !variant.isEmpty()) {
+            if (isISO639LanguageCode(language)
+                    && (country.isEmpty() || isISO3166CountryCode(country) || isNumericAreaCode(country))
+                    && !variant.isEmpty()) {
                 return new Locale(language, country, variant);
             }
         }

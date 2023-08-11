@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.template;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,11 +32,8 @@ class TemplateFormatterTest {
     @Test
     void completeFormatting() {
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").build();
 
         final var formatter = getPersonNameFormatter();
 
@@ -31,14 +43,11 @@ class TemplateFormatterTest {
     @Test
     void completeFormattingWithStrict() {
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(PERSON_NAME_FORMAT, PersonName.class, true);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(PERSON_NAME_FORMAT,
+                PersonName.class, true);
 
         assertEquals("FamilyName, GivenName MiddleName", formatter.format(personName));
     }
@@ -48,18 +57,13 @@ class TemplateFormatterTest {
 
         final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .givenNameSuffix("GivenNameSuffix")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").givenNameSuffix("GivenNameSuffix").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class);
 
-        assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
-                formatter.format(personName));
+        assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix", formatter.format(personName));
     }
 
     @Test
@@ -67,18 +71,13 @@ class TemplateFormatterTest {
 
         final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .givenNameSuffix("GivenNameSuffix")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").givenNameSuffix("GivenNameSuffix").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class, true);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class, true);
 
-        assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix",
-                formatter.format(personName));
+        assertEquals("FamilyName, GivenName, MiddleName GivenNameSuffix", formatter.format(personName));
     }
 
     @Test
@@ -86,18 +85,13 @@ class TemplateFormatterTest {
 
         final var myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .givenNameSuffix("GivenNameSuffix")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").givenNameSuffix("GivenNameSuffix").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class);
 
-        assertEquals("FamilyNamee, GivenNamenn, MiddleNameö GivenNameSuffix-",
-                formatter.format(personName));
+        assertEquals("FamilyNamee, GivenNamenn, MiddleNameö GivenNameSuffix-", formatter.format(personName));
     }
 
     @Test
@@ -105,15 +99,11 @@ class TemplateFormatterTest {
 
         final var myTemplate = "[familyNamee], [givenNamenn], [middleNameö] [givenNameSuffix-]";
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .givenNameSuffix("GivenNameSuffix")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").givenNameSuffix("GivenNameSuffix").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class, true);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class, true);
 
         assertThrows(IllegalArgumentException.class, () -> {
             formatter.format(personName);
@@ -124,14 +114,11 @@ class TemplateFormatterTest {
     void formatWithLikelySoundsMissingProperties() {
         final var myTemplate = "[familyName], [givenName], [middleName] [givenNameSuffix]";
 
-        final var personName = PersonName.builder()
-                .familyName("FamilyName")
-                .givenName("GivenName")
-                .middleName("MiddleName")
-                .build();
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName")
+                .middleName("MiddleName").build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class);
         assertEquals("FamilyName, GivenName, MiddleName", formatter.format(personName));
     }
 
@@ -155,8 +142,8 @@ class TemplateFormatterTest {
         final var givenName = "Given";
 
         final var object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
-        final var object2 =
-            PersonName.builder().familyName(familyName).givenName(givenName).givenBirthName("other one").build();
+        final var object2 = PersonName.builder().familyName(familyName).givenName(givenName).givenBirthName("other one")
+                .build();
 
         assertNotEquals(object1, object2);
 
@@ -173,8 +160,8 @@ class TemplateFormatterTest {
         final var myTemplate = "[familyName], [givenName], [middleName]";
         final var object1 = PersonName.builder().familyName(familyName).givenName(givenName).build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class);
         final var expected = familyName + ", " + givenName;
         assertEquals(expected, formatter.format(object1));
     }
@@ -186,8 +173,8 @@ class TemplateFormatterTest {
         final var myTemplate = "[familyName], [givenName], [middleName]";
         final var object1 = PersonName.builder().middleName(middle).givenName(givenName).build();
 
-        final TemplateFormatter<PersonName> formatter =
-            TemplateFormatterImpl.createFormatter(myTemplate, PersonName.class);
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
+                PersonName.class);
         final var expected = givenName + ", " + middle;
         assertEquals(expected, formatter.format(object1));
     }
@@ -200,9 +187,8 @@ class TemplateFormatterTest {
      */
     void shouldProvideConditionalFormatting() {
         /*
-         * implementation idea : use Guava JOINER for String Tokens in between
-         * therefore tree graph is needed, no linear list is able to represent
-         * this
+         * implementation idea : use Guava JOINER for String Tokens in between therefore
+         * tree graph is needed, no linear list is able to represent this
          */
     }
 
@@ -213,8 +199,7 @@ class TemplateFormatterTest {
     }
 
     private static TemplateFormatter<PersonName> getPersonNameFormatterByLexer() {
-        final Lexer<PersonName> lexer =
-            LexerBuilder.useSimpleElWithSquaredBrackets().build(PersonName.class);
+        final Lexer<PersonName> lexer = LexerBuilder.useSimpleElWithSquaredBrackets().build(PersonName.class);
         return TemplateFormatterImpl.createFormatter(PERSON_NAME_FORMAT, lexer);
     }
 

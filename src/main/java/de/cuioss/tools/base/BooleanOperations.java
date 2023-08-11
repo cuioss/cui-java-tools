@@ -1,11 +1,25 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.base;
 
 import lombok.experimental.UtilityClass;
 
 /**
- * Utility Class providing some boolean operations. In essence, it simplifies 'or' and 'and'
- * operations.
- * Some examples from the unit-tests:
+ * Utility Class providing some boolean operations. In essence, it simplifies
+ * 'or' and 'and' operations. Some examples from the unit-tests:
  *
  * <pre>
  *
@@ -93,7 +107,8 @@ public final class BooleanOperations {
      * Shorthand for checking if at least one of the given booleans is {@code true}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if one of parameters is {@code true}, {@code false} otherwise
+     * @return {@code true} if one of parameters is {@code true}, {@code false}
+     *         otherwise
      */
     public static boolean isAnyTrue(final boolean... parameter) {
         return containsTrue(parameter);
@@ -103,8 +118,8 @@ public final class BooleanOperations {
      * Shorthand for checking if all the given booleans are {@code true}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all parameters are {@code true} or no parameter is given ratio: no
-     *         given false, {@code false} otherwise
+     * @return {@code true} if all parameters are {@code true} or no parameter is
+     *         given ratio: no given false, {@code false} otherwise
      */
     public static boolean areAllTrue(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -117,8 +132,9 @@ public final class BooleanOperations {
      * Shorthand for checking if all given booleans are {@code false}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all parameters are {@code false}, {@code true} otherwise.
-     *         {@code false} if no parameter is passed, ratio: no given false
+     * @return {@code true} if all parameters are {@code false}, {@code true}
+     *         otherwise. {@code false} if no parameter is passed, ratio: no given
+     *         false
      */
     public static boolean areAllFalse(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -131,7 +147,8 @@ public final class BooleanOperations {
      * Shorthand for checking if at least one of the given booleans is {@code false}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if one of parameters is {@code false}, {@code true} otherwise
+     * @return {@code true} if one of parameters is {@code false}, {@code true}
+     *         otherwise
      */
     public static boolean isAnyFalse(final boolean... parameter) {
         return containsFalse(parameter);
@@ -139,11 +156,10 @@ public final class BooleanOperations {
 
     /**
      * @param value to be checked
-     * @return true, if the given value represents a boolean value i.e. "true" or "false" ignoring
-     *         case.
+     * @return true, if the given value represents a boolean value i.e. "true" or
+     *         "false" ignoring case.
      */
     public static boolean isValidBoolean(String value) {
-        return Boolean.TRUE.toString().equalsIgnoreCase(value)
-                || Boolean.FALSE.toString().equalsIgnoreCase(value);
+        return Boolean.TRUE.toString().equalsIgnoreCase(value) || Boolean.FALSE.toString().equalsIgnoreCase(value);
     }
 }

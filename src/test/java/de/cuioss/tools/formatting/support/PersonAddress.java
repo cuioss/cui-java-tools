@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.support;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
@@ -19,9 +34,8 @@ import lombok.ToString;
  * PersonAddress consolidate several Address Objects by make a one-way
  * transformation.
  * <p/>
- * Supported Classes:
- * Mapping of properties will be done during construction. Properties which
- * can't be mapped will be initialized to null.
+ * Supported Classes: Mapping of properties will be done during construction.
+ * Properties which can't be mapped will be initialized to null.
  */
 @ToString
 @EqualsAndHashCode
@@ -81,10 +95,10 @@ public class PersonAddress implements FormatterSupport, Serializable {
     }
 
     /**
-     * Use data from address object to copy this to PersonAddress.
-     * Because this is just a stupid bean and AddressDto use CodeDto for some
-     * properties they must be set separate. Otherwise, CodeResolverService and
-     * locale must be passed throw.
+     * Use data from address object to copy this to PersonAddress. Because this is
+     * just a stupid bean and AddressDto use CodeDto for some properties they must
+     * be set separate. Otherwise, CodeResolverService and locale must be passed
+     * throw.
      *
      * @param address must not be null.
      */
@@ -122,8 +136,7 @@ public class PersonAddress implements FormatterSupport, Serializable {
     }
 
     /**
-     * @param country
-     *            the country to set
+     * @param country the country to set
      */
     public void setCountry(String country) {
         this.country = country;
@@ -131,8 +144,7 @@ public class PersonAddress implements FormatterSupport, Serializable {
     }
 
     /**
-     * @param state
-     *            the state to set
+     * @param state the state to set
      */
     public void setState(String state) {
         this.state = state;

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.net.ssl;
 
 import java.io.Serializable;
@@ -10,8 +25,8 @@ import lombok.NonNull;
 import lombok.ToString;
 
 /**
- * Runtime representation of key-material. The actual key is provided as byte[]. An optional
- * keyPassword is available as well.
+ * Runtime representation of key-material. The actual key is provided as byte[].
+ * An optional keyPassword is available as well.
  *
  * @author Oliver Wolff
  *
@@ -28,12 +43,16 @@ public final class KeyMaterialHolder implements Serializable {
     private final byte[] keyMaterial;
 
     /**
-     * (Optional) password for the key, or in case of {@link KeyHolderType#KEY_STORE} for the store.
+     * (Optional) password for the key, or in case of
+     * {@link KeyHolderType#KEY_STORE} for the store.
      */
     @Getter
     private final String keyPassword;
 
-    /** Optional: An arbitrary name for displaying the key in an ui or logging context. */
+    /**
+     * Optional: An arbitrary name for displaying the key in an ui or logging
+     * context.
+     */
     @Getter
     private final String name;
 
@@ -58,8 +77,9 @@ public final class KeyMaterialHolder implements Serializable {
     private final KeyAlgorithm keyAlgorithm = KeyAlgorithm.UNDEFINED;
 
     /**
-     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If keyPassword is
-     *         {@code null} or empty it returns an empty char[], never {@code null}
+     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If
+     *         keyPassword is {@code null} or empty it returns an empty char[],
+     *         never {@code null}
      */
     public char[] getKeyPasswordAsCharArray() {
         return KeyStoreProvider.toCharArray(keyPassword);
@@ -69,7 +89,8 @@ public final class KeyMaterialHolder implements Serializable {
      * @param serializedKeyMaterial the Base64 encoded key material
      *
      * @return Raw i.e. original key material
-     * @throws IllegalArgumentException if serializedKeyMaterial is not Base64 encoded
+     * @throws IllegalArgumentException if serializedKeyMaterial is not Base64
+     *                                  encoded
      */
     public static byte[] deserializeKeyMaterial(final String serializedKeyMaterial) {
         return Base64.getDecoder().decode(serializedKeyMaterial);

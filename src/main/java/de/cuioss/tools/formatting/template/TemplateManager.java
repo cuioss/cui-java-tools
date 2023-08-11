@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.template;
 
 import java.util.HashMap;
@@ -46,7 +61,7 @@ public class TemplateManager<T extends FormatterSupport> {
          * Constructor
          */
         public TemplateManagerBuilder() {
-            this.map = new HashMap<>();
+            map = new HashMap<>();
         }
 
         /**
@@ -55,22 +70,20 @@ public class TemplateManager<T extends FormatterSupport> {
          */
         public TemplateManagerBuilder<B> with(final Map<Locale, TemplateFormatter<B>> mapValue) {
             if (null != mapValue) {
-                this.map.putAll(mapValue);
+                map.putAll(mapValue);
             }
             return this;
         }
 
         /**
          *
-         * @param locale
-         *            mapValue Map consists of key, which is {@link Locale}
-         * @param formatter
-         *            and a template formatter {@link TemplateFormatter}
+         * @param locale    mapValue Map consists of key, which is {@link Locale}
+         * @param formatter and a template formatter {@link TemplateFormatter}
          *
          * @return This method should add new locale to the current template
          */
         public TemplateManagerBuilder<B> with(final Locale locale, final TemplateFormatter<B> formatter) {
-            this.map.put(locale, formatter);
+            map.put(locale, formatter);
             return this;
         }
 
@@ -79,7 +92,7 @@ public class TemplateManager<T extends FormatterSupport> {
          * @return TemplateManagerBuilder return the default formatter
          */
         public TemplateManagerBuilder<B> useAsDefault(final TemplateFormatter<B> formatter) {
-            this.defFormatter = formatter;
+            defFormatter = formatter;
             return this;
         }
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.template.lexer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,19 +40,16 @@ class BracketLexerTest {
 
     private static final String PERSON_NAME_FORMAT = "[familyName, ][givenName ][middleName]";
 
-    private static final String PERSON_NAME_FORMAT_WITH_STATIC_PREFIX =
-        "StaticPrefix: [familyName, ][givenName ][middleName] StaticSuffix";
+    private static final String PERSON_NAME_FORMAT_WITH_STATIC_PREFIX = "StaticPrefix: [familyName, ][givenName ][middleName] StaticSuffix";
 
-    private static final String PERSON_NAME_FORMAT_ANGLE_BRACKET =
-        "<familyName, ><givenName ><middleName>";
+    private static final String PERSON_NAME_FORMAT_ANGLE_BRACKET = "<familyName, ><givenName ><middleName>";
 
     private static final String PERSON_NAME_FORMAT_CURLY_BRACKTETS = "{familyName, }{givenName }{middleName}";
 
     @Test
     void testScan() {
         final List<Token> result = new ArrayList<>();
-        final Lexer<PersonAddress> lexer =
-            new BracketLexer<>(generator.next(), Brackets.CURLY_BRACKETS);
+        final Lexer<PersonAddress> lexer = new BracketLexer<>(generator.next(), Brackets.CURLY_BRACKETS);
         result.addAll(lexer.scan(null));
         assertEquals(0, result.size());
     }
@@ -54,8 +66,7 @@ class BracketLexerTest {
 
     @Test
     void shouldDetectUnbalancedTemplate() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Validator.validateTemplate("[givenName", PersonName.class));
+        assertThrows(IllegalArgumentException.class, () -> Validator.validateTemplate("[givenName", PersonName.class));
     }
 
     @Test
@@ -66,15 +77,13 @@ class BracketLexerTest {
     @Test
     void shouldPassValidationForAngleBrackets() {
         Validator.validateTemplate(PERSON_NAME_FORMAT_ANGLE_BRACKET,
-                LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET)
-                        .build(PersonName.class));
+                LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET).build(PersonName.class));
     }
 
     @Test
     void shouldPassValidationForCurlyBrackets() {
         Validator.validateTemplate(PERSON_NAME_FORMAT_CURLY_BRACKTETS,
-                LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_CURLY_BRACKETS)
-                        .build(PersonName.class));
+                LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_CURLY_BRACKETS).build(PersonName.class));
     }
 
     @Test
@@ -85,9 +94,8 @@ class BracketLexerTest {
 
     @Test
     void shouldFailOnValidationByLexer() {
-        final Lexer<WrongDataObject> lexer =
-            LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET)
-                    .build(WrongDataObject.class);
+        final Lexer<WrongDataObject> lexer = LexerBuilder
+                .withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET).build(WrongDataObject.class);
         assertThrows(IllegalArgumentException.class,
                 () -> Validator.validateTemplate(PERSON_NAME_FORMAT_ANGLE_BRACKET, lexer));
     }

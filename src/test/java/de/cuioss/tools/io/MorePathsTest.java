@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import static de.cuioss.tools.io.MorePaths.BACKUP_DIR_NAME;
@@ -11,6 +26,7 @@ import static de.cuioss.tools.io.MorePaths.deleteQuietly;
 import static de.cuioss.tools.io.MorePaths.getBackupDirectoryForPath;
 import static de.cuioss.tools.io.MorePaths.getRealPathSafely;
 import static de.cuioss.tools.io.MorePaths.saveAndBackup;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -192,8 +208,7 @@ class MorePathsTest {
         var newFilePath = createNonExistingPath(playGroundBase, filename);
         assertFalse(Files.exists(newFilePath));
         assertEquals(filename, newFilePath.getFileName().toString());
-        Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES);
+        Files.copy(EXISTING_FILE, newFilePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         assertTrue(Files.exists(newFilePath));
         for (var counter = 1; counter < 20; counter++) {
             newFilePath = createNonExistingPath(playGroundBase, filename);
@@ -216,9 +231,8 @@ class MorePathsTest {
     void shouldSaveAndBackup() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
-        saveAndBackup(existingFile,
-                filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
-                        filePath.toAbsolutePath().toString()));
+        saveAndBackup(existingFile, filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
+                filePath.toAbsolutePath().toString()));
         assertTrue(Files.exists(playGroundBackup));
     }
 
@@ -243,11 +257,9 @@ class MorePathsTest {
 
     @Test
     void testDeleteQuietlyForNull() {
-        try {
+        assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(null));
-        } catch (final Exception ex) {
-            fail(ex.getMessage());
-        }
+        });
     }
 
     @Test
@@ -279,11 +291,9 @@ class MorePathsTest {
         var testFile = playGroundBase.resolve(POM_XML);
         assertFalse(testFile.toFile().exists());
 
-        try {
+        assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(testFile));
-        } catch (final Exception ex) {
-            fail(ex.getMessage());
-        }
+        });
     }
 
     @Test

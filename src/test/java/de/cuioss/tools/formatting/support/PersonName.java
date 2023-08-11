@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.support;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
@@ -34,8 +49,8 @@ public final class PersonName implements FormatterSupport, Serializable {
 
     private static final long serialVersionUID = -6138413254405190225L;
     /**
-     * alternative reflection could provide the same information, but than no filtering for
-     * properties will be possible
+     * alternative reflection could provide the same information, but than no
+     * filtering for properties will be possible
      */
     private static final List<String> SUPPORTED_PROP_LIST = new CollectionBuilder<String>().add("familyNamePrefix")
             .add("familyName").add("familyBirthName").add("givenNamePrefix").add("givenName").add("givenNameSuffix")

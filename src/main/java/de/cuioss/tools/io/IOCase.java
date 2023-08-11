@@ -1,14 +1,29 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 /**
  * Enumeration of IO case sensitivity.
  * <p>
- * Different filing systems have different rules for case-sensitivity.
- * Windows is case-insensitive, Unix is case-sensitive.
+ * Different filing systems have different rules for case-sensitivity. Windows
+ * is case-insensitive, Unix is case-sensitive.
  * <p>
- * This class captures that difference, providing an enumeration to
- * control how filename comparisons should be performed. It also provides
- * methods that use the enumeration to perform comparisons.
+ * This class captures that difference, providing an enumeration to control how
+ * filename comparisons should be performed. It also provides methods that use
+ * the enumeration to perform comparisons.
  * <p>
  * Wherever possible, you should use the <code>check</code> methods in this
  * class to compare filenames.
@@ -33,8 +48,8 @@ enum IOCase {
      * <p>
      * <strong>Note:</strong> This only caters for Windows and Unix. Other operating
      * systems (e.g. OSX and OpenVMS) are treated as case-sensitive if they use the
-     * Unix file separator and case-insensitive if they use the Windows file separator
-     * (see {@link java.io.File#separatorChar}).
+     * Unix file separator and case-insensitive if they use the Windows file
+     * separator (see {@link java.io.File#separatorChar}).
      * <p>
      * If you serialize this constant on Windows, and deserialize on Unix, or vice
      * versa, then the value of the case-sensitivity flag will change.
@@ -74,7 +89,7 @@ enum IOCase {
     /**
      * Private constructor.
      *
-     * @param name the name
+     * @param name      the name
      * @param sensitive the sensitivity
      */
     IOCase(final String name, final boolean sensitive) {
@@ -83,8 +98,8 @@ enum IOCase {
     }
 
     /**
-     * Replaces the enumeration from the stream with a real one.
-     * This ensures that the correct flag is set for SYSTEM.
+     * Replaces the enumeration from the stream with a real one. This ensures that
+     * the correct flag is set for SYSTEM.
      *
      * @return the resolved object
      */
@@ -117,14 +132,15 @@ enum IOCase {
     /**
      * Compares two strings using the case-sensitivity rule.
      * <p>
-     * This method mimics {@link String#compareTo} but takes case-sensitivity
-     * into account.
+     * This method mimics {@link String#compareTo} but takes case-sensitivity into
+     * account.
      *
      * @param str1 the first string to compare, not null
      * @param str2 the second string to compare, not null
-     * @return the value 0 if the argument string is equal to this string; a value less than 0 if
-     *         this string is lexicographically less than the string argument; and a value greater
-     *         than 0 if this string is lexicographically greater than the string argument.
+     * @return the value 0 if the argument string is equal to this string; a value
+     *         less than 0 if this string is lexicographically less than the string
+     *         argument; and a value greater than 0 if this string is
+     *         lexicographically greater than the string argument.
      * @throws NullPointerException if either string is null
      */
     public int checkCompareTo(final String str1, final String str2) {
@@ -137,8 +153,8 @@ enum IOCase {
     /**
      * Compares two strings using the case-sensitivity rule.
      * <p>
-     * This method mimics {@link String#equals} but takes case-sensitivity
-     * into account.
+     * This method mimics {@link String#equals} but takes case-sensitivity into
+     * account.
      *
      * @param str1 the first string to compare, not null
      * @param str2 the second string to compare, not null
@@ -155,10 +171,10 @@ enum IOCase {
     /**
      * Checks if one string starts with another using the case-sensitivity rule.
      * <p>
-     * This method mimics {@link String#startsWith(String)} but takes case-sensitivity
-     * into account.
+     * This method mimics {@link String#startsWith(String)} but takes
+     * case-sensitivity into account.
      *
-     * @param str the string to check, not null
+     * @param str   the string to check, not null
      * @param start the start to compare against, not null
      * @return true if equal using the case rules
      * @throws NullPointerException if either string is null
@@ -170,8 +186,8 @@ enum IOCase {
     /**
      * Checks if one string ends with another using the case-sensitivity rule.
      * <p>
-     * This method mimics {@link String#endsWith} but takes case-sensitivity
-     * into account.
+     * This method mimics {@link String#endsWith} but takes case-sensitivity into
+     * account.
      *
      * @param str the string to check, not null
      * @param end the end to compare against, not null
@@ -187,14 +203,14 @@ enum IOCase {
      * Checks if one string contains another starting at a specific index using the
      * case-sensitivity rule.
      * <p>
-     * This method mimics parts of {@link String#indexOf(String, int)}
-     * but takes case-sensitivity into account.
+     * This method mimics parts of {@link String#indexOf(String, int)} but takes
+     * case-sensitivity into account.
      *
-     * @param str the string to check, not null
+     * @param str           the string to check, not null
      * @param strStartIndex the index to start at in str
-     * @param search the start to search for, not null
-     * @return the first index of the search String,
-     *         -1 if no match or {@code null} string input
+     * @param search        the start to search for, not null
+     * @return the first index of the search String, -1 if no match or {@code null}
+     *         string input
      * @throws NullPointerException if either string is null
      */
     public int checkIndexOf(final String str, final int strStartIndex, final String search) {
@@ -210,14 +226,16 @@ enum IOCase {
     }
 
     /**
-     * Checks if one string contains another at a specific index using the case-sensitivity rule.
+     * Checks if one string contains another at a specific index using the
+     * case-sensitivity rule.
      * <p>
-     * This method mimics parts of {@link String#regionMatches(boolean, int, String, int, int)}
-     * but takes case-sensitivity into account.
+     * This method mimics parts of
+     * {@link String#regionMatches(boolean, int, String, int, int)} but takes
+     * case-sensitivity into account.
      *
-     * @param str the string to check, not null
+     * @param str           the string to check, not null
      * @param strStartIndex the index to start at in str
-     * @param search the start to search for, not null
+     * @param search        the start to search for, not null
      * @return true if equal using the case rules
      * @throws NullPointerException if either string is null
      */

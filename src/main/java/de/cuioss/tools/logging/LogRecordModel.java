@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.logging;
 
 import static de.cuioss.tools.string.MoreStrings.lenientFormat;
@@ -10,11 +25,11 @@ import lombok.Getter;
 import lombok.NonNull;
 
 /**
- * Represents a log-entry. Especially focuses on enforcing log-entry identifier, see
- * {@link #getPrefix()} and {@link #getIdentifier()}. The template mechanism is the same as with
- * {@link CuiLogger}, saying it accepts as well '%s' and '{}' as placeholder, even mixed.
- * To simplify usage the prefix string will always be prepended on calling
- * {@link #format(Object...)}
+ * Represents a log-entry. Especially focuses on enforcing log-entry identifier,
+ * see {@link #getPrefix()} and {@link #getIdentifier()}. The template mechanism
+ * is the same as with {@link CuiLogger}, saying it accepts as well '%s' and
+ * '{}' as placeholder, even mixed. To simplify usage the prefix string will
+ * always be prepended on calling {@link #format(Object...)}
  *
  * @author Oliver Wolff
  *

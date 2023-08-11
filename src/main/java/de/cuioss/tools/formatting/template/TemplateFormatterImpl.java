@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.template;
 
 import static de.cuioss.tools.base.Preconditions.checkState;
@@ -15,7 +30,8 @@ import lombok.ToString;
 
 /**
  * Formatter which is able to replace parameter inside the template based on
- * {@link FormatterSupport} information. See {@link de.cuioss.tools.formatting} for details.
+ * {@link FormatterSupport} information. See {@link de.cuioss.tools.formatting}
+ * for details.
  *
  * @param <T> at least {@link FormatterSupport}
  *
@@ -48,15 +64,14 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
      * @return reference to TemplateFormatter, fluent api style
      */
     TemplateFormatterImpl<T> scanBy(final Lexer<T> lexerInstance) {
-        this.lexer = requireNonNull(lexerInstance, "Parser must not be null");
-        this.parsedTokens = null;
+        lexer = requireNonNull(lexerInstance, "Parser must not be null");
+        parsedTokens = null;
         return this;
     }
 
     /**
-     * replace attributes from template by attribute values from the map.
-     * missing template attributes will be ignored and doesn't add to result at
-     * all.
+     * replace attributes from template by attribute values from the map. missing
+     * template attributes will be ignored and doesn't add to result at all.
      *
      * @param reference must not be null
      *
@@ -128,39 +143,34 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
      * The created TemplateFormatter provide only usage of simple expression
      * language with squared brackets.
      *
-     * @param template must not be null
+     * @param template   must not be null
      * @param sourceType must not be null
      *
-     * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * @return TemplateFormatter which using template and lexer which was forwarded
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
             final Class<F> sourceType) {
         return TemplateBuilder.useTemplate(template).forType(sourceType);
     }
 
     /**
      * @param template must not be null
-     * @param source must not be null
+     * @param source   must not be null
      *
      * @return TemplateFormatter
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
             final F source) {
         return TemplateBuilder.useTemplate(template).forSource(source);
     }
 
     /**
      * @param template must not be null
-     * @param lexer must not be null
+     * @param lexer    must not be null
      *
-     * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * @return TemplateFormatter which using template and lexer which was forwarded
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
             final Lexer<F> lexer) {
         return TemplateBuilder.useTemplate(template).scanBy(lexer);
     }
@@ -169,49 +179,41 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
      * The created TemplateFormatter provide only usage of simple expression
      * language with squared brackets.
      *
-     * @param template must not be null
+     * @param template   must not be null
      * @param sourceType must not be null
-     * @param strict use strict mode for pattern matching (only match exact name) instead of best
-     *            fitting
+     * @param strict     use strict mode for pattern matching (only match exact
+     *                   name) instead of best fitting
      *
-     * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * @return TemplateFormatter which using template and lexer which was forwarded
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
-            final Class<F> sourceType,
-            final boolean strict) {
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
+            final Class<F> sourceType, final boolean strict) {
         return TemplateBuilder.useTemplate(template).strict(strict).forType(sourceType);
     }
 
     /**
      * @param template must not be null
-     * @param source must not be null
-     * @param strict use strict mode for pattern matching (only match exact name) instead of best
-     *            fitting
+     * @param source   must not be null
+     * @param strict   use strict mode for pattern matching (only match exact name)
+     *                 instead of best fitting
      *
      * @return TemplateFormatter
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
-            final F source,
-            final boolean strict) {
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
+            final F source, final boolean strict) {
         return TemplateBuilder.useTemplate(template).strict(strict).forSource(source);
     }
 
     /**
      * @param template must not be null
-     * @param lexer must not be null
-     * @param strict use strict mode for pattern matching (only match exact name) instead of best
-     *            fitting
+     * @param lexer    must not be null
+     * @param strict   use strict mode for pattern matching (only match exact name)
+     *                 instead of best fitting
      *
-     * @return TemplateFormatter which using template and lexer which was
-     *         forwarded
+     * @return TemplateFormatter which using template and lexer which was forwarded
      */
-    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(
-            final String template,
-            final Lexer<F> lexer,
-            final boolean strict) {
+    public static <F extends FormatterSupport> TemplateFormatter<F> createFormatter(final String template,
+            final Lexer<F> lexer, final boolean strict) {
         return TemplateBuilder.useTemplate(template).strict(strict).scanBy(lexer);
     }
 
@@ -248,8 +250,8 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
             }
 
             /**
-             * @param strict use strict mode for pattern matching (only match exact name) instead of
-             *            best fitting
+             * @param strict use strict mode for pattern matching (only match exact name)
+             *               instead of best fitting
              * @return a {@link FormatterBuilder} with strict set to given parameter
              */
             public FormatterBuilder strict(boolean strict) {
@@ -266,10 +268,8 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
                 return this.scanBy(lexer);
             }
 
-            public <F extends FormatterSupport> TemplateFormatter<F> forType(
-                    final Class<F> classType) {
-                final Lexer<F> lexer =
-                    LexerBuilder.useSimpleElWithSquaredBrackets().strict(strict).build(classType);
+            public <F extends FormatterSupport> TemplateFormatter<F> forType(final Class<F> classType) {
+                final Lexer<F> lexer = LexerBuilder.useSimpleElWithSquaredBrackets().strict(strict).build(classType);
                 return scanBy(lexer);
             }
         }

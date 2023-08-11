@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.io;
 
 import java.io.IOException;
@@ -26,12 +41,12 @@ public interface FileLoader extends Serializable {
     StructuredFilename getFileName();
 
     /**
-     * This method should be within a {@code try-with-resources} statement as it is not closed by
-     * the implementation.
+     * This method should be within a {@code try-with-resources} statement as it is
+     * not closed by the implementation.
      *
-     * @return an {@link InputStream} on the corresponding file. It implicitly checks
-     *         {@link #isReadable()} before accessing the file and will throw an
-     *         {@link IllegalStateException} in case it is not readable.
+     * @return an {@link InputStream} on the corresponding file. It implicitly
+     *         checks {@link #isReadable()} before accessing the file and will throw
+     *         an {@link IllegalStateException} in case it is not readable.
      * @throws IOException
      */
     InputStream inputStream() throws IOException;
@@ -42,8 +57,8 @@ public interface FileLoader extends Serializable {
     URL getURL();
 
     /**
-     * @return boolean indicating that the loader loads from the file-system and not from the
-     *         classpath
+     * @return boolean indicating that the loader loads from the file-system and not
+     *         from the classpath
      */
     boolean isFilesystemLoader();
 }

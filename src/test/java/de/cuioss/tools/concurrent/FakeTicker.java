@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.concurrent;
 
 import java.util.concurrent.TimeUnit;
@@ -37,8 +52,8 @@ public class FakeTicker extends Ticker {
      * Sets the increment applied to the ticker whenever it is queried.
      *
      * <p>
-     * The default behavior is to auto increment by zero. i.e: The ticker is left unchanged when
-     * queried.
+     * The default behavior is to auto increment by zero. i.e: The ticker is left
+     * unchanged when queried.
      */
     @SuppressWarnings("GoodTime") // should accept a java.time.Duration
     public FakeTicker setAutoIncrementStep(long autoIncrementStep, TimeUnit timeUnit) {
@@ -51,8 +66,8 @@ public class FakeTicker extends Ticker {
      * Sets the increment applied to the ticker whenever it is queried.
      *
      * <p>
-     * The default behavior is to auto increment by zero. i.e: The ticker is left unchanged when
-     * queried.
+     * The default behavior is to auto increment by zero. i.e: The ticker is left
+     * unchanged when queried.
      */
     public FakeTicker setAutoIncrementStep(java.time.Duration autoIncrementStep) {
         return setAutoIncrementStep(autoIncrementStep.toNanos(), TimeUnit.NANOSECONDS);

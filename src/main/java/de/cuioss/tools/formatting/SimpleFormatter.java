@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting;
 
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
@@ -15,8 +30,8 @@ import lombok.ToString;
 
 /**
  * Provide concatenation of strings by using
- * {@linkplain String#join(CharSequence, CharSequence...)}.
- * Furthermore, formatter supports different strategies for values handling. (see
+ * {@linkplain String#join(CharSequence, CharSequence...)}. Furthermore,
+ * formatter supports different strategies for values handling. (see
  * {@link ValueHandling})
  *
  * @author Eugen Fischer
@@ -48,8 +63,8 @@ public class SimpleFormatter implements Serializable {
     private final ValueHandling handling;
 
     /**
-     * Concatenate values by separator and return result inside the parentheses. Handle parameter
-     * according defined ValueHandling strategy.
+     * Concatenate values by separator and return result inside the parentheses.
+     * Handle parameter according defined ValueHandling strategy.
      *
      * @param values ellipses of string values
      *
@@ -124,18 +139,22 @@ public class SimpleFormatter implements Serializable {
         private static final long serialVersionUID = 6414005370772800008L;
 
         /**
-         * Use {@linkplain ValueHandling#FORMAT_IF_ALL_AVAILABLE} as value handling strategy
+         * Use {@linkplain ValueHandling#FORMAT_IF_ALL_AVAILABLE} as value handling
+         * strategy
          *
-         * @return initialized {@link BuilderWithStrategy} with defined value handling strategy
+         * @return initialized {@link BuilderWithStrategy} with defined value handling
+         *         strategy
          */
         public BuilderWithStrategy skipResultIfAnyValueIsMissing() {
             return new BuilderWithStrategy(ValueHandling.FORMAT_IF_ALL_AVAILABLE);
         }
 
         /**
-         * Use {@linkplain ValueHandling#FORMAT_IF_ANY_AVAILABLE} as value handling strategy
+         * Use {@linkplain ValueHandling#FORMAT_IF_ANY_AVAILABLE} as value handling
+         * strategy
          *
-         * @return initialized {@link BuilderWithStrategy} with defined value handling strategy
+         * @return initialized {@link BuilderWithStrategy} with defined value handling
+         *         strategy
          */
         public BuilderWithStrategy ignoreMissingValues() {
             return new BuilderWithStrategy(ValueHandling.FORMAT_IF_ANY_AVAILABLE);
@@ -161,7 +180,8 @@ public class SimpleFormatter implements Serializable {
              *
              * @param separator must not be null
              *
-             * @return {@link SimpleFormatter} with defined value handling strategy and separator
+             * @return {@link SimpleFormatter} with defined value handling strategy and
+             *         separator
              */
             public SimpleFormatter separatesBy(@NonNull final String separator) {
                 return new SimpleFormatter(separator, valueHandlingStrategy);

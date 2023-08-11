@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.formatting.template.lexer;
 
 import static java.util.Objects.requireNonNull;
@@ -17,9 +32,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LexerBuilder {
 
-    static final EnumSet<ExpressionLanguage> SIMPLE = EnumSet.of(
-            ExpressionLanguage.SIMPLE_SQUARED_BRACKTES, ExpressionLanguage.SIMPLE_CURLY_BRACKETS,
-            ExpressionLanguage.SIMPLE_ANGLE_BRACKET);
+    static final EnumSet<ExpressionLanguage> SIMPLE = EnumSet.of(ExpressionLanguage.SIMPLE_SQUARED_BRACKTES,
+            ExpressionLanguage.SIMPLE_CURLY_BRACKETS, ExpressionLanguage.SIMPLE_ANGLE_BRACKET);
 
     /**
      * @return the builder with {@link ExpressionLanguage#SIMPLE_SQUARED_BRACKTES}
@@ -54,26 +68,25 @@ public final class LexerBuilder {
         private static Brackets getBracketsTypeFor(final ExpressionLanguage expl) {
             final Brackets type;
             switch (expl) {
-                case SIMPLE_SQUARED_BRACKTES:
-                    type = Brackets.SQUARED_BRACKETS;
-                    break;
-                case SIMPLE_CURLY_BRACKETS:
-                    type = Brackets.CURLY_BRACKETS;
-                    break;
-                case SIMPLE_ANGLE_BRACKET:
-                    type = Brackets.ANGLE_BRACKET;
-                    break;
-                // $CASES-OMITTED$
-                default:
-                    throw new IllegalArgumentException(expl
-                            + " doesn't belongs to Simple expression language.");
+            case SIMPLE_SQUARED_BRACKTES:
+                type = Brackets.SQUARED_BRACKETS;
+                break;
+            case SIMPLE_CURLY_BRACKETS:
+                type = Brackets.CURLY_BRACKETS;
+                break;
+            case SIMPLE_ANGLE_BRACKET:
+                type = Brackets.ANGLE_BRACKET;
+                break;
+            // $CASES-OMITTED$
+            default:
+                throw new IllegalArgumentException(expl + " doesn't belongs to Simple expression language.");
             }
             return type;
         }
 
         /**
-         * @param strict enabling the strict mode for pattern matching (only match exact name)
-         *            instead of best fitting
+         * @param strict enabling the strict mode for pattern matching (only match exact
+         *               name) instead of best fitting
          * @return The concrete {@link Builder}
          */
         public Builder strict(boolean strict) {
@@ -92,16 +105,15 @@ public final class LexerBuilder {
             if (SIMPLE.contains(expl)) {
                 return new BracketLexer<>(source, getBracketsTypeFor(expl), strict);
             }
-            throw new IllegalArgumentException(expl
-                    + " doesn't belongs to Simple expression language.");
+            throw new IllegalArgumentException(expl + " doesn't belongs to Simple expression language.");
         }
 
         /**
          * @param sourceType bean type
          *
          * @return Lexer for classType
-         * @throws IllegalStateException if access to the class constructor fails or class isn't
-         *             public
+         * @throws IllegalStateException if access to the class constructor fails or
+         *                               class isn't public
          */
         public <F extends FormatterSupport> Lexer<F> build(final Class<F> sourceType) {
             try {

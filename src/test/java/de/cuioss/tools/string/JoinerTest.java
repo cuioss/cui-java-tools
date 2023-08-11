@@ -1,3 +1,18 @@
+/*
+ * Copyright 2023 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * https://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.cuioss.tools.string;
 
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
@@ -30,8 +45,7 @@ class JoinerTest {
     private static final Iterable<Integer> ITERABLE_NULL_1 = Arrays.asList(null, 1);
     private static final Iterable<Integer> ITERABLE_1_NULL = Arrays.asList(1, null);
     private static final Iterable<Integer> ITERABLE_1_NULL_2 = Arrays.asList(1, null, 2);
-    private static final Iterable<Integer> ITERABLE_FOUR_NULLS =
-        Arrays.asList(null, null, null, null);
+    private static final Iterable<Integer> ITERABLE_FOUR_NULLS = Arrays.asList(null, null, null, null);
 
     @Test
     void testOnCharOverride() {
@@ -142,15 +156,17 @@ class JoinerTest {
 
     @Test
     // FIXME this is not working in JAVA 11 due to a changed String#join method
-    // FIXME owolff: Hm I'm not sure whether the old behavior is a problem at all. The main
-    // difference is not calling the toString method CharSequence. This code is taken directly from
-    // guava, and may be a problem there, but I do not think it is a problem within our JRE based
+    // FIXME owolff: Hm I'm not sure whether the old behavior is a problem at all.
+    // The main
+    // difference is not calling the toString method CharSequence. This code is
+    // taken directly from
+    // guava, and may be a problem there, but I do not think it is a problem within
+    // our JRE based
     // approach
     @DisabledForJreRange(min = JRE.JAVA_11)
     void testDontConvertCharSequenceToString() {
         assertEquals("foo,foo", Joiner.on(",").join(new DontStringMeBro(), new DontStringMeBro()));
-        assertEquals(
-                "foo,bar,foo",
+        assertEquals("foo,bar,foo",
                 Joiner.on(",").useForNull("bar").join(new DontStringMeBro(), null, new DontStringMeBro()));
     }
 
