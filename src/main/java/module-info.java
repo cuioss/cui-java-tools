@@ -1,5 +1,5 @@
 module de.cuioss.java.tools {
-    requires lombok;
+    requires static lombok;
     requires java.desktop;
     requires java.logging;
 
