@@ -32,12 +32,9 @@ class ClassPathLoaderTest {
 
     private static final String EXISTING_CLASSPATH_FILE = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH;
 
-    private static final String EXISTING_CLASSPATH_FILE_WO_SLASH = FileTypePrefix.CLASSPATH
-            + EXISTING_FILE_PATH_WO_SLASH;
+    private static final String EXISTING_CLASSPATH_FILE_WO_SLASH = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH_WO_SLASH;
 
-    private static final String JAR_LOCATED_FILE_NAME = "META-INF/MANIFEST.MF";
-
-    private static final String JAR_LOCATED_CLASSPATH_FILE_NAME = FileTypePrefix.CLASSPATH + JAR_LOCATED_FILE_NAME;
+    private static final String JAR_LOCATED_CLASSPATH_FILE_NAME = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH_WO_SLASH;
 
     private static final String NOT_EXISTING_FILE = FilenameUtils.normalize("/not/there.cui");
 
@@ -66,8 +63,8 @@ class ClassPathLoaderTest {
     @Test
     void shouldHandleExistingFileInJar() {
         final var loader = new ClassPathLoader(JAR_LOCATED_CLASSPATH_FILE_NAME);
-        assertTrue(loader.isReadable());
-        assertNotNull(loader.inputStream());
+        assertTrue(loader.isReadable(), "file must be readable: " + JAR_LOCATED_CLASSPATH_FILE_NAME);
+        assertNotNull(loader.inputStream(), "input stream must not be null");
     }
 
     @Test

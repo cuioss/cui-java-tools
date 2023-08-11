@@ -30,7 +30,7 @@ package de.cuioss.tools.io;
  *
  * @author commons.io:org.apache.commons.io.IOCase
  */
-enum IOCase {
+public enum IOCase {
 
     /**
      * The constant for case-sensitive regardless of operating system.
