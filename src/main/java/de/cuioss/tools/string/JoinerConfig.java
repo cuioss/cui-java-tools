@@ -52,10 +52,14 @@ class JoinerConfig {
     @Getter
     private final String useForNull = "null";
 
+    @SuppressWarnings("java:S2094")
+    // owolff: workaround for javadoc-error, see
+    // https://stackoverflow.com/questions/51947791/javadoc-cannot-find-symbol-error-when-using-lomboks-builder-annotation
+    public static class JoinerConfigBuilder {
+    }
+
     JoinerConfigBuilder copy() {
-        var copyBuilder = builder();
-        copyBuilder.separator(getSeparator()).useForNull(getUseForNull()).skipEmpty(isSkipEmpty())
+        return builder().separator(getSeparator()).useForNull(getUseForNull()).skipEmpty(isSkipEmpty())
                 .skipBlank(isSkipBlank()).skipNulls(isSkipNulls());
-        return copyBuilder;
     }
 }

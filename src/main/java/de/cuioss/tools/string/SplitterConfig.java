@@ -52,6 +52,12 @@ class SplitterConfig {
     @Getter
     private final boolean doNotModifySeparatorString = false;
 
+    @SuppressWarnings("java:S2094")
+    // owolff: workaround for javadoc-error, see
+    // https://stackoverflow.com/questions/51947791/javadoc-cannot-find-symbol-error-when-using-lomboks-builder-annotation
+    public static class SplitterConfigBuilder {
+    }
+
     SplitterConfigBuilder copy() {
         var copyBuilder = builder();
         copyBuilder.separator(getSeparator()).maxItems(getMaxItems())
