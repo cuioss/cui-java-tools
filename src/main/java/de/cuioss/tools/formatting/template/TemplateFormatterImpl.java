@@ -265,7 +265,7 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
 
             public <F extends FormatterSupport> TemplateFormatter<F> forSource(final F source) {
                 final Lexer<F> lexer = LexerBuilder.useSimpleElWithSquaredBrackets().strict(strict).build(source);
-                return this.scanBy(lexer);
+                return scanBy(lexer);
             }
 
             public <F extends FormatterSupport> TemplateFormatter<F> forType(final Class<F> classType) {

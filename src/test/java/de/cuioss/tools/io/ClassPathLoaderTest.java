@@ -32,9 +32,11 @@ class ClassPathLoaderTest {
 
     private static final String EXISTING_CLASSPATH_FILE = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH;
 
-    private static final String EXISTING_CLASSPATH_FILE_WO_SLASH = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH_WO_SLASH;
+    private static final String EXISTING_CLASSPATH_FILE_WO_SLASH = FileTypePrefix.CLASSPATH
+            + EXISTING_FILE_PATH_WO_SLASH;
 
-    private static final String JAR_LOCATED_CLASSPATH_FILE_NAME = FileTypePrefix.CLASSPATH + EXISTING_FILE_PATH_WO_SLASH;
+    private static final String JAR_LOCATED_CLASSPATH_FILE_NAME = FileTypePrefix.CLASSPATH
+            + EXISTING_FILE_PATH_WO_SLASH;
 
     private static final String NOT_EXISTING_FILE = FilenameUtils.normalize("/not/there.cui");
 

@@ -223,7 +223,12 @@ public final class MoreStrings {
      * MoreStrings.isNumeric("")     = false
      * MoreStrings.isNumeric("  ")   = false
      * MoreStrings.isNumeric("123")  = true
-     * MoreStrings.isNumeric("१२३")  = true MoreStrings.isNumeric("12 3") = false MoreStrings.isNumeric("ab2c") = false MoreStrings.isNumeric("12-3") = false MoreStrings.isNumeric("12.3") = false MoreStrings.isNumeric("-123") = false MoreStrings.isNumeric("+123") = false </pre > @param csthe CharSequence to check, may be null@return{@codetrue if only contains digits, and is non-null@author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
+     * MoreStrings.isNumeric("१२३")  = true MoreStrings.isNumeric("12 3") = false MoreStrings.isNumeric("ab2c") = false MoreStrings.isNumeric("12-3") = false MoreStrings.isNumeric("12.3") = false MoreStrings.isNumeric("-123") = false MoreStrings.isNumeric("+123") = false
+     * </pre >
+     * 
+     * @param csthe CharSequence to check, may be null@return{@codetrue if only
+     * contains digits, and is non-null@author
+     * https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java
      *
      *
      *

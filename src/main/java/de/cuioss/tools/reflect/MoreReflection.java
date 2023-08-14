@@ -246,27 +246,20 @@ public final class MoreReflection {
         if (!check.isPrimitive()) {
             return check;
         }
-        switch (check.getName()) {
-        case "boolean":
-            return Boolean.class;
-        case "byte":
-            return Byte.class;
-        case "char":
-            return Character.class;
-        case "short":
-            return Short.class;
-        case "int":
-            return Integer.class;
-        case "long":
-            return Long.class;
-        case "double":
-            return Double.class;
-        case "float":
-            return Float.class;
-        default:
+        return switch (check.getName()) {
+        case "boolean" -> Boolean.class;
+        case "byte" -> Byte.class;
+        case "char" -> Character.class;
+        case "short" -> Short.class;
+        case "int" -> Integer.class;
+        case "long" -> Long.class;
+        case "double" -> Double.class;
+        case "float" -> Float.class;
+        default -> {
             log.warn("Unable to determine wrapper type for '{}', ", check);
-            return check;
+            yield check;
         }
+        };
     }
 
     /**
