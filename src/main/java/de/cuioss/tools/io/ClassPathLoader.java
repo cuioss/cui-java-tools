@@ -23,8 +23,8 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 
-import de.cuioss.tools.lang.SecuritySupport;
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -131,7 +131,7 @@ public class ClassPathLoader implements FileLoader {
             log.debug("Resolved '{}' from ClassPathLoader.class", path);
             return url;
         }
-        var loader = SecuritySupport.getContextClassLoader();
+        var loader = Optional.ofNullable(Thread.currentThread().getContextClassLoader());
         if (loader.isPresent()) {
             url = loader.get().getResource(path);
             if (null != url) {
