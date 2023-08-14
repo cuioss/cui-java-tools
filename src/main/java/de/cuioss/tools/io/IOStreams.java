@@ -210,7 +210,7 @@ public class IOStreams {
      * @throws NullPointerException if the input parameter is null
      */
     public static BufferedReader toBufferedReader(final Reader reader) {
-        return reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
+        return reader instanceof BufferedReader br ? br : new BufferedReader(reader);
     }
 
     // copy from InputStream

@@ -216,14 +216,14 @@ public final class MorePaths {
     public static Path getBackupDirectoryForPath(final Path directory) {
         if (!checkAccessiblePath(directory, true, true)) {
             throw new IllegalArgumentException(
-                    String.format("Given path '%s' does not denote an existing writable directory",
+                    "Given path '%s' does not denote an existing writable directory".formatted(
                             directory.toFile().getAbsolutePath()));
         }
         final var backup = directory.resolve(BACKUP_DIR_NAME);
         final var backupAsFile = backup.toFile();
         if (!backupAsFile.exists() && !backupAsFile.mkdir()) {
             throw new IllegalStateException(
-                    String.format("Unable to create directory '%s'", backup.toFile().getAbsolutePath()));
+                    "Unable to create directory '%s'".formatted(backup.toFile().getAbsolutePath()));
         }
         return backup;
 
@@ -286,8 +286,8 @@ public final class MorePaths {
     public static void assertAccessibleFile(final Path path) {
         requireNonNull(path, "path");
         if (!checkAccessiblePath(path, false, true)) {
-            throw new IllegalArgumentException(String.format(
-                    "Given path '%s' does not denote an existing readable file", path.toFile().getAbsolutePath()));
+            throw new IllegalArgumentException(
+                    "Given path '%s' does not denote an existing readable file".formatted(path.toFile().getAbsolutePath()));
         }
     }
 
@@ -305,7 +305,7 @@ public final class MorePaths {
             }
         }
         throw new IllegalStateException(
-                String.format("Unable to determine a non-existing file within '%s' for file-name '%s'",
+                "Unable to determine a non-existing file within '%s' for file-name '%s'".formatted(
                         parentDir.toFile().getAbsolutePath(), fileName));
     }
 
@@ -486,7 +486,10 @@ public final class MorePaths {
         if (null != path && null != path2) {
             if (!path.toFile().exists() || !path2.toFile().exists()) {
                 log.debug(
-                        "Comparing paths with #equals, as at least one path does not exist. " + "path_a={}, path_b={}",
+                        """
+                        Comparing paths with #equals, as at least one path does not exist. \
+                        path_a={}, path_b={}\
+                        """,
                         path, path2);
                 return path.equals(path2);
             }

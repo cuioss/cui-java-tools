@@ -180,8 +180,8 @@ public final class Joiner {
                 if (!joinerConfig.isSkipNulls()) {
                     builder.add(joinerConfig.getUseForNull());
                 }
-            } else if (element instanceof CharSequence) {
-                builder.add((CharSequence) element);
+            } else if (element instanceof CharSequence sequence) {
+                builder.add(sequence);
             } else {
                 builder.add(MoreStrings.lenientToString(element));
             }

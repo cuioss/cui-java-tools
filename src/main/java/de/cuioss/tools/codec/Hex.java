@@ -429,14 +429,14 @@ public class Hex {
      * @see #decodeHex(char[])
      */
     public Object decode(final Object object) throws DecoderException {
-        if (object instanceof String) {
-            return decode(((String) object).toCharArray());
+        if (object instanceof String string) {
+            return decode(string.toCharArray());
         }
-        if (object instanceof byte[]) {
-            return decode((byte[]) object);
+        if (object instanceof byte[] bytes) {
+            return decode(bytes);
         }
-        if (object instanceof ByteBuffer) {
-            return decode((ByteBuffer) object);
+        if (object instanceof ByteBuffer buffer) {
+            return decode(buffer);
         }
         try {
             return decodeHex((char[]) object);
@@ -508,10 +508,10 @@ public class Hex {
      */
     public Object encode(final Object object) throws EncoderException {
         byte[] byteArray;
-        if (object instanceof String) {
-            byteArray = ((String) object).getBytes(getCharset());
-        } else if (object instanceof ByteBuffer) {
-            byteArray = toByteArray((ByteBuffer) object);
+        if (object instanceof String string) {
+            byteArray = string.getBytes(getCharset());
+        } else if (object instanceof ByteBuffer buffer) {
+            byteArray = toByteArray(buffer);
         } else {
             try {
                 byteArray = (byte[]) object;

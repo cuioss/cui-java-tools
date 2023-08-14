@@ -54,8 +54,8 @@ public final class ExceptionHelper {
         if (null == throwable) {
             return NO_MESSAGE;
         }
-        if (throwable instanceof InvocationTargetException) {
-            return extractMessageFromThrowable(((InvocationTargetException) throwable).getTargetException());
+        if (throwable instanceof InvocationTargetException exception) {
+            return extractMessageFromThrowable(exception.getTargetException());
         }
         return extractMessageFromThrowable(throwable);
     }

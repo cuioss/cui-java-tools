@@ -651,8 +651,8 @@ public final class MoreStrings {
             return INDEX_NOT_FOUND;
         }
 
-        if (cs instanceof String) {
-            return ((String) cs).indexOf(searchChar, start);
+        if (cs instanceof String string) {
+            return string.indexOf(searchChar, start);
         }
         final var sz = cs.length();
         if (start < 0) {

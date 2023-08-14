@@ -431,19 +431,18 @@ public final class MoreReflection {
      *         type represents already a {@link Class} it will be returned directly.
      *         Otherwise, the super-type will be checked by calling the superclass
      */
-    @SuppressWarnings("rawtypes")
     public static Optional<Class<?>> extractGenericTypeCovariantly(final Type type) {
         if (null == type) {
             log.trace("No KeyStoreType given, returning empty");
             return Optional.empty();
         }
-        if (type instanceof Class) {
+        if (type instanceof Class class1) {
             log.debug("Found actual class returning as result {}", type);
-            return Optional.of((Class) type);
+            return Optional.of(class1);
         }
-        if (type instanceof ParameterizedType) {
+        if (type instanceof ParameterizedType parameterizedType) {
             log.debug("found Parameterized type, for {}, calling recursively", type);
-            return extractGenericTypeCovariantly(((ParameterizedType) type).getRawType());
+            return extractGenericTypeCovariantly(parameterizedType.getRawType());
         }
         log.warn("Unable to determines generic-type for {}", type);
         return Optional.empty();
@@ -466,8 +465,8 @@ public final class MoreReflection {
             return Optional.empty();
         }
         final var genericSuperclass = typeToBeExtractedFrom.getGenericSuperclass();
-        if (genericSuperclass instanceof ParameterizedType) {
-            return Optional.of((ParameterizedType) genericSuperclass);
+        if (genericSuperclass instanceof ParameterizedType type) {
+            return Optional.of(type);
         }
         // Check the tree
         return extractParameterizedType(typeToBeExtractedFrom.getSuperclass());

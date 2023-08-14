@@ -117,7 +117,7 @@ public class SimpleFormatter implements Serializable {
     private String format(final List<String> values) {
         final var joined = getJoined(values);
         if (null != joined) {
-            return String.format("(%s)", joined);
+            return "(%s)".formatted(joined);
         }
         return null;
     }
