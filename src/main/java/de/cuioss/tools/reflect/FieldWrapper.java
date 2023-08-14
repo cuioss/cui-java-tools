@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Optional;
 
-import de.cuioss.tools.lang.SecuritySupport;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
 import lombok.Getter;
@@ -82,7 +81,7 @@ public class FieldWrapper {
         synchronized (field) {
             if (!initialAccessible) {
                 log.trace("Explicitly setting accessible flag");
-                SecuritySupport.setAccessible(field, true);
+                field.setAccessible(true);
             }
             try {
                 return Optional.ofNullable(field.get(object));
@@ -93,7 +92,7 @@ public class FieldWrapper {
             } finally {
                 if (!initialAccessible) {
                     log.trace("Resetting accessible flag");
-                    SecuritySupport.setAccessible(field, false);
+                    field.setAccessible(false);
                 }
             }
         }
@@ -137,7 +136,7 @@ public class FieldWrapper {
         synchronized (field) {
             if (!initialAccessible) {
                 log.trace("Explicitly setting accessible flag");
-                SecuritySupport.setAccessible(field, true);
+                field.setAccessible(true);
             }
             try {
                 field.set(object, value);
@@ -149,7 +148,7 @@ public class FieldWrapper {
             } finally {
                 if (!initialAccessible) {
                     log.trace("Resetting accessible flag");
-                    SecuritySupport.setAccessible(field, false);
+                    field.setAccessible(false);
                 }
             }
         }

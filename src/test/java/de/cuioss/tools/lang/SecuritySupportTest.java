@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import de.cuioss.tools.reflect.MoreReflection;
 import de.cuioss.tools.reflect.support.FieldNameClass;
 
+@Deprecated
 class SecuritySupportTest {
 
     static final String TEST_VALUE = "testValue";

@@ -212,7 +212,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      *         <em>Caution:</em> with this call the return value of
      *         {@link java.util.Collection#add(Object)} will be ignored.
      */
-    public CollectionBuilder<E> add(@SuppressWarnings("unchecked") E... elements) {
+    @SafeVarargs
+    public final CollectionBuilder<E> add(E... elements) {
         if (!MoreCollections.isEmpty(elements)) {
             for (E element : elements) {
                 add(element);

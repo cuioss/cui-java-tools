@@ -57,7 +57,7 @@ class FieldWrapperTest {
         assertFalse(wrapper.readValue(null).isPresent());
         assertFalse(wrapper.readValue(Integer.valueOf(2)).isPresent());
         // afterException accessible Flag should be reset correctly
-        assertFalse(wrapper.getField().isAccessible());
+        assertFalse(wrapper.getField().canAccess(nameClass));
     }
 
     @Test
@@ -125,7 +125,7 @@ class FieldWrapperTest {
         assertThrows(IllegalArgumentException.class, () -> wrapper.writeValue(nameClass, value));
 
         // afterException accessible Flag should be resetted correctly
-        assertFalse(wrapper.getField().isAccessible());
+        assertFalse(wrapper.getField().canAccess(nameClass));
     }
 
     @Test
@@ -151,9 +151,9 @@ class FieldWrapperTest {
         nameClass.setMyField(test);
         var field = getMyFieldField();
         var wrapper = new FieldWrapper(field);
-        assertFalse(field.isAccessible());
+        assertFalse(field.canAccess(nameClass));
         var fieldValue = wrapper.readValue(nameClass);
-        assertFalse(field.isAccessible());
+        assertFalse(field.canAccess(nameClass));
         assertNotNull(fieldValue);
         assertTrue(fieldValue.isPresent());
         assertEquals(test, fieldValue.get());

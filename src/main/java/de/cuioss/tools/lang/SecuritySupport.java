@@ -21,15 +21,10 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import de.cuioss.tools.logging.CuiLogger;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -38,34 +33,21 @@ import lombok.experimental.UtilityClass;
  * {@link AccessController#doPrivileged(PrivilegedAction)} for its method in
  * case a {@link SecurityManager} is set.
  *
+ * @deprecated SecurityManager hard deprecated by Java 18+
  * @author Oliver Wolff
  *
  */
 @UtilityClass
 @SuppressWarnings("java:S1905") // owolff: The casts are necessary for the return type
+@Deprecated(forRemoval = true, since = "1.2")
 public class SecuritySupport {
-
-    private static final String SECURITY_MANAGER_CONFIGURED = "A SecurityManager is configured, using PrivilegedAction";
-    private static final CuiLogger LOGGER = new CuiLogger(SecuritySupport.class);
 
     /**
      * @return the context-classloader if obtainable, {@link Optional#empty()}
      *         otherwise
      */
     public static Optional<ClassLoader> getContextClassLoader() {
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, accessing context-class-loader");
-            return Optional.ofNullable(Thread.currentThread().getContextClassLoader());
-        }
-        LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-        return AccessController.doPrivileged((PrivilegedAction<Optional<ClassLoader>>) () -> {
-            try {
-                return Optional.ofNullable(Thread.currentThread().getContextClassLoader());
-            } catch (SecurityException e) {
-                LOGGER.warn("Unable to access context-class-loader due to SecurityException", e);
-                return Optional.empty();
-            }
-        });
+        return Optional.ofNullable(Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -73,21 +55,7 @@ public class SecuritySupport {
      * @param accessible value
      */
     public static void setAccessible(AccessibleObject object, boolean accessible) {
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, setting accessible directly");
-            object.setAccessible(accessible);
-        } else {
-            LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-
-                try {
-                    object.setAccessible(accessible);
-                } catch (SecurityException e) {
-                    LOGGER.warn("Unable to call 'setAccessible' due to SecurityException", e);
-                }
-                return null;
-            });
-        }
+        object.setAccessible(accessible);
     }
 
     /**
@@ -99,20 +67,7 @@ public class SecuritySupport {
         if (isEmpty(propertyName)) {
             return Optional.empty();
         }
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, accessing System-Property directly");
-            return Optional.ofNullable(System.getProperty(propertyName));
-        }
-        LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-        return AccessController.doPrivileged((PrivilegedAction<Optional<String>>) () -> {
-
-            try {
-                return Optional.ofNullable(System.getProperty(propertyName));
-            } catch (SecurityException e) {
-                LOGGER.warn("Unable to call 'System.getProperty' due to SecurityException", e);
-            }
-            return Optional.empty();
-        });
+        return Optional.ofNullable(System.getProperty(propertyName));
     }
 
     /**
@@ -121,19 +76,7 @@ public class SecuritySupport {
      *         object.
      */
     public static Properties accessSystemProperties() {
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, accessing System.getProperties directly");
-            return System.getProperties();
-        }
-        LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-        return AccessController.doPrivileged((PrivilegedAction<Properties>) () -> {
-            try {
-                return System.getProperties();
-            } catch (SecurityException e) {
-                LOGGER.warn("Unable to call 'System.getProperties' due to SecurityException", e);
-            }
-            return new Properties();
-        });
+        return System.getProperties();
     }
 
     /**
@@ -141,19 +84,7 @@ public class SecuritySupport {
      *         achieved it returns an empty map.
      */
     public static Map<String, String> accessSystemEnv() {
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, accessing System.getenv directly");
-            return System.getenv();
-        }
-        LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-        return AccessController.doPrivileged((PrivilegedAction<Map<String, String>>) () -> {
-            try {
-                return System.getenv();
-            } catch (SecurityException e) {
-                LOGGER.warn("Unable to call 'System.getenv' due to SecurityException", e);
-            }
-            return Collections.emptyMap();
-        });
+        return System.getenv();
     }
 
     /**
@@ -171,30 +102,6 @@ public class SecuritySupport {
                                      // do
     public static <T> Constructor<? extends T> getDeclaredConstructor(Class<T> clazz, Class<?>... paramTypes)
             throws NoSuchMethodException {
-        if (null == System.getSecurityManager()) {
-            LOGGER.trace("No SecurityManager configured, accessing declared constructors directly");
-            return clazz.getDeclaredConstructor(paramTypes);
-        }
-        try {
-            LOGGER.trace(SECURITY_MANAGER_CONFIGURED);
-            return AccessController.doPrivileged((PrivilegedExceptionAction<Constructor<? extends T>>) () -> {
-                Constructor<? extends T> constructor = null;
-                try {
-                    constructor = clazz.getDeclaredConstructor(paramTypes);
-
-                } catch (SecurityException e) {
-                    LOGGER.warn(e,
-                            "Unable to call 'getDeclaredConstructor' due to SecurityException, class='{}', paramTypes='{}'",
-                            clazz.toString(), Arrays.toString(paramTypes));
-                }
-                return constructor;
-            });
-        } catch (PrivilegedActionException e) {
-            var e2 = e.getException();
-            if (e2 instanceof NoSuchMethodException) {
-                throw (NoSuchMethodException) e2;
-            }
-            throw new IllegalStateException(e2);
-        }
+        return clazz.getDeclaredConstructor(paramTypes);
     }
 }
