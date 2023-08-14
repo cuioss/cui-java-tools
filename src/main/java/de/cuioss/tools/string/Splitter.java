@@ -111,7 +111,6 @@ public final class Splitter {
      * emptiness. So, for example, {@code
      * Splitter.on(':').omitEmptyStrings().trimResults().split(": : : ")} returns an
      * empty iterable.
-     * <p>
      *
      * @return a splitter with the desired configuration
      */

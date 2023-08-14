@@ -70,7 +70,6 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>
  * <b>Note:</b> This class is not thread-safe.
- * <p>
  *
  * @author com.google.common.base.Stopwatch
  */

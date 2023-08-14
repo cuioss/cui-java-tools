@@ -31,7 +31,6 @@ import lombok.ToString;
  * url parameter handling. Therefore, it filters parameter prefixed with
  * "javax.faces", depending on <code>excludeFacesParameter</code> and
  * additionally a given list of parameter names.
- * <p>
  *
  * @author Oliver Wolff
  */
