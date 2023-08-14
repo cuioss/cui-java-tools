@@ -30,6 +30,9 @@
     </scm>
     <properties>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven-javadoc-plugin.source>17</maven-javadoc-plugin.source>
     </properties>
     <issueManagement>
         <url>https://github.com/cuioss/cui-java-tools/issues</url>
