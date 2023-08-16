@@ -351,9 +351,8 @@ public class FilenameUtils {
      * @param keepSeparator true to keep the final separator
      * @return the normalized filename. Null bytes inside string will be removed.
      */
-    @SuppressWarnings({ "squid:S3776", "squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck" }) // owolff:
-                                                                                                                 // original
-                                                                                                                 // code
+    @SuppressWarnings({ "squid:S3776", "squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck",
+            "java:S6541" }) // owolff: original code
     private static String doNormalize(final String filename, final char separator, final boolean keepSeparator) {
         if (filename == null) {
             return null;

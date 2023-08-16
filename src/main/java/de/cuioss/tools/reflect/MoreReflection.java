@@ -429,7 +429,7 @@ public final class MoreReflection {
             log.trace("No KeyStoreType given, returning empty");
             return Optional.empty();
         }
-        if (type instanceof Class class1) {
+        if (type instanceof Class<?> class1) {
             log.debug("Found actual class returning as result {}", type);
             return Optional.of(class1);
         }

@@ -1,7 +1,7 @@
 module de.cuioss.java.tools {
     requires static lombok;
-    requires java.desktop;
-    requires java.logging;
+    requires transitive java.desktop;
+    requires transitive java.logging;
 
     exports de.cuioss.tools.base;
     exports de.cuioss.tools.codec;

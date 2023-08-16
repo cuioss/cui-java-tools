@@ -21,7 +21,6 @@ import static de.cuioss.tools.string.MoreStrings.emptyToNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -107,7 +106,7 @@ public class SimpleFormatter implements Serializable {
         if (isEmpty(values)) {
             return null;
         }
-        List<String> filtered = values.stream().filter(element -> !isEmpty(element)).collect(Collectors.toList());
+        List<String> filtered = values.stream().filter(element -> !isEmpty(element)).toList();
         if (isEmpty(filtered)) {
             return null;
         }

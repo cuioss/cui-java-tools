@@ -66,13 +66,12 @@ public final class LexerBuilder {
         }
 
         private static Brackets getBracketsTypeFor(final ExpressionLanguage expl) {
-            final Brackets type = switch (expl) {
+            return switch (expl) {
             case SIMPLE_SQUARED_BRACKTES -> Brackets.SQUARED_BRACKETS;
             case SIMPLE_CURLY_BRACKETS -> Brackets.CURLY_BRACKETS;
             case SIMPLE_ANGLE_BRACKET -> Brackets.ANGLE_BRACKET;
             default -> throw new IllegalArgumentException(expl + " doesn't belongs to Simple expression language.");
             };
-            return type;
         }
 
         /**
