@@ -13,6 +13,7 @@ module de.cuioss.java.tools {
     exports de.cuioss.tools.formatting.template.token;
     exports de.cuioss.tools.io;
     exports de.cuioss.tools.lang;
+    exports de.cuioss.tools.logging;
     exports de.cuioss.tools.net;
     exports de.cuioss.tools.net.ssl;
     exports de.cuioss.tools.property;
