@@ -24,7 +24,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-@SuppressWarnings("javadoc")
 public class TestLogHandler extends Handler {
 
     List<LogRecord> records = new ArrayList<>();

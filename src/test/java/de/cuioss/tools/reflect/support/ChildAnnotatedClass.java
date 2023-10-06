@@ -19,7 +19,6 @@ import java.util.function.Function;
 
 import jakarta.annotation.Resource;
 
-@SuppressWarnings("javadoc")
 @Resource
 @Deprecated
 public class ChildAnnotatedClass extends BaseAnnotatedClass implements Function<String, String> {

@@ -15,7 +15,6 @@
  */
 package de.cuioss.tools.property.support;
 
-@SuppressWarnings("javadoc")
 public class BeanWithBuilderStyleAccessor {
 
     @SuppressWarnings("unused")

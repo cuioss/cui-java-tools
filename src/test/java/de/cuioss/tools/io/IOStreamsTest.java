@@ -78,7 +78,6 @@ class IOStreamsTest {
     }
 
     @Test
-    @SuppressWarnings("resource")
     void shouldProvideInputStream() throws IOException {
         assertTrue(contentEquals(new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8)), toInputStream(null)));
         assertFalse(

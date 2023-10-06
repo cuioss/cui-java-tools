@@ -18,7 +18,6 @@ package de.cuioss.tools.property.support;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings("javadoc")
 public class BeanWithReadWriteProperties {
 
     public static final String ATTRIBUTE_READ_WRITE = "readWriteProperty";

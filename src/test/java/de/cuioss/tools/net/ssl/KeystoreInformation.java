@@ -27,7 +27,6 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-@SuppressWarnings("javadoc")
 public class KeystoreInformation {
 
     public static final String PASSWORD = "secret";

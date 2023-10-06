@@ -91,7 +91,6 @@ public class Validator<F extends FormatterSupport> implements Serializable {
         new Validator.ValidatorBuilder<E>().withLexer(lexer).validate(template);
     }
 
-    @SuppressWarnings("javadoc")
     @NoArgsConstructor
     public static final class ValidatorBuilder<E extends FormatterSupport> {
 

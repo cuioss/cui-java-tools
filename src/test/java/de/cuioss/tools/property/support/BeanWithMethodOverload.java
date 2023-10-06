@@ -17,7 +17,6 @@ package de.cuioss.tools.property.support;
 
 import lombok.Getter;
 
-@SuppressWarnings("javadoc")
 public class BeanWithMethodOverload {
 
     @Getter

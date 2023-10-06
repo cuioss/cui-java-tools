@@ -19,7 +19,6 @@ import java.io.Serializable;
 
 import lombok.Data;
 
-@SuppressWarnings("javadoc")
 @Data
 public class AddressDto implements Serializable {
 

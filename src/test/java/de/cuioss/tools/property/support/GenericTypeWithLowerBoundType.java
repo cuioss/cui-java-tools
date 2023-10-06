@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-@SuppressWarnings("javadoc")
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Serializable>

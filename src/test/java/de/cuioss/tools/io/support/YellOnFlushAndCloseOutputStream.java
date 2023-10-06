@@ -61,7 +61,6 @@ public class YellOnFlushAndCloseOutputStream extends ProxyOutputStream {
         super.close();
     }
 
-    @SuppressWarnings("javadoc")
     public void off() {
         yellForFlush = false;
         yellForClose = false;

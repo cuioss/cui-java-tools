@@ -17,7 +17,6 @@ package de.cuioss.tools.formatting.support;
 
 import de.cuioss.tools.support.TypedGenerator;
 
-@SuppressWarnings("javadoc")
 public class PersonAddressGenerator implements TypedGenerator<PersonAddress> {
 
     @Override

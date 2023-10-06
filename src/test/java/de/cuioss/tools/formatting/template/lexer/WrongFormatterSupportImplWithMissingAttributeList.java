@@ -21,7 +21,6 @@ import java.util.Map;
 
 import de.cuioss.tools.formatting.template.FormatterSupport;
 
-@SuppressWarnings("javadoc")
 public class WrongFormatterSupportImplWithMissingAttributeList implements FormatterSupport {
 
     @Override

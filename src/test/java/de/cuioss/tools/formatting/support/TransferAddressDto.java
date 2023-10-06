@@ -20,7 +20,6 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-@SuppressWarnings("javadoc")
 public class TransferAddressDto implements Serializable {
 
     private static final long serialVersionUID = 5329606920285197130L;

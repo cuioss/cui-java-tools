@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("resource")
 class FileSystemLoaderTest {
 
     private static final String EXISTING_FILE = "pom.xml";

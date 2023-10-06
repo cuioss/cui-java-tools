@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import de.cuioss.tools.base.Preconditions;
 
-@SuppressWarnings("javadoc")
 public class FakeTicker extends Ticker {
 
     private static final long serialVersionUID = 1047851947159622996L;

@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("resource")
 class ClassPathLoaderTest {
 
     private static final String EXISTING_FILE_PATH = "/META-INF/someTestFile.txt";

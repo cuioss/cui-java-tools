@@ -18,7 +18,7 @@ package de.cuioss.tools.reflect.support;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings({ "javadoc", "unused" })
+@SuppressWarnings({ "unused" })
 public class MethodNameClass {
 
     private String name;

@@ -17,12 +17,11 @@ package de.cuioss.tools.property.support;
 
 import java.lang.reflect.InvocationTargetException;
 
-@SuppressWarnings("javadoc")
 public class ExplodingBean {
 
     private Throwable throwable = new IllegalArgumentException();
 
-    public void setProperty(@SuppressWarnings("unused") String property) throws Throwable {
+    public void setProperty(String property) throws Throwable {
         throw throwable;
     }
 
