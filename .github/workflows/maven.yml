@@ -56,7 +56,7 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
         
-    - uses: radcortez/project-metadata-action@main
+    - uses: radcortez/project-metadata-action@1.1
       name: Retrieve project metadata from '.github/project.yml'
       id: metadata
       with:

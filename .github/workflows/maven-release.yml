@@ -18,7 +18,7 @@ jobs:
         persist-credentials: false # otherwise, the token used is the PA_TOKEN, instead of your personal access token.
         fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
 
-    - uses: radcortez/project-metadata-action@main
+    - uses: radcortez/project-metadata-action@1.1
       name: Retrieve project metadata from '.github/project.yml'
       id: metadata
       with:
