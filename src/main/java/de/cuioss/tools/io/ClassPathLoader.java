@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.net.URL;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ import lombok.ToString;
 @ToString
 public class ClassPathLoader implements FileLoader {
 
+    @Serial
     private static final long serialVersionUID = 9140071059594577808L;
 
     private static final CuiLogger log = new CuiLogger(ClassPathLoader.class);
@@ -103,7 +105,7 @@ public class ClassPathLoader implements FileLoader {
 
     @Override
     public InputStream inputStream() {
-        checkState(isReadable(), "Resource '{}' is not readable", givenPathName);
+        checkState(isReadable(), "Resource '%s' is not readable", givenPathName);
         try {
             return getURL().openStream();
         } catch (IOException e) {
