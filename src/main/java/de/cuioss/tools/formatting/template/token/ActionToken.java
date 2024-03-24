@@ -73,7 +73,7 @@ public class ActionToken implements Token {
                 "AvailablePropertyValues must not be null. ");
         final var result = new StringBuilder();
         if (attributeValues.containsKey(attribute)) {
-            if (attributeValues.keySet().size() > 1) {
+            if (attributeValues.size() > 1) {
                 result.append(before).append(attributeValues.get(attribute)).append(after);
             } else {
                 // special case : if only one value exists no stored before + after are needed

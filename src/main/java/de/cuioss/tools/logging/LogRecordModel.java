@@ -83,7 +83,6 @@ public class LogRecordModel implements LogRecord {
 
     @Builder
     private LogRecordModel(@NonNull String prefix, @NonNull Integer identifier, @NonNull String template) {
-        super();
         this.prefix = prefix;
         this.identifier = identifier;
         this.template = template;

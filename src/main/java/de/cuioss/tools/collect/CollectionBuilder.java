@@ -107,7 +107,6 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      * @param collector to be used for storage. Must not be null
      */
     public CollectionBuilder(Collection<E> collector) {
-        super();
         this.collector = requireNonNull(collector);
     }
 

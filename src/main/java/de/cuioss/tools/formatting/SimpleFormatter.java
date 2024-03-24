@@ -106,7 +106,7 @@ public class SimpleFormatter implements Serializable {
         if (isEmpty(values)) {
             return null;
         }
-        List<String> filtered = values.stream().filter(element -> !isEmpty(element)).toList();
+        var filtered = values.stream().filter(element -> !isEmpty(element)).toList();
         if (isEmpty(filtered)) {
             return null;
         }

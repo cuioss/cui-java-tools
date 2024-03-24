@@ -39,7 +39,6 @@ public class EncoderException extends Exception {
      * {@link #initCause}.
      */
     public EncoderException() {
-        super();
     }
 
     /**

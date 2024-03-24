@@ -94,7 +94,6 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      *               UTF-8
      */
     public UrlParameter(final String name, final String value, final boolean encode) {
-        super();
         requireNotEmptyTrimmed(name, "Parameter name must not be empty");
         if (encode) {
             this.name = encode(name, StandardCharsets.UTF_8);

@@ -222,10 +222,8 @@ class KeyStoreProviderTest {
 
         var signer = new JcaContentSignerBuilder(signatureAlgorithm).build(keyPair.getPrivate());
 
-        var x509Certificate = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
+        return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider())
                 .getCertificate(x509Builder.build(signer));
-
-        return x509Certificate;
     }
 
     @Test

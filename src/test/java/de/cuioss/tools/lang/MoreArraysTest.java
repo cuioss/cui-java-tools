@@ -68,7 +68,7 @@ class MoreArraysTest {
     void shouldDetermineEmptyLongArray() {
         assertTrue(MoreArrays.isEmpty((long[]) null));
         assertTrue(MoreArrays.isEmpty(new long[0]));
-        assertFalse(MoreArrays.isEmpty(new long[] { 1l }));
+        assertFalse(MoreArrays.isEmpty(new long[] { 1L }));
     }
 
     @Test
