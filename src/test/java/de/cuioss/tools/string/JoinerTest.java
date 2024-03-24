@@ -23,9 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledForJreRange;
-import org.junit.jupiter.api.condition.JRE;
-import org.opentest4j.AssertionFailedError;
 
 /**
  * Initially taken from
@@ -129,45 +126,6 @@ class JoinerTest {
     private static void assertResult(final Joiner joiner, final Iterable<?> parts, final String expected) {
         assertEquals(expected, joiner.join(parts));
         assertEquals(expected, joiner.join(parts.iterator()));
-    }
-
-    private static class DontStringMeBro implements CharSequence {
-
-        @Override
-        public int length() {
-            return 3;
-        }
-
-        @Override
-        public char charAt(final int index) {
-            return "foo".charAt(index);
-        }
-
-        @Override
-        public CharSequence subSequence(final int start, final int end) {
-            return "foo".subSequence(start, end);
-        }
-
-        @Override
-        public String toString() {
-            throw new AssertionFailedError("shouldn't be invoked");
-        }
-    }
-
-    @Test
-    // FIXME this is not working in JAVA 11 due to a changed String#join method
-    // FIXME owolff: Hm I'm not sure whether the old behavior is a problem at all.
-    // The main
-    // difference is not calling the toString method CharSequence. This code is
-    // taken directly from
-    // guava, and may be a problem there, but I do not think it is a problem within
-    // our JRE based
-    // approach
-    @DisabledForJreRange(min = JRE.JAVA_11)
-    void testDontConvertCharSequenceToString() {
-        assertEquals("foo,foo", Joiner.on(",").join(new DontStringMeBro(), new DontStringMeBro()));
-        assertEquals("foo,bar,foo",
-                Joiner.on(",").useForNull("bar").join(new DontStringMeBro(), null, new DontStringMeBro()));
     }
 
 }

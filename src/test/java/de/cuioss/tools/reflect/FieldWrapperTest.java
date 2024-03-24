@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import de.cuioss.tools.reflect.support.FieldNameClass;
@@ -126,22 +125,6 @@ class FieldWrapperTest {
 
         // afterException accessible Flag should be resetted correctly
         assertFalse(wrapper.getField().canAccess(nameClass));
-    }
-
-    @Test
-    @Disabled("Test need to be reviewed")
-    void writeShouldHandleInvalidAccess() {
-        var nameClass = new FieldNameClass();
-        var field = getMyFieldField();
-        field.setAccessible(true);
-        var wrapper = new FieldWrapper(field);
-        field.setAccessible(false);
-
-        var test = Generators.randomString();
-        // TODO : review test access is allowed
-        assertThrows(IllegalStateException.class, () -> wrapper.writeValue(nameClass, test));
-
-        field.setAccessible(false);
     }
 
     @Test
