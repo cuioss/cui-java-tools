@@ -18,6 +18,7 @@ package de.cuioss.tools.collect;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableSortedSet;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -108,6 +109,7 @@ class CollectionBuilderTest {
         builder.add("1");
 
         assertNotNull(builder.toString());
+        assertDoesNotThrow(builder::hashCode);
         assertNotEquals(0, builder.hashCode());
         assertEquals(builder, builder);
     }
