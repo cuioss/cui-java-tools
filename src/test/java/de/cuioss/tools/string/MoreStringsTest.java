@@ -363,6 +363,7 @@ class MoreStringsTest {
         assertEquals("null [5, 6]", MoreStrings.lenientFormat(null, 5, 6));
         assertEquals("null", MoreStrings.lenientFormat("%s", (Object) null));
         assertEquals("(Object[])null", MoreStrings.lenientFormat("%s", (Object[]) null));
+        assertEquals("missing param 1%s", MoreStrings.lenientFormat("missing param %s%s", "1"));
     }
 
     @Test
