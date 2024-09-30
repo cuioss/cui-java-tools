@@ -13,9 +13,8 @@
     <artifactId>cui-java-tools</artifactId>
     <name>cui java tools</name>
     <version>2.1-SNAPSHOT</version>
-    <description>Utility Library acting as a replacement for googles guava,
-        certain apache-commons libraries and logging
-        facades/frameworks.
+    <description>Utility Library acting as a replacement for google's guava,
+        certain apache-commons libraries and logging facades/frameworks.
     </description>
     <packaging>jar</packaging>
 
