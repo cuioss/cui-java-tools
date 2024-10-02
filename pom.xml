@@ -27,6 +27,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
+        <version.cui.parent>0.8.0</version.cui.parent>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
     </properties>
     <issueManagement>
@@ -52,7 +53,7 @@
             <dependency>
                 <groupId>de.cuioss</groupId>
                 <artifactId>java-ee-10-bom</artifactId>
-                <version>0.8.0</version>
+                <version>${version.cui.parent}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
