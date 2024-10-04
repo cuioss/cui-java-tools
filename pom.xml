@@ -20,6 +20,7 @@
     <packaging>jar</packaging>
 
     <url>https://github.com/cuioss/cui-java-tools/</url>
+
     <scm>
         <url>https://github.com/cuioss/cui-java-tools/</url>
         <connection>scm:git:https://github.com/cuioss/cui-java-tools.git</connection>
