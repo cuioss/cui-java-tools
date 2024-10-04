@@ -33,7 +33,7 @@ jobs:
     - name: Build with Maven, Java ${{ matrix.version }}
       run: ./mvnw -B verify -Dmaven.compiler.source=${{ matrix.version }} -Dmaven.compiler.target=${{ matrix.version }}
         
-    - uses: radcortez/project-metadata-action@1.2
+    - uses: radcortez/project-metadata-action@1.1
       name: Retrieve project metadata from '.github/project.yml'
       id: metadata
       with:
