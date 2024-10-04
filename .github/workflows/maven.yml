@@ -20,43 +20,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [17,21]
+        version: [17,21,22]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK ${{ matrix.version }}
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ matrix.version }}
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven, Java ${{ matrix.version }}
-      run: ./mvnw -B package -Dmaven.compiler.source=${{ matrix.version }} -Dmaven.compiler.target=${{ matrix.version }}
-
-  sonar-build:
-    needs: build
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      run: ./mvnw -B verify -Dmaven.compiler.source=${{ matrix.version }} -Dmaven.compiler.target=${{ matrix.version }}
         
-    - name: Set up JDK 17 for Sonar-build
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-        
-    - name: Cache SonarCloud packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
-        
-    - uses: radcortez/project-metadata-action@1.1
+    - uses: radcortez/project-metadata-action@1.2
       name: Retrieve project metadata from '.github/project.yml'
       id: metadata
       with:
@@ -67,17 +44,15 @@ jobs:
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./mvnw -B verify -Psonar -Dsonar.projectKey=${{steps.metadata.outputs.sonar-project-key}} sonar:sonar
+      run: ./mvnw -B verify
 
   deploy-snapshot:
-    needs: sonar-build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK 17 for snapshot release
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
