@@ -71,6 +71,7 @@ jobs:
       run: ./mvnw -B verify -Psonar -Dsonar.projectKey=${{steps.metadata.outputs.sonar-project-key}} sonar:sonar
 
   deploy-snapshot:
+    needs: sonar-build
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
