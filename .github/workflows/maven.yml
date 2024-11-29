@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,6 +29,7 @@ jobs:
   sonar-build:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
