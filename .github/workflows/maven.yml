@@ -2,9 +2,9 @@ name: Master Build
 
 on:
   push:
-    branches: [ "main", "feature/*" ]
+    branches: [ "master", "feature/*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
 
   deploy-snapshot:
     needs: sonar-build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
