@@ -18,6 +18,7 @@ package de.cuioss.tools.formatting.support;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -31,26 +32,41 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * PersonName consolidate several Person Objects by make a one-way
- * transformation. It implements {@linkplain FormatterSupport} interface.
- * <p/>
- *
- * Mapping of properties will be done during construction. Properties which
- * can't be mapped will be initialized to null.
+ * Represents a structured person name with various components such as given name, family name,
+ * and additional name-related attributes. This class implements {@link FormatterSupport}
+ * to provide a standardized way of accessing name properties.
+ * <p>
+ * The class supports the following name components:
+ * <ul>
+ *   <li>Basic name parts: given name, family name, middle name</li>
+ *   <li>Name prefixes: academic, professional, generic, nobility</li>
+ *   <li>Name suffixes: academic, professional, generic, nobility</li>
+ *   <li>Birth names: family birth name, given birth name</li>
+ *   <li>Additional components: nickname, second name</li>
+ * </ul>
+ * <p>
+ * All properties are optional and can be set using the builder pattern.
+ * Empty or null values are handled gracefully and excluded from property maps.
  *
  * @author Eugen Fischer
+ * @see FormatterSupport
+ * @see #getAvailablePropertyValues()
+ * @see #getSupportedPropertyNames()
  */
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public final class PersonName implements FormatterSupport, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6138413254405190225L;
+
     /**
-     * alternative reflection could provide the same information, but than no
-     * filtering for properties will be possible
+     * List of all supported property names. This list is immutable and used by
+     * {@link #getSupportedPropertyNames()} to provide metadata about available properties.
+     * The properties are defined at compile time to allow for proper validation and avoid
+     * reflection-based property discovery.
      */
     private static final List<String> SUPPORTED_PROP_LIST = new CollectionBuilder<String>().add("familyNamePrefix")
             .add("familyName").add("familyBirthName").add("givenNamePrefix").add("givenName").add("givenNameSuffix")
@@ -94,6 +110,12 @@ public final class PersonName implements FormatterSupport, Serializable {
 
     private String nobilitySuffix;
 
+    /**
+     * Retrieves a map of all non-empty property values. Properties with null or empty
+     * values are excluded from the result.
+     *
+     * @return An immutable map containing all non-empty property values
+     */
     private Map<String, Serializable> retrieveAvailablePropertyValues() {
         final Map<String, Serializable> builder = new HashMap<>();
         putIfNotNullOrEmpty(builder, "familyNamePrefix", familyNamePrefix);
@@ -117,6 +139,13 @@ public final class PersonName implements FormatterSupport, Serializable {
         return immutableMap(builder);
     }
 
+    /**
+     * Helper method to add a property value to the map only if it is not null or empty.
+     *
+     * @param builder The map builder to add the value to
+     * @param key The property key
+     * @param value The property value
+     */
     private static void putIfNotNullOrEmpty(final Map<String, Serializable> builder, final String key,
             final String value) {
         if (!isEmpty(value)) {

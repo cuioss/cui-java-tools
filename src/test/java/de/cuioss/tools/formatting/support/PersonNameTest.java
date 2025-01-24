@@ -17,6 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Test class for {@link PersonName} which verifies:
+ * <ul>
+ *   <li>Property support and retrieval</li>
+ *   <li>Builder functionality</li>
+ *   <li>Value handling for all name components</li>
+ * </ul>
+ */
 @DisplayName("PersonName Tests")
 class PersonNameTest {
 
@@ -33,6 +41,10 @@ class PersonNameTest {
                 .build();
     }
 
+    /**
+     * Verifies that all defined properties.
+     * are properly supported and accessible.
+     */
     @Test
     @DisplayName("Should support all defined properties")
     void shouldSupportAllProperties() {
@@ -44,6 +56,14 @@ class PersonNameTest {
         // Add more assertions for other properties
     }
 
+    /**
+     * Tests property value handling using parameterized test cases.
+     * Each test case verifies that a specific property is correctly stored and retrieved.
+     *
+     * @param propertyName The name of the property being tested
+     * @param value        The test value for the property
+     * @param person       The PersonName instance with the test value set
+     */
     @ParameterizedTest(name = "Property {0} should be handled correctly")
     @MethodSource("provideTestCases")
     void shouldHandleProperties(String propertyName, String value, PersonName person) {
@@ -51,11 +71,28 @@ class PersonNameTest {
         assertEquals(value, values.get(propertyName));
     }
 
+    /**
+     * Provides test cases for property value handling.
+     * Each test case consists of:
+     * <ul>
+     *   <li>Property name to test</li>
+     *   <li>Test value</li>
+     *   <li>PersonName instance with only that property set</li>
+     * </ul>
+     *
+     * @return Stream of test case arguments
+     */
     private static Stream<Arguments> provideTestCases() {
         return Stream.of(TEST_CASES)
                 .map(holder -> Arguments.of(holder.propertyName(), holder.value(), holder.person()));
     }
 
+    /**
+     * Creates an array of test cases covering all essential name components.
+     * Each case tests a single property in isolation to ensure proper value handling.
+     *
+     * @return Array of CaseHolder instances for testing
+     */
     private static CaseHolder[] createTestCases() {
         String testValue = STRING_GENERATOR.next();
         return new CaseHolder[]{
@@ -76,7 +113,13 @@ class PersonNameTest {
         };
     }
 
-
+    /**
+     * Record holding test case data for property testing.
+     *
+     * @param propertyName Name of the property being tested
+     * @param value        Test value for the property
+     * @param person       PersonName instance with the test value set
+     */
     private record CaseHolder(String propertyName, String value, PersonName person) {
     }
 }
