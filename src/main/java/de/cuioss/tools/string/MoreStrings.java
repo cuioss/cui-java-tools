@@ -27,9 +27,93 @@ import java.util.function.Predicate;
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
- * Provides some extensions to String handling like
- * com.google.common.base.Strings. It was created using different source, see
- * authors
+ * Provides enhanced String handling utilities focusing on null-safety, performance,
+ * and common string manipulation tasks. This class serves as a lightweight alternative
+ * to larger utility libraries.
+ *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>Null-safe string operations</li>
+ *   <li>Efficient string formatting</li>
+ *   <li>String validation and transformation</li>
+ *   <li>Common string manipulation tasks</li>
+ * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ *
+ * <h3>1. Null-Safe String Operations</h3>
+ * <pre>
+ * // Safe null handling
+ * String nullString = null;
+ * assertEquals("", nullToEmpty(nullString));
+ * assertEquals("default", nullToDefault(nullString, "default"));
+ *
+ * // Safe empty handling
+ * String emptyString = "";
+ * assertTrue(isEmpty(emptyString));
+ * assertTrue(isBlank("   "));
+ * assertFalse(isEmpty("  not empty  "));
+ * </pre>
+ *
+ * <h3>2. String Formatting</h3>
+ * <pre>
+ * // Simple parameter replacement
+ * String result = lenientFormat("User %s logged in from %s", "admin", "localhost");
+ * assertEquals("User admin logged in from localhost", result);
+ *
+ * // Mixed placeholders (both %s and {})
+ * String mixed = lenientFormat("Value: {} equals %s", 42, "forty-two");
+ * assertEquals("Value: 42 equals forty-two", mixed);
+ *
+ * // Handling null parameters
+ * String withNull = lenientFormat("Nullable: %s", (Object) null);
+ * assertEquals("Nullable: null", withNull);
+ * </pre>
+ *
+ * <h3>3. String Validation</h3>
+ * <pre>
+ * // String presence checks
+ * assertTrue(isEmpty(null));
+ * assertTrue(isEmpty(""));
+ * assertFalse(isEmpty(" "));
+ *
+ * assertTrue(isBlank(null));
+ * assertTrue(isBlank(""));
+ * assertTrue(isBlank("   "));
+ * assertFalse(isBlank("text"));
+ * </pre>
+ *
+ * <h3>4. String Transformation</h3>
+ * <pre>
+ * // Safe trimming
+ * assertEquals("text", trimToEmpty("  text  "));
+ * assertEquals("", trimToEmpty(null));
+ *
+ * // Case conversion
+ * assertEquals("TEXT", toUpperCase("text"));
+ * assertEquals("", toUpperCase(null));
+ *
+ * assertEquals("text", toLowerCase("TEXT"));
+ * assertEquals("", toLowerCase(null));
+ * </pre>
+ *
+ *
+ *
+ * <h2>Best Practices</h2>
+ * <ul>
+ *   <li>Always use null-safe methods when handling potentially null strings</li>
+ *   <li>Prefer lenientFormat over String.format for better null handling</li>
+ *   <li>Use isEmpty() for null-safe empty checks</li>
+ *   <li>Use isBlank() when whitespace should be considered empty</li>
+ * </ul>
+ *
+ * <h2>Performance Notes</h2>
+ * <ul>
+ *   <li>Methods are optimized for minimal object creation</li>
+ *   <li>String concatenation is avoided in favor of StringBuilder</li>
+ *   <li>Null checks are performed before any string operations</li>
+ *   <li>Regular expressions are precompiled where possible</li>
+ * </ul>
  *
  * @author Oliver Wolff
  * @author Sven Haag
