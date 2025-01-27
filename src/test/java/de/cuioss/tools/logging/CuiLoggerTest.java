@@ -19,9 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +34,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * Test class for {@link CuiLogger} ensuring proper logging behavior and
+ * integration with {@link LogRecord} and {@link LogRecordModel}.
+ */
 @DisplayName("CuiLogger Tests")
 class CuiLoggerTest {
 
@@ -147,6 +155,130 @@ class CuiLoggerTest {
             assertThrows(IllegalArgumentException.class, () -> underTest.error(EXPLODER));
             underTest.getWrapped().setLevel(Level.OFF);
             underTest.error(EXPLODER);
+        }
+    }
+
+    @Nested
+    @DisplayName("Enhanced Logging Tests")
+    class EnhancedLoggingTests {
+
+        private static final String TEST_MESSAGE = "test message";
+        private static final String FORMATTED_MESSAGE = "formatted message: {}";
+        private static final String PARAMETER = "param";
+        private static final RuntimeException TEST_EXCEPTION = new RuntimeException("test exception");
+
+        @Test
+        void shouldHandleTraceLevel() {
+            // Given trace is enabled
+            assumeTrue(underTest.isTraceEnabled(), "Trace logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.trace(TEST_MESSAGE);
+            underTest.trace(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.trace(() -> TEST_MESSAGE);
+            underTest.trace(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.trace(FORMATTED_MESSAGE, PARAMETER);
+            underTest.trace(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleDebugLevel() {
+            // Given debug is enabled
+            assumeTrue(underTest.isDebugEnabled(), "Debug logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.debug(TEST_MESSAGE);
+            underTest.debug(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.debug(() -> TEST_MESSAGE);
+            underTest.debug(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.debug(FORMATTED_MESSAGE, PARAMETER);
+            underTest.debug(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleInfoLevel() {
+            // Given info is enabled
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.info(TEST_MESSAGE);
+            underTest.info(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.info(() -> TEST_MESSAGE);
+            underTest.info(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.info(FORMATTED_MESSAGE, PARAMETER);
+            underTest.info(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleWarnLevel() {
+            // Given warn is enabled
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.warn(TEST_MESSAGE);
+            underTest.warn(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.warn(() -> TEST_MESSAGE);
+            underTest.warn(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.warn(FORMATTED_MESSAGE, PARAMETER);
+            underTest.warn(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleErrorLevel() {
+            // Given error is enabled
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.error(TEST_MESSAGE);
+            underTest.error(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.error(() -> TEST_MESSAGE);
+            underTest.error(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.error(FORMATTED_MESSAGE, PARAMETER);
+            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleStructuredLogging() {
+            // Given
+            var logRecord = LogRecordModel.builder()
+                    .identifier(100)
+                    .prefix("TEST")
+                    .template("Structured log: {}")
+                    .build();
+
+            // When/Then
+            underTest.info(logRecord.format("test data"));
+            underTest.error(TEST_EXCEPTION, logRecord.format("error data"));
+        }
+
+        @Test
+        void shouldHandleMultipleParameters() {
+            // Given
+            var template = "Value1: {}, Value2: {}, Value3: {}";
+            var param1 = "first";
+            var param2 = "second";
+            var param3 = "third";
+
+            // When/Then
+            underTest.info(template, param1, param2, param3);
+            underTest.error(TEST_EXCEPTION, template, param1, param2, param3);
+        }
+
+        @Test
+        void shouldHandleNullParameters() {
+            // When/Then
+            underTest.info(FORMATTED_MESSAGE, (Object) null);
+            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, (Object) null);
+        }
+
+        @Test
+        void shouldHandleSuppliers() {
+            // Given
+            Supplier<String> messageSupplier = () -> "Computed message";
+
+            // When/Then
+            underTest.info(messageSupplier);
+            underTest.error(TEST_EXCEPTION, messageSupplier);
         }
     }
 
