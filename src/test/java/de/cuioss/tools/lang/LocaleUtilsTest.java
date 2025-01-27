@@ -46,8 +46,8 @@ class LocaleUtilsTest {
         assertNotNull(locale, "valid locale");
         assertEquals(language, locale.getLanguage());
         // country and variant are empty
-        assertTrue(locale.getCountry() == null || locale.getCountry().isEmpty());
-        assertTrue(locale.getVariant() == null || locale.getVariant().isEmpty());
+        assertTrue(locale.getCountry().isEmpty());
+        assertTrue(locale.getVariant().isEmpty());
     }
 
     /**
@@ -63,7 +63,7 @@ class LocaleUtilsTest {
         assertEquals(language, locale.getLanguage());
         assertEquals(country, locale.getCountry());
         // variant is empty
-        assertTrue(locale.getVariant() == null || locale.getVariant().isEmpty());
+        assertTrue(locale.getVariant().isEmpty());
     }
 
     /**

@@ -46,7 +46,7 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  *             "Username must be at least 3 characters long, was: %s", username);
  *
  *         // Range check with multiple parameters
- *         checkArgument(age >= 18 &amp;&amp; age <= 100,
+ *         checkArgument(age &gt;= 18 &amp;&amp; age &lt;= 100,
  *             "Age must be between 18 and 100, was: %s", age);
  *     }
  * }

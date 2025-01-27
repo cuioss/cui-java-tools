@@ -76,35 +76,14 @@ public class UrlLoader implements FileLoader {
         this.url = url;
     }
 
-    /**
-     * @return true, if a connection to {@link #getURL()} can be established
-     */
-    @Override
-    public boolean isReadable() {
-        try {
-            var con = getConnection();
-            if (con.isPresent()) {
-                con.get().connect();
-                return true;
-            }
-        } catch (final IOException e) {
-            log.error(e, "Could not read from URL: {}", getURL());
-        }
-        return false;
-    }
-
-    @Override
-    public StructuredFilename getFileName() {
-        return new StructuredFilename(getURL().getPath());
-    }
-
     @Override
     public InputStream inputStream() throws IOException {
-        var con = getConnection();
-        if (con.isPresent()) {
-            return con.get().getInputStream();
+        if (null == connection) {
+            connection = url.openConnection();
+            connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
+            connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
         }
-        return null;
+        return connection.getInputStream();
     }
 
     @Override
@@ -113,20 +92,23 @@ public class UrlLoader implements FileLoader {
     }
 
     @Override
-    public boolean isFilesystemLoader() {
-        return false;
+    public boolean isReadable() {
+        try {
+            inputStream().close();
+            return true;
+        } catch (IOException e) {
+            log.debug("Resource not readable: {}", url, e);
+            return false;
+        }
     }
 
-    private Optional<URLConnection> getConnection() {
-        if (null == connection) {
-            try {
-                connection = url.openConnection();
-                connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
-                connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
-            } catch (final IOException e) {
-                log.error(e, "Portal-538: Could not read from URL: {}", getURL());
-            }
-        }
-        return Optional.ofNullable(connection);
+    @Override
+    public StructuredFilename getFileName() {
+        return new StructuredFilename(url.getPath());
+    }
+
+    @Override
+    public boolean isFilesystemLoader() {
+        return false;
     }
 }
