@@ -46,7 +46,7 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  *             "Username must be at least 3 characters long, was: %s", username);
  *
  *         // Range check with multiple parameters
- *         checkArgument(age >= 18 && age <= 100,
+ *         checkArgument(age >= 18 &amp;&amp; age <= 100,
  *             "Age must be between 18 and 100, was: %s", age);
  *     }
  * }
@@ -56,7 +56,7 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  * <pre>
  * public class ConnectionPool {
  *     private boolean initialized;
- *     private List<Connection> connections;
+ *     private List&lt;Connection&gt; connections;
  *
  *     public Connection getConnection() {
  *         // Verify object state
@@ -74,12 +74,12 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  * <h3>3. Collection and Array Validation</h3>
  * <pre>
  * public class BatchProcessor {
- *     public void processBatch(List<String> items, String[] config) {
+ *     public void processBatch(List&lt;String&gt; items, String[] config) {
  *         // Check collection
  *         checkArgument(!items.isEmpty(), "Items list must not be empty");
  *
  *         // Check array with index
- *         for (int i = 0; i < items.size(); i++) {
+ *         for (int i = 0; i &lt; items.size(); i++) {
  *             checkArgument(items.get(i) != null,
  *                 "Item at index %s must not be null", i);
  *         }
@@ -96,7 +96,7 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  * public class TransactionService {
  *     public void transfer(Account from, Account to, BigDecimal amount) {
  *         // Multiple conditions in single check
- *         checkArgument(amount != null && amount.compareTo(BigDecimal.ZERO) > 0,
+ *         checkArgument(amount != null &amp;&amp; amount.compareTo(BigDecimal.ZERO) &gt; 0,
  *             "Transfer amount must be positive, was: %s", amount);
  *
  *         // Business rule validation
@@ -105,7 +105,7 @@ import static de.cuioss.tools.string.MoreStrings.lenientFormat;
  *             amount, from.getBalance());
  *
  *         // State consistency check
- *         checkState(!from.isLocked() && !to.isLocked(),
+ *         checkState(!from.isLocked() &amp;&amp; !to.isLocked(),
  *             "Cannot transfer between locked accounts (from: %s, to: %s)",
  *             from.isLocked(), to.isLocked());
  *     }

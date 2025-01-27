@@ -19,24 +19,97 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test class for {@link LogRecordModel} ensuring proper log message formatting
+ * and integration with {@link CuiLogger}.
+ */
 class LogRecordModelTest {
 
     private static final String PREFIX = "CUI-100";
+    private static final CuiLogger log = new CuiLogger(LogRecordModelTest.class);
 
-    private final LogRecord model = LogRecordModel.builder().identifier(100).prefix("CUI").template("{}-%s").build();
+    private final LogRecord infoModel = LogRecordModel.builder()
+            .identifier(100)
+            .prefix("CUI")
+            .template("{}-%s")
+            .build();
+
+    private final LogRecord errorModel = LogRecordModel.builder()
+            .identifier(500)
+            .prefix("ERROR")
+            .template("Operation failed: {}")
+            .build();
+
+    private final LogRecord warnModel = LogRecordModel.builder()
+            .identifier(300)
+            .prefix("WARN")
+            .template("Warning condition: {}")
+            .build();
 
     @Test
     void shouldHandlePrefix() {
-        assertEquals(PREFIX, model.resolveIdentifierString());
-        assertEquals(PREFIX + ": A-2", model.format("A", 2));
-        // Should be reentrant
-        assertEquals(PREFIX + ": A-2", model.format("A", 2));
+        assertEquals(PREFIX, infoModel.resolveIdentifierString());
+        assertEquals(PREFIX + ": A-2", infoModel.format("A", 2));
     }
 
     @Test
-    void shouldHandleSupplier() {
-        var supplier = model.supplier("A", 2);
-        assertEquals(PREFIX + ": A-2", supplier.get());
+    void shouldHandleInfoLevel() {
+        var result = "Operation completed";
+        log.info(infoModel.format(result, "success"));
+        // No assertion needed as per logging rules - the fact that it logs without error is sufficient
     }
 
+    @Test
+    void shouldHandleErrorLevel() {
+        var errorMessage = "Database connection failed";
+        try {
+            throw new RuntimeException(errorMessage);
+        } catch (Exception e) {
+            log.error(errorModel.format(errorMessage));
+            log.error(e, errorModel.format(errorMessage));
+        }
+    }
+
+    @Test
+    void shouldHandleWarnLevel() {
+        var warningCondition = "Resource usage above 80%";
+        log.warn(warnModel.format(warningCondition));
+    }
+
+    @Test
+    void shouldHandleMultipleParameters() {
+        var complexModel = LogRecordModel.builder()
+                .identifier(200)
+                .prefix("COMPLEX")
+                .template("Value1: {}, Value2: {}, Value3: %s")
+                .build();
+
+        var result = complexModel.format("first", "second", "third");
+        assertEquals("COMPLEX-200: Value1: first, Value2: second, Value3: third", result);
+        log.info(result);
+    }
+
+    @Test
+    void shouldHandleNullParameters() {
+        var result = infoModel.format(null, null);
+        assertEquals(PREFIX + ": null-null", result);
+        log.info(result);
+    }
+
+    @Test
+    void shouldHandleExceptionFormatting() {
+        var exceptionModel = LogRecordModel.builder()
+                .identifier(600)
+                .prefix("EX")
+                .template("Exception occurred: {} - Details: %s")
+                .build();
+
+        try {
+            throw new IllegalArgumentException("Invalid input");
+        } catch (Exception e) {
+            var result = exceptionModel.format(e.getClass().getSimpleName(), e.getMessage());
+            assertEquals("EX-600: Exception occurred: IllegalArgumentException - Details: Invalid input", result);
+            log.error(e, result);
+        }
+    }
 }

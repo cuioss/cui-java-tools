@@ -15,15 +15,6 @@
  */
 package de.cuioss.tools.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +23,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
+/**
+ * Test class for {@link CuiLogger} ensuring proper logging behavior and
+ * integration with {@link LogRecord} and {@link LogRecordModel}.
+ */
 @DisplayName("CuiLogger Tests")
 class CuiLoggerTest {
 
@@ -150,65 +155,248 @@ class CuiLoggerTest {
         }
     }
 
+    @Nested
+    @DisplayName("Enhanced Logging Tests")
+    class EnhancedLoggingTests {
+
+        private static final String TEST_MESSAGE = "test message";
+        private static final String FORMATTED_MESSAGE = "formatted message: {}";
+        private static final String PARAMETER = "param";
+        private static final RuntimeException TEST_EXCEPTION = new RuntimeException("test exception");
+
+        @Test
+        void shouldHandleTraceLevel() {
+            // Given trace is enabled
+            assumeTrue(underTest.isTraceEnabled(), "Trace logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.trace(TEST_MESSAGE);
+            underTest.trace(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.trace(() -> TEST_MESSAGE);
+            underTest.trace(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.trace(FORMATTED_MESSAGE, PARAMETER);
+            underTest.trace(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleDebugLevel() {
+            // Given debug is enabled
+            assumeTrue(underTest.isDebugEnabled(), "Debug logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.debug(TEST_MESSAGE);
+            underTest.debug(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.debug(() -> TEST_MESSAGE);
+            underTest.debug(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.debug(FORMATTED_MESSAGE, PARAMETER);
+            underTest.debug(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleInfoLevel() {
+            // Given info is enabled
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.info(TEST_MESSAGE);
+            underTest.info(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.info(() -> TEST_MESSAGE);
+            underTest.info(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.info(FORMATTED_MESSAGE, PARAMETER);
+            underTest.info(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleWarnLevel() {
+            // Given warn is enabled
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.warn(TEST_MESSAGE);
+            underTest.warn(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.warn(() -> TEST_MESSAGE);
+            underTest.warn(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.warn(FORMATTED_MESSAGE, PARAMETER);
+            underTest.warn(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleErrorLevel() {
+            // Given error is enabled
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled for this test");
+
+            // When/Then - no assertions needed as per logging rules
+            underTest.error(TEST_MESSAGE);
+            underTest.error(TEST_EXCEPTION, TEST_MESSAGE);
+            underTest.error(() -> TEST_MESSAGE);
+            underTest.error(TEST_EXCEPTION, () -> TEST_MESSAGE);
+            underTest.error(FORMATTED_MESSAGE, PARAMETER);
+            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+        }
+
+        @Test
+        void shouldHandleStructuredLogging() {
+            // Given
+            var logRecord = LogRecordModel.builder()
+                    .identifier(100)
+                    .prefix("TEST")
+                    .template("Structured log: {}")
+                    .build();
+
+            // When/Then
+            underTest.info(logRecord.format("test data"));
+            underTest.error(TEST_EXCEPTION, logRecord.format("error data"));
+        }
+
+        @Test
+        void shouldHandleMultipleParameters() {
+            // Given
+            var template = "Value1: {}, Value2: {}, Value3: {}";
+            var param1 = "first";
+            var param2 = "second";
+            var param3 = "third";
+
+            // When/Then
+            underTest.info(template, param1, param2, param3);
+            underTest.error(TEST_EXCEPTION, template, param1, param2, param3);
+        }
+
+        @Test
+        void shouldHandleNullParameters() {
+            // When/Then
+            underTest.info(FORMATTED_MESSAGE, (Object) null);
+            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, (Object) null);
+        }
+
+        @Test
+        void shouldHandleSuppliers() {
+            // Given
+            Supplier<String> messageSupplier = () -> "Computed message";
+
+            // When/Then
+            underTest.info(messageSupplier);
+            underTest.error(TEST_EXCEPTION, messageSupplier);
+        }
+    }
+
+    @SuppressWarnings("java:S1144") // owolff: used by tests using MethodSource
     private static Stream<Arguments> provideLogLevels() {
         return Stream.of(
-            Arguments.of(Level.FINER, TRACE, new LogMethod() {
-                @Override
-                public void log(CuiLogger logger, String msg) { logger.trace(msg); }
-                @Override
-                public void log(CuiLogger logger, String msg, Throwable t) { logger.trace(msg, t); }
-                @Override
-                public void logSupplier(CuiLogger logger, Supplier<String> supplier) { logger.trace(supplier); }
-                @Override
-                public void logFormat(CuiLogger logger, String template, Object... args) { logger.trace(template, args); }
-            }),
-            Arguments.of(Level.FINE, DEBUG, new LogMethod() {
-                @Override
-                public void log(CuiLogger logger, String msg) { logger.debug(msg); }
-                @Override
-                public void log(CuiLogger logger, String msg, Throwable t) { logger.debug(msg, t); }
-                @Override
-                public void logSupplier(CuiLogger logger, Supplier<String> supplier) { logger.debug(supplier); }
-                @Override
-                public void logFormat(CuiLogger logger, String template, Object... args) { logger.debug(template, args); }
-            }),
-            Arguments.of(Level.INFO, INFO, new LogMethod() {
-                @Override
-                public void log(CuiLogger logger, String msg) { logger.info(msg); }
-                @Override
-                public void log(CuiLogger logger, String msg, Throwable t) { logger.info(msg, t); }
-                @Override
-                public void logSupplier(CuiLogger logger, Supplier<String> supplier) { logger.info(supplier); }
-                @Override
-                public void logFormat(CuiLogger logger, String template, Object... args) { logger.info(template, args); }
-            }),
-            Arguments.of(Level.WARNING, WARN, new LogMethod() {
-                @Override
-                public void log(CuiLogger logger, String msg) { logger.warn(msg); }
-                @Override
-                public void log(CuiLogger logger, String msg, Throwable t) { logger.warn(msg, t); }
-                @Override
-                public void logSupplier(CuiLogger logger, Supplier<String> supplier) { logger.warn(supplier); }
-                @Override
-                public void logFormat(CuiLogger logger, String template, Object... args) { logger.warn(template, args); }
-            }),
-            Arguments.of(Level.SEVERE, ERROR, new LogMethod() {
-                @Override
-                public void log(CuiLogger logger, String msg) { logger.error(msg); }
-                @Override
-                public void log(CuiLogger logger, String msg, Throwable t) { logger.error(msg, t); }
-                @Override
-                public void logSupplier(CuiLogger logger, Supplier<String> supplier) { logger.error(supplier); }
-                @Override
-                public void logFormat(CuiLogger logger, String template, Object... args) { logger.error(template, args); }
-            })
+                Arguments.of(Level.FINER, TRACE, new LogMethod() {
+                    @Override
+                    public void log(CuiLogger logger, String msg) {
+                        logger.trace(msg);
+                    }
+
+                    @Override
+                    public void log(CuiLogger logger, String msg, Throwable t) {
+                        logger.trace(msg, t);
+                    }
+
+                    @Override
+                    public void logSupplier(CuiLogger logger, Supplier<String> supplier) {
+                        logger.trace(supplier);
+                    }
+
+                    @Override
+                    public void logFormat(CuiLogger logger, String template, Object... args) {
+                        logger.trace(template, args);
+                    }
+                }),
+                Arguments.of(Level.FINE, DEBUG, new LogMethod() {
+                    @Override
+                    public void log(CuiLogger logger, String msg) {
+                        logger.debug(msg);
+                    }
+
+                    @Override
+                    public void log(CuiLogger logger, String msg, Throwable t) {
+                        logger.debug(msg, t);
+                    }
+
+                    @Override
+                    public void logSupplier(CuiLogger logger, Supplier<String> supplier) {
+                        logger.debug(supplier);
+                    }
+
+                    @Override
+                    public void logFormat(CuiLogger logger, String template, Object... args) {
+                        logger.debug(template, args);
+                    }
+                }),
+                Arguments.of(Level.INFO, INFO, new LogMethod() {
+                    @Override
+                    public void log(CuiLogger logger, String msg) {
+                        logger.info(msg);
+                    }
+
+                    @Override
+                    public void log(CuiLogger logger, String msg, Throwable t) {
+                        logger.info(msg, t);
+                    }
+
+                    @Override
+                    public void logSupplier(CuiLogger logger, Supplier<String> supplier) {
+                        logger.info(supplier);
+                    }
+
+                    @Override
+                    public void logFormat(CuiLogger logger, String template, Object... args) {
+                        logger.info(template, args);
+                    }
+                }),
+                Arguments.of(Level.WARNING, WARN, new LogMethod() {
+                    @Override
+                    public void log(CuiLogger logger, String msg) {
+                        logger.warn(msg);
+                    }
+
+                    @Override
+                    public void log(CuiLogger logger, String msg, Throwable t) {
+                        logger.warn(msg, t);
+                    }
+
+                    @Override
+                    public void logSupplier(CuiLogger logger, Supplier<String> supplier) {
+                        logger.warn(supplier);
+                    }
+
+                    @Override
+                    public void logFormat(CuiLogger logger, String template, Object... args) {
+                        logger.warn(template, args);
+                    }
+                }),
+                Arguments.of(Level.SEVERE, ERROR, new LogMethod() {
+                    @Override
+                    public void log(CuiLogger logger, String msg) {
+                        logger.error(msg);
+                    }
+
+                    @Override
+                    public void log(CuiLogger logger, String msg, Throwable t) {
+                        logger.error(msg, t);
+                    }
+
+                    @Override
+                    public void logSupplier(CuiLogger logger, Supplier<String> supplier) {
+                        logger.error(supplier);
+                    }
+
+                    @Override
+                    public void logFormat(CuiLogger logger, String template, Object... args) {
+                        logger.error(template, args);
+                    }
+                })
         );
     }
 
     private interface LogMethod {
         void log(CuiLogger logger, String msg);
+
         void log(CuiLogger logger, String msg, Throwable t);
+
         void logSupplier(CuiLogger logger, Supplier<String> supplier);
+
         void logFormat(CuiLogger logger, String template, Object... args);
     }
 }

@@ -60,7 +60,7 @@ import static java.util.Objects.requireNonNull;
  * public class PerformanceService {
  *     private static final CuiLogger log = new CuiLogger(PerformanceService.class);
  *
- *     public void processData(List<String> items) {
+ *     public void processData(List&lt;String&gt; items) {
  *         // Message will only be constructed if debug is enabled
  *         log.debug(() -> String.format("Processing %d items: %s",
  *             items.size(),
@@ -76,7 +76,7 @@ import static java.util.Objects.requireNonNull;
  * public class DataProcessor {
  *     private static final CuiLogger log = new CuiLogger(DataProcessor.class);
  *
- *     public void process(String filename, Map<String, Object> data) {
+ *     public void process(String filename, Map&lt;String, Object&gt; data) {
  *         try {
  *             // ... processing logic
  *         } catch (IOException e) {

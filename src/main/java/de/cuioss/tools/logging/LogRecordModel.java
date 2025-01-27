@@ -170,8 +170,8 @@ public class LogRecordModel implements LogRecord {
 
     @Override
     public String format(Object... parameter) {
-        return new StringBuilder(resolveIdentifierString()).append(AFTER_PREFIX)
-                .append(lenientFormat(getParsedMessageTemplate(), parameter)).toString();
+        return resolveIdentifierString() + AFTER_PREFIX +
+                lenientFormat(getParsedMessageTemplate(), parameter);
     }
 
     @Override

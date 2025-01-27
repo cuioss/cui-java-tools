@@ -37,7 +37,7 @@ class JoinerTest {
     private static final Iterable<Integer> ITERABLE_1 = List.of(1);
     private static final Iterable<Integer> ITERABLE_12 = Arrays.asList(1, 2);
     private static final Iterable<Integer> ITERABLE_123 = Arrays.asList(1, 2, 3);
-    private static final Iterable<Integer> ITERABLE_NULL = Collections.singletonList((Integer) null);
+    private static final Iterable<Integer> ITERABLE_NULL = Collections.singletonList(null);
     private static final Iterable<Integer> ITERABLE_NULL_NULL = Arrays.asList(null, null);
     private static final Iterable<Integer> ITERABLE_NULL_1 = Arrays.asList(null, 1);
     private static final Iterable<Integer> ITERABLE_1_NULL = Arrays.asList(1, null);
