@@ -23,7 +23,7 @@ import org.opentest4j.AssertionFailedError;
 /**
  * Helper class for checking behaviour of IO classes.
  *
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/testtools/YellOnFlushAndCloseOutputStream.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/testtools/YellOnFlushAndCloseOutputStream.java">...</a>
  *
  */
 public class YellOnFlushAndCloseOutputStream extends ProxyOutputStream {

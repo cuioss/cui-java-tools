@@ -26,7 +26,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsWildcardTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsWildcardTestCase.java">...</a>
  *
  */
 @SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
@@ -186,7 +186,7 @@ class FilenameUtilsWildcardTest {
     }
 
     /**
-     * See https://issues.apache.org/jira/browse/IO-246
+     * See <a href="https://issues.apache.org/jira/browse/IO-246">...</a>
      */
     @Test
     void test_IO_246() {

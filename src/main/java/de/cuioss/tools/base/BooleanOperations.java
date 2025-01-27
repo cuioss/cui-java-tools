@@ -67,8 +67,6 @@ import lombok.experimental.UtilityClass;
  * }
  * </pre>
  *
- *
- *
  * @author Eugen Fischer
  * @author Oliver Wolff
  */
@@ -108,7 +106,7 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if one of parameters is {@code true}, {@code false}
-     *         otherwise
+     * otherwise
      */
     public static boolean isAnyTrue(final boolean... parameter) {
         return containsTrue(parameter);
@@ -119,7 +117,7 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if all parameters are {@code true} or no parameter is
-     *         given ratio: no given false, {@code false} otherwise
+     * given ratio: no given false, {@code false} otherwise
      */
     public static boolean areAllTrue(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -133,8 +131,8 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if all parameters are {@code false}, {@code true}
-     *         otherwise. {@code false} if no parameter is passed, ratio: no given
-     *         false
+     * otherwise.
+     * if no parameter is passed, ratio: no given -> false
      */
     public static boolean areAllFalse(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -148,7 +146,7 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if one of parameters is {@code false}, {@code true}
-     *         otherwise
+     * otherwise
      */
     public static boolean isAnyFalse(final boolean... parameter) {
         return containsFalse(parameter);
@@ -157,7 +155,7 @@ public final class BooleanOperations {
     /**
      * @param value to be checked
      * @return true, if the given value represents a boolean value i.e. "true" or
-     *         "false" ignoring case.
+     * "false" ignoring case.
      */
     public static boolean isValidBoolean(String value) {
         return Boolean.TRUE.toString().equalsIgnoreCase(value) || Boolean.FALSE.toString().equalsIgnoreCase(value);

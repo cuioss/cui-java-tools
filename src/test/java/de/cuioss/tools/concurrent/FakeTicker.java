@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.concurrent;
 
+import java.io.Serial;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,6 +23,7 @@ import de.cuioss.tools.base.Preconditions;
 
 public class FakeTicker extends Ticker {
 
+    @Serial
     private static final long serialVersionUID = 1047851947159622996L;
     private final AtomicLong nanos = new AtomicLong();
     private volatile long autoIncrementStepNanos;

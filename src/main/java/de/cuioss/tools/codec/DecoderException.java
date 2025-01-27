@@ -15,12 +15,14 @@
  */
 package de.cuioss.tools.codec;
 
+import java.io.Serial;
+
 /**
  * Thrown when there is a failure condition during the decoding process. This
  * exception is thrown when a Decoder encounters a decoding specific exception
  * such as invalid data, or characters outside the expected range.
  *
- * @author https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/DecoderException.java
+ * @see <a href="https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/DecoderException.java">commons-codec/</a>
  */
 public class DecoderException extends Exception {
 
@@ -28,15 +30,15 @@ public class DecoderException extends Exception {
      * Declares the Serial Version Uid.
      *
      * @see <a href="http://c2.com/cgi/wiki?AlwaysDeclareSerialVersionUid">Always
-     *      Declare Serial Version Uid</a>
+     * Declare Serial Version Uid</a>
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new exception with {@code null} as its detail message. The cause
      * is not initialized, and may subsequently be initialized by a call to
      * {@link #initCause}.
-     *
      */
     public DecoderException() {
     }

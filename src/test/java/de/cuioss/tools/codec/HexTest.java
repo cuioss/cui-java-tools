@@ -32,7 +32,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java
+ * @author <a href="https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java">...</a>
  *
  */
 @SuppressWarnings("java:S5785") // owolff: I will not change because I want to stay ins sync with

@@ -49,7 +49,7 @@ import de.cuioss.tools.io.support.YellOnFlushAndCloseOutputStream;
 import de.cuioss.tools.support.Generators;
 
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java">...</a>
  *
  */
 @SuppressWarnings("resource")

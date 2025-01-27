@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * See the protected methods for ways in which a subclass can easily decorate a
  * stream with custom pre-, post- or error processing functionality.
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/ProxyOutputStream.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/ProxyOutputStream.java">...</a>
  */
 public class ProxyOutputStream extends FilterOutputStream {
 

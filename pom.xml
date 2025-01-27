@@ -31,6 +31,24 @@
         <version.cui.parent>0.8.5</version.cui.parent>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <detectJavaApiLink>false</detectJavaApiLink>
+                    <doclint>none</doclint>
+                    <quiet>true</quiet>
+                    <additionalJOption>--add-modules=java.desktop,java.logging</additionalJOption>
+                    <sourceFileExcludes>
+                        <exclude>module-info.java</exclude>
+                    </sourceFileExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <issueManagement>
         <url>https://github.com/cuioss/cui-java-tools/issues</url>
         <system>GitHub Issues</system>

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Initially taken from
- * https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/SplitterTest.java
+ * <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/SplitterTest.java">...</a>
  */
 class SplitterTest {
 

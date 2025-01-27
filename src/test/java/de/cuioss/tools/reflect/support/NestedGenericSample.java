@@ -15,11 +15,13 @@
  */
 package de.cuioss.tools.reflect.support;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NestedGenericSample extends ArrayList<List<String>> {
 
+    @Serial
     private static final long serialVersionUID = 4953296552239805855L;
 
 }

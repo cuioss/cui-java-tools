@@ -15,12 +15,12 @@
  */
 package de.cuioss.tools.net;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 import java.net.IDN;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 
 /**
  * <p>
@@ -64,7 +64,7 @@ public class IDNInternetAddress {
      * sanitizer. It takes care on the special elements like {@code <>} by not
      * trying to sanitize them.
      *
-     * @param completeAddress
+     * @param completeAddress to be encoded
      * @param sanitizer       to be passed as UnaryOperator
      * @return the sanitized and encoded address.
      */
@@ -93,10 +93,11 @@ public class IDNInternetAddress {
 
     /**
      * Decodes the given address and sanitizes the elements with the provided
-     * sanitizer. It takes care on the special elements like <> by not trying to
+     * sanitizer.
+     * It takes care of the special elements like &lt;&gt; by not trying to
      * sanitize them.
      *
-     * @param completeAddress
+     * @param completeAddress tp be decoded
      * @param sanitizer       to be passed as UnaryOperator
      * @return the sanitized and decoded address.
      */

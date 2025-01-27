@@ -15,16 +15,16 @@
  */
 package de.cuioss.tools.support;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Simple helper providing an assert for {@link Object#equals(Object)}
@@ -32,7 +32,6 @@ import java.io.Serializable;
  * contract
  *
  * @author Oliver Wolff
- *
  */
 @SuppressWarnings("java:S5785") // owolff THe fine-grained equals test is by design and not a bug
 public class ObjectMethodsAsserts {
@@ -85,8 +84,7 @@ public class ObjectMethodsAsserts {
     public static void assertSerializableContract(Object underTest) {
         assertNotNull(underTest);
 
-        assertTrue(underTest instanceof Serializable,
-                underTest.getClass().getName() + " does not implement java.io.Serializable");
+        assertInstanceOf(Serializable.class, underTest, underTest.getClass().getName() + " does not implement java.io.Serializable");
 
         final var serializationFailedMessage = underTest.getClass().getName() + " is not equal after serialization";
         var serializeAndDeserialize = serializeAndDeserialize(underTest);
@@ -107,7 +105,7 @@ public class ObjectMethodsAsserts {
         final var msgNotEqualsObject = "Expected result for equals(new Object()) will be 'false'. Class was : "
                 + underTest.getClass();
 
-        assertNotEquals(underTest, new Object(), msgNotEqualsObject);
+        assertNotEquals(new Object(), underTest, msgNotEqualsObject);
 
         final var msgEqualsToSelf = "Expected result for equals(underTest) will be 'true'. Class was : "
                 + underTest.getClass();
@@ -136,7 +134,7 @@ public class ObjectMethodsAsserts {
      * @param object to be serialized, must not be null
      * @return the deserialized object.
      */
-    public static final Object serializeAndDeserialize(final Object object) {
+    public static Object serializeAndDeserialize(final Object object) {
         assertNotNull(object, "Given Object must not be null");
         final var serialized = serializeObject(object);
         return deserializeObject(serialized);
@@ -148,7 +146,7 @@ public class ObjectMethodsAsserts {
      * @param object to be serialized
      * @return the resulting byte array
      */
-    public static final byte[] serializeObject(final Object object) {
+    public static byte[] serializeObject(final Object object) {
         assertNotNull(object, "Given Object must not be null");
         final var baos = new ByteArrayOutputStream(1024);
         try (var oas = new ObjectOutputStream(baos)) {
@@ -167,7 +165,7 @@ public class ObjectMethodsAsserts {
      * @param bytes to be deserialized
      * @return the deserialized object
      */
-    public static final Object deserializeObject(final byte[] bytes) {
+    public static Object deserializeObject(final byte[] bytes) {
         assertNotNull(bytes, "Given byte-array must not be null");
         final var bais = new ByteArrayInputStream(bytes);
         try (var ois = new ObjectInputStream(bais)) {

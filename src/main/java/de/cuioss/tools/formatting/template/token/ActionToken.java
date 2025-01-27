@@ -18,6 +18,7 @@ package de.cuioss.tools.formatting.template.token;
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class ActionToken implements Token {
 
+    @Serial
     private static final long serialVersionUID = -6329721490557755853L;
 
     private final String before;

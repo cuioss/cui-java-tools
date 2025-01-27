@@ -20,18 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides runtime-information about a bean without resorting to reflection.
+ * Base interface for all formatters.
+ * Each implementation must provide a method for retrieving all properties that can be used for formatting.
  *
- * @author Eugen Fischer
+ * @author Oliver Wolff
  */
 public interface FormatterSupport {
 
     /**
-     * Allow easier access to available properties. Order of available properties
-     * and their values has no effect.
-     *
-     * @return Map<String, Serializable> of property name -> property Value for
-     *         <b>non</b> {@code null} properties
+     * @return A map containing property names and their corresponding values.
+     * The values must be {@link Serializable}.
      */
     Map<String, Serializable> getAvailablePropertyValues();
 

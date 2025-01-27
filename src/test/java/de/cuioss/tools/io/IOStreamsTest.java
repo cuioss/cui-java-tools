@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import de.cuioss.tools.support.Generators;
 
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsTestCase.java">...</a>
  *
  */
 class IOStreamsTest {

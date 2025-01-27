@@ -15,19 +15,6 @@
  */
 package de.cuioss.tools.property;
 
-import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
-import java.beans.Beans;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Objects;
-import java.util.Optional;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
@@ -36,39 +23,36 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Objects;
+import java.util.Optional;
+
+import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
+
 /**
- * <h2>Overview</h2> An instance of {@link PropertyHolder} provides runtime
- * information for a specific BeanProperty. Under the hood it uses {@link Beans}
- * tooling provided by the JDK and the utilities {@link PropertyUtil} an and
- * {@link MoreReflection}. Compared to the standard tooling it is more flexible
- * regarding fluent api style of bean / DTOs.
- * <h3>Usage</h3>
+ * Represents a property of a class, providing type-safe access to its value.
+ * This class wraps a property (field or method) and provides type-safe access
+ * to read and write operations.
  * <p>
- * The usual entry-point is {@link #from(Class, String)}. In case you want to
- * create your own instance you can use the contained builder directly using
- * {@link #builder()}
+ * To create a new instance, use {@code PropertyHolder.builder().build()}.
  * </p>
  * <p>
- * Now you can access the metadata for that property, see
- * {@link #getMemberInfo()}, {@link #getName()}, {@link #getType()},
- * {@link #getReadMethod()}
+ * The holder provides access to property metadata through its accessor methods:
+ * {@code getMemberInfo()}, {@code getName()}, {@code getType()},
+ * {@code getReadMethod()}, and {@code getWriteMethod()}.
  * </p>
  * <p>
- * Reading and writing of properties should be done by {@link #readFrom(Object)}
- * and {@link #writeTo(Object, Object)}. Directly using {@link #getReadMethod()}
- * and {@link #getWriteMethod()} is more error-prone and less versatile.
- * </p>
- *
- * <h2>Caution:</h2>
- * <p>
- * Use reflection only if there is no other way. Even if some of the problems
- * are minimized by using this type. It should be used either in test-code, what
- * we actually do, and not production code. An other reason could be framework
- * code. as for that you should exactly know what you do.
+ * For type-safe access, use {@code readFrom(Object)} and {@code writeTo(Object, Object)}.
+ * Direct method access is more error-prone and less versatile.
  * </p>
  *
  * @author Oliver Wolff
- *
  */
 @Value
 @Builder
@@ -78,30 +62,40 @@ public class PropertyHolder {
 
     private static final CuiLogger log = new CuiLogger(PropertyHolder.class);
 
-    /** The name of the property. */
+    /**
+     * The name of the property.
+     */
     @NonNull
-    private final String name;
+    String name;
 
-    /** The actual type of the property. */
+    /**
+     * The actual type of the property.
+     */
     @NonNull
-    private final Class<?> type;
+    Class<?> type;
 
     /**
      * Provides additional runtime information for the property, see
      * {@link PropertyMemberInfo}
      */
     @NonNull
-    private final PropertyMemberInfo memberInfo;
+    PropertyMemberInfo memberInfo;
 
-    /** Provides additional Runtime-information, see {@link PropertyReadWrite} */
+    /**
+     * Provides additional Runtime-information, see {@link PropertyReadWrite}
+     */
     @NonNull
-    private final PropertyReadWrite readWrite;
+    PropertyReadWrite readWrite;
 
-    /** Derived by {@link PropertyDescriptor}, may be null */
-    private final Method readMethod;
+    /**
+     * Derived by {@link PropertyDescriptor}, may be null
+     */
+    Method readMethod;
 
-    /** Derived by {@link PropertyDescriptor}, may be null */
-    private final Method writeMethod;
+    /**
+     * Derived by {@link PropertyDescriptor}, may be null
+     */
+    Method writeMethod;
 
     /**
      * Reads the property on the given bean identified by the concrete
@@ -111,52 +105,50 @@ public class PropertyHolder {
      * tries to read the property by using
      * {@link PropertyUtil#readProperty(Object, String)}
      *
-     * @param bean instance to be read from, must not be null
+     * @param source instance to be read from, must not be null
      * @return the object read from the property
-     * @throws IllegalStateException in case the property can not be read, see
-     *                               {@link PropertyReadWrite#isReadable()}
-     * @throws IllegalStateException in case some Exception occurred while reading
+     * @throws IllegalArgumentException if the source is null or if the property is not
+     *                                  readable according to {@code isReadable()}
      */
-    public Object readFrom(Object bean) {
-        log.debug("Reading property '%s' from %s", name, bean);
-        requireNonNull(bean);
-        Preconditions.checkState(readWrite.isReadable(), "Property '%s' on bean '%s' can not be read", name, bean);
+    public Object readFrom(Object source) {
+        log.debug("Reading property '%s' from %s", name, source);
+        requireNonNull(source);
+        Preconditions.checkState(readWrite.isReadable(), "Property '%s' on bean '%s' can not be read", name, source);
         if (null != readMethod) {
             try {
-                return readMethod.invoke(bean);
+                return readMethod.invoke(source);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException(
-                        MoreStrings.lenientFormat(PropertyUtil.UNABLE_TO_READ_PROPERTY, name, bean.getClass()), e);
+                        MoreStrings.lenientFormat(PropertyUtil.UNABLE_TO_READ_PROPERTY, name, source.getClass()), e);
             }
         }
-        return PropertyUtil.readProperty(bean, name);
+        return PropertyUtil.readProperty(source, name);
     }
 
     /**
-     * @param bean          instance to be read from, must not be null
-     * @param propertyValue to be set
+     * @param target must not be null
+     * @param value  to be written
      * @return In case the property set method is void the given bean will be
-     *         returned. Otherwise, the return value of the method invocation,
-     *         assuming the setMethods is a builder / fluent-api type.
-     * @throws IllegalStateException in case the property can not be read, see
-     *                               {@link PropertyReadWrite#isWriteable()}
-     * @throws IllegalStateException in case some Exception occurred while writing
+     * returned. Otherwise, the return value of the method invocation,
+     * assuming the setMethods is a builder / fluent-api type.
+     * @throws IllegalArgumentException if the target is null or if the property is not
+     *                                  writeable according to {@code isWriteable()}
      */
-    public Object writeTo(Object bean, Object propertyValue) {
-        log.debug("Writing %s to property '%s' on %s", propertyValue, name, bean);
-        requireNonNull(bean);
-        Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, bean);
+    public Object writeTo(Object target, Object value) {
+        log.debug("Writing %s to property '%s' on %s", value, name, target);
+        requireNonNull(target);
+        Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, target);
         if (null != writeMethod) {
             try {
-                var result = writeMethod.invoke(bean, propertyValue);
-                return Objects.requireNonNullElse(result, bean);
+                var result = writeMethod.invoke(target, value);
+                return Objects.requireNonNullElse(result, target);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException(
-                        MoreStrings.lenientFormat(PropertyUtil.UNABLE_TO_WRITE_PROPERTY_RUNTIME, name, bean.getClass()),
+                        MoreStrings.lenientFormat(PropertyUtil.UNABLE_TO_WRITE_PROPERTY_RUNTIME, name, target.getClass()),
                         e);
             }
         }
-        return PropertyUtil.writeProperty(bean, name, propertyValue);
+        return PropertyUtil.writeProperty(target, name, value);
     }
 
     /**
@@ -165,7 +157,7 @@ public class PropertyHolder {
      * @param beanType      must not be null
      * @param attributeName must not be null nor empty
      * @return the concrete {@link PropertyHolder} for the given parameter if
-     *         applicable
+     * applicable
      * @throws IllegalArgumentException for cases where {@link Introspector} is not
      *                                  capable of resolving a
      *                                  {@link PropertyDescriptor}. This is usually
@@ -190,7 +182,7 @@ public class PropertyHolder {
     }
 
     private static Optional<PropertyHolder> doBuild(PropertyDescriptor propertyDescriptor, Class<?> type,
-            String attributeName) {
+                                                    String attributeName) {
         var builder = builder();
         builder.name(attributeName);
         builder.readWrite(PropertyReadWrite.fromPropertyDescriptor(propertyDescriptor, type, attributeName));

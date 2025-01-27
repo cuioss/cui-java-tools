@@ -19,6 +19,7 @@ import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class PersonAddress implements FormatterSupport, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -5846491132374853787L;
 
     private String street;

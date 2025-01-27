@@ -20,13 +20,12 @@ package de.cuioss.tools.net.ssl;
  * contained Key.
  *
  * @author Oliver Wolff
- *
  */
 public enum KeyHolderType {
 
     /**
      * The byte[] represents a serialized keyStore. Therefore, the optional
-     * {@link KeyMaterialHolder#getKeyPassword()} represents the store-password.
+     * KeyMaterialHolder#getKeyPassword represents the store-password.
      */
     KEY_STORE,
 

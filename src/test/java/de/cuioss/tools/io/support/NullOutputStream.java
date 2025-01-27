@@ -25,7 +25,7 @@ import java.io.OutputStream;
  * written to it are ignored and lost.
  * </p>
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/NullOutputStream.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/NullOutputStream.java">...</a>
  *
  */
 public class NullOutputStream extends OutputStream {

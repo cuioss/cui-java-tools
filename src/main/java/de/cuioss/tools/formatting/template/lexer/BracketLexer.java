@@ -19,6 +19,7 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -45,6 +46,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
+    @Serial
     private static final long serialVersionUID = 6117181403355108849L;
 
     /**

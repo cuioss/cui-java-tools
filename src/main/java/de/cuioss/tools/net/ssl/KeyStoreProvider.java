@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -45,36 +46,22 @@ import lombok.Singular;
 import lombok.ToString;
 
 /**
- * Provides instances of {@link KeyStore} defined by either given file /
- * storePassword combination or one or more {@link KeyMaterialHolder} containing
- * key-material as a byte-array.
- * <h2>Some words on the String-representation of passwords</h2> <em>No</em> it
- * is not (much) more secure to store them in a char[] because of not being part
- * of the string-pool:
+ * Provides access to a {@link KeyStore}. The store can be loaded from a file or
+ * created from a list of {@link KeyMaterialHolder}s. The provider ensures proper
+ * handling of passwords and key materials.
+ * <p>
+ * If both a file location and key materials are provided, the store will be
+ * created only from the key materials. The file location will be ignored.
+ * </p>
+ * <p>
+ * When using a file location, ensure that:
+ * </p>
  * <ul>
- * <li>If an attacker is on your machine debugging the string-pool you are
- * doomed anyway.</li>
- * <li>In most frameworks / user-land code there are some places where input /
- * configuration data is represented as String on the way to the more secure
- * "give me a char[]" parts. So it is usually in the String pool anyway.</li>
+ *   <li>The file exists and is readable</li>
+ *   <li>The store password is correct</li>
+ *   <li>The file contains a valid keystore</li>
  * </ul>
- * <p>
- * So: In theory the statements made by the Java Cryptography Architecture guide
- * ("<a href=
- * "http://docs.oracle.com/javase/6/docs/technotes/guides/security/crypto/CryptoSpec.html#PBEEx">...</a>")
- * are correct but in our scenarios they will increase security only a small
- * amount and introduce potential bugs and will therefore be ignored for this
- * keyStoreType.
- * </p>
- * <p>
- * It is more important to avoid accidental printing on logs and such, what is
- * handled by this keyStoreType.
- * </p>
- * Therefore, this class uses String-based handling of credentials, for
- * simplification and provide shortcuts for creating char[], see
- * {@link #getStorePasswordAsCharArray()} and
- * {@link #getKeyPasswordAsCharArray()}
- *
+ * 
  * @author Oliver Wolff
  * @author Nikola Marijan
  *
@@ -89,6 +76,7 @@ public class KeyStoreProvider implements Serializable {
 
     private static final CuiLogger log = new CuiLogger(KeyStoreProvider.class);
 
+    @Serial
     private static final long serialVersionUID = 496381186621534386L;
 
     @NonNull
@@ -115,16 +103,12 @@ public class KeyStoreProvider implements Serializable {
     private final Collection<KeyMaterialHolder> keys;
 
     /**
-     * Instantiates a {@link KeyStore} according to the given parameter. In case of
-     * {@link #getKeys()} and {@link #getLocation()} being present the
-     * {@link KeyStore} will <em>only</em> be created from the {@link #getKeys()}.
-     * The file will be ignored.
+     * Creates a new {@link KeyStore} using the configured parameters.
+     * If key materials are provided, they will be used to create the store.
+     * Otherwise, the store will be loaded from the configured file location.
      *
-     * @return an {@link Optional} on a {@link KeyStore} created from the configured
-     *         parameter. In case of {@link #getKeys} and {@link #getLocation()}
-     *         being {@code null} / empty it will return {@link Optional#empty()}
-     * @throws IllegalStateException in case the location-file is not null but not
-     *                               readable or of the key-store creation did fail.
+     * @return a new {@link KeyStore} instance
+     * @throws IllegalStateException if the store cannot be created or loaded
      */
     public Optional<KeyStore> resolveKeyStore() {
         if (BooleanOperations.areAllTrue(keys.isEmpty(), null == location)) {
@@ -217,18 +201,16 @@ public class KeyStoreProvider implements Serializable {
     }
 
     /**
-     * @return NPE-safe char-array representation of {@link #getStorePassword()}. If
-     *         storePassword is {@code null} or empty it returns an empty char[],
-     *         never {@code null}
+     * @return The store password as a character array. If no password is set,
+     *         returns an empty array.
      */
     public char[] getStorePasswordAsCharArray() {
         return toCharArray(storePassword);
     }
 
     /**
-     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If
-     *         keyPassword is {@code null} or empty it returns an empty char[],
-     *         never {@code null}
+     * @return The key password as a character array. If no password is set,
+     *         returns an empty array.
      */
     public char[] getKeyPasswordAsCharArray() {
         return toCharArray(keyPassword);
@@ -254,7 +236,7 @@ public class KeyStoreProvider implements Serializable {
      * @return NPE-safe char-array representation of given password. If password is
      *         {@code null} or empty it returns an empty char[], never {@code null}
      */
-    static final char[] toCharArray(String password) {
+    static char[] toCharArray(String password) {
         if (isEmpty(password)) {
             return new char[0];
         }

@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.property.support;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map.Entry;
 
@@ -28,6 +29,7 @@ import lombok.ToString;
 public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Serializable>
         implements Entry<K, V>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6403178000941411123L;
 
     @Getter

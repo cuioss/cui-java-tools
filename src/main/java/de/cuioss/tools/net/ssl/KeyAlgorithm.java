@@ -30,51 +30,51 @@ public enum KeyAlgorithm {
     /** A concrete algorithm that is not this enum / list. */
     OTHER,
 
-    /** https://en.wikipedia.org/wiki/Advanced_Encryption_Standard */
+    /** <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">...</a> */
     AES_128,
 
-    /** https://en.wikipedia.org/wiki/Advanced_Encryption_Standard */
+    /** <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">...</a> */
     AES_192,
 
-    /** https://en.wikipedia.org/wiki/Advanced_Encryption_Standard */
+    /** <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">...</a> */
     AES_256,
 
-    /** https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm */
+    /** <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm">...</a> */
     ECDSA_P_256,
 
-    /** https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm */
+    /** <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm">...</a> */
     ECDSA_P_384,
 
-    /** https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm */
+    /** <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm">...</a> */
     ECDSA_P_521,
 
-    /** https://en.wikipedia.org/wiki/HMAC */
+    /** <a href="https://en.wikipedia.org/wiki/HMAC">...</a> */
     HMAC_H_256,
 
-    /** https://en.wikipedia.org/wiki/HMAC */
+    /** <a href="https://en.wikipedia.org/wiki/HMAC">...</a> */
     HMAC_H_384,
 
-    /** https://en.wikipedia.org/wiki/HMAC */
+    /** <a href="https://en.wikipedia.org/wiki/HMAC">...</a> */
     HMAC_H_512,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_RS_256,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_RS_384,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_RS_512,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_PS_256,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_PS_384,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_PS_512,
 
-    /** https://en.wikipedia.org/wiki/RSA_(cryptosystem) */
+    /** <a href="https://en.wikipedia.org/wiki/RSA_(cryptosystem)">...</a> */
     RSA_2048,
 }

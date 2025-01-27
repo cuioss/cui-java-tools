@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java
+ * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java">...</a>
  *
  */
 class ConcurrentToolsTest {

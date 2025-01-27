@@ -54,7 +54,7 @@ import de.cuioss.tools.io.IOStreams;
  *  }
  * </pre>
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullReader.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullReader.java">...</a>
  *
  */
 public class NullReader extends Reader {

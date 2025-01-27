@@ -15,8 +15,11 @@
  */
 package de.cuioss.tools.reflect;
 
-import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
+import de.cuioss.tools.base.Preconditions;
+import de.cuioss.tools.collect.CollectionBuilder;
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.Synchronized;
+import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -36,21 +39,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import de.cuioss.tools.base.Preconditions;
-import de.cuioss.tools.collect.CollectionBuilder;
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.Synchronized;
-import lombok.experimental.UtilityClass;
+import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based
  * access.
  * <h2>Caution</h2>
  * <p>
- * Use reflection only if there is no other way. Even if some of the problems
- * are minimized by using this type. It should be used either in test-code, what
- * is we actually do, and not production code. An other reason could be
- * framework code. as for that you should exactly know what you do.
+ * Use reflection only if there is no other way.
+ * Even if some problems are minimized by using this type.
+ * It should be used either in test-code, what
+ * we actually do, and not production code.
+ * Another reason could be framework code.
+ * But in that case, you should exactly know what you do.
  * </p>
  *
  * @author Oliver Wolff
@@ -75,7 +77,7 @@ public final class MoreReflection {
      * calls itself with the corresponding parent until {@link Object}.
      * <em>Caution:</em>
      * <p>
-     * The field elements are shared between requests (cached), therefore you must
+     * The field elements are shared between requests (cached); therefore, you must
      * ensure that changes to the instance, like
      * {@link Field#setAccessible(boolean)} are reseted by the client. This can be
      * simplified by using {@link FieldWrapper}
@@ -87,7 +89,7 @@ public final class MoreReflection {
      */
     @Synchronized
     @SuppressWarnings("java:S3824") // owolff: computeIfAbsent is not an option because we add null
-                                    // to the field
+    // to the field
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
@@ -194,10 +196,10 @@ public final class MoreReflection {
      * @param parameterType identifying the parameter to be passed to the given
      *                      method, must not be null
      * @return the found modifier-method or {@link Optional#empty()} if none could
-     *         be found
+     * be found
      */
     public static Optional<Method> retrieveWriteMethod(final Class<?> clazz, final String propertyName,
-            final Class<?> parameterType) {
+                                                       final Class<?> parameterType) {
         requireNonNull(parameterType);
 
         for (final Method method : retrieveWriteMethodCandidates(clazz, propertyName)) {
@@ -213,7 +215,7 @@ public final class MoreReflection {
      * @param assignableSource the type to be checked
      * @param queryType        to be checked for
      * @return boolean indicating whether the given parameter, identified by their
-     *         class attributes match
+     * class attributes match
      */
     public static boolean checkWhetherParameterIsAssignable(final Class<?> assignableSource, final Class<?> queryType) {
         requireNonNull(assignableSource);
@@ -240,25 +242,25 @@ public final class MoreReflection {
      *
      * @param check must not be null
      * @return the wrapper type if the given type represents a primitive, the given
-     *         type otherwise.
+     * type otherwise.
      */
     static Class<?> resolveWrapperTypeForPrimitive(final Class<?> check) {
         if (!check.isPrimitive()) {
             return check;
         }
         return switch (check.getName()) {
-        case "boolean" -> Boolean.class;
-        case "byte" -> Byte.class;
-        case "char" -> Character.class;
-        case "short" -> Short.class;
-        case "int" -> Integer.class;
-        case "long" -> Long.class;
-        case "double" -> Double.class;
-        case "float" -> Float.class;
-        default -> {
-            log.warn("Unable to determine wrapper type for '{}', ", check);
-            yield check;
-        }
+            case "boolean" -> Boolean.class;
+            case "byte" -> Byte.class;
+            case "char" -> Character.class;
+            case "short" -> Short.class;
+            case "int" -> Integer.class;
+            case "long" -> Long.class;
+            case "double" -> Double.class;
+            case "float" -> Float.class;
+            default -> {
+                log.warn("Unable to determine wrapper type for '{}', ", check);
+                yield check;
+            }
         };
     }
 
@@ -274,7 +276,7 @@ public final class MoreReflection {
      * @param clazz        to be checked
      * @param propertyName to be checked, must not be null
      * @return the found modifier-methods or an empty {@link Collection} if none
-     *         could be found
+     * could be found
      */
     public static Collection<Method> retrieveWriteMethodCandidates(final Class<?> clazz, final String propertyName) {
         requireNotEmpty(propertyName);
@@ -304,7 +306,7 @@ public final class MoreReflection {
      * @param clazz        must not be null
      * @param propertyName to be accessed
      * @return {@link Optional#empty()} in case no method could be found, an
-     *         {@link Optional} with the found method otherwise.
+     * {@link Optional} with the found method otherwise.
      */
     public static Optional<Method> retrieveAccessMethod(final Class<?> clazz, final String propertyName) {
         requireNotEmpty(propertyName);
@@ -322,8 +324,8 @@ public final class MoreReflection {
      *
      * @param methodName must not be null nor empty
      * @return the possible attribute name of a given method-name, e.g. it return
-     *         'name' for getName/setName/isName. If none of the prefixes 'get',
-     *         'set', 'is' is found it returns the passed String.
+     * 'name' for getName/setName/isName. If none of the prefixes 'get',
+     * 'set', 'is' is found it returns the passed String.
      */
     public static String computePropertyNameFromMethodName(final String methodName) {
         requireNotEmpty(methodName);
@@ -352,10 +354,10 @@ public final class MoreReflection {
      *                      {@link Object#getClass()} it will return an empty list
      * @param annotation    the annotation to be extracted, must not be null
      * @return an immutable List with all annotations found at the given object or
-     *         one of its ancestors. May be empty but never null
+     * one of its ancestors. May be empty but never null
      */
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
-            final Class<A> annotation) {
+                                                                       final Class<A> annotation) {
         if (null == annotatedType || Object.class.equals(annotatedType.getClass())) {
             return Collections.emptyList();
         }
@@ -375,11 +377,11 @@ public final class MoreReflection {
      *                      {@link Object#getClass()} {@link Optional#empty()}
      * @param annotation    the annotation to be extracted, must not be null
      * @return an {@link Optional} on the annotated Object if the annotation can be
-     *         found. In case the annotation is found multiple times the first
-     *         element will be returned.
+     * found. In case the annotation is found multiple times the first
+     * element will be returned.
      */
     public static <A extends Annotation> Optional<A> extractAnnotation(final Class<?> annotatedType,
-            final Class<A> annotation) {
+                                                                       final Class<A> annotation) {
         requireNonNull(annotation);
         final List<A> extracted = extractAllAnnotations(annotatedType, annotation);
         if (extracted.isEmpty()) {
@@ -421,8 +423,8 @@ public final class MoreReflection {
     /**
      * @param type to be extracted from
      * @return if applicable the actual type argument for the given type. If the
-     *         type represents already a {@link Class} it will be returned directly.
-     *         Otherwise, the super-type will be checked by calling the superclass
+     * type represents already a {@link Class} it will be returned directly.
+     * Otherwise, the super-type will be checked by calling the superclass
      */
     public static Optional<Class<?>> extractGenericTypeCovariantly(final Type type) {
         if (null == type) {
@@ -446,7 +448,7 @@ public final class MoreReflection {
      *
      * @param typeToBeExtractedFrom must not be null
      * @return an {@link Optional} of the {@link ParameterizedType} view of the
-     *         given class.
+     * given class.
      */
     public static Optional<ParameterizedType> extractParameterizedType(final Class<?> typeToBeExtractedFrom) {
         log.debug("Extracting ParameterizedType from {}", typeToBeExtractedFrom);
@@ -466,6 +468,21 @@ public final class MoreReflection {
     }
 
     /**
+     * Returns the package name of {@code clazz} according to the Java Language
+     * Specification (section 6.7). Unlike {@link Class#getPackage}, this method only
+     * parses the class name and does not depend on the classloader.
+     *
+     * @param clazz the class to get the package name for
+     * @return the package name, or "" for default package
+     * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/reflect/Reflection.java">guava-Reflection</a>
+     */
+    public static String getPackageName(final Class<?> clazz) {
+        final var className = clazz.getName();
+        final var lastDotIndex = className.lastIndexOf('.');
+        return lastDotIndex != -1 ? className.substring(0, lastDotIndex) : "";
+    }
+
+    /**
      * Returns a proxy instance that implements {@code interfaceType} by dispatching
      * method invocations to {@code handler}. The class loader of
      * {@code interfaceType} will be used to define the proxy class. To implement
@@ -478,12 +495,12 @@ public final class MoreReflection {
      * @return the created Proxy-instance
      * @throws IllegalArgumentException if {@code interfaceType} does not specify
      *                                  the type of Java interface
-     * @author https://github.com/google/guava/blob/master/guava/src/com/google/common/reflect/Reflection.java
+     * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/reflect/Reflection.java">guava-Reflection</a>
      */
     public static <T> T newProxy(final Class<T> interfaceType, final InvocationHandler handler) {
         requireNonNull(handler);
         Preconditions.checkArgument(interfaceType.isInterface(), "%s is not an interface", interfaceType);
-        final var object = Proxy.newProxyInstance(interfaceType.getClassLoader(), new Class<?>[] { interfaceType },
+        final var object = Proxy.newProxyInstance(interfaceType.getClassLoader(), new Class<?>[]{interfaceType},
                 handler);
         return interfaceType.cast(object);
     }
@@ -512,7 +529,7 @@ public final class MoreReflection {
      * @return option of detected caller class name
      */
     public static Optional<StackTraceElement> findCallerElement(final Throwable throwable,
-            final Collection<String> markerClasses) {
+                                                                final Collection<String> markerClasses) {
 
         Objects.requireNonNull(markerClasses, "Marker class names are missing");
 

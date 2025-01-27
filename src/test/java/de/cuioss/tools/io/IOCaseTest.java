@@ -30,7 +30,7 @@ import java.io.ObjectOutputStream;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java">...</a>
  *
  */
 @SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test

@@ -15,13 +15,15 @@
  */
 package de.cuioss.tools.codec;
 
+import java.io.Serial;
+
 /**
  * Thrown when there is a failure condition during the encoding process. This
- * exception is thrown when an Encoder encounters an encoding specific exception
+ * exception is thrown when an Encoder encounters an encoding-specific exception
  * such as invalid data, inability to calculate a checksum, characters outside
  * the expected range.
  *
- * @author https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/EncoderException.java
+ * @see <a href="https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/EncoderException.java">commons-codec</a>
  */
 public class EncoderException extends Exception {
 
@@ -29,8 +31,9 @@ public class EncoderException extends Exception {
      * Declares the Serial Version Uid.
      *
      * @see <a href="http://c2.com/cgi/wiki?AlwaysDeclareSerialVersionUid">Always
-     *      Declare Serial Version Uid</a>
+     * Declare Serial Version Uid</a>
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

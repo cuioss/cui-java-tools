@@ -71,7 +71,7 @@ class MoreStringsTest {
 
     /**
      * Test for {@link MoreStrings#isAllLowerCase(CharSequence)}. COPIED FROM:
-     * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java
+     * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java">...</a>
      */
     @Test
     void testIsAllLowerCase() {
@@ -89,7 +89,7 @@ class MoreStringsTest {
 
     /**
      * Test for {@link MoreStrings#isAllUpperCase(CharSequence)}. COPIED FROM:
-     * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java
+     * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java">...</a>
      */
     @Test
     void testIsAllUpperCase() {
@@ -107,7 +107,7 @@ class MoreStringsTest {
 
     /**
      * COPIED FROM:
-     * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsIsTest.java
+     * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsIsTest.java">...</a>
      */
     @Test
     void testIsNumeric() {
@@ -133,7 +133,7 @@ class MoreStringsTest {
 
     /**
      * COPIED FROM:
-     * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java
+     * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java">...</a>
      */
     @Test
     void testIsEmpty() {
@@ -146,7 +146,7 @@ class MoreStringsTest {
 
     /**
      * COPIED FROM:
-     * https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java
+     * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java">...</a>
      */
     @Test
     void testIsBlank() {

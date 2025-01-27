@@ -15,17 +15,17 @@
  */
 package de.cuioss.tools.codec;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import lombok.Getter;
-import lombok.ToString;
-
 /**
  * <h2>Overview</h2> Converts hexadecimal Strings. The Charset used for certain
  * operation can be set, the default is set in {@link StandardCharsets#UTF_8}
- *
+ * <p>
  * This class is thread-safe.
  * <h3>Usage</h3>
  *
@@ -34,8 +34,7 @@ import lombok.ToString;
  * assertEquals(roundtrip, new String(Hex.decodeHex(Hex.encodeHex(roundtrip.getBytes()))));
  * </pre>
  *
- *
- * @author https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/binary/Hex.java
+ * @author <a href="https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/binary/Hex.java">commons-codec</a>
  */
 @ToString
 public class Hex {
@@ -48,14 +47,14 @@ public class Hex {
     /**
      * Used to build output as Hex
      */
-    private static final char[] DIGITS_LOWER = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
-            'e', 'f' };
+    private static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
+            'e', 'f'};
 
     /**
      * Used to build output as Hex
      */
-    private static final char[] DIGITS_UPPER = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-            'E', 'F' };
+    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+            'E', 'F'};
 
     /**
      * Converts a String representing hexadecimal values into an array of bytes of
@@ -65,7 +64,7 @@ public class Hex {
      *
      * @param data A String containing hexadecimal digits
      * @return A byte array containing binary data decoded from the supplied char
-     *         array.
+     * array.
      * @throws DecoderException Thrown if an odd number or illegal of characters is
      *                          supplied
      */
@@ -81,7 +80,7 @@ public class Hex {
      *
      * @param data An array of characters containing hexadecimal digits
      * @return A byte array containing binary data decoded from the supplied char
-     *         array.
+     * array.
      * @throws DecoderException Thrown if an odd number or illegal of characters is
      *                          supplied
      */
@@ -150,7 +149,6 @@ public class Hex {
      * @param toLowerCase {@code true} converts to lowercase, {@code false} to
      *                    uppercase
      * @return A char[] containing hexadecimal characters in the selected case
-     *
      */
     public static char[] encodeHex(final byte[] data, final boolean toLowerCase) {
         return encodeHex(data, toLowerCase ? DIGITS_LOWER : DIGITS_UPPER);
@@ -186,8 +184,7 @@ public class Hex {
      * @param data     a byte[] to convert to Hex characters
      * @param toDigits the output alphabet (must contain at least 16 chars)
      * @return A char[] containing the appropriate characters from the alphabet For
-     *         best results, this should be either upper- or lower-case hex.
-     *
+     * best results, this should be either upper- or lower-case hex.
      */
     @SuppressWarnings("squid:ForLoopCounterChangedCheck") // owolff: original code
     protected static char[] encodeHex(final byte[] data, final char[] toDigits) {
@@ -218,8 +215,7 @@ public class Hex {
      * @param byteBuffer a byte buffer to convert to Hex characters
      * @param toDigits   the output alphabet (must be at least 16 characters)
      * @return A char[] containing the appropriate characters from the alphabet For
-     *         best results, this should be either upper- or lower-case hex.
-     *
+     * best results, this should be either upper- or lower-case hex.
      */
     protected static char[] encodeHex(final ByteBuffer byteBuffer, final char[] toDigits) {
         return encodeHex(toByteArray(byteBuffer), toDigits);
@@ -232,7 +228,6 @@ public class Hex {
      *
      * @param data a byte[] to convert to Hex characters
      * @return A String containing lower-case hexadecimal characters
-     *
      */
     public static String encodeHexString(final byte[] data) {
         return new String(encodeHex(data));
@@ -247,7 +242,6 @@ public class Hex {
      * @param toLowerCase {@code true} converts to lowercase, {@code false} to
      *                    uppercase
      * @return A String containing lower-case hexadecimal characters
-     *
      */
     public static String encodeHexString(final byte[] data, final boolean toLowerCase) {
         return new String(encodeHex(data, toLowerCase));
@@ -266,7 +260,6 @@ public class Hex {
      *
      * @param data a byte buffer to convert to Hex characters
      * @return A String containing lower-case hexadecimal characters
-     *
      */
     public static String encodeHexString(final ByteBuffer data) {
         return new String(encodeHex(data));
@@ -287,7 +280,6 @@ public class Hex {
      * @param toLowerCase {@code true} converts to lowercase, {@code false} to
      *                    uppercase
      * @return A String containing lower-case hexadecimal characters
-     *
      */
     public static String encodeHexString(final ByteBuffer data, final boolean toLowerCase) {
         return new String(encodeHex(data, toLowerCase));
@@ -347,7 +339,6 @@ public class Hex {
      * Creates a new codec with the given Charset.
      *
      * @param charset the charset.
-     *
      */
     public Hex(final Charset charset) {
         this.charset = charset;
@@ -359,7 +350,7 @@ public class Hex {
      * @param charsetName the charset name.
      * @throws java.nio.charset.UnsupportedCharsetException If the named charset is
      *                                                      unavailable
-     *
+     *                                                      <p>
      *                                                      throws
      *                                                      UnsupportedCharsetException
      *                                                      if the named charset is
@@ -370,59 +361,37 @@ public class Hex {
     }
 
     /**
-     * Converts an array of character bytes representing hexadecimal values into an
-     * array of bytes of those same values. The returned array will be half the
-     * length of the passed array, as it takes two characters to represent any given
-     * byte. An exception is thrown if the passed char array has an odd number of
-     * elements.
+     * Converts a String or an array of character bytes to an array of bytes
+     * using the default charset.
      *
-     * @param array An array of character bytes containing hexadecimal digits
-     * @return A byte array containing binary data decoded from the supplied byte
-     *         array (representing characters).
-     * @throws DecoderException Thrown if an odd number of characters is supplied to
-     *                          this function
-     * @see #decodeHex(char[])
+     * @param object String to convert to byte array
+     * @return the byte array
+     * @throws IllegalArgumentException if the parameter is null
      */
-    public byte[] decode(final byte[] array) throws DecoderException {
-        return decodeHex(new String(array, getCharset()).toCharArray());
+    public byte[] decode(final byte[] object) throws DecoderException {
+        return decodeHex(new String(object, getCharset()).toCharArray());
     }
 
     /**
-     * Converts a buffer of character bytes representing hexadecimal values into an
-     * array of bytes of those same values. The returned array will be half the
-     * length of the passed array, as it takes two characters to represent any given
-     * byte. An exception is thrown if the passed char array has an odd number of
-     * elements.
+     * Converts a String or an array of bytes to an array of bytes
+     * using the default charset.
      *
-     * <p>
-     * All bytes identified by {@link ByteBuffer#remaining()} will be used; after
-     * this method the value {@link ByteBuffer#remaining() remaining()} will be
-     * zero.
-     * </p>
-     *
-     * @param buffer An array of character bytes containing hexadecimal digits
-     * @return A byte array containing binary data decoded from the supplied byte
-     *         array (representing characters).
-     * @throws DecoderException Thrown if an odd number of characters is supplied to
-     *                          this function
-     * @see #decodeHex(char[])
-     *
+     * @param object String to convert to byte array
+     * @return the byte array
+     * @throws IllegalArgumentException if the parameter is null
      */
-    public byte[] decode(final ByteBuffer buffer) throws DecoderException {
-        return decodeHex(new String(toByteArray(buffer), getCharset()).toCharArray());
+    public byte[] decode(final ByteBuffer object) throws DecoderException {
+        return decodeHex(new String(toByteArray(object), getCharset()).toCharArray());
     }
 
     /**
-     * Converts a String or an array of character bytes representing hexadecimal
-     * values into an array of bytes of those same values. The returned array will
-     * be half the length of the passed String or array, as it takes two characters
-     * to represent any given byte. An exception is thrown if the passed char array
-     * has an odd number of elements.
+     * Converts a String or an array of character bytes to an array of bytes
+     * using the default charset.
      *
-     * @param object A String, ByteBuffer, byte[], or an array of character bytes
+     * @param object a String, ByteBuffer, byte[], or an array of character bytes
      *               containing hexadecimal digits
      * @return A byte array containing binary data decoded from the supplied byte
-     *         array (representing characters).
+     * array (representing characters).
      * @throws DecoderException Thrown if an odd number of characters is supplied to
      *                          this function or the object is not a String or
      *                          char[]
@@ -447,33 +416,22 @@ public class Hex {
 
     /**
      * Converts an array of bytes into an array of bytes for the characters
-     * representing the hexadecimal values of each byte in order. The returned array
-     * will be double the length of the passed array, as it takes two characters to
-     * represent any given byte.
-     * <p>
-     * The conversion from hexadecimal characters to the returned bytes is performed
-     * with the charset named by {@link #getCharset()}.
-     * </p>
+     * representing the hexadecimal values of each byte in order.
      *
      * @param array a byte[] to convert to Hex characters
-     * @return A byte[] containing the bytes of the lower-case hexadecimal
-     *         characters No longer throws IllegalStateException if the charsetName
-     *         is invalid.
-     * @see #encodeHex(byte[])
+     * @return A byte[] containing the bytes of the lower-case hexadecimal characters
      */
     public byte[] encode(final byte[] array) {
         return encodeHexString(array).getBytes(getCharset());
     }
 
     /**
-     * Converts byte buffer into an array of bytes for the characters representing
-     * the hexadecimal values of each byte in order. The returned array will be
-     * double the length of the passed array, as it takes two characters to
-     * represent any given byte.
+     * Converts byte buffer into an array of bytes for the characters
+     * representing the hexadecimal values of each byte in order.
      *
      * <p>
      * The conversion from hexadecimal characters to the returned bytes is performed
-     * with the charset named by {@link #getCharset()}.
+     * with the charset named by getCharset().
      * </p>
      *
      * <p>
@@ -482,24 +440,17 @@ public class Hex {
      * zero.
      * </p>
      *
-     * @param array a byte buffer to convert to Hex characters
-     * @return A byte[] containing the bytes of the lower-case hexadecimal
-     *         characters
-     * @see #encodeHex(byte[])
+     * @param array the byte buffer to convert
+     * @return the byte array
+     * @throws IllegalArgumentException if the parameter is null
      */
     public byte[] encode(final ByteBuffer array) {
         return encodeHexString(array).getBytes(getCharset());
     }
 
     /**
-     * Converts a String or an array of bytes into an array of characters
-     * representing the hexadecimal values of each byte in order. The returned array
-     * will be double the length of the passed String or array, as it takes two
-     * characters to represent any given byte.
-     * <p>
-     * The conversion from hexadecimal characters to bytes to be encoded to
-     * performed with the charset named by {@link #getCharset()}.
-     * </p>
+     * Converts a String or an array of bytes to an array of characters
+     * using the default charset.
      *
      * @param object a String, ByteBuffer, or byte[] to convert to Hex characters
      * @return A char[] containing lower-case hexadecimal characters

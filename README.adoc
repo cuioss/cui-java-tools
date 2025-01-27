@@ -479,7 +479,7 @@ thrown also if one of the parameters is null.
 Although small in size, our logging framework is the most precious part
 of this library. It is a wrapper around java-util Logger that simplifies
 its usage. In addition, it provides an api similar to slf4j. It is not
-meant to act as logging-facade like slf4j or jakarta-commons-logging. It
+meant to act as logging-facade like slf4j or similar logging frameworks. It
 only provides a little syntactic sugar for the built-in logger.
 
 ==== Obtaining a logger

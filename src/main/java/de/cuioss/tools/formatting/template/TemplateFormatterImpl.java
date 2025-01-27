@@ -18,6 +18,7 @@ package de.cuioss.tools.formatting.template;
 import static de.cuioss.tools.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public final class TemplateFormatterImpl<T extends FormatterSupport> implements TemplateFormatter<T> {
 
+    @Serial
     private static final long serialVersionUID = -6297959581838201331L;
 
     private final String template;

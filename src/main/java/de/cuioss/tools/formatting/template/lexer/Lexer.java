@@ -20,6 +20,7 @@ import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public abstract class Lexer<T extends FormatterSupport> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8645233576605974741L;
 
     @Getter(AccessLevel.PROTECTED)

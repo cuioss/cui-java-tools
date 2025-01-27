@@ -16,6 +16,7 @@
 package de.cuioss.tools.io;
 
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Path;
 
@@ -34,6 +35,7 @@ import lombok.ToString;
 @ToString
 public class StructuredFilename implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 7473756881958645393L;
 
     @Getter

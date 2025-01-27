@@ -30,7 +30,7 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsTestCase.java">...</a>
  *
  */
 @SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
@@ -793,7 +793,7 @@ class FilenameUtilsTest {
     }
 
     /**
-     * Test for https://issues.apache.org/jira/browse/IO-248
+     * Test for <a href="https://issues.apache.org/jira/browse/IO-248">...</a>
      */
     @Test
     void testGetFullPathNoEndSeparator_IO_248() {
@@ -935,7 +935,7 @@ class FilenameUtilsTest {
     }
 
     /**
-     * Test for https://issues.apache.org/jira/browse/IO-128
+     * Test for <a href="https://issues.apache.org/jira/browse/IO-128">...</a>
      */
     @Test
     void testEqualsNormalizedError_IO_128() {

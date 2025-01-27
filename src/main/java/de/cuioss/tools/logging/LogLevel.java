@@ -44,7 +44,7 @@ public enum LogLevel {
      * Trace Level, maps to {@link Level#FINER}.
      * <p>
      * Attention: This is a derivation to
-     * http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html. But in
+     * <a href="http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html">...</a>. But in
      * fact this works...
      */
     TRACE(Level.FINER),

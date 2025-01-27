@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.collect;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +40,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class PartialArrayList<T extends Serializable> extends ArrayList<T> implements PartialCollection<T> {
 
+    @Serial
     private static final long serialVersionUID = -7548645400982124555L;
 
     @Getter

@@ -17,6 +17,7 @@ package de.cuioss.tools.formatting.template.lexer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.Serial;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ class LexerTest {
 
     static class TestImplLexer<T extends FormatterSupport> extends Lexer<T> {
 
+        @Serial
         private static final long serialVersionUID = -7653785743419231265L;
 
         public TestImplLexer(final T source) {

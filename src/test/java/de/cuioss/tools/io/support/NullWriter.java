@@ -23,7 +23,7 @@ import java.io.Writer;
  * This <code>Writer</code> has no destination (file/socket etc.) and all
  * characters written to it are ignored and lost.
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/NullWriter.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/output/NullWriter.java">...</a>
  *
  */
 public class NullWriter extends Writer {

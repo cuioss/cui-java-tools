@@ -29,7 +29,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/StopwatchTest.java
+ * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/StopwatchTest.java">...</a>
  *
  */
 class StopWatchTest {

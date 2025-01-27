@@ -19,7 +19,7 @@ package de.cuioss.tools.net.ssl;
  * The semantic keyStoreType of the Keystore.
  * <p>
  * The specific documentation is inspired from
- * https://www.java67.com/2012/12/difference-between-truststore-vs.html.
+ * <a href="https://www.java67.com/2012/12/difference-between-truststore-vs.html">...</a>.
  * </p>
  * <p>
  * Whats the difference? keystore is used to store server's own certificate

@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.lang;
 
-import java.util.Locale;
-
 import de.cuioss.tools.string.MoreStrings;
 import lombok.experimental.UtilityClass;
 
+import java.util.Locale;
+
 /**
  * <p>
- * Operations to assist when working with a {@link Locale}.
+ * Operations to help when working with a {@link Locale}.
  * </p>
  *
  * <p>
@@ -31,8 +31,7 @@ import lombok.experimental.UtilityClass;
  * more detail.
  * </p>
  *
- * @author https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/LocaleUtils.java
- *
+ * @author <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/LocaleUtils.java">...</a>
  */
 @UtilityClass
 public class LocaleUtils {
@@ -74,7 +73,7 @@ public class LocaleUtils {
             return null;
         }
         if (str.isEmpty()) { // LANG-941 - JDK 8 introduced an empty locale where all fields are
-                             // blank
+            // blank
             return new Locale(MoreStrings.EMPTY, MoreStrings.EMPTY);
         }
         if (str.contains("#")) { // LANG-879 - Cannot handle Java 7 script & extensions
@@ -110,7 +109,6 @@ public class LocaleUtils {
      * Tries to parse a locale from the given String.
      *
      * @param str the String to parse a locale from.
-     *
      * @return a Locale instance parsed from the given String.
      * @throws IllegalArgumentException if the given String can not be parsed.
      */
@@ -142,7 +140,6 @@ public class LocaleUtils {
      * Checks whether the given String is a ISO 639 compliant language code.
      *
      * @param str the String to check.
-     *
      * @return true, if the given String is a ISO 639 compliant language code.
      */
     private static boolean isISO639LanguageCode(final String str) {
@@ -153,7 +150,6 @@ public class LocaleUtils {
      * Checks whether the given String is a ISO 3166 alpha-2 country code.
      *
      * @param str the String to check
-     *
      * @return true, is the given String is a ISO 3166 compliant country code.
      */
     private static boolean isISO3166CountryCode(final String str) {
@@ -164,7 +160,6 @@ public class LocaleUtils {
      * Checks whether the given String is a UN M.49 numeric area code.
      *
      * @param str the String to check
-     *
      * @return true, is the given String is a UN M.49 numeric area code.
      */
     private static boolean isNumericAreaCode(final String str) {

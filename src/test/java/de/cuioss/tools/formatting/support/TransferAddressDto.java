@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.formatting.support;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import lombok.Data;
@@ -22,6 +23,7 @@ import lombok.Data;
 @Data
 public class TransferAddressDto implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 5329606920285197130L;
 
     private String streetLine;

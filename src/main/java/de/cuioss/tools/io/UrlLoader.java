@@ -19,6 +19,7 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,6 +42,7 @@ import lombok.ToString;
 @ToString(of = { "url" })
 public class UrlLoader implements FileLoader {
 
+    @Serial
     private static final long serialVersionUID = -8758614099334823819L;
 
     private static final CuiLogger log = new CuiLogger(UrlLoader.class);

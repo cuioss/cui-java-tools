@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -44,6 +45,7 @@ import lombok.ToString;
 @ToString
 public class FileSystemLoader implements FileReaderWriter {
 
+    @Serial
     private static final long serialVersionUID = -1278929108857440808L;
 
     private static final CuiLogger LOG = new CuiLogger(FileSystemLoader.class);
