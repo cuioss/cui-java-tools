@@ -267,7 +267,7 @@ public final class MoreReflection {
     /**
      * Determines the modifier methods of a given class for a property. A modifier
      * method is defined as being a public not static single-argument method that is
-     * prefixed with either "set" or consists of the ropertyName only. This will
+     * prefixed with either "set" or consists of the propertyName only. This will
      * implicitly return all possible setter or builder methods, e.g.
      * {@code setPropertyName(String name)}, {@code propertyName(String name)} and
      * {@code setPropertyName(Collection<String> name)} will all be part of the
@@ -319,13 +319,13 @@ public final class MoreReflection {
     }
 
     /**
-     * Helper method that extract the property-name from a given accessor-method
+     * Helper method that extracts the property-name from a given accessor-method
      * name.
      *
      * @param methodName must not be null nor empty
-     * @return the possible attribute name of a given method-name, e.g. it return
+     * @return the possible attribute name of a given method-name, e.g., it returns
      * 'name' for getName/setName/isName. If none of the prefixes 'get',
-     * 'set', 'is' is found it returns the passed String.
+     * 'set', 'is' is found, it returns the passed String.
      */
     public static String computePropertyNameFromMethodName(final String methodName) {
         requireNotEmpty(methodName);
@@ -422,7 +422,7 @@ public final class MoreReflection {
 
     /**
      * @param type to be extracted from
-     * @return if applicable the actual type argument for the given type. If the
+     * @return if applicable, the actual type argument for the given type. If the
      * type represents already a {@link Class} it will be returned directly.
      * Otherwise, the super-type will be checked by calling the superclass
      */

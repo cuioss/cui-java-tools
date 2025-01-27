@@ -81,7 +81,7 @@ class MoreReflectionTest {
     }
 
     @Test
-    void shouldDetectAccessMethodsCaseInsensitivly() {
+    void shouldDetectAccessMethodsCaseInsensitively() {
         var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(MoreReflection.retrieveAccessMethod(BeanWithUnusualAttributeCasing.class, propertyName).isPresent(),
                 "Looked for " + propertyName);
@@ -102,7 +102,7 @@ class MoreReflectionTest {
     }
 
     @Test
-    void shouldDetectModifierMethodsCaseInsensitivly() {
+    void shouldDetectModifierMethodsCaseInsensitively() {
         var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(MoreReflection.retrieveWriteMethod(BeanWithUnusualAttributeCasing.class, propertyName, String.class)
                 .isPresent(), "Looked for " + propertyName);
@@ -202,5 +202,10 @@ class MoreReflectionTest {
         InvocationHandler handler = (proxy, method, args) -> null;
         assertNotNull(MoreReflection.newProxy(Collection.class, handler));
         assertThrows(IllegalArgumentException.class, () -> MoreReflection.newProxy(MoreReflection.class, handler));
+    }
+
+    @Test
+    void shouldResolvePackageName(){
+        assertEquals("de.cuioss.tools.reflect", MoreReflection.getPackageName(getClass()));
     }
 }
