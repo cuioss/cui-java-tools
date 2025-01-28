@@ -40,7 +40,7 @@ public class Validator<F extends FormatterSupport> implements Serializable {
     }
 
     /**
-     * @param template must not be null if template doesn't fit to el-expression or
+     * @param template must not be null if the template doesn't fit to el-expression or
      *                 use tokens which are not supported.
      */
     public void validate(final String template) {

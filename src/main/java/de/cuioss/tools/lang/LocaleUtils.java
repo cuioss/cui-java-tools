@@ -75,7 +75,7 @@ public class LocaleUtils {
 
     private static Locale toLocaleInternal(final String str) {
         if (str.isEmpty()) {
-            return new Locale.Builder().build();
+            return new Locale("", "");
         }
         Preconditions.checkArgument(!str.contains("#"), INVALID_LOCALE_FORMAT + str);
 
@@ -90,12 +90,11 @@ public class LocaleUtils {
             // For _GB format
             if (parts.length == 2) {
                 Preconditions.checkArgument(parts[1].matches("[A-Z]{2}"), "Must be uppercase if starts with underscore");
-                return new Locale.Builder().setRegion(parts[1]).build();
+                return new Locale("", parts[1]);
             }
             // For _GB_VARIANT format
             if (parts.length == 3) {
                 Preconditions.checkArgument(parts[1].matches("[A-Z]{2}"), "Must be uppercase if starts with underscore");
-                // Use legacy constructor for backwards compatibility with variants
                 return new Locale("", parts[1], parts[2]);
             }
             throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
@@ -105,30 +104,24 @@ public class LocaleUtils {
         if (!str.contains("_")) {
             Preconditions.checkArgument(str.length() == 2 || str.length() == 3, "Must be 2 chars if less than 5");
             Preconditions.checkArgument(str.equals(str.toLowerCase()), INVALID_LOCALE_FORMAT + str);
-            return new Locale.Builder().setLanguage(str).build();
+            return new Locale(str);
         }
 
         final var parts = str.split("_", 3);
         try {
             return switch (parts.length) {
-                case 1 -> new Locale.Builder().setLanguage(parts[0].toLowerCase()).build();
+                case 1 -> new Locale(parts[0].toLowerCase());
                 case 2 -> {
                     Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()), "Language code must be lowercase");
                     if (parts[1].matches("\\d{3}")) {
-                        yield new Locale.Builder()
-                                .setLanguage(parts[0])
-                                .setRegion(parts[1])
-                                .build(); // Handle numeric country codes
+                        yield new Locale(parts[0], parts[1]); // Handle numeric country codes
                     }
                     Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
                             "Country code must be uppercase");
                     if (parts[0].isEmpty()) {
-                        yield new Locale.Builder().setRegion(parts[1]).build();
+                        yield new Locale("", parts[1]);
                     }
-                    yield new Locale.Builder()
-                            .setLanguage(parts[0])
-                            .setRegion(parts[1])
-                            .build();
+                    yield new Locale(parts[0], parts[1]);
                 }
                 case 3 -> {
                     Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7,
@@ -136,16 +129,13 @@ public class LocaleUtils {
                     Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()),
                             "Language code must be lowercase");
                     if (parts[1].isEmpty() && !parts[2].isEmpty()) {
-                        // Use legacy constructor for backwards compatibility with variants
                         yield new Locale(parts[0], "", parts[2]); // Handle double underscore variants
                     }
                     if (parts[1].matches("\\d{3}")) {
-                        // Use legacy constructor for backwards compatibility with variants
                         yield new Locale(parts[0], parts[1], parts[2]); // Handle numeric country codes with variants
                     }
                     Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
                             "Country code must be uppercase");
-                    // Use legacy constructor for backwards compatibility with variants
                     yield new Locale(parts[0], parts[1], parts[2]);
                 }
                 default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
