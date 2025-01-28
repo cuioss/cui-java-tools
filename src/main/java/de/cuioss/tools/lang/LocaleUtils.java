@@ -61,6 +61,13 @@ public class LocaleUtils {
      * underscore. The length must be correct.
      * </p>
      *
+     * <p>
+     * Note: This implementation uses the deprecated {@link Locale} constructor for
+     * backward compatibility with existing code that relies on its more lenient
+     * validation rules, particularly for variants. Future versions may migrate to
+     * {@link Locale.Builder} which enforces stricter rules.
+     * </p>
+     *
      * @param str the locale String to convert, null returns null
      * @return a Locale, null if null input
      * @throws IllegalArgumentException if the string is an invalid format
@@ -79,65 +86,20 @@ public class LocaleUtils {
         }
         Preconditions.checkArgument(!str.contains("#"), INVALID_LOCALE_FORMAT + str);
 
-        // Handle special case for string starting with underscore
         if (str.startsWith("_")) {
-            Preconditions.checkArgument(str.length() >= 3, "Must be at least 3 chars if starts with underscore");
-            Preconditions.checkArgument(!(str.length() >= 5 && !str.substring(3).startsWith("_")),
-                    "Must have underscore after the country if starts with underscore and is at least 5 chars");
-            Preconditions.checkArgument(str.length() != 4, "Must be at least 5 chars if starts with underscore");
-
-            final var parts = str.split("_", 3);
-            // For _GB format
-            if (parts.length == 2) {
-                Preconditions.checkArgument(parts[1].matches("[A-Z]{2}"), "Must be uppercase if starts with underscore");
-                return new Locale("", parts[1]);
-            }
-            // For _GB_VARIANT format
-            if (parts.length == 3) {
-                Preconditions.checkArgument(parts[1].matches("[A-Z]{2}"), "Must be uppercase if starts with underscore");
-                return new Locale("", parts[1], parts[2]);
-            }
-            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+            return handleUnderscorePrefixedLocale(str);
         }
 
-        // Handle a special case for single lowercase language
         if (!str.contains("_")) {
-            Preconditions.checkArgument(str.length() == 2 || str.length() == 3, "Must be 2 chars if less than 5");
-            Preconditions.checkArgument(str.equals(str.toLowerCase()), INVALID_LOCALE_FORMAT + str);
-            return new Locale(str);
+            return handleSimpleLocale(str);
         }
 
         final var parts = str.split("_", 3);
         try {
             return switch (parts.length) {
-                case 1 -> new Locale(parts[0].toLowerCase());
-                case 2 -> {
-                    Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()), "Language code must be lowercase");
-                    if (parts[1].matches("\\d{3}")) {
-                        yield new Locale(parts[0], parts[1]); // Handle numeric country codes
-                    }
-                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
-                            "Country code must be uppercase");
-                    if (parts[0].isEmpty()) {
-                        yield new Locale("", parts[1]);
-                    }
-                    yield new Locale(parts[0], parts[1]);
-                }
-                case 3 -> {
-                    Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7,
-                            "Must be 3, 5 or 7+ in length");
-                    Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()),
-                            "Language code must be lowercase");
-                    if (parts[1].isEmpty() && !parts[2].isEmpty()) {
-                        yield new Locale(parts[0], "", parts[2]); // Handle double underscore variants
-                    }
-                    if (parts[1].matches("\\d{3}")) {
-                        yield new Locale(parts[0], parts[1], parts[2]); // Handle numeric country codes with variants
-                    }
-                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
-                            "Country code must be uppercase");
-                    yield new Locale(parts[0], parts[1], parts[2]);
-                }
+                case 1 -> handleSinglePart(parts[0]);
+                case 2 -> handleTwoParts(parts[0], parts[1]);
+                case 3 -> handleThreeParts(str, parts);
                 default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
             };
         } catch (final IllegalArgumentException iae) {
@@ -145,4 +107,67 @@ public class LocaleUtils {
         }
     }
 
+    private static Locale handleUnderscorePrefixedLocale(final String str) {
+        Preconditions.checkArgument(str.length() >= 3, "Must be at least 3 chars if starts with underscore");
+        Preconditions.checkArgument(!(str.length() >= 5 && !str.substring(3).startsWith("_")),
+                "Must have underscore after the country if starts with underscore and is at least 5 chars");
+        Preconditions.checkArgument(str.length() != 4, "Must be at least 5 chars if starts with underscore");
+
+        final var parts = str.split("_", 3);
+        if (parts.length == 2) {
+            validateCountryCode(parts[1]);
+            return new Locale("", parts[1]);
+        }
+        if (parts.length == 3) {
+            validateCountryCode(parts[1]);
+            return new Locale("", parts[1], parts[2]);
+        }
+        throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+    }
+
+    private static Locale handleSimpleLocale(final String str) {
+        Preconditions.checkArgument(str.length() == 2 || str.length() == 3, "Must be 2 chars if less than 5");
+        Preconditions.checkArgument(str.equals(str.toLowerCase()), INVALID_LOCALE_FORMAT + str);
+        return new Locale(str);
+    }
+
+    private static Locale handleSinglePart(final String language) {
+        return new Locale(language.toLowerCase());
+    }
+
+    private static Locale handleTwoParts(final String language, final String country) {
+        validateLanguageCode(language);
+        if (country.matches("\\d{3}")) {
+            return new Locale(language, country);
+        }
+        validateCountryCode(country);
+        if (language.isEmpty()) {
+            return new Locale("", country);
+        }
+        return new Locale(language, country);
+    }
+
+    private static Locale handleThreeParts(final String str, final String[] parts) {
+        Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7,
+                "Must be 3, 5 or 7+ in length");
+        validateLanguageCode(parts[0]);
+        
+        if (parts[1].isEmpty() && !parts[2].isEmpty()) {
+            return new Locale(parts[0], "", parts[2]);
+        }
+        if (parts[1].matches("\\d{3}")) {
+            return new Locale(parts[0], parts[1], parts[2]);
+        }
+        validateCountryCode(parts[1]);
+        return new Locale(parts[0], parts[1], parts[2]);
+    }
+
+    private static void validateLanguageCode(final String language) {
+        Preconditions.checkArgument(language.equals(language.toLowerCase()), "Language code must be lowercase");
+    }
+
+    private static void validateCountryCode(final String country) {
+        Preconditions.checkArgument(country.equals(country.toUpperCase()) && country.matches("[A-Z]{2}"),
+                "Country code must be uppercase");
+    }
 }
