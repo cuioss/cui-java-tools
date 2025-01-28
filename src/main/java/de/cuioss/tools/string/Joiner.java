@@ -20,14 +20,14 @@ import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.isBlank;
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.stream.Collectors;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.stream.Collectors;
 
 /**
  * Inspired by Googles Joiner.

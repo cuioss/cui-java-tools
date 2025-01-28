@@ -15,13 +15,13 @@
  */
 package de.cuioss.tools.io;
 
+import lombok.experimental.UtilityClass;
+
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * Copied from commons.io:org.apache.commons.io.FilenameUtils
@@ -121,6 +121,7 @@ public class FilenameUtils {
      * The separator character that is the opposite of the system separator.
      */
     private static final char OTHER_SEPARATOR;
+
     static {
         if (isSystemWindows()) {
             OTHER_SEPARATOR = UNIX_SEPARATOR;
@@ -351,8 +352,8 @@ public class FilenameUtils {
      * @param keepSeparator true to keep the final separator
      * @return the normalized filename. Null bytes inside string will be removed.
      */
-    @SuppressWarnings({ "squid:S3776", "squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck",
-            "java:S6541" }) // owolff: original code
+    @SuppressWarnings({"squid:S3776", "squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck",
+            "java:S6541"}) // owolff: original code
     private static String doNormalize(final String filename, final char separator, final boolean keepSeparator) {
         if (filename == null) {
             return null;
@@ -628,7 +629,7 @@ public class FilenameUtils {
      * @param filename the filename to find the prefix in, null returns -1
      * @return the length of the prefix, -1 if invalid or null
      */
-    @SuppressWarnings({ "squid:S3776" }) // owolff: original code
+    @SuppressWarnings({"squid:S3776"}) // owolff: original code
     public static int getPrefixLength(final String filename) {
         if (filename == null) {
             return NOT_FOUND;
@@ -1346,7 +1347,7 @@ public class FilenameUtils {
      *                        case-sensitive
      * @return true if the filename matches the wildcard string
      */
-    @SuppressWarnings({ "squid:S3776", "squid:S135" }) // owolff: original code
+    @SuppressWarnings({"squid:S3776", "squid:S135"}) // owolff: original code
     public static boolean wildcardMatch(final String filename, final String wildcardMatcher, IOCase caseSensitivity) {
         if (filename == null && wildcardMatcher == null) {
             return true;
@@ -1401,13 +1402,13 @@ public class FilenameUtils {
                         }
                         final var repeat = caseSensitivity.checkIndexOf(filename, textIdx + 1, wcs[wcsIdx]);
                         if (repeat >= 0) {
-                            backtrack.push(new int[] { wcsIdx, repeat });
+                            backtrack.push(new int[]{wcsIdx, repeat});
                         }
                     } else // matching from current position
-                    if (!caseSensitivity.checkRegionMatches(filename, textIdx, wcs[wcsIdx])) {
-                        // couldn't match token
-                        break;
-                    }
+                        if (!caseSensitivity.checkRegionMatches(filename, textIdx, wcs[wcsIdx])) {
+                            // couldn't match token
+                            break;
+                        }
 
                     // matched text token, move text index to end of matched token
                     textIdx += wcs[wcsIdx].length();
@@ -1439,7 +1440,7 @@ public class FilenameUtils {
         // package level so a unit test may run on this
 
         if (text.indexOf('?') == NOT_FOUND && text.indexOf('*') == NOT_FOUND) {
-            return new String[] { text };
+            return new String[]{text};
         }
 
         final var array = text.toCharArray();

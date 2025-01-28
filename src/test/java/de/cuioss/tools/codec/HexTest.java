@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -29,14 +31,13 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.junit.jupiter.api.Test;
-
 /**
  * @author <a href="https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java">...</a>
  *
  */
-@SuppressWarnings("java:S5785") // owolff: I will not change because I want to stay ins sync with
-                                // original test-case
+@SuppressWarnings("java:S5785")
+// owolff: I will not change because I want to stay ins sync with
+// original test-case
 class HexTest {
 
     private static final String BAD_ENCODING_NAME = "UNKNOWN";
@@ -241,7 +242,7 @@ class HexTest {
     @Test
     void testDecodeByteArrayOddCharacters() {
         try {
-            new Hex().decode(new byte[] { 65 });
+            new Hex().decode(new byte[]{65});
             fail("An exception wasn't thrown when trying to decode an odd number of characters");
         } catch (final DecoderException e) {
             // Expected exception
@@ -297,7 +298,7 @@ class HexTest {
     @Test
     void testDecodeClassCastException() {
         try {
-            new Hex().decode(new int[] { 65 });
+            new Hex().decode(new int[]{65});
             fail("An exception wasn't thrown when trying to decode.");
         } catch (final DecoderException e) {
             // Expected exception
@@ -306,7 +307,7 @@ class HexTest {
 
     @Test
     void testDecodeHexCharArrayOddCharacters1() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A' });
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A'});
     }
 
     @Test
@@ -316,12 +317,12 @@ class HexTest {
 
     @Test
     void testDecodeHexCharArrayOddCharacters3() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A', 'B', 'C' });
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A', 'B', 'C'});
     }
 
     @Test
     void testDecodeHexCharArrayOddCharacters5() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A', 'B', 'C', 'D', 'E' });
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A', 'B', 'C', 'D', 'E'});
     }
 
     @Test
@@ -342,7 +343,7 @@ class HexTest {
     @Test
     void testDecodeByteBufferWithLimit() throws DecoderException {
         final var bb = getByteBufferUtf8("000102030405060708090a0b0c0d0e0f");
-        final byte[] expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        final byte[] expected = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         // Test pairs of bytes
         for (var i = 0; i < 15; i++) {
             bb.position(i * 2);
@@ -384,7 +385,7 @@ class HexTest {
     @Test
     void testEncodeClassCastException() {
         try {
-            new Hex().encode(new int[] { 65 });
+            new Hex().encode(new int[]{65});
             fail("An exception wasn't thrown when trying to encode.");
         } catch (final EncoderException e) {
             // Expected exception
@@ -559,12 +560,12 @@ class HexTest {
 
     @Test
     void testEncodeHexByteString_ByteArrayBoolean_ToLowerCase() {
-        assertEquals("0a", Hex.encodeHexString(new byte[] { 10 }, true));
+        assertEquals("0a", Hex.encodeHexString(new byte[]{10}, true));
     }
 
     @Test
     void testEncodeHexByteString_ByteArrayBoolean_ToUpperCase() {
-        assertEquals("0A", Hex.encodeHexString(new byte[] { 10 }, false));
+        assertEquals("0A", Hex.encodeHexString(new byte[]{10}, false));
     }
 
     @Test
@@ -608,7 +609,7 @@ class HexTest {
      */
     @Test
     void testEncodeHexReadOnlyByteBuffer() {
-        final var chars = Hex.encodeHex(ByteBuffer.wrap(new byte[] { 10 }).asReadOnlyBuffer());
+        final var chars = Hex.encodeHex(ByteBuffer.wrap(new byte[]{10}).asReadOnlyBuffer());
         assertEquals("0a", String.valueOf(chars));
     }
 

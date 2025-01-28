@@ -15,7 +15,7 @@
  */
 package de.cuioss.tools.property.support;
 
-@SuppressWarnings({ "unused" })
+@SuppressWarnings({"unused"})
 public class BeanForTestingTypeResolving {
 
     private Integer fieldOnly;

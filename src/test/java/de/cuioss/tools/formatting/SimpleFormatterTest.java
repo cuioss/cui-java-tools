@@ -18,9 +18,8 @@ package de.cuioss.tools.formatting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.support.ObjectMethodsAsserts;
+import org.junit.jupiter.api.Test;
 
 class SimpleFormatterTest {
 

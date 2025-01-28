@@ -18,9 +18,9 @@ package de.cuioss.tools.lang;
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 
-import java.util.function.Supplier;
-
 import lombok.experimental.UtilityClass;
+
+import java.util.function.Supplier;
 
 /**
  * Provides some utilities in the context of {@link Object}

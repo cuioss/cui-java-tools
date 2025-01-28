@@ -20,15 +20,15 @@ import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Derived from Googles Splitter.

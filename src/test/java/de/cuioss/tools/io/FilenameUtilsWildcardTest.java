@@ -20,16 +20,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.Locale;
-
-import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsWildcardTestCase.java">...</a>
  *
  */
-@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
+@SuppressWarnings("java:S5961")
+// owolff: I prefer being in sync with the original test
 class FilenameUtilsWildcardTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';
@@ -121,16 +122,16 @@ class FilenameUtilsWildcardTest {
 
     @Test
     void testSplitOnTokens() {
-        assertArrayEquals(new String[] { "Ad", "*", "er" }, FilenameUtils.splitOnTokens("Ad*er"));
-        assertArrayEquals(new String[] { "Ad", "?", "er" }, FilenameUtils.splitOnTokens("Ad?er"));
-        assertArrayEquals(new String[] { "Test", "*", "?", "One" }, FilenameUtils.splitOnTokens("Test*?One"));
-        assertArrayEquals(new String[] { "Test", "?", "*", "One" }, FilenameUtils.splitOnTokens("Test?*One"));
-        assertArrayEquals(new String[] { "*" }, FilenameUtils.splitOnTokens("****"));
-        assertArrayEquals(new String[] { "*", "?", "?", "*" }, FilenameUtils.splitOnTokens("*??*"));
-        assertArrayEquals(new String[] { "*", "?", "*", "?", "*" }, FilenameUtils.splitOnTokens("*?**?*"));
-        assertArrayEquals(new String[] { "*", "?", "*", "?", "*" }, FilenameUtils.splitOnTokens("*?***?*"));
-        assertArrayEquals(new String[] { "h", "?", "?", "*" }, FilenameUtils.splitOnTokens("h??*"));
-        assertArrayEquals(new String[] { "" }, FilenameUtils.splitOnTokens(""));
+        assertArrayEquals(new String[]{"Ad", "*", "er"}, FilenameUtils.splitOnTokens("Ad*er"));
+        assertArrayEquals(new String[]{"Ad", "?", "er"}, FilenameUtils.splitOnTokens("Ad?er"));
+        assertArrayEquals(new String[]{"Test", "*", "?", "One"}, FilenameUtils.splitOnTokens("Test*?One"));
+        assertArrayEquals(new String[]{"Test", "?", "*", "One"}, FilenameUtils.splitOnTokens("Test?*One"));
+        assertArrayEquals(new String[]{"*"}, FilenameUtils.splitOnTokens("****"));
+        assertArrayEquals(new String[]{"*", "?", "?", "*"}, FilenameUtils.splitOnTokens("*??*"));
+        assertArrayEquals(new String[]{"*", "?", "*", "?", "*"}, FilenameUtils.splitOnTokens("*?**?*"));
+        assertArrayEquals(new String[]{"*", "?", "*", "?", "*"}, FilenameUtils.splitOnTokens("*?***?*"));
+        assertArrayEquals(new String[]{"h", "?", "?", "*"}, FilenameUtils.splitOnTokens("h??*"));
+        assertArrayEquals(new String[]{""}, FilenameUtils.splitOnTokens(""));
     }
 
     private void assertMatch(final String text, final String wildcard, final boolean expected) {
@@ -216,8 +217,8 @@ class FilenameUtilsWildcardTest {
 
         final var locales = Locale.getAvailableLocales();
 
-        final String[][] data = { { "I", "i" }, { "i", "I" }, { "i", "\u0130" }, { "i", "\u0131" },
-                { "\u03A3", "\u03C2" }, { "\u03A3", "\u03C3" }, { "\u03C2", "\u03C3" }, };
+        final String[][] data = {{"I", "i"}, {"i", "I"}, {"i", "\u0130"}, {"i", "\u0131"},
+                {"\u03A3", "\u03C2"}, {"\u03A3", "\u03C3"}, {"\u03C2", "\u03C3"}, };
 
         try {
             for (var i = 0; i < data.length; i++) {

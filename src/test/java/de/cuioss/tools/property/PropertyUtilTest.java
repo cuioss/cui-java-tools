@@ -30,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.property.support.BeanForTestingTypeResolving;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithPrimitives;
@@ -42,6 +38,9 @@ import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
 import de.cuioss.tools.property.support.ExplodingBean;
 import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.StringCaseShuffler;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 class PropertyUtilTest {
 

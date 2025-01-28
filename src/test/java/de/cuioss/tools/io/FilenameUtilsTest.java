@@ -22,19 +22,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsTestCase.java">...</a>
  *
  */
-@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
+@SuppressWarnings("java:S5961")
+// owolff: I prefer being in sync with the original test
 class FilenameUtilsTest {
 
     private static final String SEP = "" + File.separatorChar;
@@ -1017,36 +1018,36 @@ class FilenameUtilsTest {
         assertFalse(FilenameUtils.isExtension("file.txt", (String[]) null));
         assertTrue(FilenameUtils.isExtension("file", (String[]) null));
         assertFalse(FilenameUtils.isExtension("file.txt"));
-        assertTrue(FilenameUtils.isExtension("file.txt", new String[] { "txt" }));
-        assertFalse(FilenameUtils.isExtension("file.txt", new String[] { "rtf" }));
+        assertTrue(FilenameUtils.isExtension("file.txt", new String[]{"txt"}));
+        assertFalse(FilenameUtils.isExtension("file.txt", new String[]{"rtf"}));
         assertTrue(FilenameUtils.isExtension("file", "rtf", ""));
         assertTrue(FilenameUtils.isExtension("file.txt", "rtf", "txt"));
 
         assertFalse(FilenameUtils.isExtension("a/b/file.txt", (String[]) null));
         assertFalse(FilenameUtils.isExtension("a/b/file.txt"));
-        assertTrue(FilenameUtils.isExtension("a/b/file.txt", new String[] { "txt" }));
-        assertFalse(FilenameUtils.isExtension("a/b/file.txt", new String[] { "rtf" }));
+        assertTrue(FilenameUtils.isExtension("a/b/file.txt", new String[]{"txt"}));
+        assertFalse(FilenameUtils.isExtension("a/b/file.txt", new String[]{"rtf"}));
         assertTrue(FilenameUtils.isExtension("a/b/file.txt", "rtf", "txt"));
 
         assertFalse(FilenameUtils.isExtension("a.b/file.txt", (String[]) null));
         assertFalse(FilenameUtils.isExtension("a.b/file.txt"));
-        assertTrue(FilenameUtils.isExtension("a.b/file.txt", new String[] { "txt" }));
-        assertFalse(FilenameUtils.isExtension("a.b/file.txt", new String[] { "rtf" }));
+        assertTrue(FilenameUtils.isExtension("a.b/file.txt", new String[]{"txt"}));
+        assertFalse(FilenameUtils.isExtension("a.b/file.txt", new String[]{"rtf"}));
         assertTrue(FilenameUtils.isExtension("a.b/file.txt", "rtf", "txt"));
 
         assertFalse(FilenameUtils.isExtension("a\\b\\file.txt", (String[]) null));
         assertFalse(FilenameUtils.isExtension("a\\b\\file.txt"));
-        assertTrue(FilenameUtils.isExtension("a\\b\\file.txt", new String[] { "txt" }));
-        assertFalse(FilenameUtils.isExtension("a\\b\\file.txt", new String[] { "rtf" }));
+        assertTrue(FilenameUtils.isExtension("a\\b\\file.txt", new String[]{"txt"}));
+        assertFalse(FilenameUtils.isExtension("a\\b\\file.txt", new String[]{"rtf"}));
         assertTrue(FilenameUtils.isExtension("a\\b\\file.txt", "rtf", "txt"));
 
         assertFalse(FilenameUtils.isExtension("a.b\\file.txt", (String[]) null));
         assertFalse(FilenameUtils.isExtension("a.b\\file.txt"));
-        assertTrue(FilenameUtils.isExtension("a.b\\file.txt", new String[] { "txt" }));
-        assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new String[] { "rtf" }));
+        assertTrue(FilenameUtils.isExtension("a.b\\file.txt", new String[]{"txt"}));
+        assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new String[]{"rtf"}));
         assertTrue(FilenameUtils.isExtension("a.b\\file.txt", "rtf", "txt"));
 
-        assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new String[] { "TXT" }));
+        assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new String[]{"TXT"}));
         assertFalse(FilenameUtils.isExtension("a.b\\file.txt", "TXT", "RTF"));
     }
 

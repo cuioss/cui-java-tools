@@ -15,10 +15,10 @@
  */
 package de.cuioss.tools.io.support;
 
+import org.opentest4j.AssertionFailedError;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.opentest4j.AssertionFailedError;
 
 /**
  * Helper class for checking behaviour of IO classes.

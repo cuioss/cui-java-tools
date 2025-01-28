@@ -22,13 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.InvocationHandler;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
 import de.cuioss.tools.reflect.support.ChildAnnotatedClass;
 import de.cuioss.tools.reflect.support.FieldNameClass;
@@ -39,6 +32,12 @@ import de.cuioss.tools.reflect.support.NotAnnotatedClass;
 import de.cuioss.tools.reflect.support.StringTypedArrayList;
 import de.cuioss.tools.support.StringCaseShuffler;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 class MoreReflectionTest {
@@ -205,7 +204,7 @@ class MoreReflectionTest {
     }
 
     @Test
-    void shouldResolvePackageName(){
+    void shouldResolvePackageName() {
         assertEquals("de.cuioss.tools.reflect", MoreReflection.getPackageName(getClass()));
     }
 }

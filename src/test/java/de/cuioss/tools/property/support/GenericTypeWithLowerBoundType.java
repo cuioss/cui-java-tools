@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.property.support;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Map.Entry;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map.Entry;
 
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)

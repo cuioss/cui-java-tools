@@ -17,6 +17,8 @@ package de.cuioss.tools.collect;
 
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +32,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Stream;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * <h2>Overview</h2> Provides a number of methods simplifying the task of

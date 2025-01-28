@@ -31,12 +31,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-
+import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 
 class PropertyReadWriteTest {
 

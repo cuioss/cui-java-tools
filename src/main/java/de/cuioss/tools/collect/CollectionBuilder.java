@@ -18,6 +18,10 @@ package de.cuioss.tools.collect;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static java.util.Objects.requireNonNull;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,10 +38,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Stream;
-
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * <h2>Overview</h2>

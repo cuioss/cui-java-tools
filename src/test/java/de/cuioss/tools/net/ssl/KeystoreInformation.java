@@ -15,10 +15,10 @@
  */
 package de.cuioss.tools.net.ssl;
 
+import lombok.experimental.UtilityClass;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * Provide some constants for the testKeystore

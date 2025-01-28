@@ -18,6 +18,13 @@ package de.cuioss.tools.io;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.base.Preconditions;
+import de.cuioss.tools.logging.CuiLogger;
+import de.cuioss.tools.string.MoreStrings;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,20 +35,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import de.cuioss.tools.base.Preconditions;
-import de.cuioss.tools.logging.CuiLogger;
-import de.cuioss.tools.string.MoreStrings;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
 /**
  * File-system based variant. Responsible for all non
  * {@link FileTypePrefix#CLASSPATH} files.
  *
  * @author Oliver Wolff
  */
-@EqualsAndHashCode(of = { "normalizedPathName" })
+@EqualsAndHashCode(of = {"normalizedPathName"})
 @ToString
 public class FileSystemLoader implements FileReaderWriter {
 

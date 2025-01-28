@@ -15,10 +15,10 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.tools.reflect.MoreReflection;
+
 import java.io.Serializable;
 import java.lang.reflect.Modifier;
-
-import de.cuioss.tools.reflect.MoreReflection;
 
 /**
  * Members of this enum define the way the corresponding property is subject to

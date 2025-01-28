@@ -31,10 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.Serializable;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
@@ -42,6 +38,9 @@ import de.cuioss.tools.property.support.ExplodingBean;
 import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
 import de.cuioss.tools.property.support.StringTypedGenericType;
 import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
+import java.io.Serializable;
 
 class PropertyHolderTest {
 

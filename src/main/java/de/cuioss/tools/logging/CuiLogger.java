@@ -15,12 +15,12 @@
  */
 package de.cuioss.tools.logging;
 
+import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
+import static java.util.Objects.requireNonNull;
+
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A wrapper around java-util {@link Logger} that provides enhanced logging capabilities

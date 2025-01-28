@@ -30,6 +30,9 @@
     <properties>
         <version.cui.parent>0.8.5</version.cui.parent>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
+        <open.rewrite.maven.plugin.version>6.0.5</open.rewrite.maven.plugin.version>
+        <rewrite-testing-frameworks.version>3.1.0</rewrite-testing-frameworks.version>
+        <rewrite-migrate-java.version>3.1.0</rewrite-migrate-java.version>
     </properties>
 
     <issueManagement>
@@ -87,4 +90,36 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- Usage: ./mvnw -Prewrite-prepare-release rewrite:run -->
+            <!-- Unifies some aspect like coding, formatting, and header-->
+            <id>rewrite-prepare-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.java.AddApache2LicenseHeader</recipe>
+                                <recipe>org.openrewrite.java.format.AutoFormat</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                                <recipe>org.openrewrite.java.OrderImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>rewrite</id>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

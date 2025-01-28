@@ -21,19 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.jupiter.api.Test;
-
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java">...</a>
  *
  */
-@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
+@SuppressWarnings("java:S5961")
+// owolff: I prefer being in sync with the original test
 class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';

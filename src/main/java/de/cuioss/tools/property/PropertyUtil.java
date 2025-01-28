@@ -18,16 +18,16 @@ package de.cuioss.tools.property;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.util.Objects.requireNonNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Objects;
-import java.util.Optional;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
 import de.cuioss.tools.string.MoreStrings;
 import lombok.experimental.UtilityClass;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Helper class providing convenient methods for reading from / writing to java

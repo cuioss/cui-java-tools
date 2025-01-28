@@ -20,23 +20,23 @@ import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serial;
 import java.net.URL;
 import java.util.Optional;
 
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
 /**
  * Variant of {@link FileLoader} that loads files from the classpath.
  *
  * @author Oliver Wolff
  */
-@EqualsAndHashCode(of = { "normalizedPathName" })
+@EqualsAndHashCode(of = {"normalizedPathName"})
 @ToString
 public class ClassPathLoader implements FileLoader {
 

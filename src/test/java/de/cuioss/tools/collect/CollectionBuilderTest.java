@@ -25,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
 
 class CollectionBuilderTest {
 
@@ -63,29 +63,29 @@ class CollectionBuilderTest {
         final var builder = new CollectionBuilder<String>().addNullValues(true);
         builder.add("1");
         assertEquals(1, builder.size());
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(2, builder.size());
         builder.add("2", "3");
         assertEquals(4, builder.size());
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(5, builder.size());
         builder.add(Arrays.asList("4", "5"));
         assertEquals(7, builder.size());
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(8, builder.size());
         builder.add(Arrays.asList("6", "7").stream());
         assertEquals(10, builder.size());
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(11, builder.size());
         builder.add((Iterable<String>) Arrays.asList("8", "9"));
         assertEquals(13, builder.size());
 
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(14, builder.size());
 
         builder.add((Iterable<String>) Arrays.asList("10", null));
         assertEquals(16, builder.size());
-        builder.add(new String[] { null });
+        builder.add(new String[]{null});
         assertEquals(17, builder.size());
     }
 

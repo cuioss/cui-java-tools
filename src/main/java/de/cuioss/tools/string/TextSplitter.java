@@ -15,6 +15,10 @@
  */
 package de.cuioss.tools.string;
 
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
+import static java.lang.Integer.valueOf;
+
 import de.cuioss.tools.collect.MapBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,10 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-import static java.lang.Integer.valueOf;
 
 /**
  * This class provides functionality to transform long text to several HTML

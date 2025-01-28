@@ -17,15 +17,15 @@ package de.cuioss.tools.net;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Defines a filter identifying which parameters are not to be included within

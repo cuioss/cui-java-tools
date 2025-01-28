@@ -21,12 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.reflect.support.FieldNameClass;
 import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
 
 class FieldWrapperTest {
 

@@ -18,11 +18,10 @@ package de.cuioss.tools.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.nio.file.Paths;
-
+import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.support.ObjectMethodsAsserts;
+import java.nio.file.Paths;
 
 class StructuredFilenameTest {
 

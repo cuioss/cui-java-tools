@@ -17,6 +17,10 @@ package de.cuioss.tools.io;
 
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,10 +31,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 
 /**
  * Provides {@link Path} related utilities

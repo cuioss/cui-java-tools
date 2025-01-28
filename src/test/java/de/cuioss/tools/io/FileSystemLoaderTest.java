@@ -15,18 +15,18 @@
  */
 package de.cuioss.tools.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileSystemLoaderTest {
 
@@ -130,10 +130,10 @@ class FileSystemLoaderTest {
         // Create a temporary file for testing
         File tempFile = File.createTempFile("test", ".txt");
         tempFile.deleteOnExit();
-        
+
         var loader = new FileSystemLoader(tempFile.getAbsolutePath());
         assertTrue(loader.isWritable());
-        
+
         try (var output = loader.outputStream()) {
             assertNotNull(output);
             output.write("test".getBytes());

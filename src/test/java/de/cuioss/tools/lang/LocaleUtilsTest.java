@@ -21,12 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.util.Arrays;
-import java.util.Locale;
-
+import de.cuioss.tools.string.MoreStrings;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.string.MoreStrings;
+import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Unit tests for {@link LocaleUtils}.
@@ -34,7 +33,8 @@ import de.cuioss.tools.string.MoreStrings;
  * COPIED FROM:
  * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/LocaleUtilsTest.java">...</a>
  */
-@SuppressWarnings("deprecation") // Using deprecated constructor for backwards compatibility
+@SuppressWarnings("deprecation")
+// Using deprecated constructor for backwards compatibility
 class LocaleUtilsTest {
 
     /**
@@ -286,7 +286,7 @@ class LocaleUtilsTest {
             // constructor
             final var locale = new Locale(l.getLanguage(), l.getCountry(), l.getVariant());
             if (l.equals(locale)) { // it is possible for LocaleUtils.toLocale to handle these
-                                    // Locales
+                // Locales
                 var str = l.toString();
                 // Look for the script/extension suffix
                 var suff = str.indexOf("_#");

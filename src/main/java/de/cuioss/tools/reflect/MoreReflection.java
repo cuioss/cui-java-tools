@@ -15,6 +15,9 @@
  */
 package de.cuioss.tools.reflect;
 
+import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
+
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
@@ -38,9 +41,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
-
-import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based
@@ -199,7 +199,7 @@ public final class MoreReflection {
      * be found
      */
     public static Optional<Method> retrieveWriteMethod(final Class<?> clazz, final String propertyName,
-                                                       final Class<?> parameterType) {
+            final Class<?> parameterType) {
         requireNonNull(parameterType);
 
         for (final Method method : retrieveWriteMethodCandidates(clazz, propertyName)) {
@@ -357,7 +357,7 @@ public final class MoreReflection {
      * one of its ancestors. May be empty but never null
      */
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
-                                                                       final Class<A> annotation) {
+            final Class<A> annotation) {
         if (null == annotatedType || Object.class.equals(annotatedType.getClass())) {
             return Collections.emptyList();
         }
@@ -381,7 +381,7 @@ public final class MoreReflection {
      * element will be returned.
      */
     public static <A extends Annotation> Optional<A> extractAnnotation(final Class<?> annotatedType,
-                                                                       final Class<A> annotation) {
+            final Class<A> annotation) {
         requireNonNull(annotation);
         final List<A> extracted = extractAllAnnotations(annotatedType, annotation);
         if (extracted.isEmpty()) {
@@ -529,7 +529,7 @@ public final class MoreReflection {
      * @return option of detected caller class name
      */
     public static Optional<StackTraceElement> findCallerElement(final Throwable throwable,
-                                                                final Collection<String> markerClasses) {
+            final Collection<String> markerClasses) {
 
         Objects.requireNonNull(markerClasses, "Marker class names are missing");
 

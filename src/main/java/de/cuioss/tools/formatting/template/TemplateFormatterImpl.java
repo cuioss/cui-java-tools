@@ -18,16 +18,16 @@ package de.cuioss.tools.formatting.template;
 import static de.cuioss.tools.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.cuioss.tools.formatting.template.lexer.Lexer;
 import de.cuioss.tools.formatting.template.lexer.LexerBuilder;
 import de.cuioss.tools.formatting.template.token.Token;
 import lombok.EqualsAndHashCode;
 import lombok.Synchronized;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Formatter which is able to replace parameter inside the template based on

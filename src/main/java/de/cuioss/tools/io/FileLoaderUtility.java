@@ -19,6 +19,9 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -27,9 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * Utility class for dealing with generic / classpath related file access.

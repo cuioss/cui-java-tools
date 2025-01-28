@@ -18,11 +18,6 @@ package de.cuioss.tools.formatting.template.lexer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.formatting.support.PersonAddress;
 import de.cuioss.tools.formatting.support.PersonAddressGenerator;
 import de.cuioss.tools.formatting.support.PersonName;
@@ -33,6 +28,10 @@ import de.cuioss.tools.formatting.template.lexer.Lexer.ExpressionLanguage;
 import de.cuioss.tools.formatting.template.token.Token;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import de.cuioss.tools.support.TypedGenerator;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class BracketLexerTest {
 

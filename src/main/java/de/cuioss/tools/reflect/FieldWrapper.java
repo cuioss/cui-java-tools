@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.reflect;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.util.Optional;
-
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
 import lombok.Getter;
 import lombok.NonNull;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.util.Optional;
 
 /**
  * Wraps a field and provides type-safe access to its value.
@@ -39,9 +39,9 @@ import lombok.NonNull;
  *
  */
 @SuppressWarnings("java:S3011") // owolff: The warning is "Reflection should not be used to
-                                // increase accessibility of classes, methods, or fields "
-                                // What is actually the use-case of this type, therefore there
-                                // is nothing we can do
+// increase accessibility of classes, methods, or fields "
+// What is actually the use-case of this type, therefore there
+// is nothing we can do
 public class FieldWrapper {
 
     private static final CuiLogger log = new CuiLogger(FieldWrapper.class);

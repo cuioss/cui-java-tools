@@ -19,6 +19,16 @@ import static de.cuioss.tools.base.Preconditions.checkState;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.base.BooleanOperations;
+import de.cuioss.tools.io.MorePaths;
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Singular;
+import lombok.ToString;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,16 +44,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Collection;
 import java.util.Optional;
-
-import de.cuioss.tools.base.BooleanOperations;
-import de.cuioss.tools.io.MorePaths;
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Singular;
-import lombok.ToString;
 
 /**
  * Provides access to a {@link KeyStore}. The store can be loaded from a file or
@@ -67,8 +67,8 @@ import lombok.ToString;
  *
  */
 @Builder
-@EqualsAndHashCode(of = { "keyStoreType", "location" }, doNotUseGetters = true)
-@ToString(of = { "keyStoreType", "location" }, doNotUseGetters = true)
+@EqualsAndHashCode(of = {"keyStoreType", "location"}, doNotUseGetters = true)
+@ToString(of = {"keyStoreType", "location"}, doNotUseGetters = true)
 public class KeyStoreProvider implements Serializable {
 
     private static final String UNABLE_TO_CREATE_KEYSTORE = "The creation of a KeyStore did not succeed";
@@ -144,16 +144,16 @@ public class KeyStoreProvider implements Serializable {
             log.debug("Adding Key {}", key);
             requireNonNull(key);
             switch (key.getKeyHolderType()) {
-            case SINGLE_KEY:
-                // adds single certificate to the keyStore
-                addCertificateToKeyStore(key, keyStore);
-                break;
-            case KEY_STORE:
-                checkState(keys.size() == 1, "It is not allowed that there are multiple KeyStores");
-                keyStore = createKeyStoreFromByteArray(key);
-                break;
-            default:
-                throw new UnsupportedOperationException("KeyHolderType is not defined: " + key.getKeyHolderType());
+                case SINGLE_KEY:
+                    // adds single certificate to the keyStore
+                    addCertificateToKeyStore(key, keyStore);
+                    break;
+                case KEY_STORE:
+                    checkState(keys.size() == 1, "It is not allowed that there are multiple KeyStores");
+                    keyStore = createKeyStoreFromByteArray(key);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("KeyHolderType is not defined: " + key.getKeyHolderType());
             }
         }
         return Optional.of(keyStore);

@@ -29,14 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
 
 class MoreCollectionsTest {
 
@@ -54,8 +54,8 @@ class MoreCollectionsTest {
     }
 
     void shouldDetermineEmptinessForArrays() {
-        assertFalse(isEmpty(new byte[] { Byte.MIN_VALUE }));
-        assertFalse(isEmpty(new byte[] { Byte.MIN_VALUE, Byte.MAX_VALUE }));
+        assertFalse(isEmpty(new byte[]{Byte.MIN_VALUE}));
+        assertFalse(isEmpty(new byte[]{Byte.MIN_VALUE, Byte.MAX_VALUE}));
         assertTrue(isEmpty((byte[]) null));
         assertTrue(isEmpty(new byte[0]));
     }

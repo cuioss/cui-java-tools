@@ -15,9 +15,8 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.support.ObjectMethodsAsserts;
+import org.junit.jupiter.api.Test;
 
 class ActionTokenTest {
 

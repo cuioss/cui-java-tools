@@ -18,9 +18,9 @@ package de.cuioss.tools.support;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.lang.reflect.Method;
-
 import lombok.experimental.UtilityClass;
+
+import java.lang.reflect.Method;
 
 /**
  * Simple Helper for reflection-api. Like many other methods of this

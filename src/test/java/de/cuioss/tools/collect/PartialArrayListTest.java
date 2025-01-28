@@ -23,11 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collections;
-
+import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.support.ObjectMethodsAsserts;
+import java.util.Collections;
 
 class PartialArrayListTest {
 

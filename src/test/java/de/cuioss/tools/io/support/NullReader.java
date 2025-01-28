@@ -15,11 +15,11 @@
  */
 package de.cuioss.tools.io.support;
 
+import de.cuioss.tools.io.IOStreams;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
-
-import de.cuioss.tools.io.IOStreams;
 
 /**
  * A functional, light weight {@link Reader} that emulates a reader of a

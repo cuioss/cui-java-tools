@@ -249,14 +249,14 @@ public final class StopWatch implements Serializable {
 
     private static String abbreviate(TimeUnit unit) {
         return switch (unit) {
-        case NANOSECONDS -> "ns";
-        case MICROSECONDS -> "\u03bcs"; // μs
-        case MILLISECONDS -> "ms";
-        case SECONDS -> "s";
-        case MINUTES -> "min";
-        case HOURS -> "h";
-        case DAYS -> "d";
-        default -> throw new AssertionError();
+            case NANOSECONDS -> "ns";
+            case MICROSECONDS -> "\u03bcs"; // μs
+            case MILLISECONDS -> "ms";
+            case SECONDS -> "s";
+            case MINUTES -> "min";
+            case HOURS -> "h";
+            case DAYS -> "d";
+            default -> throw new AssertionError();
         };
     }
 }

@@ -21,6 +21,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import de.cuioss.tools.io.support.NullInputStream;
+import de.cuioss.tools.io.support.NullOutputStream;
+import de.cuioss.tools.io.support.NullReader;
+import de.cuioss.tools.io.support.NullWriter;
+import de.cuioss.tools.io.support.YellOnCloseInputStream;
+import de.cuioss.tools.io.support.YellOnFlushAndCloseOutputStream;
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
@@ -36,17 +46,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import de.cuioss.tools.io.support.NullInputStream;
-import de.cuioss.tools.io.support.NullOutputStream;
-import de.cuioss.tools.io.support.NullReader;
-import de.cuioss.tools.io.support.NullWriter;
-import de.cuioss.tools.io.support.YellOnCloseInputStream;
-import de.cuioss.tools.io.support.YellOnFlushAndCloseOutputStream;
-import de.cuioss.tools.support.Generators;
 
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java">...</a>

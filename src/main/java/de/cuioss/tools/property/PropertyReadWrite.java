@@ -17,13 +17,13 @@ package de.cuioss.tools.property;
 
 import static java.util.Objects.requireNonNull;
 
-import java.beans.PropertyDescriptor;
-
 import de.cuioss.tools.lang.MoreObjects;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.beans.PropertyDescriptor;
 
 /**
  * Defines the read write permissions for a given property. It is defined for

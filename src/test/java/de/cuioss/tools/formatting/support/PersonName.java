@@ -18,18 +18,18 @@ package de.cuioss.tools.formatting.support;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a structured person name with various components such as given name, family name,
