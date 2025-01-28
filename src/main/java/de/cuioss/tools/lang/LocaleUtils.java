@@ -72,37 +72,99 @@ public class LocaleUtils {
         if (str == null) {
             return null;
         }
-        if (str.isEmpty()) { // LANG-941 - JDK 8 introduced an empty locale where all fields are
-            // blank
-            return new Locale(MoreStrings.EMPTY, MoreStrings.EMPTY);
+        return toLocaleInternal(str);
+    }
+
+    private static Locale toLocaleInternal(final String str) {
+        if (str.isEmpty()) {
+            return new Locale.Builder().build();
         }
-        if (str.contains("#")) { // LANG-879 - Cannot handle Java 7 script & extensions
+        if (str.contains("#")) {
             throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-        }
-        final var len = str.length();
-        if (len < 2) {
-            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-        }
-        final var ch0 = str.charAt(0);
-        if (ch0 == '_') {
-            if (len < 3) {
-                throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-            }
-            final var ch1 = str.charAt(1);
-            final var ch2 = str.charAt(2);
-            if (!Character.isUpperCase(ch1) || !Character.isUpperCase(ch2)) {
-                throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-            }
-            if (len == 3) {
-                return new Locale(MoreStrings.EMPTY, str.substring(1, 3));
-            }
-            if (len < 5 || str.charAt(3) != '_') {
-                throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-            }
-            return new Locale(MoreStrings.EMPTY, str.substring(1, 3), str.substring(4));
         }
 
-        return parseLocale(str);
+        // Handle special case for string starting with underscore
+        if (str.startsWith("_")) {
+            if (str.length() < 3) {
+                throw new IllegalArgumentException("Must be at least 3 chars if starts with underscore");
+            }
+            if (str.length() >= 5 && !str.substring(3).startsWith("_")) {
+                throw new IllegalArgumentException("Must have underscore after the country if starts with underscore and is at least 5 chars");
+            }
+            if (str.length() == 4) {
+                throw new IllegalArgumentException("Must be at least 5 chars if starts with underscore");
+            }
+            final var parts = str.split("_", 3);
+            // For _GB format
+            if (parts.length == 2) {
+                if (!parts[1].matches("[A-Z]{2}")) {
+                    throw new IllegalArgumentException("Must be uppercase if starts with underscore");
+                }
+                return new Locale("", parts[1]);
+            }
+            // For _GB_VARIANT format
+            if (parts.length == 3) {
+                if (!parts[1].matches("[A-Z]{2}")) {
+                    throw new IllegalArgumentException("Must be uppercase if starts with underscore");
+                }
+                return new Locale("", parts[1], parts[2]);
+            }
+            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+        }
+
+        // Handle special case for single lowercase language
+        if (!str.contains("_")) {
+            if (str.length() != 2 && str.length() != 3) {
+                throw new IllegalArgumentException("Must be 2 chars if less than 5");
+            }
+            if (!str.equals(str.toLowerCase())) {
+                throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+            }
+            return new Locale(str);
+        }
+
+        final var parts = str.split("_", 3);
+        try {
+            return switch (parts.length) {
+                case 1 -> new Locale(parts[0].toLowerCase());
+                case 2 -> {
+                    if (!parts[0].equals(parts[0].toLowerCase())) {
+                        throw new IllegalArgumentException("Language code must be lowercase");
+                    }
+                    if (parts[1].matches("\\d{3}")) {
+                        yield new Locale(parts[0], parts[1]); // Handle numeric country codes
+                    }
+                    if (!parts[1].equals(parts[1].toUpperCase()) || !parts[1].matches("[A-Z]{2}")) {
+                        throw new IllegalArgumentException("Country code must be uppercase");
+                    }
+                    if (parts[0].isEmpty()) {
+                        yield new Locale("", parts[1]);
+                    }
+                    yield new Locale(parts[0], parts[1]);
+                }
+                case 3 -> {
+                    if (str.length() != 3 && str.length() != 5 && str.length() < 7) {
+                        throw new IllegalArgumentException("Must be 3, 5 or 7+ in length");
+                    }
+                    if (!parts[0].equals(parts[0].toLowerCase())) {
+                        throw new IllegalArgumentException("Language code must be lowercase");
+                    }
+                    if (parts[1].isEmpty() && !parts[2].isEmpty()) {
+                        yield new Locale(parts[0], "", parts[2]); // Handle double underscore variants
+                    }
+                    if (parts[1].matches("\\d{3}")) {
+                        yield new Locale(parts[0], parts[1], parts[2]); // Handle numeric country codes
+                    }
+                    if (!parts[1].equals(parts[1].toUpperCase()) || !parts[1].matches("[A-Z]{2}")) {
+                        throw new IllegalArgumentException("Country code must be uppercase");
+                    }
+                    yield new Locale(parts[0], parts[1], parts[2]);
+                }
+                default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+            };
+        } catch (final IllegalArgumentException iae) {
+            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str, iae);
+        }
     }
 
     /**
@@ -113,27 +175,17 @@ public class LocaleUtils {
      * @throws IllegalArgumentException if the given String can not be parsed.
      */
     private static Locale parseLocale(final String str) {
-        if (isISO639LanguageCode(str)) {
-            return new Locale(str);
+        final var parts = str.split("_", 3);
+        try {
+            return switch (parts.length) {
+                case 1 -> new Locale.Builder().setLanguage(parts[0]).build();
+                case 2 -> new Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).build();
+                case 3 -> new Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).setVariant(parts[2]).build();
+                default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+            };
+        } catch (final IllegalArgumentException iae) {
+            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str, iae);
         }
-
-        final var segments = str.split("_", -1);
-        final var language = segments[0];
-        if (segments.length == 2) {
-            final var country = segments[1];
-            if (isISO639LanguageCode(language) && isISO3166CountryCode(country) || isNumericAreaCode(country)) {
-                return new Locale(language, country);
-            }
-        } else if (segments.length == 3) {
-            final var country = segments[1];
-            final var variant = segments[2];
-            if (isISO639LanguageCode(language)
-                    && (country.isEmpty() || isISO3166CountryCode(country) || isNumericAreaCode(country))
-                    && !variant.isEmpty()) {
-                return new Locale(language, country, variant);
-            }
-        }
-        throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
     }
 
     /**
@@ -143,7 +195,7 @@ public class LocaleUtils {
      * @return true, if the given String is a ISO 639 compliant language code.
      */
     private static boolean isISO639LanguageCode(final String str) {
-        return MoreStrings.isAllLowerCase(str) && (str.length() == 2 || str.length() == 3);
+        return str.length() >= 2 && str.length() <= 3;
     }
 
     /**
@@ -153,7 +205,7 @@ public class LocaleUtils {
      * @return true, is the given String is a ISO 3166 compliant country code.
      */
     private static boolean isISO3166CountryCode(final String str) {
-        return MoreStrings.isAllUpperCase(str) && str.length() == 2;
+        return str.length() == 2 && str.equals(str.toUpperCase());
     }
 
     /**
@@ -163,6 +215,6 @@ public class LocaleUtils {
      * @return true, is the given String is a UN M.49 numeric area code.
      */
     private static boolean isNumericAreaCode(final String str) {
-        return MoreStrings.isNumeric(str) && str.length() == 3;
+        return str.length() == 3 && str.matches("\\d{3}");
     }
 }
