@@ -15,20 +15,20 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serial;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * This {@link FileLoader} takes a {@link URL} as its parameter which is useful
@@ -62,7 +62,7 @@ public class UrlLoader implements FileLoader {
         }
 
         try {
-            this.url = new URL(sanitizedUrl);
+            this.url = URI.create(sanitizedUrl).toURL();
         } catch (final MalformedURLException e) {
             throw new IllegalArgumentException("Provided URL is invalid: " + url, e);
         }
