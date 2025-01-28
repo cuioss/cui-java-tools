@@ -96,9 +96,7 @@ public class FileSystemLoader implements FileReaderWriter {
 
     @Override
     public InputStream inputStream() throws IOException {
-        if (!isReadable()) {
-            throw new IllegalStateException("'" + normalizedPathName + "' is not readable");
-        }
+        Preconditions.checkState(isReadable(), "'%s' is not readable", normalizedPathName);
         return Files.newInputStream(getPath());
     }
 
@@ -157,9 +155,7 @@ public class FileSystemLoader implements FileReaderWriter {
      */
     @Override
     public OutputStream outputStream() throws IOException {
-        if (!isWritable()) {
-            throw new IllegalStateException(normalizedPathName + " is not writable");
-        }
+        Preconditions.checkState(isWritable(), "'%s' is not writable", normalizedPathName);
         return Files.newOutputStream(getPath());
     }
 }
