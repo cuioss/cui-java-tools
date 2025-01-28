@@ -1,6 +1,7 @@
 **/.settings
 **/target
 **/.idea
+**/.vscode
 **/src/main/gen
 *.iml
 *.classpath
