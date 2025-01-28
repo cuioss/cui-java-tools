@@ -56,6 +56,7 @@ public class UrlLoader implements FileLoader {
      *                                  a valid URL
      */
     public UrlLoader(final String url) {
+        checkArgument(null != url, "url must not be null");
         var sanitizedUrl = url;
         if (FileTypePrefix.URL.is(url)) {
             sanitizedUrl = FileTypePrefix.URL.removePrefix(url);
@@ -63,7 +64,7 @@ public class UrlLoader implements FileLoader {
 
         try {
             this.url = URI.create(sanitizedUrl).toURL();
-        } catch (final MalformedURLException e) {
+        } catch (final MalformedURLException | IllegalArgumentException e) {
             throw new IllegalArgumentException("Provided URL is invalid: " + url, e);
         }
     }
@@ -104,7 +105,17 @@ public class UrlLoader implements FileLoader {
 
     @Override
     public StructuredFilename getFileName() {
-        return new StructuredFilename(url.getPath());
+        String path = url.getPath();
+        int lastSlash = path.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            path = path.substring(lastSlash + 1);
+        }
+        // Remove query parameters if present
+        int queryStart = path.indexOf('?');
+        if (queryStart >= 0) {
+            path = path.substring(0, queryStart);
+        }
+        return new StructuredFilename(path);
     }
 
     @Override
