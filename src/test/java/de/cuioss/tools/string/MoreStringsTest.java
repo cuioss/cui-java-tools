@@ -288,7 +288,84 @@ class MoreStringsTest {
     }
 
     @Test
-    @SuppressWarnings("squid:S2699") // owolff: No assertions necessary -> will throw exceptions
+    void testIsPresent() {
+        assertTrue(MoreStrings.isPresent("abc"));
+        assertTrue(MoreStrings.isPresent(" "));
+        assertTrue(MoreStrings.isPresent("  "));
+        assertFalse(MoreStrings.isPresent(null));
+        assertFalse(MoreStrings.isPresent(""));
+    }
+
+    @Test
+    void testLeftPad() {
+        assertNull(MoreStrings.leftPad(null, 3));
+        assertEquals("   ", MoreStrings.leftPad("", 3));
+        assertEquals("bat", MoreStrings.leftPad("bat", 3));
+        assertEquals("  bat", MoreStrings.leftPad("bat", 5));
+        assertEquals("bat", MoreStrings.leftPad("bat", 1));
+        assertEquals("bat", MoreStrings.leftPad("bat", -1));
+    }
+
+    @Test
+    void testLeftPadWithChar() {
+        assertNull(MoreStrings.leftPad(null, 3, 'z'));
+        assertEquals("zzz", MoreStrings.leftPad("", 3, 'z'));
+        assertEquals("bat", MoreStrings.leftPad("bat", 3, 'z'));
+        assertEquals("zzbat", MoreStrings.leftPad("bat", 5, 'z'));
+        assertEquals("bat", MoreStrings.leftPad("bat", 1, 'z'));
+        assertEquals("bat", MoreStrings.leftPad("bat", -1, 'z'));
+    }
+
+    @Test
+    void testLeftPadWithString() {
+        assertNull(MoreStrings.leftPad(null, 3, "z"));
+        assertEquals("zzz", MoreStrings.leftPad("", 3, "z"));
+        assertEquals("bat", MoreStrings.leftPad("bat", 3, "yz"));
+        assertEquals("yzbat", MoreStrings.leftPad("bat", 5, "yz"));
+        assertEquals("yzyzybat", MoreStrings.leftPad("bat", 8, "yz"));
+        assertEquals("bat", MoreStrings.leftPad("bat", 1, "yz"));
+        assertEquals("bat", MoreStrings.leftPad("bat", -1, "yz"));
+        assertEquals("  bat", MoreStrings.leftPad("bat", 5, null));
+        assertEquals("  bat", MoreStrings.leftPad("bat", 5, ""));
+    }
+
+    @Test
+    void testIndexOf() {
+        assertEquals(-1, MoreStrings.indexOf(null, 'a'));
+        assertEquals(-1, MoreStrings.indexOf("", 'a'));
+        assertEquals(0, MoreStrings.indexOf("aabaabaa", 'a'));
+        assertEquals(2, MoreStrings.indexOf("aabaabaa", 'b'));
+    }
+
+    @Test
+    void testIndexOfWithStart() {
+        assertEquals(-1, MoreStrings.indexOf(null, 'a', 0));
+        assertEquals(-1, MoreStrings.indexOf("", 'a', 0));
+        assertEquals(0, MoreStrings.indexOf("aabaabaa", 'a', 0));
+        assertEquals(1, MoreStrings.indexOf("aabaabaa", 'a', 1));
+        assertEquals(2, MoreStrings.indexOf("aabaabaa", 'b', 0));
+        assertEquals(5, MoreStrings.indexOf("aabaabaa", 'b', 3));
+        assertEquals(-1, MoreStrings.indexOf("aabaabaa", 'b', 9));
+        assertEquals(2, MoreStrings.indexOf("aabaabaa", 'b', -1));
+    }
+
+    @Test
+    void testEnsureEndsWith() {
+        assertEquals("test.txt", MoreStrings.ensureEndsWith("test", ".txt"));
+        assertEquals("test.txt", MoreStrings.ensureEndsWith("test.txt", ".txt"));
+        assertEquals("test.json", MoreStrings.ensureEndsWith("test", ".json"));
+        assertEquals("/path/to/dir/", MoreStrings.ensureEndsWith("/path/to/dir", "/"));
+        assertEquals("/path/to/dir/", MoreStrings.ensureEndsWith("/path/to/dir/", "/"));
+    }
+
+    @Test
+    void testEnsureEndsWithNullChecks() {
+        assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith(null, ".txt"));
+        assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith("test", null));
+        assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith(null, null));
+    }
+
+    @Test
     void shouldDeterminesEmptyStringPassthrough() {
         // Positive / Passthrough cases
         MoreStrings.requireNotEmpty(NON_EMPTY_STRING);
