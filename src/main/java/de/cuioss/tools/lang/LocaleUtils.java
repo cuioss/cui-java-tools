@@ -165,12 +165,36 @@ public class LocaleUtils {
      * @throws IllegalArgumentException if the given String can not be parsed.
      */
     private static Locale parseLocale(final String str) {
+        Preconditions.checkArgument(null != str, "Input string must not be null");
         final var parts = str.split("_", 3);
         try {
             return switch (parts.length) {
-                case 1 -> new Locale.Builder().setLanguage(parts[0]).build();
-                case 2 -> new Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).build();
-                case 3 -> new Locale.Builder().setLanguage(parts[0]).setRegion(parts[1]).setVariant(parts[2]).build();
+                case 1 -> {
+                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
+                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
+                    yield new Locale.Builder().setLanguage(parts[0]).build();
+                }
+                case 2 -> {
+                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
+                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
+                    Preconditions.checkArgument(isISO3166CountryCode(parts[1]) || isNumericAreaCode(parts[1]), 
+                        "Invalid country code '%s', must be ISO 3166 alpha-2 or UN M.49 numeric", parts[1]);
+                    yield new Locale.Builder()
+                        .setLanguage(parts[0])
+                        .setRegion(parts[1])
+                        .build();
+                }
+                case 3 -> {
+                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
+                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
+                    Preconditions.checkArgument(isISO3166CountryCode(parts[1]) || isNumericAreaCode(parts[1]), 
+                        "Invalid country code '%s', must be ISO 3166 alpha-2 or UN M.49 numeric", parts[1]);
+                    yield new Locale.Builder()
+                        .setLanguage(parts[0])
+                        .setRegion(parts[1])
+                        .setVariant(parts[2])
+                        .build();
+                }
                 default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
             };
         } catch (final IllegalArgumentException iae) {
