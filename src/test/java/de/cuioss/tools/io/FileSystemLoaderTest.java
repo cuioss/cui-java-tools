@@ -15,17 +15,18 @@
  */
 package de.cuioss.tools.io;
 
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Paths;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-
-import org.junit.jupiter.api.Test;
 
 class FileSystemLoaderTest {
 
@@ -121,8 +122,51 @@ class FileSystemLoaderTest {
     @Test
     void shouldFailToLoadNotExistingFile() {
         var fileSystemLoader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
-        assertThrows(IllegalStateException.class, () -> {
-            fileSystemLoader.inputStream();
-        });
+        assertThrows(IllegalStateException.class, fileSystemLoader::inputStream);
+    }
+
+    @Test
+    void shouldHandleOutputStreamForWritableFile() throws IOException {
+        // Create a temporary file for testing
+        File tempFile = File.createTempFile("test", ".txt");
+        tempFile.deleteOnExit();
+        
+        var loader = new FileSystemLoader(tempFile.getAbsolutePath());
+        assertTrue(loader.isWritable());
+        
+        try (var output = loader.outputStream()) {
+            assertNotNull(output);
+            output.write("test".getBytes());
+        }
+    }
+
+    @Test
+    void shouldFailOutputStreamForNonWritableFile() {
+        var loader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
+        assertFalse(loader.isWritable());
+        assertThrows(IllegalStateException.class, loader::outputStream);
+    }
+
+    @Test
+    void shouldFailOutputStreamForDirectory() {
+        var loader = new FileSystemLoader(EXISTING_DIRECTORY_PATH);
+        assertFalse(loader.isWritable());
+        assertThrows(IllegalStateException.class, loader::outputStream);
+    }
+
+    @Test
+    void shouldGetUrlForExistingFile() throws IOException {
+        var loader = new FileSystemLoader(EXISTING_FILE_PATH);
+        var url = loader.getURL();
+        assertNotNull(url);
+        assertEquals(Paths.get(EXISTING_FILE_PATH).toUri().toURL(), url);
+    }
+
+    @Test
+    void shouldGetUrlForNonExistentFile() throws MalformedURLException {
+        var loader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
+        var url = loader.getURL();
+        assertNotNull(url);
+        assertEquals(Paths.get(NOT_EXISTING_FILE_PATH).toUri().toURL().getPath(), url.getPath());
     }
 }
