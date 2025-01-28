@@ -33,7 +33,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * File-system based variant. Responsible for all non
@@ -91,7 +90,7 @@ public class FileSystemLoader implements FileReaderWriter {
      * @return the path
      */
     public Path getPath() {
-        return Paths.get(normalizedPathName);
+        return Path.of(normalizedPathName);
     }
 
     @Override

@@ -43,7 +43,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,25 +55,25 @@ class MorePathsTest {
     private static final String TARGET = "target";
     private static final String POM_XML = "pom.xml";
     private static final String TEST_FILE_NAME = "someTestFile.txt";
-    private static final Path TEST_FILE_SOURCE_PATH = Paths.get("src/test/resources", TEST_FILE_NAME);
+    private static final Path TEST_FILE_SOURCE_PATH = Path.of("src/test/resources", TEST_FILE_NAME);
 
-    static final Path POM_PATH = Paths.get(POM_XML);
-    static final Path NOT_THERE_PATH = Paths.get(NOT_THERE);
+    static final Path POM_PATH = Path.of(POM_XML);
+    static final Path NOT_THERE_PATH = Path.of(NOT_THERE);
     private static final SimpleDateFormat FILE_SUFFIX_DATEFORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
-    private static final Path BASE_PATH = Paths.get("src/test/resources");
-    private static final Path TARGET_PATH = Paths.get("target/test-classes");
+    private static final Path BASE_PATH = Path.of("src/test/resources");
+    private static final Path TARGET_PATH = Path.of("target/test-classes");
     private static final Path TARGET_PLAYGROUND = TARGET_PATH.resolve("playground");
 
-    private static final Path EXISTING_FILE = Paths.get(POM_XML);
-    private static final Path NOT_EXISTING_DIRECTORY = Paths.get("not/there");
+    private static final Path EXISTING_FILE = Path.of(POM_XML);
+    private static final Path NOT_EXISTING_DIRECTORY = Path.of("not/there");
 
     private Path playGroundBase;
     private Path playGroundBackup;
 
     @BeforeEach
     void before() throws IOException {
-        var playGround = Paths.get("target/playground");
+        var playGround = Path.of("target/playground");
         if (!Files.exists(playGround)) {
             Files.createDirectories(playGround);
         }

@@ -30,6 +30,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -65,6 +66,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /** Shortcut constant parameter for includeViewParams. */
     public static final UrlParameter INCLUDE_VIEW_PARAMETER = new UrlParameter("includeViewParams", "true");
 
+    @Serial
     private static final long serialVersionUID = 634175928228707534L;
 
     /** The name of the parameter. */

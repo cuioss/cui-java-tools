@@ -74,7 +74,7 @@ public final class MorePaths {
 
     /**
      * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for
-     * details and {@link Paths#get(String, String...)} for details regarding the
+     * details and {@link Path#of(String, String...)} for details regarding the
      * parameter
      *
      * @param first the path string or initial part of the path string
@@ -82,7 +82,7 @@ public final class MorePaths {
      * @return the real-path if applicable, {@link Path#toAbsolutePath()} otherwise.
      */
     public static Path getRealPathSafely(String first, String... more) {
-        return getRealPathSafely(Paths.get(first, more));
+        return getRealPathSafely(Path.of(first, more));
     }
 
     /**

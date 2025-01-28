@@ -18,7 +18,6 @@ package de.cuioss.tools.net.ssl;
 import lombok.experimental.UtilityClass;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Provide some constants for the testKeystore
@@ -31,7 +30,7 @@ public class KeystoreInformation {
 
     public static final String PASSWORD = "secret";
 
-    public static final Path BASE = Paths.get("src", "test", "resources");
+    public static final Path BASE = Path.of("src", "test", "resources");
 
     public static final Path EMPTY_KEY_STORE = BASE.resolve("emptyKeystore.jks");
 

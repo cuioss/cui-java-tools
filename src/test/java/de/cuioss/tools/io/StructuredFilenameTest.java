@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 class StructuredFilenameTest {
 
@@ -64,13 +64,13 @@ class StructuredFilenameTest {
 
     @Test
     void shouldResolvePath() {
-        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME));
+        final var filename = new StructuredFilename(Path.of(EXISTING_FILE_NAME));
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 
     @Test
     void shouldResolveFile() {
-        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
+        final var filename = new StructuredFilename(Path.of(EXISTING_FILE_NAME).toFile());
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 
