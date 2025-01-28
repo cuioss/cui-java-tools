@@ -36,7 +36,7 @@ class FilenameUtilsWildcardTest {
     private static final boolean WINDOWS = File.separatorChar == '\\';
 
     @Test
-    void testMatch() {
+    void match() {
         assertFalse(FilenameUtils.wildcardMatch(null, "Foo"));
         assertFalse(FilenameUtils.wildcardMatch("Foo", null));
         assertTrue(FilenameUtils.wildcardMatch(null, null));
@@ -62,7 +62,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testMatchOnSystem() {
+    void matchOnSystem() {
         assertFalse(FilenameUtils.wildcardMatchOnSystem(null, "Foo"));
         assertFalse(FilenameUtils.wildcardMatchOnSystem("Foo", null));
         assertTrue(FilenameUtils.wildcardMatchOnSystem(null, null));
@@ -86,7 +86,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testMatchCaseSpecified() {
+    void matchCaseSpecified() {
         assertFalse(FilenameUtils.wildcardMatch(null, "Foo", IOCase.SENSITIVE));
         assertFalse(FilenameUtils.wildcardMatch("Foo", null, IOCase.SENSITIVE));
         assertTrue(FilenameUtils.wildcardMatch(null, null, IOCase.SENSITIVE));
@@ -121,7 +121,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testSplitOnTokens() {
+    void splitOnTokens() {
         assertArrayEquals(new String[]{"Ad", "*", "er"}, FilenameUtils.splitOnTokens("Ad*er"));
         assertArrayEquals(new String[]{"Ad", "?", "er"}, FilenameUtils.splitOnTokens("Ad?er"));
         assertArrayEquals(new String[]{"Test", "*", "?", "One"}, FilenameUtils.splitOnTokens("Test*?One"));
@@ -140,7 +140,7 @@ class FilenameUtilsWildcardTest {
 
     // A separate set of tests, added to this batch
     @Test
-    void testMatch2() {
+    void match2() {
         assertMatch("log.txt", "log.txt", true);
         assertMatch("log.txt1", "log.txt", false);
 
@@ -190,7 +190,7 @@ class FilenameUtilsWildcardTest {
      * See <a href="https://issues.apache.org/jira/browse/IO-246">...</a>
      */
     @Test
-    void test_IO_246() {
+    void io_246() {
 
         // Tests for "*?"
         assertMatch("aaa", "aa*?", true);
@@ -212,7 +212,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testLocaleIndependence() {
+    void localeIndependence() {
         final var orig = Locale.getDefault();
 
         final var locales = Locale.getAvailableLocales();

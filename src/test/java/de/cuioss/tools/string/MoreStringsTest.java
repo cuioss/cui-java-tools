@@ -74,7 +74,7 @@ class MoreStringsTest {
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java">...</a>
      */
     @Test
-    void testIsAllLowerCase() {
+    void isAllLowerCase() {
         assertFalse(MoreStrings.isAllLowerCase(null));
         assertFalse(MoreStrings.isAllLowerCase(MoreStrings.EMPTY));
         assertFalse(MoreStrings.isAllLowerCase("  "));
@@ -92,7 +92,7 @@ class MoreStringsTest {
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java">...</a>
      */
     @Test
-    void testIsAllUpperCase() {
+    void isAllUpperCase() {
         assertFalse(MoreStrings.isAllUpperCase(null));
         assertFalse(MoreStrings.isAllUpperCase(MoreStrings.EMPTY));
         assertFalse(MoreStrings.isAllUpperCase("  "));
@@ -110,7 +110,7 @@ class MoreStringsTest {
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsIsTest.java">...</a>
      */
     @Test
-    void testIsNumeric() {
+    void isNumeric() {
         assertFalse(MoreStrings.isNumeric(null));
         assertFalse(MoreStrings.isNumeric(""));
         assertFalse(MoreStrings.isNumeric(" "));
@@ -136,7 +136,7 @@ class MoreStringsTest {
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java">...</a>
      */
     @Test
-    void testIsEmpty() {
+    void isEmpty() {
         assertTrue(MoreStrings.isEmpty(null));
         assertTrue(MoreStrings.isEmpty(""));
         assertFalse(MoreStrings.isEmpty(" "));
@@ -149,7 +149,7 @@ class MoreStringsTest {
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsEmptyBlankTest.java">...</a>
      */
     @Test
-    void testIsBlank() {
+    void isBlank() {
         assertTrue(MoreStrings.isBlank(null));
         assertTrue(MoreStrings.isBlank(""));
         assertTrue(MoreStrings.isBlank(WHITESPACE));
@@ -158,7 +158,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testCountMatches_String() {
+    void countMatchesString() {
         assertEquals(0, MoreStrings.countMatches(null, null));
         assertEquals(0, MoreStrings.countMatches("blah", null));
         assertEquals(0, MoreStrings.countMatches(null, "DD"));
@@ -172,7 +172,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLeftPad_StringIntChar() {
+    void leftPadStringIntChar() {
         assertNull(MoreStrings.leftPad(null, 5, ' '));
         assertEquals("     ", MoreStrings.leftPad("", 5, ' '));
         assertEquals("  abc", MoreStrings.leftPad("abc", 5, ' '));
@@ -184,7 +184,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLeftPad_StringIntString() {
+    void leftPadStringIntString() {
         assertNull(MoreStrings.leftPad(null, 5, "-+"));
         assertNull(MoreStrings.leftPad(null, 5, null));
         assertEquals("     ", MoreStrings.leftPad("", 5, " "));
@@ -198,14 +198,14 @@ class MoreStringsTest {
     }
 
     @Test
-    void testRepeat_CharInt() {
+    void repeatCharInt() {
         assertEquals("zzz", MoreStrings.repeat('z', 3));
         assertEquals("", MoreStrings.repeat('z', 0));
         assertEquals("", MoreStrings.repeat('z', -2));
     }
 
     @Test
-    void testIndexOf_StringInt() {
+    void indexOfStringInt() {
         assertEquals(-1, MoreStrings.indexOf(null, null, 0));
         assertEquals(-1, MoreStrings.indexOf(null, null, -1));
         assertEquals(-1, MoreStrings.indexOf(null, "", 0));
@@ -237,13 +237,13 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLANG666() {
+    void lang666() {
         assertEquals("12", MoreStrings.stripEnd("120.00", ".0"));
         assertEquals("121", MoreStrings.stripEnd("121.00", ".0"));
     }
 
     @Test
-    void testStripEnd_StringString() {
+    void stripEndStringString() {
         // null stripEnd
         assertNull(MoreStrings.stripEnd(null, null));
         assertEquals("", MoreStrings.stripEnd("", null));
@@ -275,7 +275,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testNonWhitespaceChar() {
+    void nonWhitespaceChar() {
         assertFalse(MoreStrings.hasNonWhitespaceChar(null));
         assertFalse(MoreStrings.hasNonWhitespaceChar(""));
         assertFalse(MoreStrings.hasNonWhitespaceChar(" "));
@@ -288,7 +288,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testIsPresent() {
+    void isPresent() {
         assertTrue(MoreStrings.isPresent("abc"));
         assertTrue(MoreStrings.isPresent(" "));
         assertTrue(MoreStrings.isPresent("  "));
@@ -297,7 +297,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLeftPad() {
+    void leftPad() {
         assertNull(MoreStrings.leftPad(null, 3));
         assertEquals("   ", MoreStrings.leftPad("", 3));
         assertEquals("bat", MoreStrings.leftPad("bat", 3));
@@ -307,7 +307,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLeftPadWithChar() {
+    void leftPadWithChar() {
         assertNull(MoreStrings.leftPad(null, 3, 'z'));
         assertEquals("zzz", MoreStrings.leftPad("", 3, 'z'));
         assertEquals("bat", MoreStrings.leftPad("bat", 3, 'z'));
@@ -317,7 +317,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLeftPadWithString() {
+    void leftPadWithString() {
         assertNull(MoreStrings.leftPad(null, 3, "z"));
         assertEquals("zzz", MoreStrings.leftPad("", 3, "z"));
         assertEquals("bat", MoreStrings.leftPad("bat", 3, "yz"));
@@ -330,7 +330,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testIndexOf() {
+    void indexOf() {
         assertEquals(-1, MoreStrings.indexOf(null, 'a'));
         assertEquals(-1, MoreStrings.indexOf("", 'a'));
         assertEquals(0, MoreStrings.indexOf("aabaabaa", 'a'));
@@ -338,7 +338,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testIndexOfWithStart() {
+    void indexOfWithStart() {
         assertEquals(-1, MoreStrings.indexOf(null, 'a', 0));
         assertEquals(-1, MoreStrings.indexOf("", 'a', 0));
         assertEquals(0, MoreStrings.indexOf("aabaabaa", 'a', 0));
@@ -350,7 +350,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testEnsureEndsWith() {
+    void ensureEndsWith() {
         assertEquals("test.txt", MoreStrings.ensureEndsWith("test", ".txt"));
         assertEquals("test.txt", MoreStrings.ensureEndsWith("test.txt", ".txt"));
         assertEquals("test.json", MoreStrings.ensureEndsWith("test", ".json"));
@@ -359,7 +359,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testEnsureEndsWithNullChecks() {
+    void ensureEndsWithNullChecks() {
         assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith(null, ".txt"));
         assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith("test", null));
         assertThrows(NullPointerException.class, () -> MoreStrings.ensureEndsWith(null, null));
@@ -377,25 +377,19 @@ class MoreStringsTest {
 
     @Test
     void shouldDeterminesEmptyString() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmpty("");
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmpty("", MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmpty(""));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmpty("", MESSAGE));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmptyTrimmed("");
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmptyTrimmed("", MESSAGE);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmptyTrimmed(" ");
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreStrings.requireNotEmptyTrimmed(" ", MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmptyTrimmed(""));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmptyTrimmed("", MESSAGE));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmptyTrimmed(" "));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreStrings.requireNotEmptyTrimmed(" ", MESSAGE));
     }
 
     @Test
@@ -423,7 +417,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLenientFormat() {
+    void lenientFormat() {
         assertEquals("%s", MoreStrings.lenientFormat("%s"));
         assertEquals("5", MoreStrings.lenientFormat("%s", 5));
         assertEquals("foo [5]", MoreStrings.lenientFormat("foo", 5));
@@ -444,7 +438,7 @@ class MoreStringsTest {
     }
 
     @Test
-    void testLenientFormat_badArgumentToString() {
+    void lenientFormatBadArgumentToString() {
 
         var lenientFormat = MoreStrings.lenientFormat("boiler %s plate", new ThrowsOnToString());
         assertTrue(lenientFormat.startsWith("boiler <de.cuioss.tools.string.MoreStringsTest"));

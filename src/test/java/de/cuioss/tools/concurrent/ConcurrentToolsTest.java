@@ -37,12 +37,12 @@ class ConcurrentToolsTest {
     private static final long LONG_DELAY_MS = 2500;
 
     @Test
-    void testSleepNoInterrupt() {
+    void sleepNoInterrupt() {
         sleepSuccessfully(10);
     }
 
     @Test
-    void testSleepSingleInterrupt() {
+    void sleepSingleInterrupt() {
         requestInterruptIn(10);
         sleepSuccessfully(50);
         assertInterrupted();

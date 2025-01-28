@@ -42,18 +42,14 @@ class MoreObjectsTest {
 
     @Test
     void requireTypeShouldHandleInvalidTypes() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(null, null);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(HELLO, null);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(null, Serializable.class);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(HELLO, Number.class);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreObjects.requireType(null, null));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreObjects.requireType(HELLO, null));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreObjects.requireType(null, Serializable.class));
+        assertThrows(IllegalArgumentException.class, () ->
+            MoreObjects.requireType(HELLO, Number.class));
     }
 
     @Test
@@ -78,7 +74,7 @@ class MoreObjectsTest {
     }
 
     @Test
-    void testFirstNonNull() {
+    void firstNonNull() {
         assertEquals("", MoreObjects.firstNonNull(null, ""));
         final var firstNonNullGenerics = MoreObjects.firstNonNull(null, null, "123", "456");
         assertEquals("123", firstNonNullGenerics);
@@ -101,7 +97,7 @@ class MoreObjectsTest {
     }
 
     @Test
-    void testGetFirstNonNull() {
+    void getFirstNonNull() {
         // first non-null
         assertEquals("", MoreObjects.getFirstNonNull(() -> null, () -> ""));
         // first encountered value is used

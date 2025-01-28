@@ -109,12 +109,10 @@ class PropertyHolderTest {
         var holder = from(ExplodingBean.class, PROPERTY_NAME).get();
 
         underTest.illegalArgumentException();
-        assertThrows(IllegalStateException.class, () -> {
-            holder.readFrom(underTest);
-        });
-        assertThrows(IllegalStateException.class, () -> {
-            holder.writeTo(underTest, "");
-        });
+        assertThrows(IllegalStateException.class, () ->
+            holder.readFrom(underTest));
+        assertThrows(IllegalStateException.class, () ->
+            holder.writeTo(underTest, ""));
     }
 
     @Test

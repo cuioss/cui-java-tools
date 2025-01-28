@@ -45,7 +45,7 @@ class IOStreamsTest {
     private final byte[] inData = Generators.generateTestData(FILE_SIZE);
 
     @Test
-    void testContentEquals_InputStream_InputStream() throws Exception {
+    void contentEqualsInputStreamInputStream() throws Exception {
         var input1 = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
         assertTrue(contentEquals(input1, input1));
         input1 = new ByteArrayInputStream("ABC".getBytes(StandardCharsets.UTF_8));
@@ -63,7 +63,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testContentEquals_Reader_Reader() throws Exception {
+    void contentEqualsReaderReader() throws Exception {
         var input1 = new StringReader("");
         assertTrue(contentEquals(input1, input1));
 
@@ -84,7 +84,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testToByteArray_InputStream() throws Exception {
+    void toByteArrayInputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
             final var out = IOStreams.toByteArray(fin);
             assertNotNull(out);
@@ -94,7 +94,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testToString_InputStream() throws Exception {
+    void toStringInputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
             var out = IOStreams.toString(fin, StandardCharsets.UTF_8);
             assertNotNull(out);

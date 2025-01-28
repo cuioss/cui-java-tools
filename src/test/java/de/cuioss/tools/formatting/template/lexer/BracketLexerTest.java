@@ -46,7 +46,7 @@ class BracketLexerTest {
     private static final String PERSON_NAME_FORMAT_CURLY_BRACKTETS = "{familyName, }{givenName }{middleName}";
 
     @Test
-    void testScan() {
+    void scan() {
         final List<Token> result = new ArrayList<>();
         final Lexer<PersonAddress> lexer = new BracketLexer<>(generator.next(), Brackets.CURLY_BRACKETS);
         result.addAll(lexer.scan(null));

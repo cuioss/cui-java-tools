@@ -45,7 +45,7 @@ class JoinerTest {
     private static final Iterable<Integer> ITERABLE_FOUR_NULLS = Arrays.asList(null, null, null, null);
 
     @Test
-    void testOnCharOverride() {
+    void onCharOverride() {
         final var onChar = Joiner.on('-');
         assertNoOutput(onChar, ITERABLE_EMPTY);
         assertResult(onChar, ITERABLE_1, "1");
@@ -54,7 +54,7 @@ class JoinerTest {
     }
 
     @Test
-    void testSkipNulls() {
+    void skipNulls() {
         final var skipNulls = J.skipNulls();
         assertNoOutput(skipNulls, ITERABLE_EMPTY);
         assertNoOutput(skipNulls, ITERABLE_NULL);
@@ -69,7 +69,7 @@ class JoinerTest {
     }
 
     @Test
-    void testSkipEmptyStrings() {
+    void skipEmptyStrings() {
         final var skipEmptyStrings = J.skipEmptyStrings().skipNulls();
         assertNoOutput(skipEmptyStrings, ITERABLE_EMPTY);
         assertNoOutput(skipEmptyStrings, ITERABLE_NULL);
@@ -87,7 +87,7 @@ class JoinerTest {
     }
 
     @Test
-    void testSkipBlankStrings() {
+    void skipBlankStrings() {
         final var skipEmptyStrings = J.skipBlankStrings().skipNulls();
         assertNoOutput(skipEmptyStrings, ITERABLE_EMPTY);
         assertNoOutput(skipEmptyStrings, ITERABLE_NULL);
@@ -105,7 +105,7 @@ class JoinerTest {
     }
 
     @Test
-    void testUseForNull() {
+    void useForNull() {
         final var zeroForNull = J.useForNull("0");
         assertNoOutput(zeroForNull, ITERABLE_EMPTY);
         assertResult(zeroForNull, ITERABLE_1, "1");

@@ -108,9 +108,8 @@ class FileSystemLoaderTest {
     @Test
     void shouldNotHandleFileOnlyPathname() {
         var prefix = FileTypePrefix.FILE.getPrefix();
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileSystemLoader.checkPathName(prefix);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            FileSystemLoader.checkPathName(prefix));
     }
 
     @Test

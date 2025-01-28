@@ -104,9 +104,8 @@ class TemplateFormatterTest {
         final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
                 PersonName.class, true);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            formatter.format(personName);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            formatter.format(personName));
     }
 
     @Test

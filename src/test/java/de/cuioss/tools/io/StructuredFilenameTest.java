@@ -29,28 +29,28 @@ class StructuredFilenameTest {
     static final String SOME_TEST_FILE_TXT = "someTestFile.txt";
 
     @Test
-    void testValidFilename() {
+    void validFilename() {
         final var filename = new StructuredFilename("test.suffix");
         assertEquals("test", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
-    void testNoSuffixFilename() {
+    void noSuffixFilename() {
         final var filename = new StructuredFilename("test");
         assertEquals("test", filename.getNamePart());
         assertNull(filename.getSuffix());
     }
 
     @Test
-    void testMultipleDotsFilename() {
+    void multipleDotsFilename() {
         final var filename = new StructuredFilename("test.dots.suffix");
         assertEquals("test.dots", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
-    void testGetAppendedName() {
+    void getAppendedName() {
         final var filename = new StructuredFilename("test.suffix");
         assertEquals("test-appended.suffix", filename.getAppendedName("-appended"));
     }

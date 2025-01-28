@@ -32,9 +32,8 @@ class KeyMaterialHolderTest {
         assertNotNull(withRandomKeyMaterial());
 
         var builder = KeyMaterialHolder.builder();
-        assertThrows(NullPointerException.class, () -> {
-            builder.build();
-        });
+        assertThrows(NullPointerException.class, () ->
+            builder.build());
     }
 
     @Test

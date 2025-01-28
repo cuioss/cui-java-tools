@@ -34,143 +34,143 @@ class SplitterTest {
     private static final Splitter COMMA_SPLITTER = Splitter.on(",");
 
     @Test
-    void testSplitNullString() {
+    void splitNullString() {
         assertTrue(COMMA_SPLITTER.splitToList(null).isEmpty());
     }
 
     @Test
-    void testCharacterSimpleSplitToList() {
+    void characterSimpleSplitToList() {
         final var simple = "a,b,c";
         final var letters = COMMA_SPLITTER.splitToList(simple);
         assertEquals(immutableList("a", "b", "c"), letters);
     }
 
     @Test
-    void testCharacterBlankSplitToList() {
+    void characterBlankSplitToList() {
         final var simple = "a b c";
         final var letters = Splitter.on(' ').splitToList(simple);
         assertEquals(immutableList("a", "b", "c"), letters);
     }
 
     @Test
-    void testCharacterSimpleSplitWithNoDelimiter() {
+    void characterSimpleSplitWithNoDelimiter() {
         final var simple = "a,b,c";
         final Iterable<String> letters = Splitter.on('.').splitToList(simple);
         assertEquals(immutableList("a,b,c"), letters);
     }
 
     @Test
-    void testCharacterSplitWithDoubleDelimiter() {
+    void characterSplitWithDoubleDelimiter() {
         final var doubled = "a,,b,c";
         final Iterable<String> letters = COMMA_SPLITTER.splitToList(doubled);
         assertEquals(immutableList("a", "", "b", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitWithDoubleDelimiterAndSpace() {
+    void characterSplitWithDoubleDelimiterAndSpace() {
         final var doubled = "a,, b,c";
         final Iterable<String> letters = COMMA_SPLITTER.splitToList(doubled);
         assertEquals(immutableList("a", "", " b", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitWithLeadingDelimiter() {
+    void characterSplitWithLeadingDelimiter() {
         final var leading = ",a,b,c";
         final Iterable<String> letters = COMMA_SPLITTER.splitToList(leading);
         assertEquals(immutableList("", "a", "b", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitWithMultipleLetters() {
+    void characterSplitWithMultipleLetters() {
         final Iterable<String> testCharacteringMotto = Splitter.on('-').splitToList("Testing-rocks-Debugging-sucks");
         assertEquals(immutableList("Testing", "rocks", "Debugging", "sucks"), testCharacteringMotto);
     }
 
     @Test
-    void testCharacterSplitWithDoubleDelimiterOmitEmptyStrings() {
+    void characterSplitWithDoubleDelimiterOmitEmptyStrings() {
         final var doubled = "a..b.c";
         final Iterable<String> letters = Splitter.on('.').omitEmptyStrings().splitToList(doubled);
         assertEquals(immutableList("a", "b", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitEmptyToken() {
+    void characterSplitEmptyToken() {
         final var emptyToken = "a. .c";
         final Iterable<String> letters = Splitter.on('.').trimResults().splitToList(emptyToken);
         assertEquals(immutableList("a", "", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitEmptyTokenOmitEmptyStrings() {
+    void characterSplitEmptyTokenOmitEmptyStrings() {
         final var emptyToken = "a. .c";
         final Iterable<String> letters = Splitter.on('.').omitEmptyStrings().trimResults().splitToList(emptyToken);
         assertEquals(immutableList("a", "c"), letters);
     }
 
     @Test
-    void testCharacterSplitOnEmptyString() {
+    void characterSplitOnEmptyString() {
         assertTrue(Splitter.on('.').splitToList("").isEmpty());
     }
 
     @Test
-    void testCharacterSplitOnEmptyStringOmitEmptyStrings() {
+    void characterSplitOnEmptyStringOmitEmptyStrings() {
         assertTrue(Splitter.on('.').omitEmptyStrings().splitToList("").isEmpty());
     }
 
     @Test
-    void testCharacterSplitOnOnlyDelimiter() {
+    void characterSplitOnOnlyDelimiter() {
         assertTrue(Splitter.on('.').splitToList(".").isEmpty());
     }
 
     @Test
-    void testCharacterSplitOnOnlyDelimitersOmitEmptyStrings() {
+    void characterSplitOnOnlyDelimitersOmitEmptyStrings() {
         assertTrue(Splitter.on('.').omitEmptyStrings().splitToList("...").isEmpty());
     }
 
     @Test
-    void testStringSplitWithDoubleDelimiterOmitEmptyStrings() {
+    void stringSplitWithDoubleDelimiterOmitEmptyStrings() {
         final var doubled = "a..b.c";
         final Iterable<String> letters = Splitter.on(".").omitEmptyStrings().splitToList(doubled);
         assertEquals(immutableList("a", "b", "c"), letters);
     }
 
     @Test
-    void testStringSplitEmptyToken() {
+    void stringSplitEmptyToken() {
         final var emptyToken = "a. .c";
         final Iterable<String> letters = Splitter.on(".").trimResults().splitToList(emptyToken);
         assertEquals(immutableList("a", "", "c"), letters);
     }
 
     @Test
-    void testStringSplitEmptyTokenOmitEmptyStrings() {
+    void stringSplitEmptyTokenOmitEmptyStrings() {
         final var emptyToken = "a. .c";
         final Iterable<String> letters = Splitter.on(".").omitEmptyStrings().trimResults().splitToList(emptyToken);
         assertEquals(immutableList("a", "c"), letters);
     }
 
     @Test
-    void testStringSplitWithLongDelimiter() {
+    void stringSplitWithLongDelimiter() {
         final var longDelimiter = "a, b, c";
         final Iterable<String> letters = Splitter.on(", ").splitToList(longDelimiter);
         assertEquals(immutableList("a", "b", "c"), letters);
     }
 
     @Test
-    void testStringSplitWithLongLeadingDelimiter() {
+    void stringSplitWithLongLeadingDelimiter() {
         final var longDelimiter = ", a, b, c";
         final Iterable<String> letters = Splitter.on(", ").splitToList(longDelimiter);
         assertEquals(immutableList("", "a", "b", "c"), letters);
     }
 
     @Test
-    void testStringSplitWithDelimiterSubstringInValue() {
+    void stringSplitWithDelimiterSubstringInValue() {
         final var fourCommasAndFourSpaces = ",,,,    ";
         final Iterable<String> threeCommasThenThreeSpaces = Splitter.on(", ").splitToList(fourCommasAndFourSpaces);
         assertEquals(immutableList(",,,", "   "), threeCommasThenThreeSpaces);
     }
 
     @Test
-    void testStringSplitWithEmptyString() {
+    void stringSplitWithEmptyString() {
         try {
             Splitter.on("");
             fail();
@@ -179,48 +179,48 @@ class SplitterTest {
     }
 
     @Test
-    void testLimit1Separator() {
+    void limit1Separator() {
         final var simple = "a,b,c,d";
         final Iterable<String> items = COMMA_SPLITTER.limit(1).splitToList(simple);
         assertEquals(immutableList("a,b,c,d"), items);
     }
 
     @Test
-    void testLimitSeparator() {
+    void limitSeparator() {
         final var simple = "a,b,c,d";
         final Iterable<String> items = COMMA_SPLITTER.limit(2).splitToList(simple);
         assertEquals(immutableList("a", "b,c,d"), items);
     }
 
     @Test
-    void testLimitExtraSeparators() {
+    void limitExtraSeparators() {
         final var text = "a,,,b,,c,d";
         final Iterable<String> items = COMMA_SPLITTER.limit(2).splitToList(text);
         assertEquals(immutableList("a", ",,b,,c,d"), items);
     }
 
     @Test
-    void testLimitExtraSeparatorsTrim1NoOmit() {
+    void limitExtraSeparatorsTrim1NoOmit() {
         final var text = ",,a,,  , b ,, c,d ";
         final Iterable<String> items = COMMA_SPLITTER.limit(1).trimResults().splitToList(text);
         assertEquals(immutableList(",,a,,  , b ,, c,d"), items);
     }
 
     @Test
-    void testLimitExtraSeparatorsTrim1Empty() {
+    void limitExtraSeparatorsTrim1Empty() {
         final var text = "";
         assertTrue(COMMA_SPLITTER.limit(1).splitToList(text).isEmpty());
     }
 
     @Test
-    void testLimitExtraSeparatorsTrim1EmptyOmit() {
+    void limitExtraSeparatorsTrim1EmptyOmit() {
         final var text = "";
         final var items = COMMA_SPLITTER.omitEmptyStrings().limit(1).splitToList(text);
         assertTrue(items.isEmpty());
     }
 
     @Test
-    void testInvalidZeroLimit() {
+    void invalidZeroLimit() {
         assertThrows(IllegalArgumentException.class, () -> COMMA_SPLITTER.limit(0));
     }
 
@@ -238,8 +238,7 @@ class SplitterTest {
         }
 
         var splitter = Splitter.on("[").doNotModifySeparatorString();
-        assertThrows(IllegalArgumentException.class, () -> {
-            splitter.splitToList("[boom]");
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            splitter.splitToList("[boom]"));
     }
 }

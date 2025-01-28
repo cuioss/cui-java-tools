@@ -238,9 +238,8 @@ class CollectionBuilderTest {
 
     static void assertImmutable(final Collection<String> collection) {
         assertNotNull(collection);
-        assertThrows(UnsupportedOperationException.class, () -> {
-            collection.add("i am not mutable");
-        });
+        assertThrows(UnsupportedOperationException.class, () ->
+            collection.add("i am not mutable"));
 
     }
 }

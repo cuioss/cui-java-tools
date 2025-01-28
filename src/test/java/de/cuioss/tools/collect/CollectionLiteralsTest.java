@@ -175,9 +175,8 @@ class CollectionLiteralsTest {
 
     static void assertImmutable(Collection<String> collection) {
         assertNotNull(collection);
-        assertThrows(UnsupportedOperationException.class, () -> {
-            collection.add("i am not mutable");
-        });
+        assertThrows(UnsupportedOperationException.class, () ->
+            collection.add("i am not mutable"));
     }
 
     static void assertMutable(Map<String, String> map) {
@@ -188,8 +187,7 @@ class CollectionLiteralsTest {
 
     static void assertImmutable(Map<String, String> map) {
         assertNotNull(map);
-        assertThrows(UnsupportedOperationException.class, () -> {
-            map.put("i am", "not mutable");
-        });
+        assertThrows(UnsupportedOperationException.class, () ->
+            map.put("i am", "not mutable"));
     }
 }

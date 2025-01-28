@@ -51,7 +51,7 @@ class KeyStoreProviderTest {
      * @throws Exception
      */
     @Test
-    void testRsaCertificate() throws Exception {
+    void rsaCertificate() throws Exception {
 
         var x509Certificate = createX509Certificate("RSA", 2048, "SHA256WithRSAEncryption");
 
@@ -74,7 +74,7 @@ class KeyStoreProviderTest {
      * @throws Exception
      */
     @Test
-    void testCertificate() throws Exception {
+    void certificate() throws Exception {
 
         var x509Certificate = createX509Certificate("DSA", 1024, "SHA224withDSA");
 
@@ -92,7 +92,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void testEcCertificate() throws Exception {
+    void ecCertificate() throws Exception {
 
         var x509Certificate = createX509Certificate("EC", 256, "SHA256withECDSA");
 
@@ -110,7 +110,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void testKeyStoreCreation() throws Exception {
+    void keyStoreCreation() throws Exception {
 
         var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(null, null);
@@ -145,9 +145,8 @@ class KeyStoreProviderTest {
         var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
                 .key(keyHolder).build();
 
-        assertThrows(IllegalStateException.class, () -> {
-            ky.resolveKeyStore();
-        });
+        assertThrows(IllegalStateException.class, () ->
+            ky.resolveKeyStore());
     }
 
     @Test
@@ -158,13 +157,12 @@ class KeyStoreProviderTest {
         var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
                 .build();
 
-        assertThrows(IllegalStateException.class, () -> {
-            ky.resolveKeyStore();
-        });
+        assertThrows(IllegalStateException.class, () ->
+            ky.resolveKeyStore());
     }
 
     @Test
-    void testMultipleCerts() throws Exception {
+    void multipleCerts() throws Exception {
 
         Collection<KeyMaterialHolder> keyMaterialHolderCollection = new ArrayList<>();
 

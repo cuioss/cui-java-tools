@@ -158,9 +158,8 @@ class MorePathsTest {
 
     @Test
     void shouldFailToBackupNonExisitingFile() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            backupFile(TARGET_PLAYGROUND);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            backupFile(TARGET_PLAYGROUND));
     }
 
     @Test
@@ -194,9 +193,8 @@ class MorePathsTest {
 
     @Test
     void shouldFailToProvideBackupDirectoryIfParentNotExists() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY));
     }
 
     @Test
@@ -255,14 +253,14 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyForNull() {
+    void deleteQuietlyForNull() {
         assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(null));
         });
     }
 
     @Test
-    void testDeleteQuietlyDir() throws IOException {
+    void deleteQuietlyDir() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
         var testDirectory = playGroundBackup.resolve("directory");
@@ -276,7 +274,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyFile() throws IOException {
+    void deleteQuietlyFile() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
         assertTrue(existingFile.toFile().exists());
@@ -286,7 +284,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyNonExistent() {
+    void deleteQuietlyNonExistent() {
         var testFile = playGroundBase.resolve(POM_XML);
         assertFalse(testFile.toFile().exists());
 
@@ -296,7 +294,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testContentEquals() throws Exception {
+    void contentEquals() throws Exception {
 
         // Non-existent files
         var notThere1 = playGroundBase.resolve(POM_XML);

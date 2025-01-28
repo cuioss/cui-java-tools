@@ -38,7 +38,7 @@ class ParameterFilterTest {
             JAVAX_FACES + "-" + "c");
 
     @Test
-    void testShouldExludeAndIncludeStrings() {
+    void shouldExludeAndIncludeStrings() {
         final var filter = new ParameterFilter(EXCLUDES, false);
         for (final String exclude : EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));
@@ -49,7 +49,7 @@ class ParameterFilterTest {
     }
 
     @Test
-    void testShouldExludeAndIncludeFacesStrings() {
+    void shouldExludeAndIncludeFacesStrings() {
         final var filter = new ParameterFilter(EXCLUDES, true);
         for (final String exclude : FACES_EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));

@@ -70,13 +70,11 @@ class MoreCollectionsTest {
         requireNotEmpty((Iterable<String>) mutableList("1"));
         requireNotEmpty((Iterable<String>) mutableList("1"), MESSAGE);
         Iterable<String> emptyIterable = Collections.emptyList();
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyIterable);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyIterable));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyIterable, MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyIterable, MESSAGE));
     }
 
     @Test
@@ -89,13 +87,11 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableList("1"));
         requireNotEmpty(mutableList("1"), MESSAGE);
         List<String> emptyList = Collections.emptyList();
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyList);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyList));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyList, MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyList, MESSAGE));
     }
 
     @Test
@@ -107,9 +103,8 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableMap("1", "2"));
         requireNotEmpty(mutableMap("1", "2"), MESSAGE);
         Map<Object, Object> emptyMutableMap = mutableMap();
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyMutableMap);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyMutableMap));
 
     }
 
@@ -123,13 +118,11 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableList("1").iterator());
         requireNotEmpty(mutableList("1").iterator(), MESSAGE);
         Iterator<String> emptyIterator = Collections.emptyIterator();
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyIterator);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyIterator));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty(emptyIterator, MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty(emptyIterator, MESSAGE));
     }
 
     @Test
@@ -140,12 +133,10 @@ class MoreCollectionsTest {
 
         requireNotEmpty(mutableList("1").stream());
         requireNotEmpty(mutableList("1").stream(), MESSAGE);
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty((Stream<String>) null);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            requireNotEmpty((Stream<String>) null, MESSAGE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty((Stream<String>) null));
+        assertThrows(IllegalArgumentException.class, () ->
+            requireNotEmpty((Stream<String>) null, MESSAGE));
 
     }
 

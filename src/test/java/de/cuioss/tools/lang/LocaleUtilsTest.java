@@ -88,7 +88,7 @@ class LocaleUtilsTest {
      * Test toLocale() method.
      */
     @Test
-    void testToLocale_1Part() {
+    void toLocale1Part() {
         assertNull(LocaleUtils.toLocale(null));
 
         assertValidToLocale("us");
@@ -138,7 +138,7 @@ class LocaleUtilsTest {
      * Test toLocale() method.
      */
     @Test
-    void testToLocale_2Part() {
+    void toLocale2Part() {
         assertValidToLocale("us_EN", "us", "EN");
         // valid though doesn't exist
         assertValidToLocale("us_ZH", "us", "ZH");
@@ -179,7 +179,7 @@ class LocaleUtilsTest {
      * Test toLocale() method.
      */
     @Test
-    void testToLocale_3Part() {
+    void toLocale3Part() {
         assertValidToLocale("us_EN_A", "us", "EN", "A");
         // this isn't pretty, but was caused by a jdk bug it seems
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4210525
@@ -202,7 +202,7 @@ class LocaleUtilsTest {
      * Test for 3-chars locale, further details at LANG-915
      */
     @Test
-    void testThreeCharsLocale() {
+    void threeCharsLocale() {
         for (final String str : Arrays.asList("udm", "tet")) {
             final var locale = LocaleUtils.toLocale(str);
             assertNotNull(locale);
@@ -216,13 +216,13 @@ class LocaleUtilsTest {
      * Tests #LANG-328 - only language+variant
      */
     @Test
-    void testLang328() {
+    void lang328() {
         assertValidToLocale("fr__P", "fr", "", "P");
         assertValidToLocale("fr__POSIX", "fr", "", "POSIX");
     }
 
     @Test
-    void testLanguageAndUNM49Numeric3AreaCodeLang1312() {
+    void languageAndUNM49Numeric3AreaCodeLang1312() {
         assertValidToLocale("en_001", "en", "001");
         assertValidToLocale("en_150", "en", "150");
         assertValidToLocale("ar_001", "ar", "001");
@@ -236,7 +236,7 @@ class LocaleUtilsTest {
      * Tests #LANG-865, strings starting with an underscore.
      */
     @Test
-    void testLang865() {
+    void lang865() {
         assertValidToLocale("_GB", "", "GB", "");
         assertValidToLocale("_GB_P", "", "GB", "P");
         assertValidToLocale("_GB_POSIX", "", "GB", "POSIX");
@@ -278,7 +278,7 @@ class LocaleUtilsTest {
     }
 
     @Test
-    void testParseAllLocales() {
+    void parseAllLocales() {
         final var locales = Locale.getAvailableLocales();
         var failures = 0;
         for (final Locale l : locales) {

@@ -80,9 +80,8 @@ class PropertyUtilTest {
         assertEquals(Integer.valueOf(5), readProperty(underTest, PROPERTY_NAME));
 
         var propertyValue = new ArrayList<>();
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeProperty(underTest, PROPERTY_NAME, propertyValue);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            writeProperty(underTest, PROPERTY_NAME, propertyValue));
     }
 
     @Test
@@ -102,18 +101,14 @@ class PropertyUtilTest {
     @Test
     void shouldFailOnInvalidProperty() {
         var underTest = new BeanWithReadWriteProperties();
-        assertThrows(IllegalArgumentException.class, () -> {
-            readProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            readProperty(underTest, ATTRIBUTE_WRITE_ONLY);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, "");
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            writeProperty(underTest, ATTRIBUTE_READ_ONLY, "");
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+            readProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE));
+        assertThrows(IllegalArgumentException.class, () ->
+            readProperty(underTest, ATTRIBUTE_WRITE_ONLY));
+        assertThrows(IllegalArgumentException.class, () ->
+            writeProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, ""));
+        assertThrows(IllegalArgumentException.class, () ->
+            writeProperty(underTest, ATTRIBUTE_READ_ONLY, ""));
     }
 
     @Test
@@ -121,12 +116,10 @@ class PropertyUtilTest {
         var underTest = new ExplodingBean();
 
         underTest.illegalArgumentException();
-        assertThrows(IllegalStateException.class, () -> {
-            readProperty(underTest, PROPERTY_NAME);
-        });
-        assertThrows(IllegalStateException.class, () -> {
-            writeProperty(underTest, PROPERTY_NAME, "");
-        });
+        assertThrows(IllegalStateException.class, () ->
+            readProperty(underTest, PROPERTY_NAME));
+        assertThrows(IllegalStateException.class, () ->
+            writeProperty(underTest, PROPERTY_NAME, ""));
     }
 
     @Test

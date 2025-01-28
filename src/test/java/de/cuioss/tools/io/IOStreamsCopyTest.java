@@ -93,7 +93,7 @@ class IOStreamsCopyTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void testCopy_inputStreamToOutputStream() throws Exception {
+    void copyInputStreamToOutputStream() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
@@ -112,7 +112,7 @@ class IOStreamsCopyTest {
      * Test Copying file > 2GB - see issue# IO-84
      */
     @Test
-    void testCopy_inputStreamToOutputStream_IO84() throws Exception {
+    void copyInputStreamToOutputStreamIO84() throws Exception {
         final var size = (long) Integer.MAX_VALUE + (long) 1;
         final InputStream in = new NullInputStream(size);
         final OutputStream out = new NullOutputStream();
@@ -128,23 +128,21 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_inputStreamToOutputStream_nullIn() throws Exception {
+    void copyInputStreamToOutputStreamNullIn() throws Exception {
         final OutputStream out = new ByteArrayOutputStream();
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(null, out);
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(null, out));
     }
 
     @Test
-    void testCopy_inputStreamToOutputStream_nullOut() throws Exception {
+    void copyInputStreamToOutputStreamNullOut() throws Exception {
         final InputStream in = new ByteArrayInputStream(inData);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(in, null);
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(in, null));
     }
 
     @Test
-    void testCopy_inputStreamToOutputStreamWithBufferSize() throws Exception {
+    void copyInputStreamToOutputStreamWithBufferSize() throws Exception {
         testCopy_inputStreamToOutputStreamWithBufferSize(1);
         testCopy_inputStreamToOutputStreamWithBufferSize(2);
         testCopy_inputStreamToOutputStreamWithBufferSize(4);
@@ -179,7 +177,7 @@ class IOStreamsCopyTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void testCopy_inputStreamToWriter_Encoding() throws Exception {
+    void copyInputStreamToWriterEncoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
@@ -198,7 +196,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_inputStreamToWriter_Encoding_nullEncoding() throws Exception {
+    void copyInputStreamToWriterEncodingNullEncoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
 
@@ -216,26 +214,24 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_inputStreamToWriter_Encoding_nullIn() throws Exception {
+    void copyInputStreamToWriterEncodingNullIn() throws Exception {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(null, writer, "UTF8");
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(null, writer, "UTF8"));
     }
 
     @Test
-    void testCopy_inputStreamToWriter_Encoding_nullOut() throws Exception {
+    void copyInputStreamToWriterEncodingNullOut() throws Exception {
         final InputStream in = new ByteArrayInputStream(inData);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(in, null, "UTF8");
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(in, null, "UTF8"));
     }
 
     // -----------------------------------------------------------------------
     @Test
-    void testCopy_readerToOutputStream_Encoding() throws Exception {
+    void copyReaderToOutputStreamEncoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
@@ -253,7 +249,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_readerToOutputStream_Encoding_nullEncoding() throws Exception {
+    void copyReaderToOutputStreamEncodingNullEncoding() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
@@ -270,27 +266,25 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_readerToOutputStream_Encoding_nullIn() throws Exception {
+    void copyReaderToOutputStreamEncodingNullIn() throws Exception {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(null, out, "UTF16");
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(null, out, "UTF16"));
     }
 
     @Test
-    void testCopy_readerToOutputStream_Encoding_nullOut() throws Exception {
+    void copyReaderToOutputStreamEncodingNullOut() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(reader, null, "UTF16");
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(reader, null, "UTF16"));
     }
 
     // -----------------------------------------------------------------------
     @Test
-    void testCopy_readerToWriter() throws Exception {
+    void copyReaderToWriter() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
@@ -311,7 +305,7 @@ class IOStreamsCopyTest {
      * Test Copying file > 2GB - see issue# IO-84
      */
     @Test
-    void testCopy_readerToWriter_IO84() throws Exception {
+    void copyReaderToWriterIO84() throws Exception {
         final var size = (long) Integer.MAX_VALUE + (long) 1;
         final Reader reader = new NullReader(size);
         final Writer writer = new NullWriter();
@@ -328,27 +322,25 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopy_readerToWriter_nullIn() throws Exception {
+    void copyReaderToWriterNullIn() throws Exception {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(null, writer);
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(null, writer));
     }
 
     @Test
-    void testCopy_readerToWriter_nullOut() throws Exception {
+    void copyReaderToWriterNullOut() throws Exception {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
-        assertThrows(NullPointerException.class, () -> {
-            IOStreams.copy(reader, null);
-        });
+        assertThrows(NullPointerException.class, () ->
+            IOStreams.copy(reader, null));
     }
 
     @Test
-    void testCopyLarge_CharExtraLength() throws IOException {
+    void copyLargeCharExtraLength() throws IOException {
         CharArrayReader is = null;
         CharArrayWriter os = null;
         try {
@@ -387,7 +379,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_CharFullLength() throws IOException {
+    void copyLargeCharFullLength() throws IOException {
         CharArrayReader is = null;
         CharArrayWriter os = null;
         try {
@@ -413,7 +405,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_CharNoSkip() throws IOException {
+    void copyLargeCharNoSkip() throws IOException {
         CharArrayReader is = null;
         CharArrayWriter os = null;
         try {
@@ -439,7 +431,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_CharSkip() throws IOException {
+    void copyLargeCharSkip() throws IOException {
         CharArrayReader is = null;
         CharArrayWriter os = null;
         try {
@@ -465,7 +457,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_CharSkipInvalid() throws IOException {
+    void copyLargeCharSkipInvalid() throws IOException {
         CharArrayReader is = null;
         CharArrayWriter os = null;
         try {
@@ -484,7 +476,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_ExtraLength() throws IOException {
+    void copyLargeExtraLength() throws IOException {
         ByteArrayInputStream is = null;
         ByteArrayOutputStream os = null;
         try {
@@ -511,7 +503,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_FullLength() throws IOException {
+    void copyLargeFullLength() throws IOException {
         ByteArrayInputStream is = null;
         ByteArrayOutputStream os = null;
         try {
@@ -537,7 +529,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_NoSkip() throws IOException {
+    void copyLargeNoSkip() throws IOException {
         ByteArrayInputStream is = null;
         ByteArrayOutputStream os = null;
         try {
@@ -563,7 +555,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_Skip() throws IOException {
+    void copyLargeSkip() throws IOException {
         ByteArrayInputStream is = null;
         ByteArrayOutputStream os = null;
         try {
@@ -589,7 +581,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void testCopyLarge_SkipInvalid() throws IOException {
+    void copyLargeSkipInvalid() throws IOException {
         ByteArrayInputStream is = null;
         ByteArrayOutputStream os = null;
         try {
