@@ -34,6 +34,7 @@ import de.cuioss.tools.string.MoreStrings;
  * COPIED FROM:
  * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/LocaleUtilsTest.java">...</a>
  */
+@SuppressWarnings("deprecation") // Using deprecated constructor for backwards compatibility
 class LocaleUtilsTest {
 
     /**

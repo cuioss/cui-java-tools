@@ -52,7 +52,6 @@ public class LocaleUtils {
      *   LocaleUtils.toLocale("")           = new Locale("", "")
      *   LocaleUtils.toLocale("en")         = new Locale("en", "")
      *   LocaleUtils.toLocale("en_GB")      = new Locale("en", "GB")
-     *   LocaleUtils.toLocale("en_001")     = new Locale("en", "001")
      *   LocaleUtils.toLocale("en_GB_xxx")  = new Locale("en", "GB", "xxx")   (#)
      * </pre>
      *
@@ -67,14 +66,14 @@ public class LocaleUtils {
      * @throws IllegalArgumentException if the string is an invalid format
      * @see Locale#forLanguageTag(String)
      */
-    @SuppressWarnings("squid:S3776") // owolff: Original code
     public static Locale toLocale(final String str) {
-        if (str == null) {
+        if (null == str) {
             return null;
         }
         return toLocaleInternal(str);
     }
 
+    @SuppressWarnings("deprecation") // Using deprecated constructor for backwards compatibility
     private static Locale toLocaleInternal(final String str) {
         if (str.isEmpty()) {
             return new Locale.Builder().build();
