@@ -235,7 +235,7 @@ public class CollectionLiterals {
         if (null == element) {
             return Collections.emptyList();
         }
-        return Collections.singletonList(element);
+        return List.of(element);
     }
 
     /**
@@ -444,7 +444,7 @@ public class CollectionLiterals {
         if (null == element) {
             return Collections.emptySet();
         }
-        return Collections.singleton(element);
+        return Set.of(element);
     }
 
     /**
