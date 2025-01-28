@@ -15,7 +15,6 @@
  */
 package de.cuioss.tools.lang;
 
-import de.cuioss.tools.string.MoreStrings;
 import de.cuioss.tools.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
@@ -74,7 +73,6 @@ public class LocaleUtils {
         return toLocaleInternal(str);
     }
 
-    @SuppressWarnings("deprecation") // Using deprecated constructor for backwards compatibility
     private static Locale toLocaleInternal(final String str) {
         if (str.isEmpty()) {
             return new Locale.Builder().build();
@@ -84,10 +82,10 @@ public class LocaleUtils {
         // Handle special case for string starting with underscore
         if (str.startsWith("_")) {
             Preconditions.checkArgument(str.length() >= 3, "Must be at least 3 chars if starts with underscore");
-            Preconditions.checkArgument(!(str.length() >= 5 && !str.substring(3).startsWith("_")), 
-                "Must have underscore after the country if starts with underscore and is at least 5 chars");
+            Preconditions.checkArgument(!(str.length() >= 5 && !str.substring(3).startsWith("_")),
+                    "Must have underscore after the country if starts with underscore and is at least 5 chars");
             Preconditions.checkArgument(str.length() != 4, "Must be at least 5 chars if starts with underscore");
-            
+
             final var parts = str.split("_", 3);
             // For _GB format
             if (parts.length == 2) {
@@ -103,7 +101,7 @@ public class LocaleUtils {
             throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
         }
 
-        // Handle special case for single lowercase language
+        // Handle a special case for single lowercase language
         if (!str.contains("_")) {
             Preconditions.checkArgument(str.length() == 2 || str.length() == 3, "Must be 2 chars if less than 5");
             Preconditions.checkArgument(str.equals(str.toLowerCase()), INVALID_LOCALE_FORMAT + str);
@@ -118,25 +116,25 @@ public class LocaleUtils {
                     Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()), "Language code must be lowercase");
                     if (parts[1].matches("\\d{3}")) {
                         yield new Locale.Builder()
-                            .setLanguage(parts[0])
-                            .setRegion(parts[1])
-                            .build(); // Handle numeric country codes
+                                .setLanguage(parts[0])
+                                .setRegion(parts[1])
+                                .build(); // Handle numeric country codes
                     }
-                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"), 
-                        "Country code must be uppercase");
+                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
+                            "Country code must be uppercase");
                     if (parts[0].isEmpty()) {
                         yield new Locale.Builder().setRegion(parts[1]).build();
                     }
                     yield new Locale.Builder()
-                        .setLanguage(parts[0])
-                        .setRegion(parts[1])
-                        .build();
+                            .setLanguage(parts[0])
+                            .setRegion(parts[1])
+                            .build();
                 }
                 case 3 -> {
-                    Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7, 
-                        "Must be 3, 5 or 7+ in length");
-                    Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()), 
-                        "Language code must be lowercase");
+                    Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7,
+                            "Must be 3, 5 or 7+ in length");
+                    Preconditions.checkArgument(parts[0].equals(parts[0].toLowerCase()),
+                            "Language code must be lowercase");
                     if (parts[1].isEmpty() && !parts[2].isEmpty()) {
                         // Use legacy constructor for backwards compatibility with variants
                         yield new Locale(parts[0], "", parts[2]); // Handle double underscore variants
@@ -145,8 +143,8 @@ public class LocaleUtils {
                         // Use legacy constructor for backwards compatibility with variants
                         yield new Locale(parts[0], parts[1], parts[2]); // Handle numeric country codes with variants
                     }
-                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"), 
-                        "Country code must be uppercase");
+                    Preconditions.checkArgument(parts[1].equals(parts[1].toUpperCase()) && parts[1].matches("[A-Z]{2}"),
+                            "Country code must be uppercase");
                     // Use legacy constructor for backwards compatibility with variants
                     yield new Locale(parts[0], parts[1], parts[2]);
                 }
@@ -157,78 +155,4 @@ public class LocaleUtils {
         }
     }
 
-    /**
-     * Tries to parse a locale from the given String.
-     *
-     * @param str the String to parse a locale from.
-     * @return a Locale instance parsed from the given String.
-     * @throws IllegalArgumentException if the given String can not be parsed.
-     */
-    private static Locale parseLocale(final String str) {
-        Preconditions.checkArgument(null != str, "Input string must not be null");
-        final var parts = str.split("_", 3);
-        try {
-            return switch (parts.length) {
-                case 1 -> {
-                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
-                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
-                    yield new Locale.Builder().setLanguage(parts[0]).build();
-                }
-                case 2 -> {
-                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
-                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
-                    Preconditions.checkArgument(isISO3166CountryCode(parts[1]) || isNumericAreaCode(parts[1]), 
-                        "Invalid country code '%s', must be ISO 3166 alpha-2 or UN M.49 numeric", parts[1]);
-                    yield new Locale.Builder()
-                        .setLanguage(parts[0])
-                        .setRegion(parts[1])
-                        .build();
-                }
-                case 3 -> {
-                    Preconditions.checkArgument(isISO639LanguageCode(parts[0]), 
-                        "Invalid language code '%s', must be ISO 639 compliant (2-3 chars)", parts[0]);
-                    Preconditions.checkArgument(isISO3166CountryCode(parts[1]) || isNumericAreaCode(parts[1]), 
-                        "Invalid country code '%s', must be ISO 3166 alpha-2 or UN M.49 numeric", parts[1]);
-                    yield new Locale.Builder()
-                        .setLanguage(parts[0])
-                        .setRegion(parts[1])
-                        .setVariant(parts[2])
-                        .build();
-                }
-                default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-            };
-        } catch (final IllegalArgumentException iae) {
-            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str, iae);
-        }
-    }
-
-    /**
-     * Checks whether the given String is a ISO 639 compliant language code.
-     *
-     * @param str the String to check.
-     * @return true, if the given String is a ISO 639 compliant language code.
-     */
-    private static boolean isISO639LanguageCode(final String str) {
-        return str.length() >= 2 && str.length() <= 3;
-    }
-
-    /**
-     * Checks whether the given String is a ISO 3166 alpha-2 country code.
-     *
-     * @param str the String to check
-     * @return true, is the given String is a ISO 3166 compliant country code.
-     */
-    private static boolean isISO3166CountryCode(final String str) {
-        return str.length() == 2 && str.equals(str.toUpperCase());
-    }
-
-    /**
-     * Checks whether the given String is a UN M.49 numeric area code.
-     *
-     * @param str the String to check
-     * @return true, is the given String is a UN M.49 numeric area code.
-     */
-    private static boolean isNumericAreaCode(final String str) {
-        return str.length() == 3 && str.matches("\\d{3}");
-    }
 }
