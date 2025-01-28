@@ -20,9 +20,11 @@ import lombok.experimental.UtilityClass;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static java.util.Objects.isNull;
 
 /**
  * <h2>Overview</h2> Utility Methods for Collections and some types to be used
@@ -60,7 +62,7 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Object... elements) {
-        return null == elements || 0 == elements.length;
+        return isNull(elements) || elements.length == 0;
     }
 
     /**
@@ -71,7 +73,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterable<?> elements) {
-        return null == elements || isEmpty(elements.iterator());
+        return Optional.ofNullable(elements)
+                .map(it -> !it.iterator().hasNext())
+                .orElse(true);
     }
 
     /**
@@ -82,7 +86,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Collection<?> elements) {
-        return null == elements || elements.isEmpty();
+        return Optional.ofNullable(elements)
+                .map(Collection::isEmpty)
+                .orElse(true);
     }
 
     /**
@@ -93,7 +99,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Map<?, ?> map) {
-        return null == map || map.isEmpty();
+        return Optional.ofNullable(map)
+                .map(Map::isEmpty)
+                .orElse(true);
     }
 
     /**
@@ -104,7 +112,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterator<?> elements) {
-        return null == elements || !elements.hasNext();
+        return Optional.ofNullable(elements)
+                .map(it -> !it.hasNext())
+                .orElse(true);
     }
 
     /**
@@ -278,10 +288,9 @@ public final class MoreCollections {
      * @param elements to be checked, may be null
      * @return {@code true} is the given elements are {@code null}. The Stream
      * content will be untouched
-     * @throws IllegalArgumentException in case the given elements are {@code null}
      */
     public static boolean isEmpty(Stream<?> elements) {
-        return null == elements;
+        return isNull(elements);
     }
 
     /**
