@@ -109,7 +109,7 @@ public class LocaleUtils {
 
     private static Locale handleUnderscorePrefixedLocale(final String str) {
         Preconditions.checkArgument(str.length() >= 3, "Must be at least 3 chars if starts with underscore");
-        Preconditions.checkArgument(!(str.length() >= 5 && !str.substring(3).startsWith("_")),
+        Preconditions.checkArgument(!(str.length() >= 5 && !str.startsWith("_", 3)),
                 "Must have underscore after the country if starts with underscore and is at least 5 chars");
         Preconditions.checkArgument(str.length() != 4, "Must be at least 5 chars if starts with underscore");
 
