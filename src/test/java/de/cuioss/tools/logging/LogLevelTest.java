@@ -15,15 +15,16 @@
  */
 package de.cuioss.tools.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test class for {@link LogLevel} ensuring proper level mapping and behavior
@@ -103,7 +104,7 @@ class LogLevelTest {
         LogLevel.DEBUG.handleActualLog(logger, TEST_MESSAGE, TEST_EXCEPTION);
         LogLevel.INFO.handleActualLog(logger, TEST_MESSAGE, null);
         LogLevel.WARN.handleActualLog(logger, TEST_MESSAGE, TEST_EXCEPTION);
-        LogLevel.ERROR.handleActualLog(logger, TEST_MESSAGE, null);
+        assertDoesNotThrow(() -> LogLevel.ERROR.handleActualLog(logger, TEST_MESSAGE, null));
     }
 
     @Test
@@ -117,7 +118,7 @@ class LogLevelTest {
         LogLevel.DEBUG.log(logger, messageSupplier, TEST_EXCEPTION);
         LogLevel.INFO.log(logger, messageSupplier, null);
         LogLevel.WARN.log(logger, messageSupplier, TEST_EXCEPTION);
-        LogLevel.ERROR.log(logger, messageSupplier, null);
+        assertDoesNotThrow(() -> LogLevel.ERROR.log(logger, messageSupplier, null));
     }
 
     @Test
@@ -132,7 +133,7 @@ class LogLevelTest {
         LogLevel.DEBUG.log(logger, TEST_EXCEPTION, template, parameter);
         LogLevel.INFO.log(logger, template, parameter);
         LogLevel.WARN.log(logger, TEST_EXCEPTION, template, parameter);
-        LogLevel.ERROR.log(logger, template, parameter);
+        assertDoesNotThrow(() -> LogLevel.ERROR.log(logger, template, parameter));
     }
 
     @Test
@@ -143,6 +144,6 @@ class LogLevelTest {
         // When/Then - no assertions needed as per logging rules
         LogLevel.INFO.handleActualLog(logger, null, null);
         LogLevel.ERROR.handleActualLog(logger, null, TEST_EXCEPTION);
-        LogLevel.WARN.log(logger, null, (Object[]) null);
+        assertDoesNotThrow(() -> LogLevel.WARN.log(logger, null, (Object[]) null));
     }
 }
