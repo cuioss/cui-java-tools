@@ -15,13 +15,6 @@
  */
 package de.cuioss.tools.net.ssl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.cuioss.tools.support.Generators;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -43,12 +36,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class KeyStoreProviderTest {
 
     /**
      * Test RSA-2048
-     *
-     * @throws Exception
      */
     @Test
     void rsaCertificate() throws Exception {
@@ -70,8 +68,6 @@ class KeyStoreProviderTest {
 
     /**
      * Test DSA
-     *
-     * @throws Exception
      */
     @Test
     void certificate() throws Exception {
@@ -191,12 +187,12 @@ class KeyStoreProviderTest {
      * Generates a X509Certificate.
      *
      * @param algorithm          used for the creation of the KeyPair
-     * @param keysize            of the key
+     * @param keySize            of the key
      * @param signatureAlgorithm that was used to create the ContentSigner
      * @return a currently valid X509Certificate
      * @throws Exception on any error
      */
-    private X509Certificate createX509Certificate(String algorithm, int keysize, String signatureAlgorithm)
+    private X509Certificate createX509Certificate(String algorithm, int keySize, String signatureAlgorithm)
             throws Exception {
 
         // Set start and end date of certificate
@@ -205,7 +201,7 @@ class KeyStoreProviderTest {
 
         // Generate public/private KeyPair
         var keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
-        keyPairGenerator.initialize(keysize, new SecureRandom());
+        keyPairGenerator.initialize(keySize, new SecureRandom());
         var keyPair = keyPairGenerator.generateKeyPair();
 
         var serial = BigInteger.valueOf(System.currentTimeMillis());

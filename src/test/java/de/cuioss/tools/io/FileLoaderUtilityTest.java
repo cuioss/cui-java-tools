@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 
+@SuppressWarnings("DataFlowIssue")
 class FileLoaderUtilityTest {
 
     public static final String EXISTING_FILE_NAME = "/META-INF/someTestFile.txt";

@@ -15,20 +15,22 @@
  */
 package de.cuioss.tools.string;
 
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.string.MoreStrings.emptyToNull;
 import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 import static de.cuioss.tools.string.MoreStrings.unquote;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
+@SuppressWarnings({"ConstantValue", "DataFlowIssue"})
 class MoreStringsTest {
 
     private static final String MESSAGE = "Message";
@@ -45,13 +47,9 @@ class MoreStringsTest {
         for (var i = 0; i < Character.MAX_VALUE; i++) {
             if (Character.isWhitespace((char) i)) {
                 ws.append((char) i);
-                if (i > 32) {
-                }
             } else if (i < 40) {
                 nws.append((char) i);
             }
-        }
-        for (var i = 0; i <= 32; i++) {
         }
         WHITESPACE = ws.toString();
         NON_WHITESPACE = nws.toString();
@@ -120,8 +118,8 @@ class MoreStringsTest {
         assertFalse(MoreStrings.isNumeric("ham kso"));
         assertTrue(MoreStrings.isNumeric("1"));
         assertTrue(MoreStrings.isNumeric("1000"));
-        assertTrue(MoreStrings.isNumeric("\u0967\u0968\u0969"));
-        assertFalse(MoreStrings.isNumeric("\u0967\u0968 \u0969"));
+        assertTrue(MoreStrings.isNumeric("१२३"));
+        assertFalse(MoreStrings.isNumeric("१२ ३"));
         assertFalse(MoreStrings.isNumeric("2.3"));
         assertFalse(MoreStrings.isNumeric("10 00"));
         assertFalse(MoreStrings.isNumeric("hkHKHik6iUGHKJgU7tUJgKJGI87GIkug"));
@@ -366,13 +364,13 @@ class MoreStringsTest {
     }
 
     @Test
-    void shouldDeterminesEmptyStringPassthrough() {
-        // Positive / Passthrough cases
+    void shouldDeterminesEmptyStringPassThrough() {
+        // Positive / Pass through cases
         MoreStrings.requireNotEmpty(NON_EMPTY_STRING);
         MoreStrings.requireNotEmpty(NON_EMPTY_STRING, MESSAGE);
 
         MoreStrings.requireNotEmptyTrimmed(NON_EMPTY_STRING);
-        MoreStrings.requireNotEmptyTrimmed(NON_EMPTY_STRING, MESSAGE);
+        assertDoesNotThrow(() -> MoreStrings.requireNotEmptyTrimmed(NON_EMPTY_STRING, MESSAGE));
     }
 
     @Test

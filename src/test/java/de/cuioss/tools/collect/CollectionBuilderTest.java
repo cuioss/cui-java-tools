@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 class CollectionBuilderTest {
 
@@ -45,7 +46,7 @@ class CollectionBuilderTest {
         assertEquals(3, builder.size());
         builder.add(Arrays.asList("4", "5"));
         assertEquals(5, builder.size());
-        builder.add(Arrays.asList("6", "7").stream());
+        builder.add(Stream.of("6", "7"));
         assertEquals(7, builder.size());
         builder.add((Iterable<String>) Arrays.asList("8", "9"));
         assertEquals(9, builder.size());
@@ -73,7 +74,7 @@ class CollectionBuilderTest {
         assertEquals(7, builder.size());
         builder.add(new String[]{null});
         assertEquals(8, builder.size());
-        builder.add(Arrays.asList("6", "7").stream());
+        builder.add(Stream.of("6", "7"));
         assertEquals(10, builder.size());
         builder.add(new String[]{null});
         assertEquals(11, builder.size());
