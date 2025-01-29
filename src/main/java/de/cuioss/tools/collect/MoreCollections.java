@@ -328,6 +328,7 @@ public final class MoreCollections {
      * @return the difference between the maps
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Maps.java#L504"></a>
      */
+    @SuppressWarnings("avaarchitecture:S7027") // owolff: No issue, because it delegates to MapDiffenceImpl
     public static <K, V> MapDifference<K, V> difference(Map<? extends K, ? extends V> left,
             Map<? extends K, ? extends V> right) {
         return MapDiffenceImpl.from(left, right);

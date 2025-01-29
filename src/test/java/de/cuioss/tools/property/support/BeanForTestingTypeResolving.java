@@ -25,6 +25,6 @@ public class BeanForTestingTypeResolving {
     }
 
     public void setFloatProperty(Float floater) {
-
+        //Intentionally empty
     }
 }

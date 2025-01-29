@@ -15,12 +15,6 @@
  */
 package de.cuioss.tools.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +26,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Test class for {@link CuiLogger} ensuring proper logging behavior and
@@ -175,7 +176,7 @@ class CuiLoggerTest {
             underTest.trace(() -> TEST_MESSAGE);
             underTest.trace(TEST_EXCEPTION, () -> TEST_MESSAGE);
             underTest.trace(FORMATTED_MESSAGE, PARAMETER);
-            underTest.trace(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+            assertDoesNotThrow(() -> underTest.trace(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER));
         }
 
         @Test
@@ -189,7 +190,7 @@ class CuiLoggerTest {
             underTest.debug(() -> TEST_MESSAGE);
             underTest.debug(TEST_EXCEPTION, () -> TEST_MESSAGE);
             underTest.debug(FORMATTED_MESSAGE, PARAMETER);
-            underTest.debug(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+            assertDoesNotThrow(() -> underTest.debug(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER));
         }
 
         @Test
@@ -203,7 +204,7 @@ class CuiLoggerTest {
             underTest.info(() -> TEST_MESSAGE);
             underTest.info(TEST_EXCEPTION, () -> TEST_MESSAGE);
             underTest.info(FORMATTED_MESSAGE, PARAMETER);
-            underTest.info(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+            assertDoesNotThrow(() -> underTest.info(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER));
         }
 
         @Test
@@ -217,7 +218,7 @@ class CuiLoggerTest {
             underTest.warn(() -> TEST_MESSAGE);
             underTest.warn(TEST_EXCEPTION, () -> TEST_MESSAGE);
             underTest.warn(FORMATTED_MESSAGE, PARAMETER);
-            underTest.warn(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+            assertDoesNotThrow(() -> underTest.warn(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER));
         }
 
         @Test
@@ -231,7 +232,7 @@ class CuiLoggerTest {
             underTest.error(() -> TEST_MESSAGE);
             underTest.error(TEST_EXCEPTION, () -> TEST_MESSAGE);
             underTest.error(FORMATTED_MESSAGE, PARAMETER);
-            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER);
+            assertDoesNotThrow(() -> underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, PARAMETER));
         }
 
         @Test
@@ -245,7 +246,7 @@ class CuiLoggerTest {
 
             // When/Then
             underTest.info(logRecord.format("test data"));
-            underTest.error(TEST_EXCEPTION, logRecord.format("error data"));
+            assertDoesNotThrow(() -> underTest.error(TEST_EXCEPTION, logRecord.format("error data")));
         }
 
         @Test
@@ -258,14 +259,14 @@ class CuiLoggerTest {
 
             // When/Then
             underTest.info(template, param1, param2, param3);
-            underTest.error(TEST_EXCEPTION, template, param1, param2, param3);
+            assertDoesNotThrow(() -> underTest.error(TEST_EXCEPTION, template, param1, param2, param3));
         }
 
         @Test
         void shouldHandleNullParameters() {
             // When/Then
             underTest.info(FORMATTED_MESSAGE, (Object) null);
-            underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, (Object) null);
+            assertDoesNotThrow(() -> underTest.error(TEST_EXCEPTION, FORMATTED_MESSAGE, (Object) null));
         }
 
         @Test
@@ -275,7 +276,7 @@ class CuiLoggerTest {
 
             // When/Then
             underTest.info(messageSupplier);
-            underTest.error(TEST_EXCEPTION, messageSupplier);
+            assertDoesNotThrow(() -> underTest.error(TEST_EXCEPTION, messageSupplier));
         }
     }
 
