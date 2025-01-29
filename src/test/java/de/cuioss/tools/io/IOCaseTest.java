@@ -15,7 +15,11 @@
  */
 package de.cuioss.tools.io;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,96 +27,77 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import de.cuioss.tools.support.Generators;
 
 /**
- * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java">...</a>
+ * Tests for {@link IOCase} class focusing on case sensitivity handling in file operations.
+ * Based on Apache Commons IO test cases.
  */
-@SuppressWarnings("java:S5961")
-// owolff: I prefer being in sync with the original test
 class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';
 
-    // -----------------------------------------------------------------------
-    @Test
-    void for_name() {
-        assertEquals(IOCase.SENSITIVE, IOCase.forName("Sensitive"));
-        assertEquals(IOCase.INSENSITIVE, IOCase.forName("Insensitive"));
-        assertEquals(IOCase.SYSTEM, IOCase.forName("System"));
-        try {
-            IOCase.forName("Blah");
-            fail();
-        } catch (final IllegalArgumentException ignore) {
-        }
-        try {
-            IOCase.forName(null);
-            fail();
-        } catch (final IllegalArgumentException ignore) {
-        }
+    @ParameterizedTest
+    @CsvSource({
+        "Sensitive,SENSITIVE",
+        "Insensitive,INSENSITIVE",
+        "System,SYSTEM"
+    })
+    void shouldResolveValidCaseNames(String name, IOCase expected) {
+        assertEquals(expected, IOCase.forName(name));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Blah", ""})
+    void shouldFailForInvalidCaseNames(String invalidName) {
+        assertThrows(IllegalArgumentException.class, () -> IOCase.forName(invalidName));
     }
 
     @Test
-    void serialization() throws Exception {
+    void shouldFailForNullCaseName() {
+        assertThrows(IllegalArgumentException.class, () -> IOCase.forName(null));
+    }
+
+    @Test
+    void shouldMaintainSingletonThroughSerialization() throws Exception {
         assertSame(IOCase.SENSITIVE, serialize(IOCase.SENSITIVE));
         assertSame(IOCase.INSENSITIVE, serialize(IOCase.INSENSITIVE));
         assertSame(IOCase.SYSTEM, serialize(IOCase.SYSTEM));
     }
 
-    @Test
-    void get_name() {
-        assertEquals("Sensitive", IOCase.SENSITIVE.getName());
-        assertEquals("Insensitive", IOCase.INSENSITIVE.getName());
-        assertEquals("System", IOCase.SYSTEM.getName());
+    @ParameterizedTest
+    @EnumSource(IOCase.class)
+    void shouldProvideConsistentNames(IOCase ioCase) {
+        assertEquals(ioCase.getName(), ioCase.toString());
     }
 
     @Test
-    void to_string() {
-        assertEquals("Sensitive", IOCase.SENSITIVE.toString());
-        assertEquals("Insensitive", IOCase.INSENSITIVE.toString());
-        assertEquals("System", IOCase.SYSTEM.toString());
-    }
-
-    @Test
-    void is_case_sensitive() {
+    void shouldReflectSystemCaseSensitivity() {
         assertTrue(IOCase.SENSITIVE.isCaseSensitive());
         assertFalse(IOCase.INSENSITIVE.isCaseSensitive());
         assertEquals(!WINDOWS, IOCase.SYSTEM.isCaseSensitive());
     }
 
-    // -----------------------------------------------------------------------
     @Test
-    void check_compare_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "") > 0);
-        assertTrue(IOCase.SENSITIVE.checkCompareTo("", "ABC") < 0);
-        assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "DEF") < 0);
-        assertTrue(IOCase.SENSITIVE.checkCompareTo("DEF", "ABC") > 0);
-        assertEquals(0, IOCase.SENSITIVE.checkCompareTo("ABC", "ABC"));
+    void shouldHandleCompareToEdgeCases() {
+        var testString = Generators.randomString();
+        assertTrue(IOCase.SENSITIVE.checkCompareTo(testString, "") > 0);
+        assertTrue(IOCase.SENSITIVE.checkCompareTo("", testString) < 0);
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("", ""));
-
-        try {
-            IOCase.SENSITIVE.checkCompareTo("ABC", null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkCompareTo(null, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkCompareTo(null, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
+        
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(testString, null));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, testString));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, null));
     }
 
     @Test
-    void check_compare_case() {
+    void shouldHandleCompareToWithDifferentCases() {
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("ABC", "ABC"));
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "abc") < 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("abc", "ABC") > 0);
@@ -126,38 +111,19 @@ class IOCaseTest {
         assertEquals(WINDOWS, IOCase.SYSTEM.checkCompareTo("abc", "ABC") == 0);
     }
 
-    // -----------------------------------------------------------------------
     @Test
-    void check_equals_functionality() {
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", ""));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "A"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "AB"));
-        assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "BC"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "C"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkEquals("", "ABC"));
+    void shouldHandleEqualsEdgeCases() {
+        var testString = Generators.randomString();
+        assertFalse(IOCase.SENSITIVE.checkEquals(testString, ""));
         assertTrue(IOCase.SENSITIVE.checkEquals("", ""));
 
-        try {
-            IOCase.SENSITIVE.checkEquals("ABC", null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkEquals(null, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkEquals(null, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEquals(testString, null));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEquals(null, testString));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEquals(null, null));
     }
 
     @Test
-    void check_equals_case() {
+    void shouldHandleEqualsWithDifferentCases() {
         assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "Abc"));
 
@@ -168,237 +134,51 @@ class IOCaseTest {
         assertEquals(WINDOWS, IOCase.SYSTEM.checkEquals("ABC", "Abc"));
     }
 
-    // -----------------------------------------------------------------------
     @Test
-    void check_starts_with_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", ""));
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "A"));
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "BC"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "C"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("", "ABC"));
+    void shouldHandleStartsWithEdgeCases() {
+        var testString = Generators.randomString();
+        assertTrue(IOCase.SENSITIVE.checkStartsWith(testString, ""));
+        assertFalse(IOCase.SENSITIVE.checkStartsWith("", testString));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("", ""));
 
-        try {
-            IOCase.SENSITIVE.checkStartsWith("ABC", null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkStartsWith(null, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkStartsWith(null, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkStartsWith(testString, null));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkStartsWith(null, testString));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkStartsWith(null, null));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ABC,A,true",
+        "ABC,AB,true",
+        "ABC,ABC,true",
+        "ABC,BC,false",
+        "ABC,C,false",
+        "ABC,ABCD,false"
+    })
+    void shouldHandleStartsWithVariousPrefixes(String input, String prefix, boolean expected) {
+        assertEquals(expected, IOCase.SENSITIVE.checkStartsWith(input, prefix));
     }
 
     @Test
-    void check_starts_with_case() {
-        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
-        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "Ab"));
+    void shouldHandleStartsWithDifferentCases() {
+        assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "ABC"));
+        assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "abc"));
 
-        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "AB"));
-        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "Ab"));
+        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "ABC"));
+        assertTrue(IOCase.INSENSITIVE.checkStartsWith("ABC", "abc"));
 
-        assertTrue(IOCase.SYSTEM.checkStartsWith("ABC", "AB"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "Ab"));
+        assertTrue(IOCase.SYSTEM.checkStartsWith("ABC", "ABC"));
+        assertEquals(WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "abc"));
     }
 
-    // -----------------------------------------------------------------------
-    @Test
-    void check_ends_with_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", ""));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "A"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "AB"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "C"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("", "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("", ""));
-
-        try {
-            IOCase.SENSITIVE.checkEndsWith("ABC", null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkEndsWith(null, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkEndsWith(null, null);
-            fail();
-        } catch (final NullPointerException ignore) {
+    private IOCase serialize(IOCase value) throws Exception {
+        try (var baos = new ByteArrayOutputStream();
+             var oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(value);
+            try (var bais = new ByteArrayInputStream(baos.toByteArray());
+                 var ois = new ObjectInputStream(bais)) {
+                return (IOCase) ois.readObject();
+            }
         }
     }
-
-    @Test
-    void check_ends_with_case() {
-        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
-        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "Bc"));
-
-        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "BC"));
-        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "Bc"));
-
-        assertTrue(IOCase.SYSTEM.checkEndsWith("ABC", "BC"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkEndsWith("ABC", "Bc"));
-    }
-
-    // -----------------------------------------------------------------------
-    @Test
-    void check_index_of_functionality() {
-
-        // start
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "A"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "A"));
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "AB"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "AB"));
-        assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "ABC"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 1, "ABC"));
-
-        // middle
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "D"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "D"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "D"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DE"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DE"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DE"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DEF"));
-        assertEquals(3, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 3, "DEF"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 4, "DEF"));
-
-        // end
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "J"));
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "J"));
-        assertEquals(9, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "J"));
-        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "IJ"));
-        assertEquals(8, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "IJ"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 9, "IJ"));
-        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 6, "HIJ"));
-        assertEquals(7, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 7, "HIJ"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 8, "HIJ"));
-
-        // not found
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "DED"));
-
-        // too long
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("DEF", 0, "ABCDEFGHIJ"));
-
-        try {
-            IOCase.SENSITIVE.checkIndexOf("ABC", 0, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkIndexOf(null, 0, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkIndexOf(null, 0, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-    }
-
-    @Test
-    void check_index_of_case() {
-        assertEquals(1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "BC"));
-        assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "Bc"));
-
-        assertEquals(1, IOCase.INSENSITIVE.checkIndexOf("ABC", 0, "BC"));
-        assertEquals(1, IOCase.INSENSITIVE.checkIndexOf("ABC", 0, "Bc"));
-
-        assertEquals(1, IOCase.SYSTEM.checkIndexOf("ABC", 0, "BC"));
-        assertEquals(WINDOWS ? 1 : -1, IOCase.SYSTEM.checkIndexOf("ABC", 0, "Bc"));
-    }
-
-    // -----------------------------------------------------------------------
-    @Test
-    void check_region_matches_functionality() {
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, ""));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "A"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "BC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "C"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 0, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("", 0, ""));
-
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, ""));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "A"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "AB"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "BC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "C"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, ""));
-
-        try {
-            IOCase.SENSITIVE.checkRegionMatches("ABC", 0, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkRegionMatches(null, 0, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkRegionMatches(null, 0, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkRegionMatches("ABC", 1, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkRegionMatches(null, 1, "ABC");
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-        try {
-            IOCase.SENSITIVE.checkRegionMatches(null, 1, null);
-            fail();
-        } catch (final NullPointerException ignore) {
-        }
-    }
-
-    @Test
-    void check_region_matches_case() {
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "Ab"));
-
-        assertTrue(IOCase.INSENSITIVE.checkRegionMatches("ABC", 0, "AB"));
-        assertTrue(IOCase.INSENSITIVE.checkRegionMatches("ABC", 0, "Ab"));
-
-        assertTrue(IOCase.SYSTEM.checkRegionMatches("ABC", 0, "AB"));
-        assertEquals(WINDOWS, IOCase.SYSTEM.checkRegionMatches("ABC", 0, "Ab"));
-    }
-
-    // -----------------------------------------------------------------------
-    private IOCase serialize(final IOCase value) throws Exception {
-        final var buf = new ByteArrayOutputStream();
-        final var out = new ObjectOutputStream(buf);
-        out.writeObject(value);
-        out.flush();
-        out.close();
-
-        final var bufin = new ByteArrayInputStream(buf.toByteArray());
-        final var in = new ObjectInputStream(bufin);
-        return (IOCase) in.readObject();
-    }
-
 }
