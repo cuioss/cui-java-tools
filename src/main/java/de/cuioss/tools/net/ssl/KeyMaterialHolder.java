@@ -85,13 +85,14 @@ public final class KeyMaterialHolder implements Serializable {
      * If keyPassword is {@code null} or empty it returns an empty char[],
      * never {@code null}
      */
+    @SuppressWarnings("javaarchitecture:S7027") // owolff: Circular dependency not a problem here: Utility-only
     public char[] getKeyPasswordAsCharArray() {
         return KeyStoreProvider.toCharArray(keyPassword);
     }
 
     /**
      * @param serializedKeyMaterial the Base64 encoded key material
-     * @return Raw i.e. original key material
+     * @return Raw i.e., original key material
      * @throws IllegalArgumentException if serializedKeyMaterial is not Base64
      *                                  encoded
      */
@@ -100,7 +101,7 @@ public final class KeyMaterialHolder implements Serializable {
     }
 
     /**
-     * @param keyMaterial Raw i.e. original key material
+     * @param keyMaterial Raw i.e., original key material
      * @return Base64 encoded key material
      */
     public static String serializeKeyMaterial(final byte[] keyMaterial) {
