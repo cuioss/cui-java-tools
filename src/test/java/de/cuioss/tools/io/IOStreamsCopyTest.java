@@ -338,13 +338,9 @@ class IOStreamsCopyTest {
 
     @Test
     void copyLargeCharExtraLength() throws IOException {
-        CharArrayReader is = null;
-        CharArrayWriter os = null;
-        try {
-            // Create streams
-            is = new CharArrayReader(carr);
-            os = new CharArrayWriter();
-
+        // Create streams
+        try (var is = new CharArrayReader(carr);
+             var os = new CharArrayWriter()) {
             // Test our copy method
             // for extra length, it reads till EOF
             assertEquals(200, copyLarge(is, os, 0, 2000));
@@ -356,34 +352,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals((char) -1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
-    }
-
-    /**
-     * @param is
-     */
-    private void closeQuietly(Closeable is) {
-        try {
-            is.close();
-        } catch (IOException e) {
-            // Test only
-        }
-
     }
 
     @Test
     void copyLargeCharFullLength() throws IOException {
-        CharArrayReader is = null;
-        CharArrayWriter os = null;
-        try {
-            // Create streams
-            is = new CharArrayReader(carr);
-            os = new CharArrayWriter();
-
+        // Create streams
+        try (var is = new CharArrayReader(carr);
+             var os = new CharArrayWriter()) {
             // Test our copy method
             assertEquals(200, copyLarge(is, os, 0, -1));
             final var oarr = os.toCharArray();
@@ -394,22 +370,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals((char) -1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
     @Test
     void copyLargeCharNoSkip() throws IOException {
-        CharArrayReader is = null;
-        CharArrayWriter os = null;
-        try {
-            // Create streams
-            is = new CharArrayReader(carr);
-            os = new CharArrayWriter();
-
+        // Create streams
+        try (var is = new CharArrayReader(carr);
+             var os = new CharArrayWriter()) {
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 0, 100));
             final var oarr = os.toCharArray();
@@ -420,22 +388,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals((char) -1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
     @Test
     void copyLargeCharSkip() throws IOException {
-        CharArrayReader is = null;
-        CharArrayWriter os = null;
-        try {
-            // Create streams
-            is = new CharArrayReader(carr);
-            os = new CharArrayWriter();
-
+        // Create streams
+        try (var is = new CharArrayReader(carr);
+             var os = new CharArrayWriter()) {
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 10, 100));
             final var oarr = os.toCharArray();
@@ -446,10 +406,6 @@ class IOStreamsCopyTest {
             assertEquals(11, oarr[1]);
             assertEquals(79, oarr[69]);
             assertEquals((char) -1, oarr[70]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
@@ -467,13 +423,9 @@ class IOStreamsCopyTest {
 
     @Test
     void copyLargeExtraLength() throws IOException {
-        ByteArrayInputStream is = null;
-        ByteArrayOutputStream os = null;
-        try {
-            // Create streams
-            is = new ByteArrayInputStream(iarr);
-            os = new ByteArrayOutputStream();
-
+        // Create streams
+        try (var is = new ByteArrayInputStream(iarr);
+             var os = new ByteArrayOutputStream()) {
             // Test our copy method
             // for extra length, it reads till EOF
             assertEquals(200, copyLarge(is, os, 0, 2000));
@@ -485,22 +437,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals(-1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
     @Test
     void copyLargeFullLength() throws IOException {
-        ByteArrayInputStream is = null;
-        ByteArrayOutputStream os = null;
-        try {
-            // Create streams
-            is = new ByteArrayInputStream(iarr);
-            os = new ByteArrayOutputStream();
-
+        // Create streams
+        try (var is = new ByteArrayInputStream(iarr);
+             var os = new ByteArrayOutputStream()) {
             // Test our copy method
             assertEquals(200, copyLarge(is, os, 0, -1));
             final var oarr = os.toByteArray();
@@ -511,22 +455,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals(-1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
     @Test
     void copyLargeNoSkip() throws IOException {
-        ByteArrayInputStream is = null;
-        ByteArrayOutputStream os = null;
-        try {
-            // Create streams
-            is = new ByteArrayInputStream(iarr);
-            os = new ByteArrayOutputStream();
-
+        // Create streams
+        try (var is = new ByteArrayInputStream(iarr);
+             var os = new ByteArrayOutputStream()) {
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 0, 100));
             final var oarr = os.toByteArray();
@@ -537,22 +473,14 @@ class IOStreamsCopyTest {
             assertEquals(1, oarr[1]);
             assertEquals(79, oarr[79]);
             assertEquals(-1, oarr[80]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
     @Test
     void copyLargeSkip() throws IOException {
-        ByteArrayInputStream is = null;
-        ByteArrayOutputStream os = null;
-        try {
-            // Create streams
-            is = new ByteArrayInputStream(iarr);
-            os = new ByteArrayOutputStream();
-
+        // Create streams
+        try (var is = new ByteArrayInputStream(iarr);
+             var os = new ByteArrayOutputStream()) {
             // Test our copy method
             assertEquals(100, copyLarge(is, os, 10, 100));
             final var oarr = os.toByteArray();
@@ -563,10 +491,6 @@ class IOStreamsCopyTest {
             assertEquals(11, oarr[1]);
             assertEquals(79, oarr[69]);
             assertEquals(-1, oarr[70]);
-
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
         }
     }
 
