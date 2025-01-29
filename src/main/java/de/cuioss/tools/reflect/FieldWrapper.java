@@ -34,20 +34,17 @@ import java.util.Optional;
  *   <li>Proper exception handling</li>
  *   <li>Null-safe operations</li>
  * </ul>
- * 
- * @author Oliver Wolff
  *
+ * @author Oliver Wolff
  */
 @SuppressWarnings("java:S3011") // owolff: The warning is "Reflection should not be used to
-// increase accessibility of classes, methods, or fields "
-// What is actually the use-case of this type, therefore there
-// is nothing we can do
+// increase accessibility of classes, methods, or fields"
+// What is actually the use-case of this type, therefore, there is nothing we can do
 public class FieldWrapper {
 
     private static final CuiLogger log = new CuiLogger(FieldWrapper.class);
 
     @Getter
-    @NonNull
     private final Field field;
 
     private final Class<?> declaringClass;
@@ -55,7 +52,7 @@ public class FieldWrapper {
     /**
      * @param field must not be null
      */
-    public FieldWrapper(Field field) {
+    public FieldWrapper(@NonNull Field field) {
         this.field = field;
         declaringClass = ((Member) field).getDeclaringClass();
     }
@@ -105,11 +102,9 @@ public class FieldWrapper {
      *
      * @param fieldName to be read
      * @param object    to be read from
-     *
-     * @return the field value. {@link Optional#empty()} if the field cannot be
-     *         read.
+     * @return the field value. {@link Optional#empty()} if the field cannot be read.
      */
-    public static final Optional<Object> readValue(final String fieldName, final Object object) {
+    public static Optional<Object> readValue(final String fieldName, final Object object) {
         final var fieldProvider = from(object.getClass(), fieldName);
         log.trace("FieldWrapper: {}", fieldProvider);
         if (fieldProvider.isPresent()) {
@@ -157,13 +152,10 @@ public class FieldWrapper {
      * @param type      must not be null
      * @param fieldName must not be null
      * @return a {@link FieldWrapper} if the {@link Field} can be determined,
-     *         {@link Optional#empty()} otherwise
+     * {@link Optional#empty()} otherwise
      */
-    public static final Optional<FieldWrapper> from(final Class<?> type, final String fieldName) {
+    public static Optional<FieldWrapper> from(final Class<?> type, final String fieldName) {
         var loaded = MoreReflection.accessField(type, fieldName);
-        if (loaded.isPresent()) {
-            return Optional.of(new FieldWrapper(loaded.get()));
-        }
-        return Optional.empty();
+        return loaded.map(FieldWrapper::new);
     }
 }

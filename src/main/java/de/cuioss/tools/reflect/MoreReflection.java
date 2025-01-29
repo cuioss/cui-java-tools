@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.reflect;
 
-import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
@@ -42,20 +39,47 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
+import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
+
 /**
- * Provides a number of methods simplifying the usage of Reflection-based
- * access.
- * <h2>Caution</h2>
+ * Provides a number of methods simplifying the usage of Reflection-based access.
+ *
+ * <h2>Overview</h2>
  * <p>
- * Use reflection only if there is no other way.
- * Even if some problems are minimized by using this type.
- * It should be used either in test-code, what
- * we actually do, and not production code.
- * Another reason could be framework code.
- * But in that case, you should exactly know what you do.
+ * This utility class provides type-safe reflection operations with proper caching
+ * and error handling.
+ * It should be used primarily in framework code or testing
+ * where reflection is necessary.
  * </p>
  *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>Cached field and method access</li>
+ *   <li>Type-safe reflection operations</li>
+ *   <li>Proper error handling and logging</li>
+ *   <li>Support for generic type resolution</li>
+ * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ * <pre>
+ *
+ * // Access field with caching
+ * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
+ *
+ * // Handle field access safely
+ * field.ifPresent(f -> {Object value = f.get(bean);});
+ * </pre>
+ *
+ * <h2>Best Practices</h2>
+ * <ul>
+ *   <li>Use {@link FieldWrapper} for safe field access</li>
+ *   <li>Leverage caching for better performance</li>
+ * </ul>
+ *
  * @author Oliver Wolff
+ * @see FieldWrapper
+ * @see de.cuioss.tools.property.PropertyUtil
  */
 @UtilityClass
 public final class MoreReflection {
@@ -79,8 +103,8 @@ public final class MoreReflection {
      * <p>
      * The field elements are shared between requests (cached); therefore, you must
      * ensure that changes to the instance, like
-     * {@link Field#setAccessible(boolean)} are reseted by the client. This can be
-     * simplified by using {@link FieldWrapper}
+     * {@link Field#setAccessible(boolean)} are resetted by the client.
+     * This can be simplified by using {@link FieldWrapper}
      * </p>
      *
      * @param type      to be checked, must not be null
@@ -199,7 +223,7 @@ public final class MoreReflection {
      * be found
      */
     public static Optional<Method> retrieveWriteMethod(final Class<?> clazz, final String propertyName,
-            final Class<?> parameterType) {
+                                                       final Class<?> parameterType) {
         requireNonNull(parameterType);
 
         for (final Method method : retrieveWriteMethodCandidates(clazz, propertyName)) {
@@ -354,10 +378,10 @@ public final class MoreReflection {
      *                      {@link Object#getClass()} it will return an empty list
      * @param annotation    the annotation to be extracted, must not be null
      * @return an immutable List with all annotations found at the given object or
-     * one of its ancestors. May be empty but never null
+     * one of its ancestors. Maybe empty but never null
      */
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
-            final Class<A> annotation) {
+                                                                       final Class<A> annotation) {
         if (null == annotatedType || Object.class.equals(annotatedType.getClass())) {
             return Collections.emptyList();
         }
@@ -381,7 +405,7 @@ public final class MoreReflection {
      * element will be returned.
      */
     public static <A extends Annotation> Optional<A> extractAnnotation(final Class<?> annotatedType,
-            final Class<A> annotation) {
+                                                                       final Class<A> annotation) {
         requireNonNull(annotation);
         final List<A> extracted = extractAllAnnotations(annotatedType, annotation);
         if (extracted.isEmpty()) {
@@ -529,7 +553,7 @@ public final class MoreReflection {
      * @return option of detected caller class name
      */
     public static Optional<StackTraceElement> findCallerElement(final Throwable throwable,
-            final Collection<String> markerClasses) {
+                                                                final Collection<String> markerClasses) {
 
         Objects.requireNonNull(markerClasses, "Marker class names are missing");
 

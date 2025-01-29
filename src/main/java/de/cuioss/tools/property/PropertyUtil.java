@@ -38,13 +38,45 @@ import static java.util.Objects.requireNonNull;
  * <ul>
  *   <li>Test code</li>
  *   <li>Framework code where reflection is necessary</li>
+ *   <li>This type is for low-level operations.
+ *   On a higher level, use {@link de.cuioss.tools.reflect.FieldWrapper} instead</li>
  * </ul>
- * <p>
- * When using this class, ensure you understand the implications of reflection
- * and have considered alternative approaches first.
- * </p>
+ *
+ * <h2>Usage Examples</h2>
+ * <pre>
+ * // Setup - define bean and property
+ * MyBean bean = new MyBean();
+ * String propertyName = "firstName";
+ *
+ * // Read property value
+ * Object value = PropertyUtil.readProperty(bean, propertyName);
+ *
+ * // Write property value with type checking
+ * PropertyUtil.writeProperty(bean, propertyName, "John");
+ *
+ * // Handle potential exceptions
+ * try {
+ *     PropertyUtil.writeProperty(bean, propertyName, value);
+ * } catch (IllegalArgumentException e) {
+ *     // Handle invalid property name or type
+ * } catch (IllegalStateException e) {
+ *     // Handle inaccessible property
+ * }
+ * </pre>
+ *
+ * <h2>Best Practices</h2>
+ * <ul>
+ *   <li>This type is for low-level operations.
+ *   On a higher level, use {@link de.cuioss.tools.reflect.FieldWrapper} instead</li>
+ *   <li>Always validate bean and property names before access</li>
+ *   <li>Use {@link PropertyHolder} for type-safe property access</li>
+ *   <li>Handle exceptions appropriately</li>
+ * </ul>
  *
  * @author Oliver Wolff
+ * @see de.cuioss.tools.reflect.FieldWrapper
+ * @see PropertyHolder
+ * @see PropertyMemberInfo
  * @since 2.0
  */
 @UtilityClass
