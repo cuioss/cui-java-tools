@@ -15,13 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -30,9 +23,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsTestCase.java">...</a>
- *
  */
 @SuppressWarnings("java:S5961")
 // owolff: I prefer being in sync with the original test
@@ -42,7 +41,7 @@ class FilenameUtilsTest {
     private static final boolean WINDOWS = File.separatorChar == '\\';
 
     @Test
-    void normalize() throws Exception {
+    void normalize() {
         assertNull(FilenameUtils.normalize(null));
         assertNull(FilenameUtils.normalize(":"));
         assertNull(FilenameUtils.normalize("1:\\a\\b\\c.txt"));
@@ -213,38 +212,17 @@ class FilenameUtilsTest {
                 FilenameUtils.normalize("\\\\127.0.0.256\\a\\b\\c.txt"));
         assertEquals(SEP + SEP + "127.0.0.01" + SEP + "a" + SEP + "b" + SEP + "c.txt",
                 FilenameUtils.normalize("\\\\127.0.0.01\\a\\b\\c.txt"));
-
-        // assertEquals(null, FilenameUtils.normalize("\\\\-server\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\.\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\..\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\127.0..1\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\::1::2\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\:1\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\1:\\a\\b\\c.txt"));
-        // assertEquals(null,
-        // FilenameUtils.normalize("\\\\1:2:3:4:5:6:7:8:9\\a\\b\\c.txt"));
-        // assertEquals(null,
-        // FilenameUtils.normalize("\\\\g:2:3:4:5:6:7:8\\a\\b\\c.txt"));
-        // assertEquals(null,
-        // FilenameUtils.normalize("\\\\1ffff:2:3:4:5:6:7:8\\a\\b\\c.txt"));
-        // assertEquals(null, FilenameUtils.normalize("\\\\1:2\\a\\b\\c.txt"));
     }
 
     @Test
-    void normalizeWithNullbytes() throws Exception {
-        try {
-            assertEquals("a" + SEP + "b" + SEP + "c.txt", FilenameUtils.normalize("a\\b/c\u0000.txt"));
-        } catch (final IllegalArgumentException ignore) {
-        }
+    void shouldFailToNormalizeWithNullbytes() {
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.normalize("a\\b/c\u0000.txt"));
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.normalize("\u0000a\\b/c.txt"));
 
-        try {
-            assertEquals("a" + SEP + "b" + SEP + "c.txt", FilenameUtils.normalize("\u0000a\\b/c.txt"));
-        } catch (final IllegalArgumentException ignore) {
-        }
     }
 
     @Test
-    void normalizeUnixWin() throws Exception {
+    void normalizeUnixWin() {
 
         // Normalize (Unix Separator)
         assertEquals("/a/c/", FilenameUtils.normalize("/a/b/../c/", true));
@@ -257,7 +235,7 @@ class FilenameUtilsTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void normalizeNoEndSeparator() throws Exception {
+    void normalizeNoEndSeparator() {
         assertNull(FilenameUtils.normalizeNoEndSeparator(null));
         assertNull(FilenameUtils.normalizeNoEndSeparator(":"));
         assertNull(FilenameUtils.normalizeNoEndSeparator("1:\\a\\b\\c.txt"));
@@ -416,7 +394,7 @@ class FilenameUtilsTest {
     }
 
     @Test
-    void normalizeNoEndSeparatorUnixWin() throws Exception {
+    void normalizeNoEndSeparatorUnixWin() {
 
         // Normalize (Unix Separator)
         assertEquals("/a/c", FilenameUtils.normalizeNoEndSeparator("/a/b/../c/", true));
@@ -559,9 +537,6 @@ class FilenameUtilsTest {
         assertEquals(21, FilenameUtils.getPrefixLength("\\\\server.example.org\\a\\b\\c.txt"));
         assertEquals(10, FilenameUtils.getPrefixLength("\\\\server.\\a\\b\\c.txt"));
 
-        // assertEquals(-1, FilenameUtils.getPrefixLength("\\\\-server\\a\\b\\c.txt"));
-        // assertEquals(-1, FilenameUtils.getPrefixLength("\\\\.\\a\\b\\c.txt"));
-        // assertEquals(-1, FilenameUtils.getPrefixLength("\\\\..\\a\\b\\c.txt"));
     }
 
     @Test
@@ -626,12 +601,8 @@ class FilenameUtilsTest {
     }
 
     @Test
-    void getPrefixWithNullbyte() {
-        try {
-            assertEquals("~user\\", FilenameUtils.getPrefix("~u\u0000ser\\a\\b\\c.txt"));
-        } catch (final IllegalArgumentException ignore) {
-
-        }
+    void shouldFailGetPrefixWithNullbyte() {
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getPrefix("~u\u0000ser\\a\\b\\c.txt"));
     }
 
     @Test
@@ -674,7 +645,7 @@ class FilenameUtilsTest {
     @Test
     void getPathWithNullbyte() {
         assertThrows(IllegalArgumentException.class, () ->
-            FilenameUtils.getPath("~user/a/\u0000b/c.txt"));
+                FilenameUtils.getPath("~user/a/\u0000b/c.txt"));
     }
 
     @Test
@@ -715,12 +686,8 @@ class FilenameUtilsTest {
     }
 
     @Test
-    void getPathNoEndSeparatorWithNullByte() {
-        try {
-            assertEquals("a/b", FilenameUtils.getPathNoEndSeparator("~user/a\u0000/b/c.txt"));
-        } catch (final IllegalArgumentException ignore) {
-
-        }
+    void shouldFailGetPathNoEndSeparatorWithNullByte() {
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getPathNoEndSeparator("~user/a\u0000/b/c.txt"));
     }
 
     @Test
@@ -824,11 +791,7 @@ class FilenameUtilsTest {
 
     @Test
     void injectionFailure() {
-        try {
-            assertEquals("c", FilenameUtils.getName("a\\b\\\u0000c"));
-        } catch (final IllegalArgumentException ignore) {
-
-        }
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getName("a\\b\\\u0000c"));
     }
 
     @Test
@@ -844,11 +807,7 @@ class FilenameUtilsTest {
 
     @Test
     void getBaseNameWithNullByte() {
-        try {
-            assertEquals("file.txt", FilenameUtils.getBaseName("fil\u0000e.txt.bak"));
-        } catch (final IllegalArgumentException ignore) {
-
-        }
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.getBaseName("fil\u0000e.txt.bak"));
     }
 
     @Test
@@ -1004,11 +963,7 @@ class FilenameUtilsTest {
 
     @Test
     void isExtensionInjection() {
-        try {
-            FilenameUtils.isExtension("a.b\\fi\u0000le.txt", "TXT");
-            fail("Should throw IAE");
-        } catch (final IllegalArgumentException ignore) {
-        }
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.isExtension("a.b\\fi\u0000le.txt", "TXT"));
     }
 
     @Test

@@ -15,12 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -29,9 +23,14 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOCaseTestCase.java">...</a>
- *
  */
 @SuppressWarnings("java:S5961")
 // owolff: I prefer being in sync with the original test
@@ -41,7 +40,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void for_name() throws Exception {
+    void for_name() {
         assertEquals(IOCase.SENSITIVE, IOCase.forName("Sensitive"));
         assertEquals(IOCase.INSENSITIVE, IOCase.forName("Insensitive"));
         assertEquals(IOCase.SYSTEM, IOCase.forName("System"));
@@ -65,21 +64,21 @@ class IOCaseTest {
     }
 
     @Test
-    void get_name() throws Exception {
+    void get_name() {
         assertEquals("Sensitive", IOCase.SENSITIVE.getName());
         assertEquals("Insensitive", IOCase.INSENSITIVE.getName());
         assertEquals("System", IOCase.SYSTEM.getName());
     }
 
     @Test
-    void to_string() throws Exception {
+    void to_string() {
         assertEquals("Sensitive", IOCase.SENSITIVE.toString());
         assertEquals("Insensitive", IOCase.INSENSITIVE.toString());
         assertEquals("System", IOCase.SYSTEM.toString());
     }
 
     @Test
-    void is_case_sensitive() throws Exception {
+    void is_case_sensitive() {
         assertTrue(IOCase.SENSITIVE.isCaseSensitive());
         assertFalse(IOCase.INSENSITIVE.isCaseSensitive());
         assertEquals(!WINDOWS, IOCase.SYSTEM.isCaseSensitive());
@@ -87,7 +86,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_compare_functionality() throws Exception {
+    void check_compare_functionality() {
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "") > 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("", "ABC") < 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "DEF") < 0);
@@ -113,7 +112,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_compare_case() throws Exception {
+    void check_compare_case() {
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("ABC", "ABC"));
         assertTrue(IOCase.SENSITIVE.checkCompareTo("ABC", "abc") < 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("abc", "ABC") > 0);
@@ -129,7 +128,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_equals_functionality() throws Exception {
+    void check_equals_functionality() {
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", ""));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "A"));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "AB"));
@@ -158,7 +157,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_equals_case() throws Exception {
+    void check_equals_case() {
         assertTrue(IOCase.SENSITIVE.checkEquals("ABC", "ABC"));
         assertFalse(IOCase.SENSITIVE.checkEquals("ABC", "Abc"));
 
@@ -171,7 +170,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_starts_with_functionality() throws Exception {
+    void check_starts_with_functionality() {
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", ""));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "A"));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
@@ -200,7 +199,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_starts_with_case() throws Exception {
+    void check_starts_with_case() {
         assertTrue(IOCase.SENSITIVE.checkStartsWith("ABC", "AB"));
         assertFalse(IOCase.SENSITIVE.checkStartsWith("ABC", "Ab"));
 
@@ -213,7 +212,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_ends_with_functionality() throws Exception {
+    void check_ends_with_functionality() {
         assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", ""));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "A"));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "AB"));
@@ -242,7 +241,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_ends_with_case() throws Exception {
+    void check_ends_with_case() {
         assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
         assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "Bc"));
 
@@ -255,7 +254,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_index_of_functionality() throws Exception {
+    void check_index_of_functionality() {
 
         // start
         assertEquals(0, IOCase.SENSITIVE.checkIndexOf("ABCDEFGHIJ", 0, "A"));
@@ -311,7 +310,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_index_of_case() throws Exception {
+    void check_index_of_case() {
         assertEquals(1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "BC"));
         assertEquals(-1, IOCase.SENSITIVE.checkIndexOf("ABC", 0, "Bc"));
 
@@ -324,7 +323,7 @@ class IOCaseTest {
 
     // -----------------------------------------------------------------------
     @Test
-    void check_region_matches_functionality() throws Exception {
+    void check_region_matches_functionality() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, ""));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "A"));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
@@ -378,7 +377,7 @@ class IOCaseTest {
     }
 
     @Test
-    void check_region_matches_case() throws Exception {
+    void check_region_matches_case() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "Ab"));
 

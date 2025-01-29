@@ -17,6 +17,7 @@ package de.cuioss.tools.concurrent;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -139,6 +140,7 @@ class ConcurrentToolsTest {
             Thread.sleep(LONG_DELAY_MS);
             fail("Dude, where's my interrupt?");
         } catch (InterruptedException expected) {
+            assertNotNull(expected);
         }
     }
 }

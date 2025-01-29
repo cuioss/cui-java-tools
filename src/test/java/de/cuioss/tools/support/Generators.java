@@ -83,8 +83,6 @@ public class Generators {
 
     public static void generateTestData(final OutputStream out, final long size) throws IOException {
         for (var i = 0; i < size; i++) {
-            // output.write((byte)'X');
-
             // nice varied byte pattern compatible with Readers and Writers
             out.write((byte) (i % 127 + 1));
         }

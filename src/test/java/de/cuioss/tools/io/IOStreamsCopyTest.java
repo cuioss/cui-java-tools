@@ -15,12 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.io.IOStreams.copyLarge;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import de.cuioss.tools.io.support.NullInputStream;
 import de.cuioss.tools.io.support.NullOutputStream;
 import de.cuioss.tools.io.support.NullReader;
@@ -47,11 +41,14 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static de.cuioss.tools.io.IOStreams.copyLarge;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java">...</a>
- *
  */
-@SuppressWarnings("resource")
 class IOStreamsCopyTest {
 
     /*
@@ -128,17 +125,17 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyInputStreamToOutputStreamNullIn() throws Exception {
+    void copyInputStreamToOutputStreamNullIn() {
         final OutputStream out = new ByteArrayOutputStream();
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(null, out));
+                IOStreams.copy(null, out));
     }
 
     @Test
-    void copyInputStreamToOutputStreamNullOut() throws Exception {
+    void copyInputStreamToOutputStreamNullOut() {
         final InputStream in = new ByteArrayInputStream(inData);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(in, null));
+                IOStreams.copy(in, null));
     }
 
     @Test
@@ -214,19 +211,19 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyInputStreamToWriterEncodingNullIn() throws Exception {
+    void copyInputStreamToWriterEncodingNullIn() {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(null, writer, "UTF8"));
+                IOStreams.copy(null, writer, "UTF8"));
     }
 
     @Test
-    void copyInputStreamToWriterEncodingNullOut() throws Exception {
+    void copyInputStreamToWriterEncodingNullOut() {
         final InputStream in = new ByteArrayInputStream(inData);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(in, null, "UTF8"));
+                IOStreams.copy(in, null, "UTF8"));
     }
 
     // -----------------------------------------------------------------------
@@ -266,20 +263,20 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyReaderToOutputStreamEncodingNullIn() throws Exception {
+    void copyReaderToOutputStreamEncodingNullIn() {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(null, out, "UTF16"));
+                IOStreams.copy(null, out, "UTF16"));
     }
 
     @Test
-    void copyReaderToOutputStreamEncodingNullOut() throws Exception {
+    void copyReaderToOutputStreamEncodingNullOut() {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(reader, null, "UTF16"));
+                IOStreams.copy(reader, null, "UTF16"));
     }
 
     // -----------------------------------------------------------------------
@@ -322,21 +319,21 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyReaderToWriterNullIn() throws Exception {
+    void copyReaderToWriterNullIn() {
         final var baout = new ByteArrayOutputStream();
         final OutputStream out = new YellOnFlushAndCloseOutputStream(baout, true, true);
         final Writer writer = new OutputStreamWriter(out, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(null, writer));
+                IOStreams.copy(null, writer));
     }
 
     @Test
-    void copyReaderToWriterNullOut() throws Exception {
+    void copyReaderToWriterNullOut() {
         InputStream in = new ByteArrayInputStream(inData);
         in = new YellOnCloseInputStream(in);
         final Reader reader = new InputStreamReader(in, StandardCharsets.US_ASCII);
         assertThrows(NullPointerException.class, () ->
-            IOStreams.copy(reader, null));
+                IOStreams.copy(reader, null));
     }
 
     @Test
@@ -457,22 +454,15 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeCharSkipInvalid() throws IOException {
-        CharArrayReader is = null;
-        CharArrayWriter os = null;
-        try {
-            // Create streams
-            is = new CharArrayReader(carr);
-            os = new CharArrayWriter();
+    void copyLargeCharSkipInvalid() {
 
-            // Test our copy method
-            copyLarge(is, os, 1000, 100);
-            fail("Should have thrown EOFException");
-        } catch (final EOFException ignore) {
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
-        }
+        // Create streams
+        final var is = new CharArrayReader(carr);
+        final var os = new CharArrayWriter();
+
+        // Test our copy method
+        assertThrows(EOFException.class, () -> copyLarge(is, os, 1000, 100));
+
     }
 
     @Test
@@ -581,21 +571,12 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeSkipInvalid() throws IOException {
-        ByteArrayInputStream is = null;
-        ByteArrayOutputStream os = null;
-        try {
-            // Create streams
-            is = new ByteArrayInputStream(iarr);
-            os = new ByteArrayOutputStream();
+    void copyLargeSkipInvalid() {
+        final ByteArrayInputStream is = new ByteArrayInputStream(iarr);
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-            // Test our copy method
-            copyLarge(is, os, 1000, 100);
-            fail("Should have thrown EOFException");
-        } catch (final EOFException ignore) {
-        } finally {
-            closeQuietly(is);
-            closeQuietly(os);
-        }
+        // Test our copy method
+        assertThrows(EOFException.class, () -> copyLarge(is, os, 1000, 100));
+
     }
 }
