@@ -37,7 +37,7 @@
  *   <li><b>Enterprise Integration</b>
  *     <ul>
  *       <li>{@link de.cuioss.tools.net} - Network and SSL utilities</li>
- *       <li>{@link de.cuioss.tools.property} - JavaBean property handling</li>
+ *       <li>{@link de.cuioss.tools.property} - Java Bean property handling</li>
  *       <li>{@link de.cuioss.tools.reflect} - Type-safe reflection support</li>
  *     </ul>
  *   </li>
@@ -45,10 +45,10 @@
  *
  * <h2>Design Principles</h2>
  * <ul>
- *   <li><b>Jakarta EE Alignment</b>
+ *   <li><b>Zero Dependencies</b>
  *     <ul>
- *       <li>Compatible with Jakarta EE specifications</li>
- *       <li>Support for CDI and JSF integration</li>
+ *       <li>No external runtime dependencies</li>
+ *       <li>Self-contained implementation</li>
  *     </ul>
  *   </li>
  *   <li><b>Quality Focus</b>
