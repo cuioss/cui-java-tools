@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.property;
 
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
@@ -28,6 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
+
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Helper class providing convenient methods for reading from and writing to Java beans.
@@ -111,6 +111,7 @@ public class PropertyUtil {
      * @throws IllegalArgumentException if the property cannot be read or does not exist
      * @since 2.0
      */
+    @SuppressWarnings("java:S3655") // owolff: False Positive, isPresent is checked
     public static Object readProperty(Object bean, String propertyName) {
         log.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);
