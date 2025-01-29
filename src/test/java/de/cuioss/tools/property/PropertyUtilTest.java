@@ -81,7 +81,7 @@ class PropertyUtilTest {
 
         var propertyValue = new ArrayList<>();
         assertThrows(IllegalArgumentException.class, () ->
-            writeProperty(underTest, PROPERTY_NAME, propertyValue));
+                writeProperty(underTest, PROPERTY_NAME, propertyValue));
     }
 
     @Test
@@ -102,13 +102,13 @@ class PropertyUtilTest {
     void shouldFailOnInvalidProperty() {
         var underTest = new BeanWithReadWriteProperties();
         assertThrows(IllegalArgumentException.class, () ->
-            readProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE));
+                readProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE));
         assertThrows(IllegalArgumentException.class, () ->
-            readProperty(underTest, ATTRIBUTE_WRITE_ONLY));
+                readProperty(underTest, ATTRIBUTE_WRITE_ONLY));
         assertThrows(IllegalArgumentException.class, () ->
-            writeProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, ""));
+                writeProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, ""));
         assertThrows(IllegalArgumentException.class, () ->
-            writeProperty(underTest, ATTRIBUTE_READ_ONLY, ""));
+                writeProperty(underTest, ATTRIBUTE_READ_ONLY, ""));
     }
 
     @Test
@@ -117,9 +117,9 @@ class PropertyUtilTest {
 
         underTest.illegalArgumentException();
         assertThrows(IllegalStateException.class, () ->
-            readProperty(underTest, PROPERTY_NAME));
+                readProperty(underTest, PROPERTY_NAME));
         assertThrows(IllegalStateException.class, () ->
-            writeProperty(underTest, PROPERTY_NAME, ""));
+                writeProperty(underTest, PROPERTY_NAME, ""));
     }
 
     @Test

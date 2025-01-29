@@ -239,6 +239,6 @@ class SplitterTest {
 
         var splitter = Splitter.on("[").doNotModifySeparatorString();
         assertThrows(IllegalArgumentException.class, () ->
-            splitter.splitToList("[boom]"));
+                splitter.splitToList("[boom]"));
     }
 }

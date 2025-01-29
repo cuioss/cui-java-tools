@@ -43,13 +43,13 @@ class MoreObjectsTest {
     @Test
     void requireTypeShouldHandleInvalidTypes() {
         assertThrows(IllegalArgumentException.class, () ->
-            MoreObjects.requireType(null, null));
+                MoreObjects.requireType(null, null));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreObjects.requireType(HELLO, null));
+                MoreObjects.requireType(HELLO, null));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreObjects.requireType(null, Serializable.class));
+                MoreObjects.requireType(null, Serializable.class));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreObjects.requireType(HELLO, Number.class));
+                MoreObjects.requireType(HELLO, Number.class));
     }
 
     @Test

@@ -110,9 +110,9 @@ class PropertyHolderTest {
 
         underTest.illegalArgumentException();
         assertThrows(IllegalStateException.class, () ->
-            holder.readFrom(underTest));
+                holder.readFrom(underTest));
         assertThrows(IllegalStateException.class, () ->
-            holder.writeTo(underTest, ""));
+                holder.writeTo(underTest, ""));
     }
 
     @Test

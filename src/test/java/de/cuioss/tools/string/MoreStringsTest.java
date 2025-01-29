@@ -378,18 +378,18 @@ class MoreStringsTest {
     @Test
     void shouldDeterminesEmptyString() {
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmpty(""));
+                MoreStrings.requireNotEmpty(""));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmpty("", MESSAGE));
+                MoreStrings.requireNotEmpty("", MESSAGE));
 
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmptyTrimmed(""));
+                MoreStrings.requireNotEmptyTrimmed(""));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmptyTrimmed("", MESSAGE));
+                MoreStrings.requireNotEmptyTrimmed("", MESSAGE));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmptyTrimmed(" "));
+                MoreStrings.requireNotEmptyTrimmed(" "));
         assertThrows(IllegalArgumentException.class, () ->
-            MoreStrings.requireNotEmptyTrimmed(" ", MESSAGE));
+                MoreStrings.requireNotEmptyTrimmed(" ", MESSAGE));
     }
 
     @Test

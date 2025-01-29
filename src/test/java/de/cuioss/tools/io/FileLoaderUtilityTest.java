@@ -78,7 +78,7 @@ class FileLoaderUtilityTest {
         assertTrue(loaded.contains("Hello"));
 
         assertThrows(IllegalArgumentException.class, () ->
-            FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
+                FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
     }
 
 }

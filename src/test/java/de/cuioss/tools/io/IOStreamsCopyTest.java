@@ -15,6 +15,11 @@
  */
 package de.cuioss.tools.io;
 
+import static de.cuioss.tools.io.IOStreams.copyLarge;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import de.cuioss.tools.io.support.NullInputStream;
 import de.cuioss.tools.io.support.NullOutputStream;
 import de.cuioss.tools.io.support.NullReader;
@@ -39,11 +44,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import static de.cuioss.tools.io.IOStreams.copyLarge;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java">...</a>

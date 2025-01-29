@@ -71,10 +71,10 @@ class MoreCollectionsTest {
         requireNotEmpty((Iterable<String>) mutableList("1"), MESSAGE);
         Iterable<String> emptyIterable = Collections.emptyList();
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyIterable));
+                requireNotEmpty(emptyIterable));
 
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyIterable, MESSAGE));
+                requireNotEmpty(emptyIterable, MESSAGE));
     }
 
     @Test
@@ -88,10 +88,10 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableList("1"), MESSAGE);
         List<String> emptyList = Collections.emptyList();
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyList));
+                requireNotEmpty(emptyList));
 
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyList, MESSAGE));
+                requireNotEmpty(emptyList, MESSAGE));
     }
 
     @Test
@@ -104,7 +104,7 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableMap("1", "2"), MESSAGE);
         Map<Object, Object> emptyMutableMap = mutableMap();
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyMutableMap));
+                requireNotEmpty(emptyMutableMap));
 
     }
 
@@ -119,10 +119,10 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableList("1").iterator(), MESSAGE);
         Iterator<String> emptyIterator = Collections.emptyIterator();
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyIterator));
+                requireNotEmpty(emptyIterator));
 
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty(emptyIterator, MESSAGE));
+                requireNotEmpty(emptyIterator, MESSAGE));
     }
 
     @Test
@@ -134,9 +134,9 @@ class MoreCollectionsTest {
         requireNotEmpty(mutableList("1").stream());
         requireNotEmpty(mutableList("1").stream(), MESSAGE);
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty((Stream<String>) null));
+                requireNotEmpty((Stream<String>) null));
         assertThrows(IllegalArgumentException.class, () ->
-            requireNotEmpty((Stream<String>) null, MESSAGE));
+                requireNotEmpty((Stream<String>) null, MESSAGE));
 
     }
 

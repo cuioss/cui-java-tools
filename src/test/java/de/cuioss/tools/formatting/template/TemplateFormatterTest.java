@@ -105,7 +105,7 @@ class TemplateFormatterTest {
                 PersonName.class, true);
 
         assertThrows(IllegalArgumentException.class, () ->
-            formatter.format(personName));
+                formatter.format(personName));
     }
 
     @Test

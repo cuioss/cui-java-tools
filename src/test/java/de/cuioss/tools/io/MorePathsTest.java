@@ -158,7 +158,7 @@ class MorePathsTest {
     @Test
     void shouldFailToBackupNonExisitingFile() {
         assertThrows(IllegalArgumentException.class, () ->
-            backupFile(TARGET_PLAYGROUND));
+                backupFile(TARGET_PLAYGROUND));
     }
 
     @Test
@@ -193,7 +193,7 @@ class MorePathsTest {
     @Test
     void shouldFailToProvideBackupDirectoryIfParentNotExists() {
         assertThrows(IllegalArgumentException.class, () ->
-            getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY));
+                getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY));
     }
 
     @Test

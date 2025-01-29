@@ -21,19 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
+import de.cuioss.tools.support.Generators;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import de.cuioss.tools.support.Generators;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * Tests for {@link IOCase} class focusing on case sensitivity handling in file operations.
@@ -45,9 +44,9 @@ class IOCaseTest {
 
     @ParameterizedTest
     @CsvSource({
-        "Sensitive,SENSITIVE",
-        "Insensitive,INSENSITIVE",
-        "System,SYSTEM"
+            "Sensitive,SENSITIVE",
+            "Insensitive,INSENSITIVE",
+            "System,SYSTEM"
     })
     void shouldResolveValidCaseNames(String name, IOCase expected) {
         assertEquals(expected, IOCase.forName(name));
@@ -90,7 +89,7 @@ class IOCaseTest {
         assertTrue(IOCase.SENSITIVE.checkCompareTo(testString, "") > 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("", testString) < 0);
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("", ""));
-        
+
         assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(testString, null));
         assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, testString));
         assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkCompareTo(null, null));
@@ -148,12 +147,12 @@ class IOCaseTest {
 
     @ParameterizedTest
     @CsvSource({
-        "ABC,A,true",
-        "ABC,AB,true",
-        "ABC,ABC,true",
-        "ABC,BC,false",
-        "ABC,C,false",
-        "ABC,ABCD,false"
+            "ABC,A,true",
+            "ABC,AB,true",
+            "ABC,ABC,true",
+            "ABC,BC,false",
+            "ABC,C,false",
+            "ABC,ABCD,false"
     })
     void shouldHandleStartsWithVariousPrefixes(String input, String prefix, boolean expected) {
         assertEquals(expected, IOCase.SENSITIVE.checkStartsWith(input, prefix));

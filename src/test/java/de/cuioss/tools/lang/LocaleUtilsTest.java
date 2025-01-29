@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Locale;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Locale;
 
 /**
  * Unit tests for {@link LocaleUtils}. Tests the conversion of strings to Locale objects
@@ -65,8 +65,8 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-        "us_EN,us,EN",
-        "us_ZH,us,ZH"
+            "us_EN,us,EN",
+            "us_ZH,us,ZH"
     })
     void shouldHandleValidLanguageCountryCombinations(String localeString, String language, String country) {
         var locale = LocaleUtils.toLocale(localeString);
@@ -78,12 +78,12 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "us-EN",    // Invalid separator
-        "us_En",    // Invalid country case
-        "us_en",    // Invalid country case
-        "us_eN",    // Invalid country case
-        "uS_EN",    // Invalid language case
-        "us_E3"     // Invalid country format
+            "us-EN",    // Invalid separator
+            "us_En",    // Invalid country case
+            "us_en",    // Invalid country case
+            "us_eN",    // Invalid country case
+            "uS_EN",    // Invalid language case
+            "us_E3"     // Invalid country format
     })
     void shouldRejectInvalidLanguageCountryCombinations(String invalidLocale) {
         assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale(invalidLocale));
@@ -91,9 +91,9 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-        "us_EN_A,us,EN,A",
-        "us_EN_a,us,EN,a",
-        "us_EN_variant,us,EN,variant"
+            "us_EN_A,us,EN,A",
+            "us_EN_a,us,EN,a",
+            "us_EN_variant,us,EN,variant"
     })
     void shouldHandleValidLanguageCountryVariantCombinations(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);
@@ -105,8 +105,8 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "us_EN-a",  // Invalid separator
-        "uu_UU_"    // Invalid length
+            "us_EN-a",  // Invalid separator
+            "uu_UU_"    // Invalid length
     })
     void shouldRejectInvalidLanguageCountryVariantCombinations(String invalidLocale) {
         assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale(invalidLocale));
@@ -114,8 +114,8 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "_EN,,EN,",
-        "_EN_variant,,EN,variant"
+            "_EN,,EN,",
+            "_EN_variant,,EN,variant"
     }, nullValues = "")
     void shouldHandleValidCountryOnlyCombinations(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);
@@ -127,11 +127,11 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "_En",      // Invalid country case
-        "_",        // Missing country
-        "__",       // Missing country
-        "_En_",     // Invalid format
-        "_eN_var"   // Invalid country case
+            "_En",      // Invalid country case
+            "_",        // Missing country
+            "__",       // Missing country
+            "_En_",     // Invalid format
+            "_eN_var"   // Invalid country case
     })
     void shouldRejectInvalidCountryOnlyCombinations(String invalidLocale) {
         assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale(invalidLocale));
@@ -139,8 +139,8 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "de_123,de,123,",
-        "de_123_variant,de,123,variant"
+            "de_123,de,123,",
+            "de_123_variant,de,123,variant"
     }, nullValues = "")
     void shouldHandleNumericCountryCodes(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);
@@ -152,7 +152,7 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-        "de__variant,de,,variant"
+            "de__variant,de,,variant"
     })
     void shouldHandleEmptyCountryWithVariant(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);
