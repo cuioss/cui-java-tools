@@ -21,48 +21,68 @@ import java.io.Serializable;
 import java.lang.reflect.Modifier;
 
 /**
- * Members of this enum define the way the corresponding property is subject to
- * the contracts regarding the canonical {@link Object} methods like
- * {@link Object#equals(Object)}, {@link Object#hashCode()} and
- * {@link Object#toString()} and the {@link Serializable} contract
+ * Members of this enum define how a property participates in object identity and
+ * serialization contracts.
+ * This affects the property's behavior in:
+ * <ul>
+ *   <li>{@link Object#equals(Object)} - Object equality comparison</li>
+ *   <li>{@link Object#hashCode()} - Hash code generation</li>
+ *   <li>{@link Object#toString()} - String representation</li>
+ *   <li>{@link java.io.Serializable} - Serialization handling</li>
+ * </ul>
  *
  * @author Oliver Wolff
+ * @since 2.0
  */
 public enum PropertyMemberInfo {
 
     /**
-     * Defines a default property contract, saying it is not transient and defines
-     * the Object-identity, {@link Object#equals(Object)}, {@link Object#hashCode()}
-     * and {@link Object#toString()}
+     * Defines a default property contract. The property:
+     * <ul>
+     *   <li>Is not transient</li>
+     *   <li>Participates in object identity</li>
+     *   <li>Is included in equals, hashCode and toString</li>
+     * </ul>
      */
     DEFAULT,
 
     /**
-     * Defines a property that is not transient, and is not part of the
-     * object-identity and should therefore be ignored in the methods
-     * {@link Object#equals(Object)}, {@link Object#hashCode()}
+     * Defines a property that:
+     * <ul>
+     *   <li>Is not transient</li>
+     *   <li>Does not participate in object identity</li>
+     *   <li>Is excluded from equals and hashCode</li>
+     * </ul>
      */
     NO_IDENTITY,
 
     /**
-     * Defines a transient property that is not part of the object-identity and
-     * should therefore be ignored in the methods {@link Object#equals(Object)} and
-     * the serialization.
+     * Defines a transient property that:
+     * <ul>
+     *   <li>Is marked as transient</li>
+     *   <li>Does not participate in object identity</li>
+     *   <li>Is excluded from equals, hashCode and serialization</li>
+     * </ul>
      */
     TRANSIENT,
 
-    /** The actual state can not be defined. */
+    /**
+     * Indicates that the property's state cannot be determined.
+     * This usually occurs when the property cannot be resolved
+     * through standard reflection mechanisms.
+     */
     UNDEFINED;
 
     /**
-     * Resolves {@link PropertyMemberInfo} for a given property with
-     * {@link MoreReflection}. This method can solely distinguish between the states
-     * {@link #UNDEFINED}, {@link #DEFAULT} and {@link #TRANSIENT}.
-     * {@link #NO_IDENTITY} must be defined from the caller if necessary;
+     * Resolves {@link PropertyMemberInfo} for a given property using reflection.
+     * This method can distinguish between {@link #UNDEFINED}, {@link #DEFAULT}
+     * and {@link #TRANSIENT} states.
+     * must be defined by the caller if necessary.
      *
-     * @param beanType     to be checked, must not be null
-     * @param propertyName to be checked, must not be null
-     * @return the corresponding {@link PropertyReadWrite} for a given property
+     * @param beanType     type to be checked, must not be null
+     * @param propertyName name of property to be checked, must not be null
+     * @return the corresponding {@link PropertyMemberInfo} for the given property
+     * @since 2.0
      */
     public static PropertyMemberInfo resolveForBean(final Class<?> beanType, final String propertyName) {
         var fieldOption = MoreReflection.accessField(beanType, propertyName);

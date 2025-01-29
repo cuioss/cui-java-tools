@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.property;
 
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
@@ -29,41 +26,59 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
+
 /**
- * Helper class providing convenient methods for reading from / writing to java
- * beans.
- * <h2>Caution:</h2>
+ * Helper class providing convenient methods for reading from and writing to Java beans.
  * <p>
- * Use reflection only if there is no other way. Even if some of the problems
- * are minimized by using this type. It should be used either in test-code, what
- * is we actually do, and not production code. An other reason could be
- * framework code. as for that you should exactly know what you do.
+ * <strong>Caution:</strong> Use reflection only if there is no other way.
+ * While this class minimizes some reflection-related issues, it should primarily be used in:
+ * </p>
+ * <ul>
+ *   <li>Test code</li>
+ *   <li>Framework code where reflection is necessary</li>
+ * </ul>
+ * <p>
+ * When using this class, ensure you understand the implications of reflection
+ * and have considered alternative approaches first.
  * </p>
  *
  * @author Oliver Wolff
- *
+ * @since 2.0
  */
 @UtilityClass
 public class PropertyUtil {
 
     private static final CuiLogger log = new CuiLogger(PropertyUtil.class);
 
-    static final String UNABLE_TO_WRITE_PROPERTY = "Unable to write property '%s' to beanType '%s': no suitable write method found. Needed property-type '%s'";
-
-    static final String UNABLE_TO_WRITE_PROPERTY_RUNTIME = "Unable to write property '%s' to beanType '%s'. Needed property-type '%s'";
-
-    static final String UNABLE_TO_READ_PROPERTY = "Unable to read property '%s' from beanType '%s'.";
+    /**
+     * Error message template for property read failures
+     */
+    public static final String UNABLE_TO_READ_PROPERTY =
+            "Unable to read property '%s' from type '%s'";
 
     /**
-     * @param bean         instance to be read from, must not be null
-     * @param propertyName to be read, must not be null nor empty nor blank
-     * @return the object read from the property
-     * @throws IllegalArgumentException in case the property does not exist
-     *                                  (determined by a read method)
-     * @throws IllegalStateException    in case some Exception occurred while
-     *                                  reading
+     * Error message template for property write failures
      */
-    @SuppressWarnings("squid:S3655") // owolff: False Positive, Optional#isPresent is checked
+    public static final String UNABLE_TO_WRITE_PROPERTY =
+            "Unable to write property '%s' to type '%s', expected type was '%s'";
+
+    /**
+     * Error message template for runtime property write failures
+     */
+    public static final String UNABLE_TO_WRITE_PROPERTY_RUNTIME =
+            "Unable to write property '%s' to type '%s'";
+
+    /**
+     * Reads a property value from a bean using reflection.
+     *
+     * @param bean         the bean to read from, must not be null
+     * @param propertyName the name of the property to read, must not be null or empty
+     * @return the value of the property
+     * @throws IllegalArgumentException if the property cannot be read or does not exist
+     * @since 2.0
+     */
     public static Object readProperty(Object bean, String propertyName) {
         log.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);
@@ -79,16 +94,14 @@ public class PropertyUtil {
     }
 
     /**
-     * @param bean          instance to be read from, must not be null
-     * @param propertyName  to be read, must not be null nor empty nor blank
-     * @param propertyValue to be set
-     * @return In case the property set method is void the given bean will be
-     *         returned. Otherwise, the return value of the method invocation,
-     *         assuming the setMethods is a builder type.
-     * @throws IllegalArgumentException in case the property does not exist
-     *                                  (determined by a write method)
-     * @throws IllegalStateException    in case some Exception occurred while
-     *                                  writing
+     * Writes a value to a property of a bean using reflection.
+     *
+     * @param bean          the bean to write to, must not be null
+     * @param propertyName  the name of the property to write, must not be null or empty
+     * @param propertyValue the value to write to the property
+     * @return the bean instance (for method chaining)
+     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @since 2.0
      */
     public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
         log.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
@@ -107,38 +120,46 @@ public class PropertyUtil {
     }
 
     /**
-     * Tries to determine the type of given property
+     * Resolves the type of property on a given bean class.
      *
-     * @param beanType     to be checked, must not be null
-     * @param propertyName to be checked, must not be null
-     * @return an {@link Optional} on the actual type of the property. First it
-     *         checks an access-methods, then it tries to directly access the field,
-     *         and if that fails it uses the first read method found,
-     *         {@link Optional#empty()} otherwise.
+     * @param beanClass    the class to inspect, must not be null
+     * @param propertyName the name of the property to resolve, must not be null or empty
+     * @return an Optional containing the property type if found
+     * @since 2.0
      */
-    public static Optional<Class<?>> resolvePropertyType(Class<?> beanType, String propertyName) {
-        var retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanType, propertyName);
+    public static Optional<Class<?>> resolvePropertyType(Class<?> beanClass, String propertyName) {
+        var retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanClass, propertyName);
         if (retrieveAccessMethod.isPresent()) {
-            log.trace("Found read-method on class '%s' for property-name '%s'", beanType, propertyName);
+            log.trace("Found read-method on class '%s' for property-name '%s'", beanClass, propertyName);
             return Optional.of(retrieveAccessMethod.get().getReturnType());
         }
-        var field = MoreReflection.accessField(beanType, propertyName);
+        var field = MoreReflection.accessField(beanClass, propertyName);
         if (field.isPresent()) {
-            log.trace("Found field on class '%s' with name '%s'", beanType, propertyName);
+            log.trace("Found field on class '%s' with name '%s'", beanClass, propertyName);
             return Optional.of(field.get().getType());
         }
         log.debug(
                 "Neither read-method nor field found on class '%s' for property-name '%s', checking write methods, returning first type found",
-                beanType, propertyName);
-        var candidates = MoreReflection.retrieveWriteMethodCandidates(beanType, propertyName);
+                beanClass, propertyName);
+        var candidates = MoreReflection.retrieveWriteMethodCandidates(beanClass, propertyName);
         if (!candidates.isEmpty()) {
             return Optional.of(candidates.iterator().next().getParameterTypes()[0]);
         }
-        log.debug("Unable to detect property-type on class '%s' for property-name '%s'", beanType, propertyName);
+        log.debug("Unable to detect property-type on class '%s' for property-name '%s'", beanClass, propertyName);
         return Optional.empty();
     }
 
-    static Method determineWriteMethod(Object bean, String propertyName, Object propertyValue) {
+    /**
+     * Determines the write method for a property on a bean.
+     *
+     * @param bean          the bean instance, must not be null
+     * @param propertyName  the name of the property, must not be null or empty
+     * @param propertyValue the value to be written (used for type checking)
+     * @return the write method
+     * @throws IllegalArgumentException if no suitable write method is found
+     * @since 2.0
+     */
+    private static Method determineWriteMethod(Object bean, String propertyName, Object propertyValue) {
         var candidates = MoreReflection.retrieveWriteMethodCandidates(bean.getClass(), propertyName);
         var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
         Preconditions.checkArgument(!candidates.isEmpty(), UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(),

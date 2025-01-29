@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.property;
 
-import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
@@ -35,6 +31,10 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
+import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
+
 /**
  * Represents a property of a class, providing type-safe access to its value.
  * This class wraps a property (field or method) and provides type-safe access
@@ -44,15 +44,16 @@ import java.util.Optional;
  * </p>
  * <p>
  * The holder provides access to property metadata through its accessor methods:
- * {@code getMemberInfo()}, {@code getName()}, {@code getType()},
- * {@code getReadMethod()}, and {@code getWriteMethod()}.
+ * {@link #getMemberInfo()}, {@link #getName()}, {@link #getType()},
+ * {@link #getReadMethod()}, and {@link #getWriteMethod()}.
  * </p>
  * <p>
- * For type-safe access, use {@code readFrom(Object)} and {@code writeTo(Object, Object)}.
+ * For type-safe access, use {@link #readFrom(Object)} and {@link #writeTo(Object, Object)}.
  * Direct method access is more error-prone and less versatile.
  * </p>
  *
  * @author Oliver Wolff
+ * @since 2.0
  */
 @Value
 @Builder
@@ -99,16 +100,17 @@ public class PropertyHolder {
 
     /**
      * Reads the property on the given bean identified by the concrete
-     * {@link PropertyHolder} and the given bean. First it tries to access the
-     * readMethod derived by the {@link PropertyDescriptor}. If this can not be
-     * achieved, e.g. for types that do not match exactly Java-Bean-Specification it
-     * tries to read the property by using
-     * {@link PropertyUtil#readProperty(Object, String)}
+     * {@link PropertyHolder}.
+     * First it tries to access the readMethod derived by the {@link PropertyDescriptor}.
+     * If this cannot be achieved, e.g., for types that do
+     * not match exactly Java Bean Specification, it tries to read the property by
+     * using {@link PropertyUtil#readProperty(Object, String)}.
      *
      * @param source instance to be read from, must not be null
      * @return the object read from the property
      * @throws IllegalArgumentException if the source is null or if the property is not
-     *                                  readable according to {@code isReadable()}
+     *                                  readable according to {@link PropertyReadWrite#isReadable()}
+     * @since 2.0
      */
     public Object readFrom(Object source) {
         log.debug("Reading property '%s' from %s", name, source);
@@ -126,13 +128,17 @@ public class PropertyHolder {
     }
 
     /**
+     * Writes a value to the property in the given bean.
+     *
      * @param target must not be null
-     * @param value  to be written
+     * @param value  to be written to the property
      * @return In case the property set method is void the given bean will be
-     * returned. Otherwise, the return value of the method invocation,
+     * returned.
+     * Otherwise, the return value of the method invocation,
      * assuming the setMethods is a builder / fluent-api type.
      * @throws IllegalArgumentException if the target is null or if the property is not
-     *                                  writeable according to {@code isWriteable()}
+     *                                  writeable according to {@link PropertyReadWrite#isWriteable()}
+     * @since 2.0
      */
     public Object writeTo(Object target, Object value) {
         log.debug("Writing %s to property '%s' on %s", value, name, target);
@@ -152,16 +158,16 @@ public class PropertyHolder {
     }
 
     /**
-     * Factory Method for creating a concrete {@link PropertyHolder}
+     * Factory Method for creating a concrete {@link PropertyHolder}.
      *
-     * @param beanType      must not be null
-     * @param attributeName must not be null nor empty
-     * @return the concrete {@link PropertyHolder} for the given parameter if
+     * @param beanType      the type to create the holder for, must not be null
+     * @param attributeName the name of the property to access, must not be null nor empty
+     * @return an {@link Optional} containing the concrete {@link PropertyHolder} if
      * applicable
-     * @throws IllegalArgumentException for cases where {@link Introspector} is not
-     *                                  capable of resolving a
-     *                                  {@link PropertyDescriptor}. This is usually
-     *                                  the case if it is not a valid bean.
+     * @throws IllegalArgumentException if {@link Introspector} is not capable of resolving
+     *                                  a {@link PropertyDescriptor}.
+     *                                  This usually occurs with invalid Java beans.
+     * @since 2.0
      */
     public static Optional<PropertyHolder> from(Class<?> beanType, String attributeName) {
         requireNonNull(beanType);
@@ -182,7 +188,7 @@ public class PropertyHolder {
     }
 
     private static Optional<PropertyHolder> doBuild(PropertyDescriptor propertyDescriptor, Class<?> type,
-            String attributeName) {
+                                                    String attributeName) {
         var builder = builder();
         builder.name(attributeName);
         builder.readWrite(PropertyReadWrite.fromPropertyDescriptor(propertyDescriptor, type, attributeName));
