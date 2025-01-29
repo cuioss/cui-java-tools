@@ -15,9 +15,10 @@
  */
 package de.cuioss.tools.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test class for {@link LogRecordModel} ensuring proper log message formatting
@@ -55,8 +56,7 @@ class LogRecordModelTest {
     @Test
     void shouldHandleInfoLevel() {
         var result = "Operation completed";
-        log.info(infoModel.format(result, "success"));
-        // No assertion needed as per logging rules - the fact that it logs without error is sufficient
+        assertDoesNotThrow(() -> log.info(infoModel.format(result, "success")));
     }
 
     @Test
@@ -66,14 +66,14 @@ class LogRecordModelTest {
             throw new RuntimeException(errorMessage);
         } catch (Exception e) {
             log.error(errorModel.format(errorMessage));
-            log.error(e, errorModel.format(errorMessage));
+            assertDoesNotThrow(() -> log.error(e, errorModel.format(errorMessage)));
         }
     }
 
     @Test
     void shouldHandleWarnLevel() {
         var warningCondition = "Resource usage above 80%";
-        log.warn(warnModel.format(warningCondition));
+        assertDoesNotThrow(() -> log.warn(warnModel.format(warningCondition)));
     }
 
     @Test
