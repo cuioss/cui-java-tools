@@ -47,6 +47,7 @@ For detailed documentation, please refer to:
 
 * link:src/site/asciidoc/about.adoc[About Documentation]
 * https://cuioss.github.io/cui-java-tools/[JavaDoc Documentation]
+* link:doc/llm-rules/[LLM Rules] - Guidelines for AI-assisted development
 
 === Contributing
 
