@@ -47,10 +47,20 @@ class PreconditionsTest {
             checkArgument(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"", "custom message", "error: %s"})
+        @DisplayName("throw IllegalArgumentException with various messages")
+        void shouldThrowWithVariousMessages(String message) {
+            var ex = assertThrows(IllegalArgumentException.class, 
+                () -> checkArgument(false, message));
+            assertEquals(message, ex.getMessage());
+        }
+
         @Test
         @DisplayName("throw IllegalArgumentException for false condition without message")
         void shouldThrowForFalseCondition() {
-            assertThrows(IllegalArgumentException.class, () -> checkArgument(false));
+            var ex = assertThrows(IllegalArgumentException.class, () -> checkArgument(false));
+            assertInstanceOf(IllegalArgumentException.class, ex);
         }
 
         @Test
@@ -67,6 +77,14 @@ class PreconditionsTest {
                 () -> checkArgument(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
             assertEquals(MESSAGE_TEMPLATE_RESULT, ex.getMessage());
         }
+
+        @Test
+        @DisplayName("throw IllegalArgumentException with null message parameter")
+        void shouldHandleNullMessageParameter() {
+            var ex = assertThrows(IllegalArgumentException.class, 
+                () -> checkArgument(false, MESSAGE_TEMPLATE, (Object) null));
+            assertEquals("message null", ex.getMessage());
+        }
     }
 
     @Nested
@@ -81,10 +99,20 @@ class PreconditionsTest {
             checkState(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"", "custom message", "error: %s"})
+        @DisplayName("throw IllegalStateException with various messages")
+        void shouldThrowWithVariousMessages(String message) {
+            var ex = assertThrows(IllegalStateException.class, 
+                () -> checkState(false, message));
+            assertEquals(message, ex.getMessage());
+        }
+
         @Test
         @DisplayName("throw IllegalStateException for false condition without message")
         void shouldThrowForFalseCondition() {
-            assertThrows(IllegalStateException.class, () -> checkState(false));
+            var ex = assertThrows(IllegalStateException.class, () -> checkState(false));
+            assertInstanceOf(IllegalStateException.class, ex);
         }
 
         @Test
@@ -100,6 +128,14 @@ class PreconditionsTest {
             var ex = assertThrows(IllegalStateException.class, 
                 () -> checkState(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
             assertEquals(MESSAGE_TEMPLATE_RESULT, ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("throw IllegalStateException with null message parameter")
+        void shouldHandleNullMessageParameter() {
+            var ex = assertThrows(IllegalStateException.class, 
+                () -> checkState(false, MESSAGE_TEMPLATE, (Object) null));
+            assertEquals("message null", ex.getMessage());
         }
     }
 }
