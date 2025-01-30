@@ -47,13 +47,6 @@ For detailed documentation, please refer to:
 
 * link:src/site/asciidoc/about.adoc[About Documentation]
 * https://cuioss.github.io/cui-java-tools/[JavaDoc Documentation]
-* link:doc/llm-rules/[LLM Rules] - Guidelines for AI-assisted development
-
-=== Available Cascade Prompts
-
-==== fix javadoc build
-Fixes Javadoc build errors and warnings while maintaining strict rules about minimal modifications.
-See link:doc/llm-rules/fix-javadoc-build.md[rules].
 
 === Contributing
 
