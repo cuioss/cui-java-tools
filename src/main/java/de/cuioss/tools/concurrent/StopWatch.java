@@ -218,11 +218,9 @@ public final class StopWatch implements Serializable {
     @Override
     public String toString() {
         var nanos = elapsedNanos();
-
         var unit = chooseUnit(nanos);
-        var value = (double) nanos / NANOSECONDS.convert(1, unit);
-
-        return String.format(Locale.ROOT, "%.4g", value) + " " + abbreviate(unit);
+        var value = Math.round((double) nanos / NANOSECONDS.convert(1, unit) * 1000) / 1000.0;
+        return String.format(Locale.ROOT, "%.3f %s", value, abbreviate(unit));
     }
 
     private static TimeUnit chooseUnit(long nanos) {

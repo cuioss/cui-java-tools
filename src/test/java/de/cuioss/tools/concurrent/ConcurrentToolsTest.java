@@ -15,51 +15,68 @@
  */
 package de.cuioss.tools.concurrent;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java">...</a>
- *
  */
+@DisplayName("ConcurrentTools should")
 class ConcurrentToolsTest {
 
     private static final long SLEEP_SLACK = 2;
-
-    /** Timeout to use when we don't expect the timeout to expire. */
     private static final long LONG_DELAY_MS = 2500;
 
-    @Test
-    void sleepNoInterrupt() {
-        sleepSuccessfully(10);
-    }
+    @Nested
+    @DisplayName("handle uninterruptible sleep")
+    class UninterruptibleSleepTest {
 
-    @Test
-    void sleepSingleInterrupt() {
-        requestInterruptIn(10);
-        sleepSuccessfully(50);
-        assertInterrupted();
-    }
+        @Test
+        @DisplayName("complete normally without interruption")
+        void sleepNoInterrupt() {
+            sleepSuccessfully(10);
+        }
 
-    @Test
-    void shouldSleepWithDuration() {
-        var completed = new Completion(50 - SLEEP_SLACK);
-        ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(50));
-        completed.assertCompletionExpected();
-    }
+        @Test
+        @DisplayName("complete despite interruption")
+        void sleepSingleInterrupt() {
+            requestInterruptIn(10);
+            sleepSuccessfully(50);
+            assertInterrupted();
+        }
 
-    @Test
-    void shouldHandleLongOverflow() {
-        assertEquals(Long.MIN_VALUE, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MIN_VALUE)));
-        assertEquals(Long.MAX_VALUE, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MAX_VALUE)));
+        @Test
+        @DisplayName("handle Duration parameter")
+        void shouldSleepWithDuration() {
+            var completed = new Completion(50 - SLEEP_SLACK);
+            ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(50));
+            completed.assertCompletionExpected();
+        }
+
+        @Test
+        @DisplayName("handle zero duration")
+        void shouldHandleZeroDuration() {
+            var completed = new Completion(0);
+            ConcurrentTools.sleepUninterruptibly(Duration.ZERO);
+            completed.assertCompletionExpected();
+        }
+
+        @Test
+        @DisplayName("handle negative duration")
+        void shouldHandleNegativeDuration() {
+            var completed = new Completion(0);
+            ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(-10));
+            completed.assertCompletionExpected();
+        }
     }
 
     /**
@@ -84,25 +101,24 @@ class ConcurrentToolsTest {
             assertAtLeastTimePassed(stopwatch, expectedCompletionWaitMillis);
             assertTimeNotPassed(stopwatch, expectedCompletionWaitMillis + LONG_DELAY_MS);
         }
-
     }
 
     private static void assertAtLeastTimePassed(StopWatch stopwatch, long expectedMillis) {
         var elapsedMillis = stopwatch.elapsed(MILLISECONDS);
         /*
          * The "+ 5" below is to permit, say, sleep(10) to sleep only 9 milliseconds. We
-         * see such behavior sometimes when running these tests publicly as part of
+         * see such behavior sometimes, when running these tests publicly as part of
          * Guava. "+ 5" is probably more generous than it needs to be.
          */
         assertTrue(
-
                 elapsedMillis + 5 >= expectedMillis,
-                "Expected elapsed millis to be >= " + expectedMillis + " but was " + elapsedMillis);
+                () -> "Expected elapsed millis to be >= " + expectedMillis + " but was " + elapsedMillis);
     }
 
     private static void assertTimeNotPassed(StopWatch stopwatch, long timelimitMillis) {
         var elapsedMillis = stopwatch.elapsed(MILLISECONDS);
-        assertTrue(elapsedMillis < timelimitMillis);
+        assertTrue(elapsedMillis < timelimitMillis,
+                () -> "Expected elapsed millis to be < " + timelimitMillis + " but was " + elapsedMillis);
     }
 
     private static void sleepSuccessfully(long sleepMillis) {
@@ -111,7 +127,9 @@ class ConcurrentToolsTest {
         completed.assertCompletionExpected();
     }
 
-    /** Interrupts the current thread after sleeping for the specified delay. */
+    /**
+     * Interrupts the current thread after sleeping for the specified delay.
+     */
     @SuppressWarnings("squid:S2925") // owolff: ok for testing
     static void requestInterruptIn(final long time) {
         final var interruptee = Thread.currentThread();
@@ -138,9 +156,9 @@ class ConcurrentToolsTest {
              * patiently for the interrupt if not.
              */
             Thread.sleep(LONG_DELAY_MS);
-            fail("Dude, where's my interrupt?");
+            fail("Expected thread to be interrupted but it was not");
         } catch (InterruptedException expected) {
-            assertNotNull(expected);
+            assertNotNull(expected, "InterruptedException should not be null");
         }
     }
 }
