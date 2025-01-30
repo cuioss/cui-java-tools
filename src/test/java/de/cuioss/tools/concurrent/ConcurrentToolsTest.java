@@ -58,7 +58,7 @@ class ConcurrentToolsTest {
         @DisplayName("handle Duration parameter")
         void shouldSleepWithDuration() {
             var completed = new Completion(50 - SLEEP_SLACK);
-            ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(50));
+            ConcurrentTools.sleepUninterruptedly(Duration.ofMillis(50));
             completed.assertCompletionExpected();
         }
 
@@ -66,7 +66,7 @@ class ConcurrentToolsTest {
         @DisplayName("handle zero duration")
         void shouldHandleZeroDuration() {
             var completed = new Completion(0);
-            ConcurrentTools.sleepUninterruptibly(Duration.ZERO);
+            ConcurrentTools.sleepUninterruptedly(Duration.ZERO);
             completed.assertCompletionExpected();
         }
 
@@ -74,7 +74,7 @@ class ConcurrentToolsTest {
         @DisplayName("handle negative duration")
         void shouldHandleNegativeDuration() {
             var completed = new Completion(0);
-            ConcurrentTools.sleepUninterruptibly(Duration.ofMillis(-10));
+            ConcurrentTools.sleepUninterruptedly(Duration.ofMillis(-10));
             completed.assertCompletionExpected();
         }
     }
@@ -123,7 +123,7 @@ class ConcurrentToolsTest {
 
     private static void sleepSuccessfully(long sleepMillis) {
         var completed = new Completion(sleepMillis - SLEEP_SLACK);
-        ConcurrentTools.sleepUninterruptibly(sleepMillis, MILLISECONDS);
+        ConcurrentTools.sleepUninterruptedly(sleepMillis, MILLISECONDS);
         completed.assertCompletionExpected();
     }
 

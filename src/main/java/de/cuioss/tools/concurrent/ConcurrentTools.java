@@ -34,23 +34,23 @@ public class ConcurrentTools {
 
     /**
      * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-     * uninterruptibly.
+     * uninterruptedly.
      *
-     * @param sleepFor
+     * @param sleepFor duration
      *
      */
-    public static void sleepUninterruptibly(Duration sleepFor) {
-        sleepUninterruptibly(saturatedToNanos(sleepFor), TimeUnit.NANOSECONDS);
+    public static void sleepUninterruptedly(Duration sleepFor) {
+        sleepUninterruptedly(saturatedToNanos(sleepFor), TimeUnit.NANOSECONDS);
     }
 
     /**
      * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-     * uninterruptibly.
+     * uninterruptedly.
      *
-     * @param sleepFor
-     * @param unit
+     * @param sleepFor number
+     * @param unit TimeUnit
      */
-    public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
+    public static void sleepUninterruptedly(long sleepFor, TimeUnit unit) {
         var interrupted = false;
         try {
             var remainingNanos = unit.toNanos(sleepFor);
