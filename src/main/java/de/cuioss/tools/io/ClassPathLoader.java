@@ -141,7 +141,7 @@ public class ClassPathLoader implements FileLoader {
                 return url;
             }
         }
-        log.warn("Unable to resolve '{}' from classpath", path);
+        log.info("Unable to resolve '{}' from classpath", path);
         return null;
     }
 
