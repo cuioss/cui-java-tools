@@ -34,31 +34,41 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisplayName("BooleanOperations should")
 class BooleanOperationsTest {
 
+    private boolean[] toBooleanArray(String input) {
+        if (input == null || input.isEmpty()) {
+            return new boolean[0];
+        }
+        var values = input.split(",");
+        var booleans = new boolean[values.length];
+        for (int i = 0; i < values.length; i++) {
+            booleans[i] = Boolean.parseBoolean(values[i]);
+        }
+        return booleans;
+    }
+
     @Nested
     @DisplayName("handle isAnyTrue")
     class IsAnyTrueTest {
         
-        @ParameterizedTest(name = "return {1} for values {0}")
+        @ParameterizedTest(name = "return {1} when checking array [{0}] for any true value")
         @CsvSource({
             "'true', true",
             "'true,true', true",
             "'true,false', true",
-            "'false,false', false"
+            "'false,true,false', true",
+            "'false,false', false",
+            "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
-            var values = input.split(",");
-            var booleans = new boolean[values.length];
-            for (int i = 0; i < values.length; i++) {
-                booleans[i] = Boolean.parseBoolean(values[i]);
-            }
-            assertEquals(expected, isAnyTrue(booleans));
+            assertEquals(expected, isAnyTrue(toBooleanArray(input)));
         }
 
         @Test
         @DisplayName("handle edge cases")
         void shouldHandleEdgeCases() {
-            assertFalse(isAnyTrue());
-            assertFalse(isAnyTrue((boolean[]) null));
+            assertFalse(isAnyTrue(), "Empty varargs should return false");
+            assertFalse(isAnyTrue((boolean[]) null), "Null array should return false");
+            assertFalse(isAnyTrue(new boolean[0]), "Empty array should return false");
         }
     }
 
@@ -66,27 +76,25 @@ class BooleanOperationsTest {
     @DisplayName("handle isAnyFalse")
     class IsAnyFalseTest {
         
-        @ParameterizedTest(name = "return {1} for values {0}")
+        @ParameterizedTest(name = "return {1} when checking array [{0}] for any false value")
         @CsvSource({
             "'true', false",
             "'true,false', true",
             "'false,false', true",
-            "'true,true', false"
+            "'true,false,true', true",
+            "'true,true', false",
+            "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
-            var values = input.split(",");
-            var booleans = new boolean[values.length];
-            for (int i = 0; i < values.length; i++) {
-                booleans[i] = Boolean.parseBoolean(values[i]);
-            }
-            assertEquals(expected, isAnyFalse(booleans));
+            assertEquals(expected, isAnyFalse(toBooleanArray(input)));
         }
 
         @Test
         @DisplayName("handle edge cases")
         void shouldHandleEdgeCases() {
-            assertFalse(isAnyFalse());
-            assertFalse(isAnyFalse((boolean[]) null));
+            assertFalse(isAnyFalse(), "Empty varargs should return false");
+            assertFalse(isAnyFalse((boolean[]) null), "Null array should return false");
+            assertFalse(isAnyFalse(new boolean[0]), "Empty array should return false");
         }
     }
 
@@ -94,27 +102,25 @@ class BooleanOperationsTest {
     @DisplayName("handle areAllFalse")
     class AreAllFalseTest {
         
-        @ParameterizedTest(name = "return {1} for values {0}")
+        @ParameterizedTest(name = "return {1} when checking if all values are false in array [{0}]")
         @CsvSource({
             "'true', false",
             "'true,false', false",
             "'false,false', true",
-            "'true,true', false"
+            "'false,false,false', true",
+            "'true,true', false",
+            "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
-            var values = input.split(",");
-            var booleans = new boolean[values.length];
-            for (int i = 0; i < values.length; i++) {
-                booleans[i] = Boolean.parseBoolean(values[i]);
-            }
-            assertEquals(expected, areAllFalse(booleans));
+            assertEquals(expected, areAllFalse(toBooleanArray(input)));
         }
 
         @Test
         @DisplayName("handle edge cases")
         void shouldHandleEdgeCases() {
-            assertFalse(areAllFalse());
-            assertFalse(areAllFalse((boolean[]) null));
+            assertFalse(areAllFalse(), "Empty varargs should return false");
+            assertFalse(areAllFalse((boolean[]) null), "Null array should return false");
+            assertFalse(areAllFalse(new boolean[0]), "Empty array should return false");
         }
     }
 
@@ -122,27 +128,25 @@ class BooleanOperationsTest {
     @DisplayName("handle areAllTrue")
     class AreAllTrueTest {
         
-        @ParameterizedTest(name = "return {1} for values {0}")
+        @ParameterizedTest(name = "return {1} when checking if all values are true in array [{0}]")
         @CsvSource({
             "'true', true",
             "'true,false', false",
             "'false,false', false",
-            "'true,true', true"
+            "'true,true,true', true",
+            "'true,true', true",
+            "'', true"
         })
         void shouldHandleValidCases(String input, boolean expected) {
-            var values = input.split(",");
-            var booleans = new boolean[values.length];
-            for (int i = 0; i < values.length; i++) {
-                booleans[i] = Boolean.parseBoolean(values[i]);
-            }
-            assertEquals(expected, areAllTrue(booleans));
+            assertEquals(expected, areAllTrue(toBooleanArray(input)));
         }
 
         @Test
         @DisplayName("handle edge cases")
         void shouldHandleEdgeCases() {
-            assertTrue(areAllTrue());
-            assertTrue(areAllTrue((boolean[]) null));
+            assertTrue(areAllTrue(), "Empty varargs should return true");
+            assertTrue(areAllTrue((boolean[]) null), "Null array should return true");
+            assertTrue(areAllTrue(new boolean[0]), "Empty array should return true");
         }
     }
 
@@ -151,21 +155,34 @@ class BooleanOperationsTest {
     class IsValidBooleanTest {
         
         @ParameterizedTest(name = "return true for valid boolean string '{0}'")
-        @ValueSource(strings = {"true", "false", "TrUe", "FaLsE"})
+        @ValueSource(strings = {
+            "true", "false",
+            "TrUe", "FaLsE",
+            "TRUE", "FALSE"
+        })
         void shouldHandleValidCases(String input) {
-            assertTrue(BooleanOperations.isValidBoolean(input));
+            assertTrue(BooleanOperations.isValidBoolean(input),
+                () -> "Should accept '" + input + "' as valid boolean string");
         }
 
         @ParameterizedTest(name = "return false for invalid boolean string '{0}'")
-        @ValueSource(strings = {"", " ", " true ", "true ", "yes", "no"})
+        @ValueSource(strings = {
+            "", " ", "\t", "\n",
+            " true ", "true ",
+            "yes", "no",
+            "0", "1",
+            "on", "off"
+        })
         void shouldHandleInvalidCases(String input) {
-            assertFalse(BooleanOperations.isValidBoolean(input));
+            assertFalse(BooleanOperations.isValidBoolean(input),
+                () -> "Should reject '" + input + "' as invalid boolean string");
         }
 
         @Test
         @DisplayName("handle null input")
         void shouldHandleNullCase() {
-            assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null)));
+            assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null),
+                "Should not throw exception for null input"));
         }
     }
 }
