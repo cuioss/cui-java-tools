@@ -2,11 +2,9 @@
  * Provides utilities for handling Java properties and bean properties.
  *
  * <h2>Overview</h2>
- * <p>
  * This package offers utilities for working with properties, focusing on type-safe
  * property access and manipulation. It provides comprehensive property management 
  * capabilities while maintaining compatibility with Java Bean standards.
- * </p>
  *
  * <h2>Key Components</h2>
  * <ul>
@@ -27,16 +25,14 @@
  * </ul>
  *
  * <h2>Usage Examples</h2>
- * <p>
  * Reading a property:
- * <pre>
+ * <pre>{@code
  * // Read a property value
  * Object value = PropertyUtil.readProperty(bean, "propertyName");
  * 
  * // Create a type-safe property holder
  * Optional<PropertyHolder> holder = PropertyHolder.from(beanClass, "propertyName");
- * </pre>
- * </p>
+ * }</pre>
  *
  * <h2>Best Practices</h2>
  * <ul>

@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  * <h2>Implementation Examples</h2>
  *
  * <h3>1. Creating Common Log Messages</h3>
- * <pre>
+ * <pre>{@code
  * public class UserService {
  *     private static final LogRecord USER_CREATED = LogRecordModel.builder()
  *         .prefix("USER")
@@ -67,10 +67,10 @@ import java.util.function.Supplier;
  *         log.warn(LOGIN_FAILED.format(username, reason));
  *     }
  * }
- * </pre>
+ * }</pre>
  *
  * <h3>2. Mixed Placeholder Styles</h3>
- * <pre>
+ * <pre>{@code
  * // Both styles work and can be mixed
  * LogRecord mixed = LogRecordModel.builder()
  *     .prefix("APP")
@@ -80,10 +80,10 @@ import java.util.function.Supplier;
  *
  * // Outputs: APP-2001: Process backup completed with status SUCCESS
  * logger.info(mixed.format("backup", "SUCCESS"));
- * </pre>
+ * }</pre>
  *
  * <h3>3. Error Handling Pattern</h3>
- * <pre>
+ * <pre>{@code
  * public class DataService {
  *     private static final LogRecord OPERATION_FAILED = LogRecordModel.builder()
  *         .prefix("DATA")
@@ -103,10 +103,10 @@ import java.util.function.Supplier;
  *         }
  *     }
  * }
- * </pre>
+ * }</pre>
  *
  * <h3>4. Performance Logging Pattern</h3>
- * <pre>
+ * <pre>{@code
  * public class PerformanceMonitor {
  *     private static final LogRecord EXECUTION_TIME = LogRecordModel.builder()
  *         .prefix("PERF")
@@ -124,7 +124,7 @@ import java.util.function.Supplier;
  *         }
  *     }
  * }
- * </pre>
+ * }</pre>
  *
  * <h2>Implementation Notes</h2>
  * <ul>

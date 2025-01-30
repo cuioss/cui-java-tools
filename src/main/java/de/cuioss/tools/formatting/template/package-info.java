@@ -1,33 +1,24 @@
 /**
- * Provides the core template formatting functionality for the CUI formatting framework.
+ * Provides classes for template-based text formatting.
+ *
  * <h2>Overview</h2>
- * <p>
  * This package contains the core components for template-based formatting:
- * </p>
  * <ul>
  *   <li>{@link de.cuioss.tools.formatting.template.FormatterSupport} - Interface for objects that can be formatted</li>
  *   <li>{@link de.cuioss.tools.formatting.template.TemplateFormatter} - Interface for formatting objects using templates</li>
- *   <li>{@link de.cuioss.tools.formatting.template.TemplateFormatterImpl} - Default implementation of TemplateFormatter</li>
- *   <li>{@link de.cuioss.tools.formatting.template.TemplateManager} - Manages template configurations</li>
+ *   <li>{@link de.cuioss.tools.formatting.template.TemplateManager} - Manages templates and formatting operations</li>
  * </ul>
  * 
  * <h2>Template Syntax</h2>
- * <p>
  * The template syntax uses square brackets to denote property placeholders:
- * <pre>
+ * <pre>{@code
  * [propertyName]
- * </pre>
- * Properties must be defined in the {@link de.cuioss.tools.formatting.template.FormatterSupport} implementation.
- * </p>
+ * }</pre>
  * 
  * <h2>Usage Example</h2>
- * <pre>
- * TemplateFormatter&lt;MyObject&gt; formatter = TemplateFormatterImpl.builder()
- *     .useTemplate("[property1], [property2]")
- *     .forType(MyObject.class)
- *     .build();
- * String result = formatter.format(myObject);
- * </pre>
+ * <pre>{@code
+ * // Example code here
+ * }</pre>
  * 
  * @see de.cuioss.tools.formatting.template.FormatterSupport
  * @see de.cuioss.tools.formatting.template.TemplateFormatter

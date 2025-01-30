@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * <p>
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * 
  * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -194,7 +194,6 @@ public final class MoreStrings {
      * @param cs the CharSequence to check, may be null
      * @return {@code true} if only contains lowercase characters, and is non-null
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static boolean isAllLowerCase(final CharSequence cs) {
         if (isEmpty(cs)) {
@@ -236,7 +235,6 @@ public final class MoreStrings {
      * @param cs the CharSequence to check, may be null
      * @return {@code true} if only contains uppercase characters, and is non-null
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static boolean isAllUpperCase(final CharSequence cs) {
         if (isEmpty(cs)) {
@@ -270,7 +268,6 @@ public final class MoreStrings {
      * @param cs the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is empty or null
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static boolean isEmpty(final CharSequence cs) {
         return cs == null || cs.isEmpty();
@@ -322,11 +319,9 @@ public final class MoreStrings {
      *
      * <p>
      * Inspired by Apache Commons Lang StringUtils.
-     * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
+     * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java#L3677">org.apache.commons.lang3.StringUtils#isNumeric</a>
      * @param cs the CharSequence to check, may be null
      * @return true if only contains digits, and is non-null
-     * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java#L3677">org.apache.commons.lang3.StringUtils#isNumeric</a>
      */
     public static boolean isNumeric(final CharSequence cs) {
         if (isEmpty(cs)) {
@@ -364,7 +359,6 @@ public final class MoreStrings {
      * @param cs the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is null, empty or whitespace only
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static boolean isBlank(final CharSequence cs) {
         final int strLen;
@@ -433,7 +427,6 @@ public final class MoreStrings {
      * @param sub the substring to count, may be null
      * @return the number of occurrences, 0 if either CharSequence is {@code null}
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static int countMatches(final CharSequence str, final CharSequence sub) {
         if (isEmpty(str) || isEmpty(sub)) {
@@ -474,7 +467,6 @@ public final class MoreStrings {
      * @return left padded String or original String if no padding is necessary,
      * {@code null} if null String input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static String leftPad(final String str, final int size) {
         return leftPad(str, size, ' ');
@@ -507,7 +499,6 @@ public final class MoreStrings {
      * @return left padded String or original String if no padding is necessary,
      * {@code null} if null String input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static String leftPad(final String str, final int size, final char padChar) {
         if (str == null) {
@@ -553,7 +544,6 @@ public final class MoreStrings {
      * @return left padded String or original String if no padding is necessary,
      * {@code null} if null String input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static String leftPad(final String str, final int size, String padStr) {
         if (str == null) {
@@ -612,7 +602,6 @@ public final class MoreStrings {
      * @param repeat number of times to repeat char, negative treated as zero
      * @return String with repeated character
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static String repeat(final char ch, final int repeat) {
         if (repeat <= 0) {
@@ -660,7 +649,6 @@ public final class MoreStrings {
      * @param stripChars the set of characters to remove, null treated as whitespace
      * @return the stripped String, {@code null} if null String input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static String stripEnd(final String str, final String stripChars) {
         int end;
@@ -726,7 +714,6 @@ public final class MoreStrings {
      * @return the first index of the search character, -1 if no match or
      * {@code null} string input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static int indexOf(final CharSequence seq, final int searchChar) {
         if (isEmpty(seq)) {
@@ -778,7 +765,6 @@ public final class MoreStrings {
      * @param start      the start index, negative starts at the string start
      * @return the index where the search char was found, -1 if not found
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     @SuppressWarnings("squid:S3776") // owolff: original code
     public static int indexOf(final CharSequence cs, final int searchChar, int start) {
@@ -826,7 +812,6 @@ public final class MoreStrings {
      * @param start      the start index
      * @return the index where the search sequence was found
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
-     * </p>
      */
     public static int indexOf(final CharSequence cs, final CharSequence searchChar, final int start) {
         if (cs == null || searchChar == null) {
@@ -849,7 +834,6 @@ public final class MoreStrings {
      * @return {@code true} if the {@code String} is not {@code null}, its length is
      * greater than 0, and it does not contain whitespace only
      * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework</a>
-     * </p>
      */
     public static boolean hasNonWhitespaceChar(final CharSequence str) {
         if (isEmpty(str)) {
@@ -924,7 +908,6 @@ public final class MoreStrings {
      * @param string the string to test and possibly return
      * @return {@code string} itself if it is non-null; {@code ""} if it is null
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
-     * </p>
      */
     public static String nullToEmpty(String string) {
         if (null == string) {
@@ -943,7 +926,6 @@ public final class MoreStrings {
      * @return {@code string} itself if it is nonempty; {@code null} if it is empty
      * or null
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
-     * </p>
      */
     public static String emptyToNull(String string) {
         if (null == string || string.isEmpty()) {
@@ -1005,7 +987,6 @@ public final class MoreStrings {
      *                 strings using {@link Object#toString()}.
      * @return the resulting formatting String
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
-     * </p>
      */
     public static String lenientFormat(String template, Object... args) {
         template = String.valueOf(template); // null -> "null"

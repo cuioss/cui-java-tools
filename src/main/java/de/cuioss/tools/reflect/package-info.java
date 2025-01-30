@@ -2,11 +2,9 @@
  * Provides enhanced reflection utilities with type-safe operations.
  *
  * <h2>Overview</h2>
- * <p>
  * This package offers utilities for reflection operations with a focus on type safety
  * and proper error handling.
  * It provides comprehensive field access capabilities while maintaining compatibility with Java Bean standards.
- * </p>
  *
  * <h2>Key Components</h2>
  * <ul>
@@ -27,16 +25,14 @@
  * </ul>
  *
  * <h2>Usage Examples</h2>
- * <p>
  * Accessing fields:
- * <pre>
+ * <pre>{@code
  * // Access a field with proper caching
  * Optional<Field> field = MoreReflection.accessField(targetClass, "fieldName");
  * 
  * // Create a type-safe field wrapper
  * FieldWrapper wrapper = new FieldWrapper(field.get());
- * </pre>
- * </p>
+ * }</pre>
  *
  * <h2>Best Practices</h2>
  * <ul>

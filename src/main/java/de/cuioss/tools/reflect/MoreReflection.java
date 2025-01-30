@@ -62,14 +62,13 @@ import java.util.WeakHashMap;
  * </ul>
  *
  * <h2>Usage Examples</h2>
- * <pre>
- *
+ * <pre>{@code
  * // Access field with caching
  * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
- *
+ * 
  * // Handle field access safely
  * field.ifPresent(f -> {Object value = f.get(bean);});
- * </pre>
+ * }</pre>
  *
  * <h2>Best Practices</h2>
  * <ul>

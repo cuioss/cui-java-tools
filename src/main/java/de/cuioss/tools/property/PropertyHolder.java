@@ -39,18 +39,14 @@ import java.util.Optional;
  * Represents a property of a class, providing type-safe access to its value.
  * This class wraps a property (field or method) and provides type-safe access
  * to read and write operations.
- * <p>
- * To create a new instance, use {@code PropertyHolder.builder().build()}.
- * </p>
- * <p>
- * The holder provides access to property metadata through its accessor methods:
- * {@link #getMemberInfo()}, {@link #getName()}, {@link #getType()},
- * {@link #getReadMethod()}, and {@link #getWriteMethod()}.
- * </p>
- * <p>
- * For type-safe access, use {@link #readFrom(Object)} and {@link #writeTo(Object, Object)}.
- * Direct method access is more error-prone and less versatile.
- * </p>
+ *
+ * <p>To create a new instance, use {@code PropertyHolder.builder().build()}.</p>
+ *
+ * <p>The holder provides access to property metadata through its accessor methods:
+ * {@code name}, {@code type}, {@code memberInfo}, {@code readMethod}, and {@code writeMethod}.</p>
+ *
+ * <p>For type-safe access, use {@link #readFrom(Object)} and {@link #writeTo(Object, Object)}.
+ * Direct method access is more error-prone and less versatile.</p>
  *
  * @author Oliver Wolff
  * @since 2.0
@@ -109,7 +105,7 @@ public class PropertyHolder {
      * @param source instance to be read from, must not be null
      * @return the object read from the property
      * @throws IllegalArgumentException if the source is null or if the property is not
-     *                                  readable according to {@link PropertyReadWrite#isReadable()}
+     *                                  readable according to the property's read permissions
      * @since 2.0
      */
     public Object readFrom(Object source) {
@@ -137,7 +133,7 @@ public class PropertyHolder {
      * Otherwise, the return value of the method invocation,
      * assuming the setMethods is a builder / fluent-api type.
      * @throws IllegalArgumentException if the target is null or if the property is not
-     *                                  writeable according to {@link PropertyReadWrite#isWriteable()}
+     *                                  writeable according to the property's write permissions
      * @since 2.0
      */
     public Object writeTo(Object target, Object value) {

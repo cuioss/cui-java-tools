@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * <p>
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * 
  * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -137,13 +137,12 @@ import lombok.experimental.UtilityClass;
 public class Preconditions {
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression a boolean expression
      * @throws IllegalArgumentException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving one or more parameters to the
      * calling method.
      */
@@ -154,14 +153,13 @@ public class Preconditions {
     }
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression a boolean expression
      * @param message    to be put into the create {@link IllegalArgumentException}
      * @throws IllegalArgumentException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving one or more parameters to the
      * calling method.
      */
@@ -172,7 +170,7 @@ public class Preconditions {
     }
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression           a boolean expression
@@ -189,7 +187,6 @@ public class Preconditions {
      *                             using {@link String#valueOf(Object)}.
      * @throws IllegalArgumentException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving one or more parameters to the
      * calling method.
      */
@@ -200,13 +197,12 @@ public class Preconditions {
     }
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression a boolean expression
      * @throws IllegalStateException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving the state of the calling
      * instance, but not involving any parameters to the calling method.
      */
@@ -217,14 +213,13 @@ public class Preconditions {
     }
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression a boolean expression
      * @param message    to be put into the create {@link IllegalStateException}
      * @throws IllegalStateException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving the state of the calling
      * instance, but not involving any parameters to the calling method.
      */
@@ -235,7 +230,7 @@ public class Preconditions {
     }
 
     /**
-     * <p>
+     * 
      * Inspired by Google Guava Preconditions.
      *
      * @param expression           a boolean expression
@@ -252,7 +247,6 @@ public class Preconditions {
      *                             using {@link String#valueOf(Object)}.
      * @throws IllegalStateException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
-     * </p>
      * Ensures the truth of an expression involving one or more parameters to the
      * calling method.
      */
