@@ -17,16 +17,17 @@ package de.cuioss.tools.concurrent;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.Test;
-
 /**
- * @author https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java
+ * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java">...</a>
  *
  */
 class ConcurrentToolsTest {
@@ -37,12 +38,12 @@ class ConcurrentToolsTest {
     private static final long LONG_DELAY_MS = 2500;
 
     @Test
-    void testSleepNoInterrupt() {
+    void sleepNoInterrupt() {
         sleepSuccessfully(10);
     }
 
     @Test
-    void testSleepSingleInterrupt() {
+    void sleepSingleInterrupt() {
         requestInterruptIn(10);
         sleepSuccessfully(50);
         assertInterrupted();
@@ -139,6 +140,7 @@ class ConcurrentToolsTest {
             Thread.sleep(LONG_DELAY_MS);
             fail("Dude, where's my interrupt?");
         } catch (InterruptedException expected) {
+            assertNotNull(expected);
         }
     }
 }

@@ -23,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -31,12 +34,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import org.junit.jupiter.api.Test;
-
-import de.cuioss.tools.support.Generators;
-
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsTestCase.java">...</a>
  *
  */
 class IOStreamsTest {
@@ -46,7 +45,7 @@ class IOStreamsTest {
     private final byte[] inData = Generators.generateTestData(FILE_SIZE);
 
     @Test
-    void testContentEquals_InputStream_InputStream() throws Exception {
+    void contentEqualsInputStreamInputStream() throws Exception {
         var input1 = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
         assertTrue(contentEquals(input1, input1));
         input1 = new ByteArrayInputStream("ABC".getBytes(StandardCharsets.UTF_8));
@@ -64,7 +63,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testContentEquals_Reader_Reader() throws Exception {
+    void contentEqualsReaderReader() throws Exception {
         var input1 = new StringReader("");
         assertTrue(contentEquals(input1, input1));
 
@@ -85,7 +84,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testToByteArray_InputStream() throws Exception {
+    void toByteArrayInputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
             final var out = IOStreams.toByteArray(fin);
             assertNotNull(out);
@@ -95,7 +94,7 @@ class IOStreamsTest {
     }
 
     @Test
-    void testToString_InputStream() throws Exception {
+    void toStringInputStream() throws Exception {
         try (InputStream fin = new ByteArrayInputStream(inData)) {
             var out = IOStreams.toString(fin, StandardCharsets.UTF_8);
             assertNotNull(out);

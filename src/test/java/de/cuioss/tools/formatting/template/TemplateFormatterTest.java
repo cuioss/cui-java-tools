@@ -19,11 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.formatting.support.PersonName;
 import de.cuioss.tools.formatting.template.lexer.Lexer;
 import de.cuioss.tools.formatting.template.lexer.LexerBuilder;
+import org.junit.jupiter.api.Test;
 
 class TemplateFormatterTest {
 
@@ -105,9 +104,8 @@ class TemplateFormatterTest {
         final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(myTemplate,
                 PersonName.class, true);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            formatter.format(personName);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                formatter.format(personName));
     }
 
     @Test

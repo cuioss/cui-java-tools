@@ -1,18 +1,60 @@
+= About cui-java-tools
+
+== Overview
+
+cui-java-tools is a utility library providing essential Java tools with zero dependencies.
+
+== Architecture
+
+=== Core Principles
+
+* Zero Dependencies
+* Type-safe Operations
+* Extensive Testing
+* Comprehensive Documentation
+
+=== Key Components
+
+==== Property Access
+
+* Type-safe property access through `PropertyHolder`
+* Jakarta Bean Specification support
+* Reflection utilities with proper access control
+
+==== Collections
+
+* Enhanced collection utilities
+* Builder pattern support
+* Thread-safe implementations
+
+==== Logging
+
+* Structured logging support
+* Performance optimized
+* Integration with standard logging frameworks
+
+=== Technical Requirements
+
+* Java 17 or higher
+
 == History
 
-First of all: We love guava and enjoyed working with it. While doing so
-we learned a lot about java and software-engineering. But over the time
+First: We love guava and enjoy working with it.
+While doing so we learned a lot about java and software-engineering.
+But over the time
 it became too big and the messy library split up, just saying
 "listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" gave us
-the push to move on. We started to find or create something more
-suitable for our needs. Our first approach was to create a stripped
-version of guava removing all stuff we do not need. Not being happy with
+the push to move on.
+We started to find or create something more
+suitable for our needs.
+Our first approach was to create a stripped
+version of guava removing all stuff we do not need.
+Not being happy with
 the result we created our own called library "cui-java-tools".
-In addition to the stuff derived from guava we picked some elements from
-other open-source libraries. Much of the code we implemented ourselves.
-The goal was not create a complete general purpose java-util-library but
-a library for our needs. It contains a lot of ideas and code of some
-great open-source projects:
+
+=== Open Source Foundation
+
+The library builds upon ideas and code from several great open-source projects:
 
 * https://github.com/google/guava[Google Guava]
 * https://github.com/apache/commons-codec[Apache Commons Codec]
@@ -22,16 +64,42 @@ great open-source projects:
 
 == Design Goals
 
+=== Technical Ascpects
+
 * Zero Dependencies
-* Extensive Tests, Documentation, Sonar loves us
-* Use standard java where possible: Most structures provide a
-convenience API for standard Java implementations
+* Extensive Tests and Documentation
+* High Code Quality (Sonar Compliance)
+* Standard Java Integration
 
-== Comparison to Guava
+=== Comparison to Guava
 
-* Guava is huge with vast amounts of functionality
-* Guava provides a big number of implementations, while cui-java-tools
-acts more like a facade / decorator on java-standard elements
-* Many of Guavas Collection-implementations are said to be faster
-compared to JRE variants. But usually this should not be a problem.
-* The size of Guava is about 15 times compared to cui-java-tools.
+* Focused vs. Comprehensive: cui-java-tools provides essential utilities while Guava offers extensive functionality
+* Integration vs. Implementation: cui-java-tools acts as a facade/decorator on standard Java elements
+* Size: cui-java-tools is about 15 times smaller than Guava
+* Performance: Focuses on maintainable performance rather than micro-optimizations
+
+== Documentation
+
+=== JavaDoc
+
+All public APIs are thoroughly documented following Jakarta standards:
+
+* Clear method descriptions
+* Proper parameter documentation
+* Exception documentation
+* Since tags for version tracking
+* Code examples where appropriate
+
+=== Usage Examples
+
+[source,java]
+----
+// Property access example
+PropertyHolder holder = PropertyHolder.from(MyBean.class, "propertyName")
+    .orElseThrow(() -> new IllegalArgumentException("Property not found"));
+Object value = holder.readFrom(beanInstance);
+----
+
+== Contributing
+
+Please refer to our contribution guidelines in the repository root.

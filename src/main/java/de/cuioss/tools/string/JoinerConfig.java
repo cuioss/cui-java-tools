@@ -29,8 +29,9 @@ import lombok.ToString;
 @Builder
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("squid:S1170") // owolff: False positive, sonar does not recognize Lomboks
-                                 // Builder-Default annotations here
+@SuppressWarnings("squid:S1170")
+// owolff: False positive, sonar does not recognize Lomboks
+// Builder-Default annotations here
 class JoinerConfig {
 
     @Getter

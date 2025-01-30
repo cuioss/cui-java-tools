@@ -20,6 +20,17 @@ import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.net.URLEncoder.encode;
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.collect.CollectionBuilder;
+import de.cuioss.tools.collect.MoreCollections;
+import de.cuioss.tools.logging.CuiLogger;
+import de.cuioss.tools.string.Joiner;
+import de.cuioss.tools.string.MoreStrings;
+import de.cuioss.tools.string.Splitter;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -31,16 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import de.cuioss.tools.collect.CollectionBuilder;
-import de.cuioss.tools.collect.MoreCollections;
-import de.cuioss.tools.logging.CuiLogger;
-import de.cuioss.tools.string.Joiner;
-import de.cuioss.tools.string.MoreStrings;
-import de.cuioss.tools.string.Splitter;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * Simple wrapper around an Url Parameter Object.
@@ -65,6 +66,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /** Shortcut constant parameter for includeViewParams. */
     public static final UrlParameter INCLUDE_VIEW_PARAMETER = new UrlParameter("includeViewParams", "true");
 
+    @Serial
     private static final long serialVersionUID = 634175928228707534L;
 
     /** The name of the parameter. */
@@ -260,22 +262,22 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             if (element.contains("=")) {
                 var splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
-                case 0:
-                    log.debug(
-                            "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
-                            queryString, element);
-                    break;
-                case 1:
-                    builder.add(createDecoded(splitted.get(0), null));
-                    break;
-                case 2:
-                    builder.add(createDecoded(splitted.get(0), splitted.get(1)));
-                    break;
-                default:
-                    log.debug(
-                            "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
-                            queryString);
-                    break;
+                    case 0:
+                        log.debug(
+                                "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
+                                queryString, element);
+                        break;
+                    case 1:
+                        builder.add(createDecoded(splitted.get(0), null));
+                        break;
+                    case 2:
+                        builder.add(createDecoded(splitted.get(0), splitted.get(1)));
+                        break;
+                    default:
+                        log.debug(
+                                "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
+                                queryString);
+                        break;
                 }
             } else {
                 builder.add(createDecoded(element, null));

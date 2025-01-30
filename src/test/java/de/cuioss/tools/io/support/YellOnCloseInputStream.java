@@ -15,15 +15,15 @@
  */
 package de.cuioss.tools.io.support;
 
+import org.opentest4j.AssertionFailedError;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.opentest4j.AssertionFailedError;
 
 /**
  * Helper class for checking behaviour of IO classes.
  *
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/testtools/YellOnCloseInputStream.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/testtools/YellOnCloseInputStream.java">...</a>
  */
 public class YellOnCloseInputStream extends ProxyInputStream {
 

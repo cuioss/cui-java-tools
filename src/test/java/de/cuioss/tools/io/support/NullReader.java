@@ -15,11 +15,11 @@
  */
 package de.cuioss.tools.io.support;
 
+import de.cuioss.tools.io.IOStreams;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
-
-import de.cuioss.tools.io.IOStreams;
 
 /**
  * A functional, light weight {@link Reader} that emulates a reader of a
@@ -54,7 +54,7 @@ import de.cuioss.tools.io.IOStreams;
  *  }
  * </pre>
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullReader.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullReader.java">...</a>
  *
  */
 public class NullReader extends Reader {

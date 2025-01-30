@@ -16,13 +16,15 @@
 package de.cuioss.tools.collect;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static java.util.Objects.isNull;
+
+import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * <h2>Overview</h2> Utility Methods for Collections and some types to be used
@@ -41,14 +43,13 @@ import lombok.experimental.UtilityClass;
  *
  * <h3>Map Difference</h3> The method
  * {@link MoreCollections#difference(Map, Map)} creates an {@link MapDifference}
- * view on the two given maps in order to check, well whether they are equal or
+ * view on the two given maps to check, well whether they are equal or
  * not and if not which elements are differing.
  *
  * <h3>Map contains key</h3> Check whether the given Map contains at least one
  * of the given keys (varags)
  *
  * @author Oliver Wolff
- *
  */
 @UtilityClass
 public final class MoreCollections {
@@ -57,11 +58,11 @@ public final class MoreCollections {
      * Simple check method for a {@code null} safe check of the emptiness of the
      * given varags-parameter.
      *
-     * @param elements to be checked, may be null
+     * @param elements to be checked may be null
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Object... elements) {
-        return null == elements || 0 == elements.length;
+        return isNull(elements) || elements.length == 0;
     }
 
     /**
@@ -72,7 +73,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterable<?> elements) {
-        return null == elements || isEmpty(elements.iterator());
+        return Optional.ofNullable(elements)
+                .map(it -> !it.iterator().hasNext())
+                .orElse(true);
     }
 
     /**
@@ -83,7 +86,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Collection<?> elements) {
-        return null == elements || elements.isEmpty();
+        return Optional.ofNullable(elements)
+                .map(Collection::isEmpty)
+                .orElse(true);
     }
 
     /**
@@ -94,7 +99,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Map<?, ?> map) {
-        return null == map || map.isEmpty();
+        return Optional.ofNullable(map)
+                .map(Map::isEmpty)
+                .orElse(true);
     }
 
     /**
@@ -105,7 +112,9 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterator<?> elements) {
-        return null == elements || !elements.hasNext();
+        return Optional.ofNullable(elements)
+                .map(it -> !it.hasNext())
+                .orElse(true);
     }
 
     /**
@@ -278,11 +287,10 @@ public final class MoreCollections {
      *
      * @param elements to be checked, may be null
      * @return {@code true} is the given elements are {@code null}. The Stream
-     *         content will be untouched
-     * @throws IllegalArgumentException in case the given elements are {@code null}
+     * content will be untouched
      */
     public static boolean isEmpty(Stream<?> elements) {
-        return null == elements;
+        return isNull(elements);
     }
 
     /**
@@ -294,7 +302,7 @@ public final class MoreCollections {
      * @param keys to be checked. If it is {@code null} or empty the method will
      *             always return {@code false}
      * @return {@code true} if the map contains at lest one of the given keys,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     public static boolean containsKey(Map<?, ?> map, Object... keys) {
         if (isEmpty(map) || isEmpty(keys)) {
@@ -309,30 +317,18 @@ public final class MoreCollections {
     }
 
     /**
-     * Computes the difference between two maps. This difference is an immutable
-     * snapshot of the state of the maps at the time this method is called. It will
-     * never change, even if the maps change at a later time.
+     * Computes the difference between two maps. The returned difference will include
+     * entries that are present only in the left map, entries that are present only in
+     * the right map, and entries that have different values in both maps.
      *
-     * <p>
-     * Since this method uses {@code HashMap} instances internally, the keys of the
-     * supplied maps must be well-behaved with respect to {@link Object#equals} and
-     * {@link Object#hashCode}.
-     *
-     * <p>
-     * <b>Note:</b>If you only need to know whether two maps have the same mappings,
-     * call {@code
-     * left.equals(right)} instead of this method.
-     *
-     * @param <K>   the type for the key
-     * @param <V>   the type for the value
-     * @param left  the map to treat as the "left" map for purposes of comparison,
-     *              must not be null
-     * @param right the map to treat as the "right" map for purposes of comparison ,
-     *              must not be null
-     * @return the difference between the two maps
-     *
-     * @author com.google.common.collect.MapDifference<K, V>
+     * @param <K>   the type of map keys
+     * @param <V>   the type of map values
+     * @param left  first map
+     * @param right second map
+     * @return the difference between the maps
+     * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Maps.java#L504"></a>
      */
+    @SuppressWarnings("javaarchitecture:S7027") // owolff: No issue, because it delegates to MapDifferenceImpl
     public static <K, V> MapDifference<K, V> difference(Map<? extends K, ? extends V> left,
             Map<? extends K, ? extends V> right) {
         return MapDiffenceImpl.from(left, right);

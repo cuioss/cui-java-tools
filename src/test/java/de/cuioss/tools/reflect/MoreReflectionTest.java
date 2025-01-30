@@ -22,13 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.InvocationHandler;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
 import de.cuioss.tools.reflect.support.ChildAnnotatedClass;
 import de.cuioss.tools.reflect.support.FieldNameClass;
@@ -39,6 +32,12 @@ import de.cuioss.tools.reflect.support.NotAnnotatedClass;
 import de.cuioss.tools.reflect.support.StringTypedArrayList;
 import de.cuioss.tools.support.StringCaseShuffler;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 class MoreReflectionTest {
@@ -81,7 +80,7 @@ class MoreReflectionTest {
     }
 
     @Test
-    void shouldDetectAccessMethodsCaseInsensitivly() {
+    void shouldDetectAccessMethodsCaseInsensitively() {
         var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(MoreReflection.retrieveAccessMethod(BeanWithUnusualAttributeCasing.class, propertyName).isPresent(),
                 "Looked for " + propertyName);
@@ -102,7 +101,7 @@ class MoreReflectionTest {
     }
 
     @Test
-    void shouldDetectModifierMethodsCaseInsensitivly() {
+    void shouldDetectModifierMethodsCaseInsensitively() {
         var propertyName = StringCaseShuffler.shuffleCase("url");
         assertTrue(MoreReflection.retrieveWriteMethod(BeanWithUnusualAttributeCasing.class, propertyName, String.class)
                 .isPresent(), "Looked for " + propertyName);
@@ -202,5 +201,10 @@ class MoreReflectionTest {
         InvocationHandler handler = (proxy, method, args) -> null;
         assertNotNull(MoreReflection.newProxy(Collection.class, handler));
         assertThrows(IllegalArgumentException.class, () -> MoreReflection.newProxy(MoreReflection.class, handler));
+    }
+
+    @Test
+    void shouldResolvePackageName() {
+        assertEquals("de.cuioss.tools.reflect", MoreReflection.getPackageName(getClass()));
     }
 }

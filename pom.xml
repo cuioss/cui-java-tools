@@ -7,7 +7,7 @@
     <parent>
         <groupId>de.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
-        <version>0.8.5</version>
+        <version>0.8.6</version>
         <relativePath/>
     </parent>
 
@@ -28,9 +28,10 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.cui.parent>0.8.5</version.cui.parent>
+        <version.cui.parent>0.8.6</version.cui.parent>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
     </properties>
+
     <issueManagement>
         <url>https://github.com/cuioss/cui-java-tools/issues</url>
         <system>GitHub Issues</system>

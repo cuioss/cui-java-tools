@@ -19,13 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.HashMap;
-import java.util.Locale;
-
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.formatting.support.PersonName;
 import de.cuioss.tools.formatting.template.TemplateManager.TemplateManagerBuilder;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Locale;
 
 class TemplateManagerTest {
 

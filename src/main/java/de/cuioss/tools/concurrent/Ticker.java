@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.concurrent;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -30,11 +31,12 @@ import java.io.Serializable;
  */
 public class Ticker implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -1361587646696392654L;
 
     /**
      * @return the number of nanoseconds elapsed since this ticker's fixed point of
-     *         reference.
+     * reference.
      */
     public long read() {
         return System.nanoTime();

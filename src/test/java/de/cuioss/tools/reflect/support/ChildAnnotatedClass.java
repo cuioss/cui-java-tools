@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.reflect.support;
 
-import java.util.function.Function;
-
 import jakarta.annotation.Resource;
+
+import java.util.function.Function;
 
 @Resource
 @Deprecated

@@ -19,6 +19,13 @@ import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 import static java.lang.Integer.valueOf;
 
+import de.cuioss.tools.collect.MapBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,24 +33,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import de.cuioss.tools.collect.MapBuilder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 /**
- * This class provide functionality to transform long text to several html
+ * This class provides functionality to transform long text to several HTML
  * useful representation and encapsulate this as an object. It is implemented as
- * an value-object keeping the calculated text.
+ * a value-object keeping the calculated text.
  *
  * @author Eugen Fischer
  */
-@EqualsAndHashCode(of = { "source", "abridgedLength", "forceLengthBreak" })
-@ToString(of = { "source", "abridgedLength", "forceLengthBreak" })
+@EqualsAndHashCode(of = {"source", "abridgedLength", "forceLengthBreak"})
+@ToString(of = {"source", "abridgedLength", "forceLengthBreak"})
 public class TextSplitter implements Serializable {
 
-    /** serial Version UID */
+    /**
+     * serial Version UID
+     */
+    @Serial
     private static final long serialVersionUID = 6594890288982910944L;
 
     /**
@@ -101,8 +105,7 @@ public class TextSplitter implements Serializable {
      * Alternative Constructor
      *
      * @param source                target text
-     * @param forceLengthBreakCount count of characters when a text break will
-     *                              forced
+     * @param forceLengthBreakCount count of characters when a text break is forced
      * @param abridgedLengthCount   count of characters
      */
     public TextSplitter(final String source, final int forceLengthBreakCount, final int abridgedLengthCount) {
@@ -131,7 +134,7 @@ public class TextSplitter implements Serializable {
 
         if (!isEmpty(source)) {
 
-            final var sourceSplitted = getSourceSplitted();
+            final var sourceSplitted = getSourceSplit();
 
             if (sourceSplitted.size() == 1) {
                 result = abridgeComputerProducedText();
@@ -161,14 +164,14 @@ public class TextSplitter implements Serializable {
     }
 
     /**
-     * @param sourceSplitted
+     * @param sourceSplit to be abridged
      * @return abridged text
      */
-    private String abridgeHumanProducedText(final List<String> sourceSplitted) {
+    private String abridgeHumanProducedText(final List<String> sourceSplit) {
         final var maxLength = getAbridgedLength() - TRADE_STR.length();
         final var builder = new StringBuilder();
         var count = 0;
-        for (final String part : sourceSplitted) {
+        for (final String part : sourceSplit) {
             count = count + part.length();
             if (count >= maxLength) {
                 builder.append(TRADE_STR);
@@ -187,20 +190,20 @@ public class TextSplitter implements Serializable {
         var result = "";
 
         if (!isEmpty(source)) {
-            final var sourceSplitted = getSourceSplitted();
-            if (sourceSplitted.size() == 1) {
+            final var sourceSplit = getSourceSplit();
+            if (sourceSplit.size() == 1) {
                 result = forceLineBreakForComputerProducedText(source);
             } else {
-                result = forceLineBreakForHumanProducedText(sourceSplitted);
+                result = forceLineBreakForHumanProducedText(sourceSplit);
             }
         }
 
         return result.trim();
     }
 
-    private String forceLineBreakForHumanProducedText(final List<String> sourceSplitted) {
+    private String forceLineBreakForHumanProducedText(final List<String> sourceSplit) {
         final var builder = new StringBuilder();
-        for (final String text : sourceSplitted) {
+        for (final String text : sourceSplit) {
             builder.append(forceLineBreakForComputerProducedText(text)).append(" ");
         }
         return builder.toString();
@@ -211,7 +214,7 @@ public class TextSplitter implements Serializable {
      * brute-force on max allowed length.
      *
      * @param text target which will be analyzed
-     * @return
+     * @return the processed text
      */
     private String forceLineBreakForComputerProducedText(final String text) {
 
@@ -222,14 +225,14 @@ public class TextSplitter implements Serializable {
             clean = matcher.replaceAll(entry.getValue());
         }
 
-        final var splittedByZeroWidthSpace = getSplittedByZeroWidthSpace(clean);
-        final List<String> lengthTrimed = new ArrayList<>();
+        final var splitByZeroWidthSpace = getSplitByZeroWidthSpace(clean);
+        final List<String> lengthTrimmed = new ArrayList<>();
 
-        for (final String item : splittedByZeroWidthSpace) {
-            lengthTrimed.add(bruteForceSplit(item));
+        for (final String item : splitByZeroWidthSpace) {
+            lengthTrimmed.add(bruteForceSplit(item));
         }
 
-        return Joiner.on(ZERO_WIDTH_SPACE).join(lengthTrimed);
+        return Joiner.on(ZERO_WIDTH_SPACE).join(lengthTrimmed);
     }
 
     /**
@@ -255,11 +258,11 @@ public class TextSplitter implements Serializable {
         return text;
     }
 
-    private static List<String> getSplittedByZeroWidthSpace(final String value) {
+    private static List<String> getSplitByZeroWidthSpace(final String value) {
         return Splitter.on(ZERO_WIDTH_SPACE).splitToList(value);
     }
 
-    private List<String> getSourceSplitted() {
+    private List<String> getSourceSplit() {
         return Splitter.on(" ").splitToList(source);
     }
 }

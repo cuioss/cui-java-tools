@@ -1,27 +1,60 @@
 /**
- * Provides a number of utilities in the context of
- * {@link java.util.Collection}s
+ * Provides utilities for handling collections, maps, and arrays.
  *
+ * <h2>Overview</h2>
+ * <p>
+ * This package offers utilities for working with Java collections, including
+ * builders, difference calculation, and partial collection views. It focuses on
+ * type safety and integration with CUI's logging standards.
+ * </p>
+ *
+ * <h2>Key Components</h2>
  * <ul>
- * <li>{@link de.cuioss.tools.collect.CollectionBuilder}: Unified builder for
- * building arbitrary Collections.</li>
- * <li>{@link de.cuioss.tools.collect.CollectionLiterals}: Provides
- * literal-forms for creating populated collection instances. In essence its
- * doing the same compared to the corresponding com.google.common.collect types
- * but with different semantics (like naming, types) and is designed as a one
- * stop utility class for all kind of Collection implementations including Sets
- * and Maps.</li>
- * <li>{@link de.cuioss.tools.collect.MapBuilder}: Builder for creating
- * different kind of {@link java.util.Map}s, similar to
- * {@link de.cuioss.tools.collect.CollectionBuilder}</li>
- * <li>{@link de.cuioss.tools.collect.MoreCollections}: Utility Methods for
- * Collections and some types to be used in the context of Collections</li>
- * <li>{@link de.cuioss.tools.collect.PartialCollection}: Used for transporting
- * partial views of java.util.Collection. Currently there is one implementation
- * available: {@link de.cuioss.tools.collect.PartialArrayList}. This provides
- * the factory method
- * {@link de.cuioss.tools.collect.PartialArrayList#of(java.util.List, int)} for
- * quickly creating instances</li>
+ *   <li><b>Collection Builders</b>
+ *     <ul>
+ *       <li>{@link de.cuioss.tools.collect.CollectionBuilder} - Collection creation</li>
+ *       <li>{@link de.cuioss.tools.collect.MapBuilder} - Map creation</li>
+ *       <li>Type-safe collection initialization</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>Collection Operations</b>
+ *     <ul>
+ *       <li>{@link de.cuioss.tools.collect.MoreCollections} - Collection utilities</li>
+ *       <li>{@link de.cuioss.tools.collect.PartialCollection} - Partial views</li>
+ *       <li>Collection difference calculation</li>
+ *     </ul>
+ *   </li>
  * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ * <pre>
+ * // Using MapBuilder
+ * Map&lt;String, Integer&gt; map = MapBuilder.from("one", 1)
+ *     .put("two", 2)
+ *     .put("three", 3)
+ *     .toImmutableMap();
+ *
+ * // Calculating map differences
+ * Map&lt;String, Integer&gt; left = MapBuilder.from("a", 1).put("b", 2).toImmutableMap();
+ * Map&lt;String, Integer&gt; right = MapBuilder.from("b", 2).put("c", 3).toImmutableMap();
+ * MapDifference difference = MoreCollections.difference(left, right);
+ *
+ * // Using partial collections
+ * List&lt;String&gt; originalList = Arrays.asList("a", "b", "c", "d", "e");
+ * List&lt;String&gt; partialView = new PartialArrayList&lt;&gt;(originalList, 0, 3);
+ * // partialView contains ["a", "b", "c"]
+ * </pre>
+ *
+ * <h2>Best Practices</h2>
+ * <ul>
+ *   <li>Use builders for type-safe collection creation</li>
+ *   <li>Consider immutable collections for thread safety</li>
+ *   <li>Use partial views for large collections</li>
+ * </ul>
+ *
+ * @author Oliver Wolff
+ * @see de.cuioss.tools.collect.CollectionBuilder
+ * @see de.cuioss.tools.collect.MapBuilder
+ * @see de.cuioss.tools.collect.MoreCollections
  */
 package de.cuioss.tools.collect;

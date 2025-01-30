@@ -15,11 +15,11 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
+import de.cuioss.tools.formatting.template.FormatterSupport;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import de.cuioss.tools.formatting.template.FormatterSupport;
 
 public class WrongFormatterSupportImplWithMissingAttributeList implements FormatterSupport {
 

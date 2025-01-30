@@ -21,11 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-
-import org.junit.jupiter.api.Test;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 
 class FileSystemLoaderTest {
 
@@ -39,11 +40,11 @@ class FileSystemLoaderTest {
 
     private static final String EXISTING_EXTERNAL_DIRECTORY = "external:/src";
 
-    private static final String EXISTING_FILE_PATH = Paths.get(EXISTING_FILE).toAbsolutePath().toString();
+    private static final String EXISTING_FILE_PATH = Path.of(EXISTING_FILE).toAbsolutePath().toString();
 
-    private static final String EXISTING_DIRECTORY_PATH = Paths.get(EXISTING_DIRECTORY).toAbsolutePath().toString();
+    private static final String EXISTING_DIRECTORY_PATH = Path.of(EXISTING_DIRECTORY).toAbsolutePath().toString();
 
-    private static final String NOT_EXISTING_FILE_PATH = Paths.get(NOT_EXISTING_FILE).toAbsolutePath().toString();
+    private static final String NOT_EXISTING_FILE_PATH = Path.of(NOT_EXISTING_FILE).toAbsolutePath().toString();
 
     @Test
     void shouldHandleExistingFile() throws IOException {
@@ -56,7 +57,7 @@ class FileSystemLoaderTest {
 
     @Test
     void shouldHandlePathAsArgument() throws IOException {
-        final var loader = new FileSystemLoader(Paths.get(EXISTING_FILE_PATH));
+        final var loader = new FileSystemLoader(Path.of(EXISTING_FILE_PATH));
         assertTrue(loader.isReadable());
         assertTrue(loader.isFilesystemLoader());
         assertEquals(EXISTING_FILE, loader.getFileName().getOriginalName());
@@ -107,9 +108,8 @@ class FileSystemLoaderTest {
     @Test
     void shouldNotHandleFileOnlyPathname() {
         var prefix = FileTypePrefix.FILE.getPrefix();
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileSystemLoader.checkPathName(prefix);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                FileSystemLoader.checkPathName(prefix));
     }
 
     @Test
@@ -121,8 +121,51 @@ class FileSystemLoaderTest {
     @Test
     void shouldFailToLoadNotExistingFile() {
         var fileSystemLoader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
-        assertThrows(IllegalStateException.class, () -> {
-            fileSystemLoader.inputStream();
-        });
+        assertThrows(IllegalStateException.class, fileSystemLoader::inputStream);
+    }
+
+    @Test
+    void shouldHandleOutputStreamForWritableFile() throws IOException {
+        // Create a temporary file for testing
+        File tempFile = File.createTempFile("test", ".txt");
+        tempFile.deleteOnExit();
+
+        var loader = new FileSystemLoader(tempFile.getAbsolutePath());
+        assertTrue(loader.isWritable());
+
+        try (var output = loader.outputStream()) {
+            assertNotNull(output);
+            output.write("test".getBytes());
+        }
+    }
+
+    @Test
+    void shouldFailOutputStreamForNonWritableFile() {
+        var loader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
+        assertFalse(loader.isWritable());
+        assertThrows(IllegalStateException.class, loader::outputStream);
+    }
+
+    @Test
+    void shouldFailOutputStreamForDirectory() {
+        var loader = new FileSystemLoader(EXISTING_DIRECTORY_PATH);
+        assertFalse(loader.isWritable());
+        assertThrows(IllegalStateException.class, loader::outputStream);
+    }
+
+    @Test
+    void shouldGetUrlForExistingFile() throws IOException {
+        var loader = new FileSystemLoader(EXISTING_FILE_PATH);
+        var url = loader.getURL();
+        assertNotNull(url);
+        assertEquals(Path.of(EXISTING_FILE_PATH).toUri().toURL(), url);
+    }
+
+    @Test
+    void shouldGetUrlForNonExistentFile() throws MalformedURLException {
+        var loader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
+        var url = loader.getURL();
+        assertNotNull(url);
+        assertEquals(Path.of(NOT_EXISTING_FILE_PATH).toUri().toURL().getPath(), url.getPath());
     }
 }

@@ -28,7 +28,7 @@ public class BeanWithPrimitives {
     private int propertyPrimitive;
 
     public void setProperty(Number property) {
-        property = Integer.valueOf(property.intValue());
+        this.property = property.intValue();
     }
 
     public void setProperty(Integer property) {

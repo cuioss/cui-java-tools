@@ -17,14 +17,15 @@ package de.cuioss.tools.net;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serializable;
-import java.util.List;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Defines a filter identifying which parameters are not to be included within
@@ -39,6 +40,7 @@ import lombok.ToString;
 @ToString
 public class ParameterFilter implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -4780294784318006024L;
 
     private static final String JAVAX_FACES = "javax.faces";

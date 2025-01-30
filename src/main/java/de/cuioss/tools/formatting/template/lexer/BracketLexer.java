@@ -19,10 +19,6 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.token.ActionToken;
 import de.cuioss.tools.formatting.template.token.StringToken;
@@ -31,6 +27,11 @@ import de.cuioss.tools.string.MoreStrings;
 import de.cuioss.tools.string.Splitter;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Simple lexer which supports parsing of template pattern where attributes are
@@ -45,6 +46,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
+    @Serial
     private static final long serialVersionUID = 6117181403355108849L;
 
     /**
@@ -201,10 +203,10 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
             final var value = chunk.substring(0, startPoint);
             tokens.add(new StringToken(value));
         } else // last string token found
-        if (startPoint == -1) {
-            startPoint = chunk.length() - 1;
-            tokens.add(new StringToken(chunk));
-        }
+            if (startPoint == -1) {
+                startPoint = chunk.length() - 1;
+                tokens.add(new StringToken(chunk));
+            }
         return chunk.substring(startPoint + 1);
     }
 

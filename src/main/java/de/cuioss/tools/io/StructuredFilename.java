@@ -15,14 +15,15 @@
  */
 package de.cuioss.tools.io;
 
-import java.io.File;
-import java.io.Serializable;
-import java.nio.file.Path;
-
 import de.cuioss.tools.string.Splitter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.File;
+import java.io.Serial;
+import java.io.Serializable;
+import java.nio.file.Path;
 
 /**
  * Helper class for splitting / interacting with Filename and corresponding
@@ -34,6 +35,7 @@ import lombok.ToString;
 @ToString
 public class StructuredFilename implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 7473756881958645393L;
 
     @Getter
@@ -51,27 +53,27 @@ public class StructuredFilename implements Serializable {
      * @param filename to be checked
      */
     @SuppressWarnings("squid:S1871") // owolff: Although duplicate code for case 0 and case 1 I find
-                                     // it better readable
+    // it better readable
     public StructuredFilename(final String filename) {
         originalName = filename;
         final var list = Splitter.on(".").omitEmptyStrings().splitToList(filename);
         switch (list.size()) {
-        case 0:
-            namePart = filename;
-            suffix = null;
-            break;
-        case 1:
-            namePart = filename;
-            suffix = null;
-            break;
-        case 2:
-            namePart = list.get(0);
-            suffix = list.get(1);
-            break;
-        default:
-            suffix = list.get(list.size() - 1);
-            namePart = String.join(".", list.subList(0, list.size() - 1));
-            break;
+            case 0:
+                namePart = filename;
+                suffix = null;
+                break;
+            case 1:
+                namePart = filename;
+                suffix = null;
+                break;
+            case 2:
+                namePart = list.get(0);
+                suffix = list.get(1);
+                break;
+            default:
+                suffix = list.get(list.size() - 1);
+                namePart = String.join(".", list.subList(0, list.size() - 1));
+                break;
         }
     }
 

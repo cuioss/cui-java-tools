@@ -19,18 +19,18 @@ import static de.cuioss.tools.logging.CuiLoggerFactory.MARKER_CLASS_NAMES;
 import static de.cuioss.tools.string.MoreStrings.lenientFormat;
 import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.cuioss.tools.collect.CollectionLiterals;
 import de.cuioss.tools.reflect.MoreReflection;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Defines the log-levels with implicit mapping
@@ -44,7 +44,7 @@ public enum LogLevel {
      * Trace Level, maps to {@link Level#FINER}.
      * <p>
      * Attention: This is a derivation to
-     * http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html. But in
+     * <a href="http://www.slf4j.org/apidocs/org/slf4j/bridge/SLF4JBridgeHandler.html">...</a>. But in
      * fact this works...
      */
     TRACE(Level.FINER),

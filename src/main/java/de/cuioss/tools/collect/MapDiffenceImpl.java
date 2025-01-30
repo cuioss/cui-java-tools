@@ -17,13 +17,13 @@ package de.cuioss.tools.collect;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import de.cuioss.tools.collect.MapDifference.ValueDifference;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Oliver Wolff

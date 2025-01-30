@@ -21,6 +21,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serial;
+
 /**
  * Simple String token, this token returns always his value on
  * {@linkplain #substituteAttribute(FormatterSupport)}
@@ -32,6 +34,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 public class StringToken implements Token {
 
+    @Serial
     private static final long serialVersionUID = 6377388001925442782L;
 
     @NonNull

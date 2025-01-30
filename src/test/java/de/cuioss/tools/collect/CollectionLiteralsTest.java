@@ -28,14 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
 
 class CollectionLiteralsTest {
 
@@ -175,9 +175,8 @@ class CollectionLiteralsTest {
 
     static void assertImmutable(Collection<String> collection) {
         assertNotNull(collection);
-        assertThrows(UnsupportedOperationException.class, () -> {
-            collection.add("i am not mutable");
-        });
+        assertThrows(UnsupportedOperationException.class, () ->
+                collection.add("i am not mutable"));
     }
 
     static void assertMutable(Map<String, String> map) {
@@ -188,8 +187,7 @@ class CollectionLiteralsTest {
 
     static void assertImmutable(Map<String, String> map) {
         assertNotNull(map);
-        assertThrows(UnsupportedOperationException.class, () -> {
-            map.put("i am", "not mutable");
-        });
+        assertThrows(UnsupportedOperationException.class, () ->
+                map.put("i am", "not mutable"));
     }
 }

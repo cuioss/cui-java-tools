@@ -15,12 +15,12 @@
  */
 package de.cuioss.tools.formatting.template;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author Sven Haag

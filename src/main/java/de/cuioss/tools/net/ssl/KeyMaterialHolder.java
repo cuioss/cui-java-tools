@@ -15,32 +15,33 @@
  */
 package de.cuioss.tools.net.ssl;
 
-import java.io.Serializable;
-import java.util.Base64;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Base64;
+
 /**
  * Runtime representation of key-material. The actual key is provided as byte[].
  * An optional keyPassword is available as well.
  *
  * @author Oliver Wolff
- *
  */
+@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency with KeyStoreProvider
 @Builder
-@EqualsAndHashCode(exclude = { "keyMaterial", "keyPassword" }, doNotUseGetters = true)
-@ToString(exclude = { "keyMaterial", "keyPassword" }, doNotUseGetters = true)
+@EqualsAndHashCode(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)
+@ToString(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)
 public final class KeyMaterialHolder implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -3125499798220509939L;
 
     @Getter
-    @NonNull
-    private final byte[] keyMaterial;
+    private final byte @NonNull [] keyMaterial;
 
     /**
      * (Optional) password for the key, or in case of
@@ -56,11 +57,15 @@ public final class KeyMaterialHolder implements Serializable {
     @Getter
     private final String name;
 
-    /** Optional: additional information transporting some context-information. */
+    /**
+     * Optional: additional information transporting some context-information.
+     */
     @Getter
     private final String description;
 
-    /** Optional: An alias name for a given key. */
+    /**
+     * Optional: An alias name for a given key.
+     */
     @Getter
     private final String keyAlias;
 
@@ -77,18 +82,18 @@ public final class KeyMaterialHolder implements Serializable {
     private final KeyAlgorithm keyAlgorithm = KeyAlgorithm.UNDEFINED;
 
     /**
-     * @return NPE-safe char-array representation of {@link #getKeyPassword()}. If
-     *         keyPassword is {@code null} or empty it returns an empty char[],
-     *         never {@code null}
+     * @return NPE-safe char-array representation of #getKeyPassword().
+     * If keyPassword is {@code null} or empty it returns an empty char[],
+     * never {@code null}
      */
+    @SuppressWarnings("javaarchitecture:S7027") // owolff: Circular dependency not a problem here: Utility-only
     public char[] getKeyPasswordAsCharArray() {
         return KeyStoreProvider.toCharArray(keyPassword);
     }
 
     /**
      * @param serializedKeyMaterial the Base64 encoded key material
-     *
-     * @return Raw i.e. original key material
+     * @return Raw i.e., original key material
      * @throws IllegalArgumentException if serializedKeyMaterial is not Base64
      *                                  encoded
      */
@@ -97,8 +102,7 @@ public final class KeyMaterialHolder implements Serializable {
     }
 
     /**
-     * @param keyMaterial Raw i.e. original key material
-     *
+     * @param keyMaterial Raw i.e., original key material
      * @return Base64 encoded key material
      */
     public static String serializeKeyMaterial(final byte[] keyMaterial) {

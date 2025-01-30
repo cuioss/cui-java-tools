@@ -19,11 +19,10 @@ import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
+import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.support.ObjectMethodsAsserts;
+import java.util.List;
 
 class ParameterFilterTest {
 
@@ -39,7 +38,7 @@ class ParameterFilterTest {
             JAVAX_FACES + "-" + "c");
 
     @Test
-    void testShouldExludeAndIncludeStrings() {
+    void shouldExludeAndIncludeStrings() {
         final var filter = new ParameterFilter(EXCLUDES, false);
         for (final String exclude : EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));
@@ -50,7 +49,7 @@ class ParameterFilterTest {
     }
 
     @Test
-    void testShouldExludeAndIncludeFacesStrings() {
+    void shouldExludeAndIncludeFacesStrings() {
         final var filter = new ParameterFilter(EXCLUDES, true);
         for (final String exclude : FACES_EXCLUDES) {
             assertTrue(filter.isExcluded(exclude));

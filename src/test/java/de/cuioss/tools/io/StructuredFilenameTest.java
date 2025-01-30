@@ -18,11 +18,10 @@ package de.cuioss.tools.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.nio.file.Paths;
-
+import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
-import de.cuioss.tools.support.ObjectMethodsAsserts;
+import java.nio.file.Path;
 
 class StructuredFilenameTest {
 
@@ -30,28 +29,28 @@ class StructuredFilenameTest {
     static final String SOME_TEST_FILE_TXT = "someTestFile.txt";
 
     @Test
-    void testValidFilename() {
+    void validFilename() {
         final var filename = new StructuredFilename("test.suffix");
         assertEquals("test", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
-    void testNoSuffixFilename() {
+    void noSuffixFilename() {
         final var filename = new StructuredFilename("test");
         assertEquals("test", filename.getNamePart());
         assertNull(filename.getSuffix());
     }
 
     @Test
-    void testMultipleDotsFilename() {
+    void multipleDotsFilename() {
         final var filename = new StructuredFilename("test.dots.suffix");
         assertEquals("test.dots", filename.getNamePart());
         assertEquals("suffix", filename.getSuffix());
     }
 
     @Test
-    void testGetAppendedName() {
+    void getAppendedName() {
         final var filename = new StructuredFilename("test.suffix");
         assertEquals("test-appended.suffix", filename.getAppendedName("-appended"));
     }
@@ -65,13 +64,13 @@ class StructuredFilenameTest {
 
     @Test
     void shouldResolvePath() {
-        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME));
+        final var filename = new StructuredFilename(Path.of(EXISTING_FILE_NAME));
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 
     @Test
     void shouldResolveFile() {
-        final var filename = new StructuredFilename(Paths.get(EXISTING_FILE_NAME).toFile());
+        final var filename = new StructuredFilename(Path.of(EXISTING_FILE_NAME).toFile());
         assertEquals(SOME_TEST_FILE_TXT, filename.getOriginalName());
     }
 

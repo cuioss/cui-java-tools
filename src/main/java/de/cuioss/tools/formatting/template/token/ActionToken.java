@@ -18,14 +18,15 @@ package de.cuioss.tools.formatting.template.token;
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.formatting.template.FormatterSupport;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import de.cuioss.tools.formatting.template.FormatterSupport;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * String Action Token store template and attribute name, and replace attribute
@@ -38,6 +39,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class ActionToken implements Token {
 
+    @Serial
     private static final long serialVersionUID = -6329721490557755853L;
 
     private final String before;

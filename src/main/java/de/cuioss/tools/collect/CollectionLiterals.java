@@ -17,6 +17,8 @@ package de.cuioss.tools.collect;
 
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +32,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Stream;
-
-import lombok.experimental.UtilityClass;
 
 /**
  * <h2>Overview</h2> Provides a number of methods simplifying the task of
@@ -84,6 +84,7 @@ import lombok.experimental.UtilityClass;
  *
  * @author Oliver Wolff
  */
+@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency within collection utilities
 @UtilityClass
 public class CollectionLiterals {
 
@@ -235,7 +236,7 @@ public class CollectionLiterals {
         if (null == element) {
             return Collections.emptyList();
         }
-        return Collections.singletonList(element);
+        return List.of(element);
     }
 
     /**
@@ -444,7 +445,7 @@ public class CollectionLiterals {
         if (null == element) {
             return Collections.emptySet();
         }
-        return Collections.singleton(element);
+        return Set.of(element);
     }
 
     /**

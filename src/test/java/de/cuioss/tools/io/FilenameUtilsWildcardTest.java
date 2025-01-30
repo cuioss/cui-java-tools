@@ -20,22 +20,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.Locale;
 
-import org.junit.jupiter.api.Test;
-
 /**
- * @author https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsWildcardTestCase.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/FilenameUtilsWildcardTestCase.java">...</a>
  *
  */
-@SuppressWarnings("java:S5961") // owolff: I prefer being in sync with the original test
+@SuppressWarnings("java:S5961")
+// owolff: I prefer being in sync with the original test
 class FilenameUtilsWildcardTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';
 
     @Test
-    void testMatch() {
+    void match() {
         assertFalse(FilenameUtils.wildcardMatch(null, "Foo"));
         assertFalse(FilenameUtils.wildcardMatch("Foo", null));
         assertTrue(FilenameUtils.wildcardMatch(null, null));
@@ -61,7 +62,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testMatchOnSystem() {
+    void matchOnSystem() {
         assertFalse(FilenameUtils.wildcardMatchOnSystem(null, "Foo"));
         assertFalse(FilenameUtils.wildcardMatchOnSystem("Foo", null));
         assertTrue(FilenameUtils.wildcardMatchOnSystem(null, null));
@@ -85,7 +86,7 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testMatchCaseSpecified() {
+    void matchCaseSpecified() {
         assertFalse(FilenameUtils.wildcardMatch(null, "Foo", IOCase.SENSITIVE));
         assertFalse(FilenameUtils.wildcardMatch("Foo", null, IOCase.SENSITIVE));
         assertTrue(FilenameUtils.wildcardMatch(null, null, IOCase.SENSITIVE));
@@ -120,17 +121,17 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testSplitOnTokens() {
-        assertArrayEquals(new String[] { "Ad", "*", "er" }, FilenameUtils.splitOnTokens("Ad*er"));
-        assertArrayEquals(new String[] { "Ad", "?", "er" }, FilenameUtils.splitOnTokens("Ad?er"));
-        assertArrayEquals(new String[] { "Test", "*", "?", "One" }, FilenameUtils.splitOnTokens("Test*?One"));
-        assertArrayEquals(new String[] { "Test", "?", "*", "One" }, FilenameUtils.splitOnTokens("Test?*One"));
-        assertArrayEquals(new String[] { "*" }, FilenameUtils.splitOnTokens("****"));
-        assertArrayEquals(new String[] { "*", "?", "?", "*" }, FilenameUtils.splitOnTokens("*??*"));
-        assertArrayEquals(new String[] { "*", "?", "*", "?", "*" }, FilenameUtils.splitOnTokens("*?**?*"));
-        assertArrayEquals(new String[] { "*", "?", "*", "?", "*" }, FilenameUtils.splitOnTokens("*?***?*"));
-        assertArrayEquals(new String[] { "h", "?", "?", "*" }, FilenameUtils.splitOnTokens("h??*"));
-        assertArrayEquals(new String[] { "" }, FilenameUtils.splitOnTokens(""));
+    void splitOnTokens() {
+        assertArrayEquals(new String[]{"Ad", "*", "er"}, FilenameUtils.splitOnTokens("Ad*er"));
+        assertArrayEquals(new String[]{"Ad", "?", "er"}, FilenameUtils.splitOnTokens("Ad?er"));
+        assertArrayEquals(new String[]{"Test", "*", "?", "One"}, FilenameUtils.splitOnTokens("Test*?One"));
+        assertArrayEquals(new String[]{"Test", "?", "*", "One"}, FilenameUtils.splitOnTokens("Test?*One"));
+        assertArrayEquals(new String[]{"*"}, FilenameUtils.splitOnTokens("****"));
+        assertArrayEquals(new String[]{"*", "?", "?", "*"}, FilenameUtils.splitOnTokens("*??*"));
+        assertArrayEquals(new String[]{"*", "?", "*", "?", "*"}, FilenameUtils.splitOnTokens("*?**?*"));
+        assertArrayEquals(new String[]{"*", "?", "*", "?", "*"}, FilenameUtils.splitOnTokens("*?***?*"));
+        assertArrayEquals(new String[]{"h", "?", "?", "*"}, FilenameUtils.splitOnTokens("h??*"));
+        assertArrayEquals(new String[]{""}, FilenameUtils.splitOnTokens(""));
     }
 
     private void assertMatch(final String text, final String wildcard, final boolean expected) {
@@ -139,7 +140,7 @@ class FilenameUtilsWildcardTest {
 
     // A separate set of tests, added to this batch
     @Test
-    void testMatch2() {
+    void match2() {
         assertMatch("log.txt", "log.txt", true);
         assertMatch("log.txt1", "log.txt", false);
 
@@ -186,10 +187,10 @@ class FilenameUtilsWildcardTest {
     }
 
     /**
-     * See https://issues.apache.org/jira/browse/IO-246
+     * See <a href="https://issues.apache.org/jira/browse/IO-246">...</a>
      */
     @Test
-    void test_IO_246() {
+    void io_246() {
 
         // Tests for "*?"
         assertMatch("aaa", "aa*?", true);
@@ -211,13 +212,13 @@ class FilenameUtilsWildcardTest {
     }
 
     @Test
-    void testLocaleIndependence() {
+    void localeIndependence() {
         final var orig = Locale.getDefault();
 
         final var locales = Locale.getAvailableLocales();
 
-        final String[][] data = { { "I", "i" }, { "i", "I" }, { "i", "\u0130" }, { "i", "\u0131" },
-                { "\u03A3", "\u03C2" }, { "\u03A3", "\u03C3" }, { "\u03C2", "\u03C3" }, };
+        final String[][] data = {{"I", "i"}, {"i", "I"}, {"i", "\u0130"}, {"i", "\u0131"},
+                {"\u03A3", "\u03C2"}, {"\u03A3", "\u03C3"}, {"\u03C2", "\u03C3"}, };
 
         try {
             for (var i = 0; i < data.length; i++) {

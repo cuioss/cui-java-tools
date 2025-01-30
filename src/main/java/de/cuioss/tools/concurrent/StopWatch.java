@@ -25,6 +25,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Locale;
@@ -75,6 +76,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class StopWatch implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4764741831457507136L;
 
     private final Ticker ticker;
@@ -247,14 +249,14 @@ public final class StopWatch implements Serializable {
 
     private static String abbreviate(TimeUnit unit) {
         return switch (unit) {
-        case NANOSECONDS -> "ns";
-        case MICROSECONDS -> "\u03bcs"; // μs
-        case MILLISECONDS -> "ms";
-        case SECONDS -> "s";
-        case MINUTES -> "min";
-        case HOURS -> "h";
-        case DAYS -> "d";
-        default -> throw new AssertionError();
+            case NANOSECONDS -> "ns";
+            case MICROSECONDS -> "\u03bcs"; // μs
+            case MILLISECONDS -> "ms";
+            case SECONDS -> "s";
+            case MINUTES -> "min";
+            case HOURS -> "h";
+            case DAYS -> "d";
+            default -> throw new AssertionError();
         };
     }
 }

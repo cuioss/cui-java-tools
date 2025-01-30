@@ -22,6 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.cuioss.tools.support.Generators;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509v1CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -34,25 +43,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509v1CertificateBuilder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.Test;
-
-import de.cuioss.tools.support.Generators;
-
 class KeyStoreProviderTest {
 
     /**
      * Test RSA-2048
-     *
-     * @throws Exception
      */
     @Test
-    void testRsaCertificate() throws Exception {
+    void rsaCertificate() throws Exception {
 
         var x509Certificate = createX509Certificate("RSA", 2048, "SHA256WithRSAEncryption");
 
@@ -71,11 +68,9 @@ class KeyStoreProviderTest {
 
     /**
      * Test DSA
-     *
-     * @throws Exception
      */
     @Test
-    void testCertificate() throws Exception {
+    void certificate() throws Exception {
 
         var x509Certificate = createX509Certificate("DSA", 1024, "SHA224withDSA");
 
@@ -93,7 +88,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void testEcCertificate() throws Exception {
+    void ecCertificate() throws Exception {
 
         var x509Certificate = createX509Certificate("EC", 256, "SHA256withECDSA");
 
@@ -111,7 +106,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void testKeyStoreCreation() throws Exception {
+    void keyStoreCreation() throws Exception {
 
         var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(null, null);
@@ -146,26 +141,22 @@ class KeyStoreProviderTest {
         var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
                 .key(keyHolder).build();
 
-        assertThrows(IllegalStateException.class, () -> {
-            ky.resolveKeyStore();
-        });
+        assertThrows(IllegalStateException.class, ky::resolveKeyStore);
     }
 
     @Test
-    void shouldFailOnemptyKeyStores() throws Exception {
+    void shouldFailOnEmptyKeyStores() {
         var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
                 .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(new byte[1]).build();
 
         var ky = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("pass").key(keyHolder)
                 .build();
 
-        assertThrows(IllegalStateException.class, () -> {
-            ky.resolveKeyStore();
-        });
+        assertThrows(IllegalStateException.class, ky::resolveKeyStore);
     }
 
     @Test
-    void testMultipleCerts() throws Exception {
+    void multipleCerts() throws Exception {
 
         Collection<KeyMaterialHolder> keyMaterialHolderCollection = new ArrayList<>();
 
@@ -196,12 +187,12 @@ class KeyStoreProviderTest {
      * Generates a X509Certificate.
      *
      * @param algorithm          used for the creation of the KeyPair
-     * @param keysize            of the key
+     * @param keySize            of the key
      * @param signatureAlgorithm that was used to create the ContentSigner
      * @return a currently valid X509Certificate
      * @throws Exception on any error
      */
-    private X509Certificate createX509Certificate(String algorithm, int keysize, String signatureAlgorithm)
+    private X509Certificate createX509Certificate(String algorithm, int keySize, String signatureAlgorithm)
             throws Exception {
 
         // Set start and end date of certificate
@@ -210,7 +201,7 @@ class KeyStoreProviderTest {
 
         // Generate public/private KeyPair
         var keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
-        keyPairGenerator.initialize(keysize, new SecureRandom());
+        keyPairGenerator.initialize(keySize, new SecureRandom());
         var keyPair = keyPairGenerator.generateKeyPair();
 
         var serial = BigInteger.valueOf(System.currentTimeMillis());
@@ -236,11 +227,11 @@ class KeyStoreProviderTest {
     void shouldFailOnInvalidFile() {
         var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).location(new File("notThere"))
                 .build();
-        assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
+        assertThrows(IllegalStateException.class, provider::resolveKeyStore);
     }
 
     @Test
-    void shouldHandlEmptyPasswordAsCharArray() {
+    void shouldHandleEmptyPasswordAsCharArray() {
         var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).build();
 
         assertNull(provider.getKeyPassword());
@@ -313,7 +304,7 @@ class KeyStoreProviderTest {
     void shouldFailEmptyKeyStoreWithoutPassword() {
         var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
                 .keyStoreType(KeyStoreType.KEY_STORE).build();
-        assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
+        assertThrows(IllegalStateException.class, provider::resolveKeyStore);
     }
 
     @Test
@@ -329,7 +320,7 @@ class KeyStoreProviderTest {
     void shouldFailUnprotectedKeyStore() {
         var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
                 .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
-        assertThrows(IllegalStateException.class, () -> provider.resolveKeyStore());
+        assertThrows(IllegalStateException.class, provider::resolveKeyStore);
     }
 
     @Test

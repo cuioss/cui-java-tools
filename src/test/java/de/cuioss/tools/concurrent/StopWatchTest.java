@@ -24,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 /**
- * @author https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/StopwatchTest.java
+ * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/StopwatchTest.java">...</a>
  *
  */
 class StopWatchTest {
@@ -38,32 +38,32 @@ class StopWatchTest {
     private final StopWatch stopwatch = new StopWatch(ticker);
 
     @Test
-    void testCreateStarted() {
+    void createStarted() {
         var startedStopwatch = StopWatch.createStarted();
         assertTrue(startedStopwatch.isRunning());
     }
 
     @Test
-    void testCreateUnstarted() {
+    void createUnstarted() {
         var unstartedStopwatch = StopWatch.createUnstarted();
         assertFalse(unstartedStopwatch.isRunning());
         assertEquals(0, unstartedStopwatch.elapsed(NANOSECONDS));
     }
 
     @Test
-    void testInitialState() {
+    void initialState() {
         assertFalse(stopwatch.isRunning());
         assertEquals(0, stopwatch.elapsed(NANOSECONDS));
     }
 
     @Test
-    void testStart() {
+    void start() {
         assertSame(stopwatch, stopwatch.start());
         assertTrue(stopwatch.isRunning());
     }
 
     @Test
-    void testStart_whileRunning() {
+    void startWhileRunning() {
         stopwatch.start();
         try {
             stopwatch.start();
@@ -74,14 +74,14 @@ class StopWatchTest {
     }
 
     @Test
-    void testStop() {
+    void stop() {
         stopwatch.start();
         assertSame(stopwatch, stopwatch.stop());
         assertFalse(stopwatch.isRunning());
     }
 
     @Test
-    void testStop_new() {
+    void stopNew() {
         try {
             stopwatch.stop();
             fail();
@@ -91,7 +91,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testStop_alreadyStopped() {
+    void stopAlreadyStopped() {
         stopwatch.start();
         stopwatch.stop();
         try {
@@ -103,7 +103,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testReset_new() {
+    void resetNew() {
         ticker.advance(1);
         stopwatch.reset();
         assertFalse(stopwatch.isRunning());
@@ -115,7 +115,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testReset_whileRunning() {
+    void resetWhileRunning() {
         ticker.advance(1);
         stopwatch.start();
         assertEquals(0, stopwatch.elapsed(NANOSECONDS));
@@ -128,7 +128,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_whileRunning() {
+    void elapsedWhileRunning() {
         ticker.advance(78);
         stopwatch.start();
         assertEquals(0, stopwatch.elapsed(NANOSECONDS));
@@ -138,7 +138,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_notRunning() {
+    void elapsedNotRunning() {
         ticker.advance(1);
         stopwatch.start();
         ticker.advance(4);
@@ -148,7 +148,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_multipleSegments() {
+    void elapsedMultipleSegments() {
         stopwatch.start();
         ticker.advance(9);
         stopwatch.stop();
@@ -166,7 +166,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_micros() {
+    void elapsedMicros() {
         stopwatch.start();
         ticker.advance(999);
         assertEquals(0, stopwatch.elapsed(MICROSECONDS));
@@ -175,7 +175,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_millis() {
+    void elapsedMillis() {
         stopwatch.start();
         ticker.advance(999999);
         assertEquals(0, stopwatch.elapsed(MILLISECONDS));
@@ -184,7 +184,7 @@ class StopWatchTest {
     }
 
     @Test
-    void testElapsed_duration() {
+    void elapsedDuration() {
         stopwatch.start();
         ticker.advance(999999);
         assertEquals(Duration.ofNanos(999999), stopwatch.elapsed());

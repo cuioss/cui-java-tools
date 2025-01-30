@@ -21,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -29,19 +31,18 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.junit.jupiter.api.Test;
-
 /**
- * @author https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java
+ * @author <a href="https://github.com/apache/commons-codec/blob/master/src/test/java/org/apache/commons/codec/binary/HexTest.java">...</a>
  *
  */
-@SuppressWarnings("java:S5785") // owolff: I will not change because I want to stay ins sync with
-                                // original test-case
+@SuppressWarnings("java:S5785")
+// owolff: I will not change because I want to stay ins sync with
+// original test-case
 class HexTest {
 
     private static final String BAD_ENCODING_NAME = "UNKNOWN";
 
-    private final static boolean LOG = false;
+    private static final boolean LOG = false;
 
     /**
      * Allocate a ByteBuffer.
@@ -160,7 +161,7 @@ class HexTest {
     }
 
     @Test
-    void testCustomCharset() throws UnsupportedEncodingException, DecoderException {
+    void customCharset() throws UnsupportedEncodingException, DecoderException {
         for (final String name : Charset.availableCharsets().keySet()) {
             testCustomCharset(name, "testCustomCharset");
         }
@@ -202,14 +203,14 @@ class HexTest {
     }
 
     @Test
-    void testCustomCharsetBadName() {
+    void customCharsetBadName() {
         assertThrows(UnsupportedCharsetException.class, () -> {
             new Hex(BAD_ENCODING_NAME);
         });
     }
 
     @Test
-    void testDecodeBadCharacterPos0() {
+    void decodeBadCharacterPos0() {
         try {
             new Hex().decode("q0");
             fail("An exception wasn't thrown when trying to decode an illegal character");
@@ -219,7 +220,7 @@ class HexTest {
     }
 
     @Test
-    void testDecodeBadCharacterPos1() {
+    void decodeBadCharacterPos1() {
         try {
             new Hex().decode("0q");
             fail("An exception wasn't thrown when trying to decode an illegal character");
@@ -229,19 +230,19 @@ class HexTest {
     }
 
     @Test
-    void testDecodeByteArrayEmpty() throws DecoderException {
+    void decodeByteArrayEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], new Hex().decode(new byte[0]));
     }
 
     @Test
-    void testDecodeByteArrayObjectEmpty() throws DecoderException {
+    void decodeByteArrayObjectEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], (byte[]) new Hex().decode((Object) new byte[0]));
     }
 
     @Test
-    void testDecodeByteArrayOddCharacters() {
+    void decodeByteArrayOddCharacters() {
         try {
-            new Hex().decode(new byte[] { 65 });
+            new Hex().decode(new byte[]{65});
             fail("An exception wasn't thrown when trying to decode an odd number of characters");
         } catch (final DecoderException e) {
             // Expected exception
@@ -249,12 +250,12 @@ class HexTest {
     }
 
     @Test
-    void testDecodeByteBufferEmpty() throws DecoderException {
+    void decodeByteBufferEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], new Hex().decode(allocate(0)));
     }
 
     @Test
-    void testDecodeByteBufferAllocatedButEmpty() throws DecoderException {
+    void decodeByteBufferAllocatedButEmpty() throws DecoderException {
         final var bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
@@ -263,12 +264,12 @@ class HexTest {
     }
 
     @Test
-    void testDecodeByteBufferObjectEmpty() throws DecoderException {
+    void decodeByteBufferObjectEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], (byte[]) new Hex().decode((Object) allocate(0)));
     }
 
     @Test
-    void testDecodeByteBufferOddCharacters() {
+    void decodeByteBufferOddCharacters() {
         final var bb = allocate(1);
         bb.put((byte) 65);
         bb.flip();
@@ -276,7 +277,7 @@ class HexTest {
     }
 
     @Test
-    void testDecodeByteBufferWithLimitOddCharacters() {
+    void decodeByteBufferWithLimitOddCharacters() {
         final var bb = allocate(10);
         bb.put(1, (byte) 65);
         bb.position(1);
@@ -285,19 +286,19 @@ class HexTest {
     }
 
     @Test
-    void testDecodeHexCharArrayEmpty() throws DecoderException {
+    void decodeHexCharArrayEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], Hex.decodeHex(new char[0]));
     }
 
     @Test
-    void testDecodeHexStringEmpty() throws DecoderException {
+    void decodeHexStringEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], Hex.decodeHex(""));
     }
 
     @Test
-    void testDecodeClassCastException() {
+    void decodeClassCastException() {
         try {
-            new Hex().decode(new int[] { 65 });
+            new Hex().decode(new int[]{65});
             fail("An exception wasn't thrown when trying to decode.");
         } catch (final DecoderException e) {
             // Expected exception
@@ -305,27 +306,27 @@ class HexTest {
     }
 
     @Test
-    void testDecodeHexCharArrayOddCharacters1() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A' });
+    void decodeHexCharArrayOddCharacters1() {
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A'});
     }
 
     @Test
-    void testDecodeHexStringOddCharacters1() {
+    void decodeHexStringOddCharacters1() {
         checkDecodeHexCharArrayOddCharacters("A");
     }
 
     @Test
-    void testDecodeHexCharArrayOddCharacters3() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A', 'B', 'C' });
+    void decodeHexCharArrayOddCharacters3() {
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A', 'B', 'C'});
     }
 
     @Test
-    void testDecodeHexCharArrayOddCharacters5() {
-        checkDecodeHexCharArrayOddCharacters(new char[] { 'A', 'B', 'C', 'D', 'E' });
+    void decodeHexCharArrayOddCharacters5() {
+        checkDecodeHexCharArrayOddCharacters(new char[]{'A', 'B', 'C', 'D', 'E'});
     }
 
     @Test
-    void testDecodeHexStringOddCharacters() {
+    void decodeHexStringOddCharacters() {
         try {
             new Hex().decode("6");
             fail("An exception wasn't thrown when trying to decode an odd number of characters");
@@ -335,14 +336,14 @@ class HexTest {
     }
 
     @Test
-    void testDecodeStringEmpty() throws DecoderException {
+    void decodeStringEmpty() throws DecoderException {
         assertArrayEquals(new byte[0], (byte[]) new Hex().decode(""));
     }
 
     @Test
-    void testDecodeByteBufferWithLimit() throws DecoderException {
+    void decodeByteBufferWithLimit() throws DecoderException {
         final var bb = getByteBufferUtf8("000102030405060708090a0b0c0d0e0f");
-        final byte[] expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        final byte[] expected = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         // Test pairs of bytes
         for (var i = 0; i < 15; i++) {
             bb.position(i * 2);
@@ -353,22 +354,22 @@ class HexTest {
     }
 
     @Test
-    void testEncodeByteArrayEmpty() {
+    void encodeByteArrayEmpty() {
         assertArrayEquals(new byte[0], new Hex().encode(new byte[0]));
     }
 
     @Test
-    void testEncodeByteArrayObjectEmpty() throws EncoderException {
+    void encodeByteArrayObjectEmpty() throws EncoderException {
         assertArrayEquals(new char[0], (char[]) new Hex().encode((Object) new byte[0]));
     }
 
     @Test
-    void testEncodeByteBufferEmpty() {
+    void encodeByteBufferEmpty() {
         assertArrayEquals(new byte[0], new Hex().encode(allocate(0)));
     }
 
     @Test
-    void testEncodeByteBufferAllocatedButEmpty() {
+    void encodeByteBufferAllocatedButEmpty() {
         final var bb = allocate(10);
         // Effectively set remaining == 0 => empty
         bb.flip();
@@ -377,14 +378,14 @@ class HexTest {
     }
 
     @Test
-    void testEncodeByteBufferObjectEmpty() throws EncoderException {
+    void encodeByteBufferObjectEmpty() throws EncoderException {
         assertArrayEquals(new char[0], (char[]) new Hex().encode((Object) allocate(0)));
     }
 
     @Test
-    void testEncodeClassCastException() {
+    void encodeClassCastException() {
         try {
-            new Hex().encode(new int[] { 65 });
+            new Hex().encode(new int[]{65});
             fail("An exception wasn't thrown when trying to encode.");
         } catch (final EncoderException e) {
             // Expected exception
@@ -392,7 +393,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeDecodeHexCharArrayRandom() throws DecoderException, EncoderException {
+    void encodeDecodeHexCharArrayRandom() throws DecoderException, EncoderException {
         final var random = new Random();
 
         final var hex = new Hex();
@@ -425,13 +426,13 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteArrayEmpty() {
+    void encodeHexByteArrayEmpty() {
         assertArrayEquals(new char[0], Hex.encodeHex(new byte[0]));
         assertArrayEquals(new byte[0], new Hex().encode(new byte[0]));
     }
 
     @Test
-    void testEncodeHexByteArrayHelloWorldLowerCaseHex() {
+    void encodeHexByteArrayHelloWorldLowerCaseHex() {
         final var b = getBytesUtf8("Hello World");
         final var expected = "48656c6c6f20576f726c64";
         char[] actual;
@@ -444,7 +445,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteArrayHelloWorldUpperCaseHex() {
+    void encodeHexByteArrayHelloWorldUpperCaseHex() {
         final var b = getBytesUtf8("Hello World");
         final var expected = "48656C6C6F20576F726C64";
         char[] actual;
@@ -457,19 +458,19 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteArrayZeroes() {
+    void encodeHexByteArrayZeroes() {
         final var c = Hex.encodeHex(new byte[36]);
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", new String(c));
     }
 
     @Test
-    void testEncodeHexByteBufferEmpty() {
+    void encodeHexByteBufferEmpty() {
         assertArrayEquals(new char[0], Hex.encodeHex(allocate(0)));
         assertArrayEquals(new byte[0], new Hex().encode(allocate(0)));
     }
 
     @Test
-    void testEncodeHexByteBufferHelloWorldLowerCaseHex() {
+    void encodeHexByteBufferHelloWorldLowerCaseHex() {
         final var b = getByteBufferUtf8("Hello World");
         final var expected = "48656c6c6f20576f726c64";
         char[] actual;
@@ -490,7 +491,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteBufferHelloWorldUpperCaseHex() {
+    void encodeHexByteBufferHelloWorldUpperCaseHex() {
         final var b = getByteBufferUtf8("Hello World");
         final var expected = "48656C6C6F20576F726C64";
         char[] actual;
@@ -511,13 +512,13 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHex_ByteBufferOfZeroes() {
+    void encodeHexByteBufferOfZeroes() {
         final var c = Hex.encodeHex(allocate(36));
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", new String(c));
     }
 
     @Test
-    void testEncodeHex_ByteBufferWithLimit() {
+    void encodeHexByteBufferWithLimit() {
         final var bb = allocate(16);
         for (var i = 0; i < 16; i++) {
             bb.put((byte) i);
@@ -534,13 +535,13 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferOfZeroes() {
+    void encodeHexByteStringByteBufferOfZeroes() {
         final var c = Hex.encodeHexString(allocate(36));
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", c);
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferOfZeroesWithLimit() {
+    void encodeHexByteStringByteBufferOfZeroesWithLimit() {
         final var bb = allocate(36);
         bb.limit(3);
         assertEquals("000000", Hex.encodeHexString(bb));
@@ -552,23 +553,23 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteString_ByteArrayOfZeroes() {
+    void encodeHexByteStringByteArrayOfZeroes() {
         final var c = Hex.encodeHexString(new byte[36]);
         assertEquals("000000000000000000000000000000000000000000000000000000000000000000000000", c);
     }
 
     @Test
-    void testEncodeHexByteString_ByteArrayBoolean_ToLowerCase() {
-        assertEquals("0a", Hex.encodeHexString(new byte[] { 10 }, true));
+    void encodeHexByteStringByteArrayBooleanToLowerCase() {
+        assertEquals("0a", Hex.encodeHexString(new byte[]{10}, true));
     }
 
     @Test
-    void testEncodeHexByteString_ByteArrayBoolean_ToUpperCase() {
-        assertEquals("0A", Hex.encodeHexString(new byte[] { 10 }, false));
+    void encodeHexByteStringByteArrayBooleanToUpperCase() {
+        assertEquals("0A", Hex.encodeHexString(new byte[]{10}, false));
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferBoolean_ToLowerCase() {
+    void encodeHexByteStringByteBufferBooleanToLowerCase() {
         final var bb = allocate(1);
         bb.put((byte) 10);
         bb.flip();
@@ -576,7 +577,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferBoolean_ToUpperCase() {
+    void encodeHexByteStringByteBufferBooleanToUpperCase() {
         final var bb = allocate(1);
         bb.put((byte) 10);
         bb.flip();
@@ -584,7 +585,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferWithLimitBoolean_ToLowerCase() {
+    void encodeHexByteStringByteBufferWithLimitBooleanToLowerCase() {
         final var bb = allocate(4);
         bb.put(1, (byte) 10);
         bb.position(1);
@@ -594,7 +595,7 @@ class HexTest {
     }
 
     @Test
-    void testEncodeHexByteString_ByteBufferWithLimitBoolean_ToUpperCase() {
+    void encodeHexByteStringByteBufferWithLimitBooleanToUpperCase() {
         final var bb = allocate(4);
         bb.put(1, (byte) 10);
         bb.position(1);
@@ -607,23 +608,23 @@ class HexTest {
      * Test encoding of a read only byte buffer. See CODEC-261.
      */
     @Test
-    void testEncodeHexReadOnlyByteBuffer() {
-        final var chars = Hex.encodeHex(ByteBuffer.wrap(new byte[] { 10 }).asReadOnlyBuffer());
+    void encodeHexReadOnlyByteBuffer() {
+        final var chars = Hex.encodeHex(ByteBuffer.wrap(new byte[]{10}).asReadOnlyBuffer());
         assertEquals("0a", String.valueOf(chars));
     }
 
     @Test
-    void testEncodeStringEmpty() throws EncoderException {
+    void encodeStringEmpty() throws EncoderException {
         assertArrayEquals(new char[0], (char[]) new Hex().encode(""));
     }
 
     @Test
-    void testGetCharset() {
+    void getCharset() {
         assertEquals(StandardCharsets.UTF_8, new Hex(StandardCharsets.UTF_8).getCharset());
     }
 
     @Test
-    void testRequiredCharset() throws UnsupportedEncodingException, DecoderException {
+    void requiredCharset() throws UnsupportedEncodingException, DecoderException {
         testCustomCharset("UTF-8", "testRequiredCharset");
         testCustomCharset("UTF-16", "testRequiredCharset");
         testCustomCharset("UTF-16BE", "testRequiredCharset");

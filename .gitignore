@@ -1,6 +1,7 @@
 **/.settings
 **/target
 **/.idea
+**/.vscode
 **/src/main/gen
 *.iml
 *.classpath
@@ -8,3 +9,4 @@
 .DS_Store
 .asciidoctorconfig.adoc
 /bin/
+.vscode/settings.json

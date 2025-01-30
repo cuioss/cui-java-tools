@@ -17,6 +17,10 @@ package de.cuioss.tools.io;
 
 import static java.util.Objects.requireNonNull;
 
+import de.cuioss.tools.logging.CuiLogger;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,10 +31,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import de.cuioss.tools.logging.CuiLogger;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 
 /**
  * Provides {@link Path} related utilities
@@ -74,7 +74,7 @@ public final class MorePaths {
 
     /**
      * Tries to determine the real-path, see {@link #getRealPathSafely(Path)} for
-     * details and {@link Paths#get(String, String...)} for details regarding the
+     * details and {@link Path#of(String, String...)} for details regarding the
      * parameter
      *
      * @param first the path string or initial part of the path string
@@ -82,7 +82,7 @@ public final class MorePaths {
      * @return the real-path if applicable, {@link Path#toAbsolutePath()} otherwise.
      */
     public static Path getRealPathSafely(String first, String... more) {
-        return getRealPathSafely(Paths.get(first, more));
+        return getRealPathSafely(Path.of(first, more));
     }
 
     /**

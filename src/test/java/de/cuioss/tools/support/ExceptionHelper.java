@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.support;
 
-import java.lang.reflect.InvocationTargetException;
-
 import lombok.experimental.UtilityClass;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Helper class used for accessing an exception message in a general way

@@ -27,21 +27,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.cuioss.tools.support.ObjectMethodsAsserts;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
-import de.cuioss.tools.support.ObjectMethodsAsserts;
 
 class UrlParameterTest {
 
     private UrlParameter parameter;
 
     @Test
-    void testUrlParameterConstructorValidParameter() {
+    void urlParameterConstructorValidParameter() {
         parameter = new UrlParameter("name", "value");
         assertNotNull(parameter);
         parameter = new UrlParameter("na/me", "va/lue");
@@ -51,22 +50,22 @@ class UrlParameterTest {
     }
 
     @Test
-    void testUrlParameterConstructorInvalidNameNull() {
+    void urlParameterConstructorInvalidNameNull() {
         assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter(null, "value"));
     }
 
     @Test
-    void testUrlParameterConstructorInvalidNameEmpty() {
+    void urlParameterConstructorInvalidNameEmpty() {
         assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("", "value"));
     }
 
     @Test
-    void testUrlParameterConstructorInvalidNameTrimEmpty() {
+    void urlParameterConstructorInvalidNameTrimEmpty() {
         assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("   ", "value"));
     }
 
     @Test
-    void testIsEmpty() {
+    void isEmpty() {
         parameter = new UrlParameter("name", null);
         assertTrue(parameter.isEmpty());
         parameter = new UrlParameter("na/me", "va/lue");
@@ -74,7 +73,7 @@ class UrlParameterTest {
     }
 
     @Test
-    void testCreateParameterString() {
+    void createParameterString() {
         assertEquals("", UrlParameter.createParameterString());
         final var parameter1 = new UrlParameter("name1", "value1");
         final var parameter2 = new UrlParameter("name2", "value2");
@@ -121,7 +120,7 @@ class UrlParameterTest {
     }
 
     @Test
-    void testGetParameterMapFromListOfUrlParameter() {
+    void getParameterMapFromListOfUrlParameter() {
         final List<UrlParameter> list = new ArrayList<>();
         assertTrue(createParameterMap(list).isEmpty());
         assertTrue(createParameterMap(null).isEmpty());
@@ -131,19 +130,19 @@ class UrlParameterTest {
     }
 
     @Test
-    void testCreateNameValueString() {
+    void createNameValueString() {
         parameter = new UrlParameter("name", "value");
         assertEquals("name=value", parameter.createNameValueString());
     }
 
     @Test
-    void testCreateNameValueString2() {
+    void createNameValueString2() {
         parameter = new UrlParameter("name", "value");
         assertEquals("name=value", parameter.createNameValueString(true));
     }
 
     @Test
-    void testCompareTo() {
+    void compareTo() {
         parameter = new UrlParameter("name", "value");
         final var parameter2 = new UrlParameter("name", "value");
 

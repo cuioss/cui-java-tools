@@ -23,37 +23,34 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.function.Supplier;
 
-import org.junit.jupiter.api.Test;
-
+@SuppressWarnings("DataFlowIssue")
 class MoreObjectsTest {
 
     private static final String HELLO = "Hello";
 
     @Test
-    void requireTypeShouldPassthroughOnFittingTypes() {
-        assertNotNull(MoreObjects.requireType(Integer.valueOf(0), Serializable.class));
-        assertNotNull(MoreObjects.requireType(Integer.valueOf(1), Number.class));
+    void requireTypeShouldPassThroughOnFittingTypes() {
+        assertNotNull(MoreObjects.requireType(0, Serializable.class));
+        assertNotNull(MoreObjects.requireType(1, Number.class));
         assertNotNull(MoreObjects.requireType(HELLO, String.class));
     }
 
     @Test
     void requireTypeShouldHandleInvalidTypes() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(null, null);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(HELLO, null);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(null, Serializable.class);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            MoreObjects.requireType(HELLO, Number.class);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                MoreObjects.requireType(null, null));
+        assertThrows(IllegalArgumentException.class, () ->
+                MoreObjects.requireType(HELLO, null));
+        assertThrows(IllegalArgumentException.class, () ->
+                MoreObjects.requireType(null, Serializable.class));
+        assertThrows(IllegalArgumentException.class, () ->
+                MoreObjects.requireType(HELLO, Number.class));
     }
 
     @Test
@@ -77,21 +74,22 @@ class MoreObjectsTest {
         assertTrue(MoreObjects.allNull((String) null));
     }
 
+    @SuppressWarnings("ConstantValue")
     @Test
-    void testFirstNonNull() {
+    void firstNonNull() {
         assertEquals("", MoreObjects.firstNonNull(null, ""));
         final var firstNonNullGenerics = MoreObjects.firstNonNull(null, null, "123", "456");
         assertEquals("123", firstNonNullGenerics);
         assertEquals("123", MoreObjects.firstNonNull("123", null, "456", null));
         assertEquals(Boolean.TRUE, MoreObjects.firstNonNull(Boolean.TRUE));
 
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't
+        // Explicitly pass in an empty array of an Object type to ensure the compiler doesn't
         // complain of
         // unchecked generic
         // array creation
         assertNull(MoreObjects.firstNonNull());
 
-        // Cast to Object in line below ensures compiler doesn't complain of unchecked
+        // Cast to Object in line below ensures the compiler doesn't complain of unchecked
         // generic array
         // creation
         assertNull(MoreObjects.firstNonNull(null, null));
@@ -101,18 +99,18 @@ class MoreObjectsTest {
     }
 
     @Test
-    void testGetFirstNonNull() {
+    void getFirstNonNull() {
         // first non-null
         assertEquals("", MoreObjects.getFirstNonNull(() -> null, () -> ""));
         // first encountered value is used
         assertEquals("1", MoreObjects.getFirstNonNull(() -> null, () -> "1", () -> "2", () -> null));
         assertEquals("123", MoreObjects.getFirstNonNull(() -> "123", () -> null, () -> "456"));
-        // don't evaluate suppliers after first value is found
+        // don't evaluate suppliers after the first value is found
         assertEquals("123", MoreObjects.getFirstNonNull(() -> null, () -> "123",
                 () -> fail("Supplier after first non-null value should not be evaluated")));
-        // supplier returning null and null supplier both result in null
+        // supplier returning null and null supplier both results in null
         assertNull(MoreObjects.getFirstNonNull(null, () -> null));
-        // Explicitly pass in an empty array of Object type to ensure compiler doesn't
+        // Explicitly pass in an empty array of an Object type to ensure the compiler doesn't
         // complain of
         // unchecked generic
         // array creation

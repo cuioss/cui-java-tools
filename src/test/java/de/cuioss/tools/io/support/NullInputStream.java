@@ -54,7 +54,7 @@ import java.io.InputStream;
  *  }
  * </pre>
  *
- * @author https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullInputStream.java
+ * @author <a href="https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/NullInputStream.java">...</a>
  *
  */
 public class NullInputStream extends InputStream {

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 class IDNInternetAddressTest {
 
     @Test
-    void testSpecialCharacters() {
+    void specialCharacters() {
         assertEquals("MD KARIN KALLWITZ <user1@xn--mller-kva.com>",
                 IDNInternetAddress.encode("MD KARIN KALLWITZ <user1@müller.com>"));
         assertEquals("user1@xn--mller-kva.com", IDNInternetAddress.encode("user1@müller.com"));
@@ -30,14 +30,14 @@ class IDNInternetAddressTest {
     }
 
     @Test
-    void testNoSpecialCharacters() {
+    void noSpecialCharacters() {
         assertEquals("MD KARIN KALLWITZ <user1@mueller.com>",
                 IDNInternetAddress.encode("MD KARIN KALLWITZ <user1@mueller.com>"));
         assertEquals("user1@mueller.com", IDNInternetAddress.encode("user1@mueller.com"));
     }
 
     @Test
-    void testRoundTripComplete() {
+    void roundTripComplete() {
         var orig = "MD KARIN KALLWITZ <user1@müller.com>";
         assertEquals("MD KARIN KALLWITZ <user1@xn--mller-kva.com>", IDNInternetAddress.encode(orig));
         assertEquals(orig, IDNInternetAddress.decode(IDNInternetAddress.encode(orig)));

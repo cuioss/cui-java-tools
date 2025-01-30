@@ -35,21 +35,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import de.cuioss.tools.support.Generators;
 
 class MorePathsTest {
 
@@ -57,25 +55,25 @@ class MorePathsTest {
     private static final String TARGET = "target";
     private static final String POM_XML = "pom.xml";
     private static final String TEST_FILE_NAME = "someTestFile.txt";
-    private static final Path TEST_FILE_SOURCE_PATH = Paths.get("src/test/resources", TEST_FILE_NAME);
+    private static final Path TEST_FILE_SOURCE_PATH = Path.of("src/test/resources", TEST_FILE_NAME);
 
-    static final Path POM_PATH = Paths.get(POM_XML);
-    static final Path NOT_THERE_PATH = Paths.get(NOT_THERE);
+    static final Path POM_PATH = Path.of(POM_XML);
+    static final Path NOT_THERE_PATH = Path.of(NOT_THERE);
     private static final SimpleDateFormat FILE_SUFFIX_DATEFORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
 
-    private static final Path BASE_PATH = Paths.get("src/test/resources");
-    private static final Path TARGET_PATH = Paths.get("target/test-classes");
+    private static final Path BASE_PATH = Path.of("src/test/resources");
+    private static final Path TARGET_PATH = Path.of("target/test-classes");
     private static final Path TARGET_PLAYGROUND = TARGET_PATH.resolve("playground");
 
-    private static final Path EXISTING_FILE = Paths.get(POM_XML);
-    private static final Path NOT_EXISTING_DIRECTORY = Paths.get("not/there");
+    private static final Path EXISTING_FILE = Path.of(POM_XML);
+    private static final Path NOT_EXISTING_DIRECTORY = Path.of("not/there");
 
     private Path playGroundBase;
     private Path playGroundBackup;
 
     @BeforeEach
     void before() throws IOException {
-        var playGround = Paths.get("target/playground");
+        var playGround = Path.of("target/playground");
         if (!Files.exists(playGround)) {
             Files.createDirectories(playGround);
         }
@@ -159,9 +157,8 @@ class MorePathsTest {
 
     @Test
     void shouldFailToBackupNonExisitingFile() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            backupFile(TARGET_PLAYGROUND);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                backupFile(TARGET_PLAYGROUND));
     }
 
     @Test
@@ -195,9 +192,8 @@ class MorePathsTest {
 
     @Test
     void shouldFailToProvideBackupDirectoryIfParentNotExists() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                getBackupDirectoryForPath(NOT_EXISTING_DIRECTORY));
     }
 
     @Test
@@ -256,14 +252,14 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyForNull() {
+    void deleteQuietlyForNull() {
         assertDoesNotThrow(() -> {
             assertFalse(deleteQuietly(null));
         });
     }
 
     @Test
-    void testDeleteQuietlyDir() throws IOException {
+    void deleteQuietlyDir() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
         var testDirectory = playGroundBackup.resolve("directory");
@@ -277,7 +273,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyFile() throws IOException {
+    void deleteQuietlyFile() throws IOException {
         var existingFile = copyPomFileToPlayground();
 
         assertTrue(existingFile.toFile().exists());
@@ -287,7 +283,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testDeleteQuietlyNonExistent() {
+    void deleteQuietlyNonExistent() {
         var testFile = playGroundBase.resolve(POM_XML);
         assertFalse(testFile.toFile().exists());
 
@@ -297,7 +293,7 @@ class MorePathsTest {
     }
 
     @Test
-    void testContentEquals() throws Exception {
+    void contentEquals() throws Exception {
 
         // Non-existent files
         var notThere1 = playGroundBase.resolve(POM_XML);

@@ -18,8 +18,8 @@ package de.cuioss.tools.base;
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.base.Preconditions.checkState;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class PreconditionsTest {
             checkArgument(false, MESSAGE);
             fail(SHOULD_HAVE_THROWN_EXCEPTION);
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
+            assertInstanceOf(IllegalArgumentException.class, e);
             assertEquals(MESSAGE, e.getMessage());
         }
     }
@@ -63,7 +63,7 @@ class PreconditionsTest {
             checkArgument(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
             fail(SHOULD_HAVE_THROWN_EXCEPTION);
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException);
+            assertInstanceOf(IllegalArgumentException.class, e);
             assertEquals(MESSAGE_TEMPLATE_RESULT, e.getMessage());
         }
     }
@@ -79,7 +79,7 @@ class PreconditionsTest {
             checkState(false, MESSAGE);
             fail(SHOULD_HAVE_THROWN_EXCEPTION);
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalStateException);
+            assertInstanceOf(IllegalStateException.class, e);
             assertEquals(MESSAGE, e.getMessage());
         }
     }
@@ -95,7 +95,7 @@ class PreconditionsTest {
             checkState(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
             fail(SHOULD_HAVE_THROWN_EXCEPTION);
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalStateException);
+            assertInstanceOf(IllegalStateException.class, e);
             assertEquals(MESSAGE_TEMPLATE_RESULT, e.getMessage());
         }
     }

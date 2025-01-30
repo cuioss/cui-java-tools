@@ -18,14 +18,15 @@ package de.cuioss.tools.formatting;
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.emptyToNull;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provide concatenation of strings by using
@@ -55,6 +56,7 @@ public class SimpleFormatter implements Serializable {
     /**
      * serial version UID
      */
+    @Serial
     private static final long serialVersionUID = -4761082365099064435L;
 
     private final String separator;
@@ -135,6 +137,7 @@ public class SimpleFormatter implements Serializable {
     @EqualsAndHashCode
     public static class SimpleFormatterBuilder implements Serializable {
 
+        @Serial
         private static final long serialVersionUID = 6414005370772800008L;
 
         /**
@@ -166,6 +169,7 @@ public class SimpleFormatter implements Serializable {
         @EqualsAndHashCode
         public static class BuilderWithStrategy implements Serializable {
 
+            @Serial
             private static final long serialVersionUID = -1987354973684803562L;
 
             private final ValueHandling valueHandlingStrategy;

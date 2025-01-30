@@ -15,19 +15,21 @@
  */
 package de.cuioss.tools.property.support;
 
-import java.io.Serializable;
-import java.util.Map.Entry;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map.Entry;
 
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode(doNotUseGetters = true)
 public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Serializable>
         implements Entry<K, V>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6403178000941411123L;
 
     @Getter

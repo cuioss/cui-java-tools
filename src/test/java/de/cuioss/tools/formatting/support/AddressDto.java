@@ -15,13 +15,15 @@
  */
 package de.cuioss.tools.formatting.support;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Data
 public class AddressDto implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -8011318084675794828L;
     private String streetAddressLine;
     private String postalCode;

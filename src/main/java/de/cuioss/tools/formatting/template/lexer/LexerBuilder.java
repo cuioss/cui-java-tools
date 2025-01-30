@@ -17,14 +17,14 @@ package de.cuioss.tools.formatting.template.lexer;
 
 import static java.util.Objects.requireNonNull;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.EnumSet;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.lexer.BracketLexer.Brackets;
 import de.cuioss.tools.formatting.template.lexer.Lexer.ExpressionLanguage;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.EnumSet;
 
 /**
  * @author Eugen Fischer
@@ -67,10 +67,10 @@ public final class LexerBuilder {
 
         private static Brackets getBracketsTypeFor(final ExpressionLanguage expl) {
             return switch (expl) {
-            case SIMPLE_SQUARED_BRACKTES -> Brackets.SQUARED_BRACKETS;
-            case SIMPLE_CURLY_BRACKETS -> Brackets.CURLY_BRACKETS;
-            case SIMPLE_ANGLE_BRACKET -> Brackets.ANGLE_BRACKET;
-            default -> throw new IllegalArgumentException(expl + " doesn't belongs to Simple expression language.");
+                case SIMPLE_SQUARED_BRACKTES -> Brackets.SQUARED_BRACKETS;
+                case SIMPLE_CURLY_BRACKETS -> Brackets.CURLY_BRACKETS;
+                case SIMPLE_ANGLE_BRACKET -> Brackets.ANGLE_BRACKET;
+                default -> throw new IllegalArgumentException(expl + " doesn't belongs to Simple expression language.");
             };
         }
 

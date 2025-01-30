@@ -20,15 +20,16 @@ import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serializable;
-import java.util.List;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.token.Token;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Functionality of scanning plain text and split this to tokens
@@ -40,6 +41,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 public abstract class Lexer<T extends FormatterSupport> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8645233576605974741L;
 
     @Getter(AccessLevel.PROTECTED)

@@ -15,10 +15,12 @@
  */
 package de.cuioss.tools.reflect.support;
 
+import java.io.Serial;
 import java.util.ArrayList;
 
 public class StringTypedArrayList extends ArrayList<String> {
 
+    @Serial
     private static final long serialVersionUID = 2410415238663640805L;
 
 }

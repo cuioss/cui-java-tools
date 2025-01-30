@@ -23,11 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.junit.jupiter.api.Test;
-
+@SuppressWarnings("DataFlowIssue")
 class FileLoaderUtilityTest {
 
     public static final String EXISTING_FILE_NAME = "/META-INF/someTestFile.txt";
@@ -77,9 +78,8 @@ class FileLoaderUtilityTest {
         assertFalse(loaded.isEmpty());
         assertTrue(loaded.contains("Hello"));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE);
-        });
+        assertThrows(IllegalArgumentException.class, () ->
+                FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
     }
 
 }

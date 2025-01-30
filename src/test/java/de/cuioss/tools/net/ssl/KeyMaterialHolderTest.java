@@ -21,10 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.Test;
-
 import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
 import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
 
 class KeyMaterialHolderTest {
 
@@ -33,9 +32,7 @@ class KeyMaterialHolderTest {
         assertNotNull(withRandomKeyMaterial());
 
         var builder = KeyMaterialHolder.builder();
-        assertThrows(NullPointerException.class, () -> {
-            builder.build();
-        });
+        assertThrows(NullPointerException.class, builder::build);
     }
 
     @Test

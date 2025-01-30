@@ -17,17 +17,18 @@ package de.cuioss.tools.io;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serial;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This {@link FileLoader} takes a {@link URL} as its parameter which is useful
@@ -37,10 +38,11 @@ import lombok.ToString;
  *
  * @author Sven Haag
  */
-@EqualsAndHashCode(of = { "url" })
-@ToString(of = { "url" })
+@EqualsAndHashCode(of = {"url"})
+@ToString(of = {"url"})
 public class UrlLoader implements FileLoader {
 
+    @Serial
     private static final long serialVersionUID = -8758614099334823819L;
 
     private static final CuiLogger log = new CuiLogger(UrlLoader.class);
@@ -54,14 +56,15 @@ public class UrlLoader implements FileLoader {
      *                                  a valid URL
      */
     public UrlLoader(final String url) {
+        checkArgument(null != url, "url must not be null");
         var sanitizedUrl = url;
         if (FileTypePrefix.URL.is(url)) {
             sanitizedUrl = FileTypePrefix.URL.removePrefix(url);
         }
 
         try {
-            this.url = new URL(sanitizedUrl);
-        } catch (final MalformedURLException e) {
+            this.url = URI.create(sanitizedUrl).toURL();
+        } catch (final MalformedURLException | IllegalArgumentException e) {
             throw new IllegalArgumentException("Provided URL is invalid: " + url, e);
         }
     }
@@ -74,35 +77,14 @@ public class UrlLoader implements FileLoader {
         this.url = url;
     }
 
-    /**
-     * @return true, if a connection to {@link #getURL()} can be established
-     */
-    @Override
-    public boolean isReadable() {
-        try {
-            var con = getConnection();
-            if (con.isPresent()) {
-                con.get().connect();
-                return true;
-            }
-        } catch (final IOException e) {
-            log.error(e, "Could not read from URL: {}", getURL());
-        }
-        return false;
-    }
-
-    @Override
-    public StructuredFilename getFileName() {
-        return new StructuredFilename(getURL().getPath());
-    }
-
     @Override
     public InputStream inputStream() throws IOException {
-        var con = getConnection();
-        if (con.isPresent()) {
-            return con.get().getInputStream();
+        if (null == connection) {
+            connection = url.openConnection();
+            connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
+            connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
         }
-        return null;
+        return connection.getInputStream();
     }
 
     @Override
@@ -111,20 +93,33 @@ public class UrlLoader implements FileLoader {
     }
 
     @Override
-    public boolean isFilesystemLoader() {
-        return false;
+    public boolean isReadable() {
+        try {
+            inputStream().close();
+            return true;
+        } catch (IOException e) {
+            log.debug("Resource not readable: {}", url, e);
+            return false;
+        }
     }
 
-    private Optional<URLConnection> getConnection() {
-        if (null == connection) {
-            try {
-                connection = url.openConnection();
-                connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
-                connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
-            } catch (final IOException e) {
-                log.error(e, "Portal-538: Could not read from URL: {}", getURL());
-            }
+    @Override
+    public StructuredFilename getFileName() {
+        String path = url.getPath();
+        int lastSlash = path.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            path = path.substring(lastSlash + 1);
         }
-        return Optional.ofNullable(connection);
+        // Remove query parameters if present
+        int queryStart = path.indexOf('?');
+        if (queryStart >= 0) {
+            path = path.substring(0, queryStart);
+        }
+        return new StructuredFilename(path);
+    }
+
+    @Override
+    public boolean isFilesystemLoader() {
+        return false;
     }
 }

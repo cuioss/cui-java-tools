@@ -57,7 +57,7 @@ public enum FileTypePrefix {
     /**
      * @param path from which the prefix should be removed
      *
-     * @return path without {@link #getPrefix()}
+     * @return path without the prefix, if any
      */
     public String removePrefix(final String path) {
         requireNonNull(path);

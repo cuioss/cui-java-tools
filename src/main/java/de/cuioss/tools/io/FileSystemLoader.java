@@ -18,15 +18,6 @@ package de.cuioss.tools.io;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
@@ -34,16 +25,26 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serial;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 /**
  * File-system based variant. Responsible for all non
  * {@link FileTypePrefix#CLASSPATH} files.
  *
  * @author Oliver Wolff
  */
-@EqualsAndHashCode(of = { "normalizedPathName" })
+@EqualsAndHashCode(of = {"normalizedPathName"})
 @ToString
 public class FileSystemLoader implements FileReaderWriter {
 
+    @Serial
     private static final long serialVersionUID = -1278929108857440808L;
 
     private static final CuiLogger LOG = new CuiLogger(FileSystemLoader.class);
@@ -89,14 +90,12 @@ public class FileSystemLoader implements FileReaderWriter {
      * @return the path
      */
     public Path getPath() {
-        return Paths.get(normalizedPathName);
+        return Path.of(normalizedPathName);
     }
 
     @Override
     public InputStream inputStream() throws IOException {
-        if (!isReadable()) {
-            throw new IllegalStateException("'" + normalizedPathName + "' is not readable");
-        }
+        Preconditions.checkState(isReadable(), "'%s' is not readable", normalizedPathName);
         return Files.newInputStream(getPath());
     }
 
@@ -155,9 +154,7 @@ public class FileSystemLoader implements FileReaderWriter {
      */
     @Override
     public OutputStream outputStream() throws IOException {
-        if (!isWritable()) {
-            throw new IllegalStateException(normalizedPathName + " is not writable");
-        }
+        Preconditions.checkState(isWritable(), "'%s' is not writable", normalizedPathName);
         return Files.newOutputStream(getPath());
     }
 }

@@ -18,6 +18,10 @@ package de.cuioss.tools.collect;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static java.util.Objects.requireNonNull;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,54 +39,112 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Stream;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-
 /**
- * <h2>Overview</h2> Builder for creating {@link java.util.Collection}s
- * providing some convenience methods. The class writes everything through into
- * the contained collector. Using the default constructor a newly created
- * {@link java.util.ArrayList} will be used as collector, but you can pass you
- * own collector as constructor-argument. Of course this should be mutable in
- * order to work.
+ * <h2>Overview</h2>
+ * Builder for creating {@link java.util.Collection}s providing some convenience methods.
+ * The class writes everything through into the contained collector. Using the default
+ * constructor a newly created {@link java.util.ArrayList} will be used as collector,
+ * but you can pass your own collector as constructor-argument. Of course this should
+ * be mutable in order to work.
+ * 
  * <h3>Handling of null-values</h3>
  * <p>
  * As default {@code null} values are ignored. This behavior can be changed by
- * call {@link #addNullValues(boolean)}. <em>Caution:</em> In case of using one
+ * calling {@link #addNullValues(boolean)}. <em>Caution:</em> In case of using one
  * of the {@link #copyFrom(Collection)} methods for instantiation the
  * {@code null} values will not be checked in that way
  * </p>
- * <h3>Standard Usage</h3>
- *
+ * 
+ * <h3>Basic Usage Examples</h3>
  * <pre>
- *
- * List&lt;String&gt; result = new CollectionBuilder&lt;String&gt;().add("this").add("that").add(mutableList("on", "or an other"))
- *         .toImmutableList();
+ * // Create an immutable list
+ * List&lt;String&gt; immutableList = new CollectionBuilder&lt;String&gt;()
+ *     .add("first")
+ *     .add("second")
+ *     .add(mutableList("third", "fourth"))
+ *     .toImmutableList();
+ * 
+ * // Create a mutable set
+ * Set&lt;String&gt; mutableSet = new CollectionBuilder&lt;String&gt;()
+ *     .add("unique1")
+ *     .add("unique2")
+ *     .toMutableSet();
  * </pre>
- *
- * or
- *
+ * 
+ * <h3>Advanced Usage Examples</h3>
+ * 
+ * <h4>1. Working with Null Values</h4>
  * <pre>
- *
- * Set&lt;String&gt; result = new CollectionBuilder&lt;String&gt;().add("this").add("that").add(mutableList("on", "or an other"))
- *         .toMutableSet();
+ * // Configure builder to accept null values
+ * List&lt;String&gt; withNulls = new CollectionBuilder&lt;String&gt;()
+ *     .addNullValues(true)
+ *     .add("first")
+ *     .add(null)
+ *     .add("third")
+ *     .toMutableList();
+ * // Result: ["first", null, "third"]
  * </pre>
- *
- * <h3>Copy From</h3> This methods can be used for ensuring a real copy
- *
+ * 
+ * <h4>2. Copying and Transforming Collections</h4>
  * <pre>
- *
- * List&lt;String&gt; result = CollectionBuilder.copyFrom(mutableList("on", "or an other")).add("element").toMutableList();
- *
+ * // Copy existing collection and add elements
+ * List&lt;String&gt; source = Arrays.asList("one", "two");
+ * List&lt;String&gt; enhanced = CollectionBuilder.copyFrom(source)
+ *     .add("three")
+ *     .add("four")
+ *     .toImmutableList();
+ * 
+ * // Transform to different collection type
+ * Set&lt;String&gt; asSet = CollectionBuilder.copyFrom(source)
+ *     .toMutableSet();
  * </pre>
- *
- * <h3>Sorting</h3>
- * <p>
- * The contained {@link java.util.Collection} can be sorted any time by calling
- * {@link #sort(Comparator)}
- * </p>
- *
+ * 
+ * <h4>3. Working with Streams and Optional</h4>
+ * <pre>
+ * // Adding elements from a stream
+ * Stream&lt;String&gt; stream = Stream.of("a", "b", "c");
+ * List&lt;String&gt; fromStream = new CollectionBuilder&lt;String&gt;()
+ *     .add(stream)
+ *     .toMutableList();
+ * 
+ * // Working with Optional values
+ * Optional&lt;String&gt; maybeValue = Optional.of("value");
+ * List&lt;String&gt; withOptional = new CollectionBuilder&lt;String&gt;()
+ *     .add(maybeValue)
+ *     .add(Optional.empty())  // Will be ignored by default
+ *     .toMutableList();
+ * </pre>
+ * 
+ * <h4>4. Sorting Collections</h4>
+ * <pre>
+ * // Create a sorted list
+ * List&lt;Integer&gt; sorted = new CollectionBuilder&lt;Integer&gt;()
+ *     .add(3, 1, 4, 1, 5)
+ *     .sort(Comparator.naturalOrder())
+ *     .toImmutableList();
+ * // Result: [1, 1, 3, 4, 5]
+ * 
+ * // Custom sorting
+ * List&lt;String&gt; sortedByLength = new CollectionBuilder&lt;String&gt;()
+ *     .add("aaa", "a", "aa")
+ *     .sort(Comparator.comparing(String::length))
+ *     .toImmutableList();
+ * // Result: ["a", "aa", "aaa"]
+ * </pre>
+ * 
+ * <h4>5. Thread-Safe Collections</h4>
+ * <pre>
+ * // Create a concurrent list
+ * List&lt;String&gt; concurrentList = new CollectionBuilder&lt;String&gt;()
+ *     .add("thread", "safe", "list")
+ *     .toConcurrentList();
+ * 
+ * // Create a concurrent navigable set
+ * NavigableSet&lt;Integer&gt; concurrentSet = new CollectionBuilder&lt;Integer&gt;()
+ *     .add(1, 2, 3)
+ *     .toConcurrentNavigableSet();
+ * </pre>
+ * 
  * @author Oliver Wolff
  * @param <E> The type of the contained {@link java.util.Collection}
  */

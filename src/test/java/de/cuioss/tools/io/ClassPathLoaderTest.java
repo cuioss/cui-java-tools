@@ -77,7 +77,7 @@ class ClassPathLoaderTest {
     @Test
     void shouldFailToLoadNotExistingFile() {
         var classPathLoader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
-        assertThrows(IllegalStateException.class, () -> classPathLoader.inputStream());
+        assertThrows(IllegalStateException.class, classPathLoader::inputStream);
     }
 
     @Test

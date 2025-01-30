@@ -18,13 +18,13 @@ package de.cuioss.tools.collect;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableMap;
 import static java.util.Objects.requireNonNull;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * <h2>Overview</h2>

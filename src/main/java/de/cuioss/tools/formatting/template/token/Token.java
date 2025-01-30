@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
-import java.io.Serializable;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
+
+import java.io.Serializable;
 
 /**
  * Any token should provide a method to substitute "placeholder" with his value
