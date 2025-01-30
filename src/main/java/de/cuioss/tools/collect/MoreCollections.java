@@ -15,6 +15,9 @@
  */
 package de.cuioss.tools.collect;
 
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static java.util.Objects.isNull;
+
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
@@ -22,9 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static java.util.Objects.isNull;
 
 /**
  * <h2>Overview</h2> Utility Methods for Collections and some types to be used
@@ -330,7 +330,7 @@ public final class MoreCollections {
      */
     @SuppressWarnings("javaarchitecture:S7027") // owolff: No issue, because it delegates to MapDifferenceImpl
     public static <K, V> MapDifference<K, V> difference(Map<? extends K, ? extends V> left,
-                                                        Map<? extends K, ? extends V> right) {
+            Map<? extends K, ? extends V> right) {
         return MapDiffenceImpl.from(left, right);
     }
 
