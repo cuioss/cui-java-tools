@@ -84,6 +84,7 @@ import java.util.stream.Stream;
  *
  * @author Oliver Wolff
  */
+@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency within collection utilities
 @UtilityClass
 public class CollectionLiterals {
 

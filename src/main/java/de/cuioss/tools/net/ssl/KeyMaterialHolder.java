@@ -31,6 +31,7 @@ import java.util.Base64;
  *
  * @author Oliver Wolff
  */
+@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency with KeyStoreProvider
 @Builder
 @EqualsAndHashCode(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)
 @ToString(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)

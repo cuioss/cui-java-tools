@@ -85,6 +85,7 @@ import java.util.Deque;
  * </p>
  *
  */
+@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency with IOCase
 @UtilityClass
 public class FilenameUtils {
 
@@ -211,7 +212,7 @@ public class FilenameUtils {
      * If the double dot has no parent path segment to work with, {@code null} is
      * returned.
      * <p>
-     * The output will be the same on both Unix and Windows except for the separator
+     * The output will be the same on both Unix and Windows including the separator
      * character.
      *
      * <pre>
@@ -593,9 +594,8 @@ public class FilenameUtils {
      * Returns the length of the filename prefix, such as <code>C:/</code> or
      * <code>~/</code>.
      * <p>
-     * This method will handle a file in either Unix or Windows format.
-     * <p>
-     * The prefix length includes the first slash in the full filename if
+     * This method will handle a file in either Unix or Windows format. The prefix
+     * length includes the first slash in the full filename if
      * applicable. Thus, it is possible that the length returned is greater than the
      * length of the input string.
      *
@@ -621,10 +621,6 @@ public class FilenameUtils {
      * <p>
      * The output will be the same irrespective of the machine that the code is
      * running on. i.e. both Unix and Windows prefixes are matched regardless.
-     * <p>
-     * Note that a leading // (or \\) is used to indicate a UNC name on Windows.
-     * These must be followed by a server name, so double-slashes are not collapsed
-     * to a single slash at the start of the filename.
      *
      * @param filename the filename to find the prefix in, null returns -1
      * @return the length of the prefix, -1 if invalid or null
@@ -1195,7 +1191,7 @@ public class FilenameUtils {
      * <p>
      * This method obtains the extension as the textual part of the filename after
      * the last dot. There must be no directory separator after the dot. The
-     * extension check is case-sensitive on all platforms.
+     * extension check is case-sensitive always.
      *
      * @param filename  the filename to query, null returns false
      * @param extension the extension to check for, null or empty checks for no
