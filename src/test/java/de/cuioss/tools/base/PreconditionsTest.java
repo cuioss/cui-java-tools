@@ -20,84 +20,86 @@ import static de.cuioss.tools.base.Preconditions.checkState;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+@DisplayName("Preconditions should")
 class PreconditionsTest {
 
-    private static final String SHOULD_HAVE_THROWN_EXCEPTION = "Should have thrown exception";
-
     private static final String MESSAGE = "message";
-
     private static final String MESSAGE_TEMPLATE = "message %s";
-
     private static final String MESSAGE_PARAMETER = "parameter";
-
     private static final String MESSAGE_TEMPLATE_RESULT = "message parameter";
 
-    @Test
-    void shouldHandleCheckArgument() {
-        checkArgument(true);
-        assertThrows(IllegalArgumentException.class, () -> checkArgument(false));
+    @Nested
+    @DisplayName("handle checkArgument")
+    class CheckArgumentTest {
 
-        checkArgument(true, MESSAGE);
+        @Test
+        @DisplayName("pass for true condition")
+        void shouldPassForTrueCondition() {
+            checkArgument(true);
+            checkArgument(true, MESSAGE);
+            checkArgument(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
+        }
 
-        try {
-            checkArgument(false, MESSAGE);
-            fail(SHOULD_HAVE_THROWN_EXCEPTION);
-        } catch (Exception e) {
-            assertInstanceOf(IllegalArgumentException.class, e);
-            assertEquals(MESSAGE, e.getMessage());
+        @Test
+        @DisplayName("throw IllegalArgumentException for false condition without message")
+        void shouldThrowForFalseCondition() {
+            assertThrows(IllegalArgumentException.class, () -> checkArgument(false));
+        }
+
+        @Test
+        @DisplayName("throw IllegalArgumentException with message for false condition")
+        void shouldThrowWithMessageForFalseCondition() {
+            var ex = assertThrows(IllegalArgumentException.class, () -> checkArgument(false, MESSAGE));
+            assertEquals(MESSAGE, ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("throw IllegalArgumentException with formatted message for false condition")
+        void shouldThrowWithFormattedMessageForFalseCondition() {
+            var ex = assertThrows(IllegalArgumentException.class, 
+                () -> checkArgument(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
+            assertEquals(MESSAGE_TEMPLATE_RESULT, ex.getMessage());
         }
     }
 
-    @Test
-    void shouldHandleCheckArgumentParameter() {
-        checkArgument(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
-        assertThrows(IllegalArgumentException.class, () -> checkArgument(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
+    @Nested
+    @DisplayName("handle checkState")
+    class CheckStateTest {
 
-        checkArgument(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
+        @Test
+        @DisplayName("pass for true condition")
+        void shouldPassForTrueCondition() {
+            checkState(true);
+            checkState(true, MESSAGE);
+            checkState(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
+        }
 
-        try {
-            checkArgument(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
-            fail(SHOULD_HAVE_THROWN_EXCEPTION);
-        } catch (Exception e) {
-            assertInstanceOf(IllegalArgumentException.class, e);
-            assertEquals(MESSAGE_TEMPLATE_RESULT, e.getMessage());
+        @Test
+        @DisplayName("throw IllegalStateException for false condition without message")
+        void shouldThrowForFalseCondition() {
+            assertThrows(IllegalStateException.class, () -> checkState(false));
+        }
+
+        @Test
+        @DisplayName("throw IllegalStateException with message for false condition")
+        void shouldThrowWithMessageForFalseCondition() {
+            var ex = assertThrows(IllegalStateException.class, () -> checkState(false, MESSAGE));
+            assertEquals(MESSAGE, ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("throw IllegalStateException with formatted message for false condition")
+        void shouldThrowWithFormattedMessageForFalseCondition() {
+            var ex = assertThrows(IllegalStateException.class, 
+                () -> checkState(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
+            assertEquals(MESSAGE_TEMPLATE_RESULT, ex.getMessage());
         }
     }
-
-    @Test
-    void shouldHandleCheckState() {
-        checkState(true);
-        assertThrows(IllegalStateException.class, () -> checkState(false));
-
-        checkState(true, MESSAGE);
-
-        try {
-            checkState(false, MESSAGE);
-            fail(SHOULD_HAVE_THROWN_EXCEPTION);
-        } catch (Exception e) {
-            assertInstanceOf(IllegalStateException.class, e);
-            assertEquals(MESSAGE, e.getMessage());
-        }
-    }
-
-    @Test
-    void shouldHandleCheckStateParameter() {
-        checkState(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
-        assertThrows(IllegalStateException.class, () -> checkState(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER));
-
-        checkState(true, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
-
-        try {
-            checkState(false, MESSAGE_TEMPLATE, MESSAGE_PARAMETER);
-            fail(SHOULD_HAVE_THROWN_EXCEPTION);
-        } catch (Exception e) {
-            assertInstanceOf(IllegalStateException.class, e);
-            assertEquals(MESSAGE_TEMPLATE_RESULT, e.getMessage());
-        }
-    }
-
 }

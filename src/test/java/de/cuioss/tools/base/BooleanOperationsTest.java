@@ -20,67 +20,152 @@ import static de.cuioss.tools.base.BooleanOperations.areAllTrue;
 import static de.cuioss.tools.base.BooleanOperations.isAnyFalse;
 import static de.cuioss.tools.base.BooleanOperations.isAnyTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+@DisplayName("BooleanOperations should")
 class BooleanOperationsTest {
 
-    @Test
-    void shouldDetectAnyTrue() {
-        assertTrue(isAnyTrue(true));
-        assertTrue(isAnyTrue(true, true));
-        assertTrue(isAnyTrue(true, false));
-        assertFalse(isAnyTrue(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(isAnyTrue());
-        assertFalse(isAnyTrue(null));
+    @Nested
+    @DisplayName("handle isAnyTrue")
+    class IsAnyTrueTest {
+        
+        @ParameterizedTest(name = "return {1} for values {0}")
+        @CsvSource({
+            "'true', true",
+            "'true,true', true",
+            "'true,false', true",
+            "'false,false', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            var values = input.split(",");
+            var booleans = new boolean[values.length];
+            for (int i = 0; i < values.length; i++) {
+                booleans[i] = Boolean.parseBoolean(values[i]);
+            }
+            assertEquals(expected, isAnyTrue(booleans));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(isAnyTrue());
+            assertFalse(isAnyTrue((boolean[]) null));
+        }
     }
 
-    @Test
-    void shouldDetectAnyFalse() {
-        assertFalse(isAnyFalse(true));
-        assertTrue(isAnyFalse(true, false));
-        assertTrue(isAnyFalse(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(isAnyFalse());
-        assertFalse(isAnyFalse(null));
+    @Nested
+    @DisplayName("handle isAnyFalse")
+    class IsAnyFalseTest {
+        
+        @ParameterizedTest(name = "return {1} for values {0}")
+        @CsvSource({
+            "'true', false",
+            "'true,false', true",
+            "'false,false', true",
+            "'true,true', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            var values = input.split(",");
+            var booleans = new boolean[values.length];
+            for (int i = 0; i < values.length; i++) {
+                booleans[i] = Boolean.parseBoolean(values[i]);
+            }
+            assertEquals(expected, isAnyFalse(booleans));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(isAnyFalse());
+            assertFalse(isAnyFalse((boolean[]) null));
+        }
     }
 
-    @Test
-    void shouldDetectAllFalse() {
-        assertFalse(areAllFalse(true));
-        assertFalse(areAllFalse(true, false));
-        assertFalse(areAllFalse(true, true));
-        assertTrue(areAllFalse(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(areAllFalse());
-        assertFalse(areAllFalse(null));
+    @Nested
+    @DisplayName("handle areAllFalse")
+    class AreAllFalseTest {
+        
+        @ParameterizedTest(name = "return {1} for values {0}")
+        @CsvSource({
+            "'true', false",
+            "'true,false', false",
+            "'false,false', true",
+            "'true,true', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            var values = input.split(",");
+            var booleans = new boolean[values.length];
+            for (int i = 0; i < values.length; i++) {
+                booleans[i] = Boolean.parseBoolean(values[i]);
+            }
+            assertEquals(expected, areAllFalse(booleans));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(areAllFalse());
+            assertFalse(areAllFalse((boolean[]) null));
+        }
     }
 
-    @Test
-    void shouldDetectAllTrue() {
-        assertTrue(areAllTrue(true));
-        assertFalse(areAllTrue(true, false));
-        assertTrue(areAllTrue(true, true));
-        assertFalse(areAllTrue(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertTrue(areAllTrue());
-        assertTrue(areAllTrue(null));
+    @Nested
+    @DisplayName("handle areAllTrue")
+    class AreAllTrueTest {
+        
+        @ParameterizedTest(name = "return {1} for values {0}")
+        @CsvSource({
+            "'true', true",
+            "'true,false', false",
+            "'false,false', false",
+            "'true,true', true"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            var values = input.split(",");
+            var booleans = new boolean[values.length];
+            for (int i = 0; i < values.length; i++) {
+                booleans[i] = Boolean.parseBoolean(values[i]);
+            }
+            assertEquals(expected, areAllTrue(booleans));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertTrue(areAllTrue());
+            assertTrue(areAllTrue((boolean[]) null));
+        }
     }
 
-    @Test
-    void isValidBoolean() {
-        assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null)));
-        assertFalse(BooleanOperations.isValidBoolean(""));
-        assertFalse(BooleanOperations.isValidBoolean(" "));
-        assertFalse(BooleanOperations.isValidBoolean(" true "));
-        assertFalse(BooleanOperations.isValidBoolean("true "));
+    @Nested
+    @DisplayName("handle isValidBoolean")
+    class IsValidBooleanTest {
+        
+        @ParameterizedTest(name = "return true for valid boolean string '{0}'")
+        @ValueSource(strings = {"true", "false", "TrUe", "FaLsE"})
+        void shouldHandleValidCases(String input) {
+            assertTrue(BooleanOperations.isValidBoolean(input));
+        }
 
-        assertTrue(BooleanOperations.isValidBoolean("true"));
-        assertTrue(BooleanOperations.isValidBoolean("false"));
-        assertTrue(BooleanOperations.isValidBoolean("TrUe"));
-        assertTrue(BooleanOperations.isValidBoolean("FaLsE"));
+        @ParameterizedTest(name = "return false for invalid boolean string '{0}'")
+        @ValueSource(strings = {"", " ", " true ", "true ", "yes", "no"})
+        void shouldHandleInvalidCases(String input) {
+            assertFalse(BooleanOperations.isValidBoolean(input));
+        }
+
+        @Test
+        @DisplayName("handle null input")
+        void shouldHandleNullCase() {
+            assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null)));
+        }
     }
 }
