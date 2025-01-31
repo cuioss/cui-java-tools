@@ -1154,8 +1154,8 @@ public final class MoreStrings {
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            var objectToString = (o == null) ? "null" : 
-                o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
+            var objectToString = (o == null) ? "null" :
+                    o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
             LOGGER.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }

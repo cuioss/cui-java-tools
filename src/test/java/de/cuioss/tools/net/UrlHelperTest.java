@@ -24,12 +24,12 @@ import java.util.Optional;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.net.UrlHelper.addPrecedingSlashToPath;
 import static de.cuioss.tools.net.UrlHelper.addTrailingSlashToUrl;
+import static de.cuioss.tools.net.UrlHelper.isValidUri;
 import static de.cuioss.tools.net.UrlHelper.removePrecedingSlashFromPath;
 import static de.cuioss.tools.net.UrlHelper.removeTrailingSlashesFromUrl;
 import static de.cuioss.tools.net.UrlHelper.splitHost;
 import static de.cuioss.tools.net.UrlHelper.splitPath;
 import static de.cuioss.tools.net.UrlHelper.tryParseUri;
-import static de.cuioss.tools.net.UrlHelper.isValidUri;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -118,7 +118,7 @@ class UrlHelperTest {
     void shouldHandleNullAndEmptyForUriValidation() {
         assertTrue(assertDoesNotThrow(() -> isValidUri("")));
         assertTrue(assertDoesNotThrow(() -> isValidUri(null)));
-        
+
         Optional<URI> emptyResult = assertDoesNotThrow(() -> tryParseUri(""));
         assertTrue(emptyResult.isEmpty());
         Optional<URI> nullResult = assertDoesNotThrow(() -> tryParseUri(null));
@@ -143,14 +143,14 @@ class UrlHelperTest {
     void shouldSplitHostCorrectly() {
         assertTrue(splitHost("").isEmpty());
         assertTrue(splitHost(null).isEmpty());
-        
+
         List<String> expected = immutableList("foo", "bar", "baz");
         assertEquals(expected, splitHost(VALID_HOST));
-        
+
         // Handle malformed host with consecutive dots
         List<String> malformed = splitHost(INVALID_HOST);
         assertEquals(immutableList("foo", "bar"), malformed);
-        
+
         // Handle host with spaces
         List<String> withSpaces = splitHost("foo . bar");
         assertEquals(immutableList("foo", "bar"), withSpaces);
