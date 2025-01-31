@@ -1130,30 +1130,31 @@ public final class MoreStrings {
     static String lenientToString(Object o) {
         try {
             if (o != null && o.getClass().isArray()) {
-                if (o instanceof Object[]) {
-                    return Arrays.toString((Object[]) o);
-                } else if (o instanceof int[]) {
-                    return Arrays.toString((int[]) o);
-                } else if (o instanceof long[]) {
-                    return Arrays.toString((long[]) o);
-                } else if (o instanceof double[]) {
-                    return Arrays.toString((double[]) o);
-                } else if (o instanceof float[]) {
-                    return Arrays.toString((float[]) o);
-                } else if (o instanceof boolean[]) {
-                    return Arrays.toString((boolean[]) o);
-                } else if (o instanceof byte[]) {
-                    return Arrays.toString((byte[]) o);
-                } else if (o instanceof short[]) {
-                    return Arrays.toString((short[]) o);
-                } else if (o instanceof char[]) {
-                    return Arrays.toString((char[]) o);
+                if (o instanceof Object[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof int[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof long[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof double[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof float[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof boolean[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof byte[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof short[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof char[] arr) {
+                    return Arrays.toString(arr);
                 }
             }
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            var objectToString = o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
+            var objectToString = (o == null) ? "null" : 
+                o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
             log.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }

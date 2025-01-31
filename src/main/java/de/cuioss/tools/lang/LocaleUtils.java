@@ -177,7 +177,7 @@ public class LocaleUtils {
     }
 
     private static void validateVariant(final String variant) {
-        Preconditions.checkArgument(variant.matches("[A-Za-z0-9]{5,8}((_[A-Za-z0-9]{5,8})*)?"),
+        Preconditions.checkArgument(variant.matches("[A-Za-z0-9]{5,8}(_[A-Za-z0-9]{5,8})*"),
                 "Variant must be 5-8 alphanumeric characters or sequence of such strings separated by underscore");
     }
 }

@@ -51,10 +51,14 @@ public class MoreObjects {
     public static <T> T requireType(final Object underCheck, Class<T> expectedType) {
         checkArgument(null != underCheck, "Object to be checked must not be null");
         checkArgument(null != expectedType, "expectedType must not be null");
-        checkArgument(expectedType.isAssignableFrom(underCheck.getClass()),
-                "KeyStoreType to be checked '%s' is not assignable to '%s'", underCheck.getClass(),
-                expectedType.getName());
-        return (T) underCheck;
+        
+        if (expectedType.isInstance(underCheck)) {
+            return (T) underCheck;
+        }
+        throw new IllegalArgumentException(String.format(
+                "Object to be checked '%s' is not assignable to '%s'", 
+                underCheck.getClass().getName(),
+                expectedType.getName()));
     }
 
     /**
