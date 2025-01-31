@@ -41,13 +41,13 @@ import static java.util.Objects.requireNonNull;
 @UtilityClass
 public final class MorePaths {
 
-    private static final CuiLogger log = new CuiLogger(MorePaths.class);
+    private static final CuiLogger LOGGER = new CuiLogger(MorePaths.class);
 
     /** ".backup" */
     public static final String BACKUP_DIR_NAME = ".backup";
 
-    /** "File or Directory {} is not accessible, reason: {}". */
-    public static final String MSG_DIRECTORY_NOT_ACCESSIBLE = "File or Directory {} is not accessible, reason: {}";
+    /** "File or Directory %s is not accessible, reason: %s". */
+    public static final String MSG_DIRECTORY_NOT_ACCESSIBLE = "File or Directory %s is not accessible, reason: %s";
 
     /** The prefix to be attached to a backup-file */
     public static final String BACKUP_FILE_SUFFIX = ".bck_";
@@ -66,7 +66,7 @@ public final class MorePaths {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            log.warn("Unable to resolve real path for '{}', due to '{}'. Returning absolutePath.", path, e.getMessage(),
+            LOGGER.warn("Unable to resolve real path for '%s', due to '%s'. Returning absolutePath.", path, e.getMessage(),
                     e);
             return path.toAbsolutePath();
         }
@@ -118,11 +118,11 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.canWrite()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Writable");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Writable");
             }
             return false;
         }
-        log.debug("{} denotes an existing file / directory with read and write permissions", absolutePath);
+        LOGGER.debug("%s denotes an existing file / directory with read and write permissions", absolutePath);
         return true;
     }
 
@@ -143,30 +143,30 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
         }
         if (checkForDirectory) {
             if (!pathFile.isDirectory()) {
                 if (verbose) {
-                    log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
+                    LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
                 }
                 return false;
             }
         } else if (!pathFile.isFile()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canRead()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Readable");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Readable");
             }
             return false;
         }
-        log.debug("{} denotes an existing file / directory with read permissions", absolutePath);
+        LOGGER.debug("%s denotes an existing file / directory with read permissions", absolutePath);
         return true;
     }
 
@@ -184,23 +184,23 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
         }
         if (!pathFile.isFile()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canExecute()) {
             if (verbose) {
-                log.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Executable");
+                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Executable");
             }
             return false;
         }
-        log.debug("{} denotes an existing file / directory with execute permission", absolutePath);
+        LOGGER.debug("%s denotes an existing file / directory with execute permission", absolutePath);
         return true;
     }
 
@@ -246,7 +246,7 @@ public final class MorePaths {
                 path.getFileName() + BACKUP_FILE_SUFFIX + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
 
         Files.copy(path, backupFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        log.debug("Created backup from '{}' at '{}'", path.toFile().getAbsolutePath(),
+        LOGGER.debug("Created backup from '%s' at '%s'", path.toFile().getAbsolutePath(),
                 backupFile.toFile().getAbsolutePath());
         return backupFile;
     }
@@ -270,7 +270,7 @@ public final class MorePaths {
         var tempFile = Files.createTempFile(filename.getNamePart(), filename.getSuffix());
 
         Files.copy(path, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        log.debug("Created temp-file from '{}' at '{}'", path.toFile().getAbsolutePath(),
+        LOGGER.debug("Created temp-file from '%s' at '%s'", path.toFile().getAbsolutePath(),
                 tempFile.toFile().getAbsolutePath());
         return tempFile;
     }
@@ -323,20 +323,20 @@ public final class MorePaths {
      *         {@code false}
      */
     public static boolean deleteQuietly(final Path path) {
-        log.trace("Deleting file {}", path);
+        LOGGER.trace("Deleting file %s", path);
         if (path == null) {
             return false;
         }
         var file = path.toFile();
         final var absolutePath = file.getAbsolutePath();
         if (!file.exists()) {
-            log.trace("Path {} does not exist", absolutePath);
+            LOGGER.trace("Path %s does not exist", absolutePath);
             return false;
         }
         var recursiveSucceful = true;
         try {
             if (file.isDirectory()) {
-                log.trace("Path {} is directory, checking children", absolutePath);
+                LOGGER.trace("Path %s is directory, checking children", absolutePath);
                 for (String child : file.list()) {
                     if (!deleteQuietly(path.resolve(child))) {
                         recursiveSucceful = false;
@@ -345,17 +345,17 @@ public final class MorePaths {
                 }
             }
         } catch (final Exception e) {
-            log.trace(e, "Unable to check Path {} whether it is a directory", absolutePath);
+            LOGGER.trace(e, "Unable to check Path %s whether it is a directory", absolutePath);
         }
 
         try {
             if (Files.deleteIfExists(path)) {
-                log.trace("Successully deleted path {}", absolutePath);
+                LOGGER.trace("Successully deleted path %s", absolutePath);
             } else {
                 recursiveSucceful = false;
             }
         } catch (final Exception e) {
-            log.trace(e, "Unable to delete Path {}", absolutePath);
+            LOGGER.trace(e, "Unable to delete Path %s", absolutePath);
             return false;
         }
         return recursiveSucceful;
@@ -483,19 +483,19 @@ public final class MorePaths {
 
         if (null != path && null != path2) {
             if (!path.toFile().exists() || !path2.toFile().exists()) {
-                log.debug("""
+                LOGGER.debug("""
                         Comparing paths with #equals, as at least one path does not exist. \
-                        path_a={}, path_b={}\
+                        path_a=%s, path_b=%s\
                         """, path, path2);
                 return path.equals(path2);
             }
             try {
                 return Files.isSameFile(path, path2);
             } catch (final IOException e) {
-                log.error(e, "Portal-123: Unable to compare path_a={} and path_b={}", path, path2);
+                LOGGER.error(e, "Portal-123: Unable to compare path_a=%s and path_b=%s", path, path2);
             }
         } else {
-            log.trace("at least one path is null: path_a={}, path_b={}", path, path2);
+            LOGGER.trace("at least one path is null: path_a=%s, path_b=%s", path, path2);
         }
 
         return false;

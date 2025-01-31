@@ -43,7 +43,7 @@ public enum PropertyReadWrite {
     /** The property can neither be read nor written to. */
     NONE(false, false);
 
-    private static final CuiLogger log = new CuiLogger(PropertyReadWrite.class);
+    private static final CuiLogger LOGGER = new CuiLogger(PropertyReadWrite.class);
 
     @Getter
     private final boolean readable;
@@ -90,9 +90,7 @@ public enum PropertyReadWrite {
         if (MoreObjects.allNonNull(descriptor.getReadMethod(), descriptor.getWriteMethod())) {
             return READ_WRITE;
         }
-        log.debug(
-                "PropertyDescriptor '%s' does not describe a standard bean-structure for property '%s' on type '%s', switching to reflection",
-                descriptor, propertyName, beanType);
+        LOGGER.debug("PropertyDescriptor '%s' does not describe a standard bean-structure for property '%s' on type '%s', switching to reflection", descriptor, propertyName, beanType);
         return resolveForBean(beanType, propertyName);
     }
 }

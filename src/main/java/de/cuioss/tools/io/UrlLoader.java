@@ -45,7 +45,7 @@ public class UrlLoader implements FileLoader {
     @Serial
     private static final long serialVersionUID = -8758614099334823819L;
 
-    private static final CuiLogger log = new CuiLogger(UrlLoader.class);
+    private static final CuiLogger LOGGER = new CuiLogger(UrlLoader.class);
 
     private final URL url;
     private transient URLConnection connection;
@@ -98,7 +98,7 @@ public class UrlLoader implements FileLoader {
             inputStream().close();
             return true;
         } catch (IOException e) {
-            log.debug("Resource not readable: {}", url, e);
+            LOGGER.debug("Resource not readable: %s", url, e);
             return false;
         }
     }

@@ -59,7 +59,7 @@ import static java.util.Objects.requireNonNull;
 @ToString
 public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
-    private static final CuiLogger log = new CuiLogger(UrlParameter.class);
+    private static final CuiLogger LOGGER = new CuiLogger(UrlParameter.class);
 
     /** Shortcut constant for faces redirect parameter. */
     public static final UrlParameter FACES_REDIRECT = new UrlParameter("faces-redirect", "true");
@@ -185,7 +185,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                 try {
                     extracted.add(new UrlParameter(key, value, encode));
                 } catch (final IllegalArgumentException e) {
-                    log.debug("Unable to read url parameter due to missing parameter name", e.getMessage());
+                    LOGGER.debug("Unable to read url parameter due to missing parameter name", e.getMessage());
                 }
             }
         }
@@ -245,7 +245,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      *         {@link UrlParameter} otherwise
      */
     public static List<UrlParameter> fromQueryString(String queryString) {
-        log.trace("Parsing Query String %s", queryString);
+        LOGGER.trace("Parsing Query String %s", queryString);
         if (MoreStrings.isEmpty(queryString)) {
             return Collections.emptyList();
         }
@@ -254,7 +254,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             cleaned = cleaned.substring(1);
         }
         if (MoreStrings.isEmpty(cleaned)) {
-            log.debug("Given String solely consists of '?' symbol, ignoring");
+            LOGGER.debug("Given String solely consists of '?' symbol, ignoring");
             return Collections.emptyList();
         }
         var elements = Splitter.on(Pattern.compile("&")).trimResults().omitEmptyStrings().splitToList(cleaned);
@@ -264,7 +264,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                 var splitted = Splitter.on(Pattern.compile("=")).omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
                     case 0:
-                        log.debug(
+                        LOGGER.debug(
                                 "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
                                 queryString, element);
                         break;
@@ -275,7 +275,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                         builder.add(createDecoded(splitted.get(0), splitted.get(1)));
                         break;
                     default:
-                        log.debug(
+                        LOGGER.debug(
                                 "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
                                 queryString);
                         break;

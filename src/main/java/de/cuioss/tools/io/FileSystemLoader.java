@@ -47,7 +47,7 @@ public class FileSystemLoader implements FileReaderWriter {
     @Serial
     private static final long serialVersionUID = -1278929108857440808L;
 
-    private static final CuiLogger LOG = new CuiLogger(FileSystemLoader.class);
+    private static final CuiLogger LOGGER = new CuiLogger(FileSystemLoader.class);
 
     private final String normalizedPathName;
 
@@ -122,9 +122,9 @@ public class FileSystemLoader implements FileReaderWriter {
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             try {
                 newPathName = new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
-                LOG.debug("Loading config file from external path: {}", newPathName);
+                LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
-                LOG.error("Retrieving the current dir failed: ", e);
+                LOGGER.error("Retrieving the current dir failed: ", e);
             }
         }
 

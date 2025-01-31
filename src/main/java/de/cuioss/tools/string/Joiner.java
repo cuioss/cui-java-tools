@@ -94,7 +94,7 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Joiner {
 
-    private static final CuiLogger log = new CuiLogger(Joiner.class);
+    private static final CuiLogger LOGGER = new CuiLogger(Joiner.class);
 
     @NonNull
     private final JoinerConfig joinerConfig;
@@ -199,7 +199,7 @@ public final class Joiner {
     }
 
     private String doJoin(Iterable<?> parts) {
-        log.trace("Joining elements with configuration {}", joinerConfig);
+        LOGGER.debug("Joining %s elements", parts);
         if (isEmpty(parts)) {
             return "";
         }

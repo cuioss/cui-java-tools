@@ -41,7 +41,7 @@ import java.util.Optional;
 // What is actually the use-case of this type, therefore, there is nothing we can do
 public class FieldWrapper {
 
-    private static final CuiLogger log = new CuiLogger(FieldWrapper.class);
+    private static final CuiLogger LOGGER = new CuiLogger(FieldWrapper.class);
 
     @Getter
     private final Field field;
@@ -66,29 +66,29 @@ public class FieldWrapper {
      */
     public Optional<Object> readValue(Object source) {
         if (null == source) {
-            log.trace("No Object given, returning Optional#empty()");
+            LOGGER.trace("No Object given, returning Optional#empty()");
             return Optional.empty();
         }
         if (!declaringClass.isAssignableFrom(source.getClass())) {
-            log.trace("Given Object is improper type, returning Optional#empty()");
+            LOGGER.trace("Given Object is improper type, returning Optional#empty()");
             return Optional.empty();
         }
         var initialAccessible = field.canAccess(source);
-        log.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
+        LOGGER.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
-                log.trace("Explicitly setting accessible flag");
+                LOGGER.trace("Explicitly setting accessible flag");
                 field.setAccessible(true);
             }
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                log.warn(e, "Reading from field '{}' with accessible='{}' and parameter ='{}' could not complete",
+                LOGGER.warn(e, "Reading from field '{}' with accessible='{}' and parameter ='{}' could not complete",
                         field, initialAccessible, source);
                 return Optional.empty();
             } finally {
                 if (!initialAccessible) {
-                    log.trace("Resetting accessible flag");
+                    LOGGER.trace("Resetting accessible flag");
                     field.setAccessible(false);
                 }
             }
@@ -105,7 +105,7 @@ public class FieldWrapper {
      */
     public static Optional<Object> readValue(final String fieldName, final Object object) {
         final var fieldProvider = from(object.getClass(), fieldName);
-        log.trace("FieldWrapper: {}", fieldProvider);
+        LOGGER.trace("FieldWrapper: {}", fieldProvider);
         if (fieldProvider.isPresent()) {
             var fieldWrapper = fieldProvider.get();
             return fieldWrapper.readValue(object);
@@ -123,10 +123,10 @@ public class FieldWrapper {
      */
     public void writeValue(@NonNull Object target, Object value) {
         var initialAccessible = field.canAccess(target);
-        log.trace("Writing to field '{}' with accessibleFlag='{}' ", field, initialAccessible);
+        LOGGER.trace("Writing to field '{}' with accessibleFlag='{}' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
-                log.trace("Explicitly setting accessible flag");
+                LOGGER.trace("Explicitly setting accessible flag");
                 field.setAccessible(true);
             }
             try {
@@ -138,7 +138,7 @@ public class FieldWrapper {
                 throw new IllegalStateException(message, e);
             } finally {
                 if (!initialAccessible) {
-                    log.trace("Resetting accessible flag");
+                    LOGGER.trace("Resetting accessible flag");
                     field.setAccessible(false);
                 }
             }

@@ -98,7 +98,7 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Splitter {
 
-    private static final CuiLogger log = new CuiLogger(Splitter.class);
+    private static final CuiLogger LOGGER = new CuiLogger(Splitter.class);
 
     @NonNull
     private final SplitterConfig splitterConfig;
@@ -292,7 +292,7 @@ public final class Splitter {
                 splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
             throw new IllegalArgumentException("Invalid regex pattern: " + splitterConfig.getSeparator());
         }
-        log.trace("Splitting String {} with configuration {}", sequence, splitterConfig);
+        LOGGER.debug("Splitting '%s' with pattern '%s'", sequence, splitterConfig.getSeparator());
         if (isEmpty(sequence)) {
             return Collections.emptyList();
         }
@@ -304,7 +304,7 @@ public final class Splitter {
 
         var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
         if (0 == splitted.length) {
-            log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
+            LOGGER.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();
         }
 

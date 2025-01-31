@@ -193,7 +193,7 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 @UtilityClass
 public final class MoreStrings {
 
-    private static final CuiLogger log = new CuiLogger(MoreStrings.class);
+    private static final CuiLogger LOGGER = new CuiLogger(MoreStrings.class);
 
     /**
      * The empty String {@code ""}.
@@ -1109,6 +1109,7 @@ public final class MoreStrings {
             builder.append(']');
         }
 
+        LOGGER.debug("No args given, returning template '%s'", template);
         return builder.toString();
     }
 
@@ -1155,7 +1156,7 @@ public final class MoreStrings {
             // Default toString() behavior - see Object.toString()
             var objectToString = (o == null) ? "null" : 
                 o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
-            log.warn(e, "Exception during lenientFormat for {}", objectToString);
+            LOGGER.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }
     }

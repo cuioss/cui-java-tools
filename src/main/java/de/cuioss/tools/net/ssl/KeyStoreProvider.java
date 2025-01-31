@@ -74,7 +74,7 @@ public class KeyStoreProvider implements Serializable {
     private static final String UNABLE_TO_CREATE_KEYSTORE = "The creation of a KeyStore did not succeed";
     private static final String UNABLE_TO_CREATE_CERTIFICATE = "The creation of a Certificate-Object did not succeed";
 
-    private static final CuiLogger log = new CuiLogger(KeyStoreProvider.class);
+    private static final CuiLogger LOGGER = new CuiLogger(KeyStoreProvider.class);
 
     @Serial
     private static final long serialVersionUID = 496381186621534386L;
@@ -112,11 +112,11 @@ public class KeyStoreProvider implements Serializable {
      */
     public Optional<KeyStore> resolveKeyStore() {
         if (BooleanOperations.areAllTrue(keys.isEmpty(), null == location)) {
-            log.debug("Neither file nor keyMaterial provided, returning Optional#empty");
+            LOGGER.debug("Neither file nor keyMaterial provided, returning Optional#empty");
             return Optional.empty();
         }
         if (null != location) {
-            log.debug("Checking whether configured {} path is readable", location.getAbsolutePath());
+            LOGGER.debug("Checking whether configured %s path is readable", location.getAbsolutePath());
             checkState(MorePaths.checkReadablePath(location.toPath(), false, true),
                     "'%s' is not readable check logs for reason", location.getAbsolutePath());
         }
@@ -127,7 +127,7 @@ public class KeyStoreProvider implements Serializable {
     }
 
     private Optional<KeyStore> retrieveFromFile() {
-        log.debug("Retrieving java.security.KeyStore from configured file '{}'", location);
+        LOGGER.debug("Loading keystore from %s", location);
         try (InputStream input = new BufferedInputStream(new FileInputStream(location))) {
             var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(input, getStorePasswordAsCharArray());
@@ -138,10 +138,10 @@ public class KeyStoreProvider implements Serializable {
     }
 
     private Optional<KeyStore> retrieveFromKeys() {
-        log.debug("Retrieving java.security.KeyStore from configured keys");
+        LOGGER.debug("Loading keystore from %s", keys);
         var keyStore = createEmptyKeyStore();
         for (KeyMaterialHolder key : keys) {
-            log.debug("Adding Key {}", key);
+            LOGGER.debug("Adding Key %s", key);
             requireNonNull(key);
             switch (key.getKeyHolderType()) {
                 case SINGLE_KEY:

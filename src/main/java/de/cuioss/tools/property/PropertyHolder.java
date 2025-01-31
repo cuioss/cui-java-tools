@@ -77,7 +77,7 @@ public class PropertyHolder {
     private static final String NO_WRITE_METHOD = "No write method available for property '%s'. Check if the property has a setter method or a builder-style method.";
     private static final String TYPE_MISMATCH = "Value type mismatch for property '%s'. Expected: %s, Got: %s";
 
-    private static final CuiLogger log = new CuiLogger(PropertyHolder.class);
+    private static final CuiLogger LOGGER = new CuiLogger(PropertyHolder.class);
 
     /**
      * The name of the property. Must not be empty or blank.
@@ -126,7 +126,7 @@ public class PropertyHolder {
      * @throws IllegalArgumentException if the bean is null
      */
     public Object readFrom(Object source) {
-        log.debug("Reading property '%s' from %s", name, source);
+        LOGGER.debug("Reading property '%s' from %s", name, source);
         requireNonNull(source, "Bean must not be null");
         Preconditions.checkState(readWrite.isReadable(), "Property '%s' on bean '%s' can not be read", name, source);
         if (null == readMethod) {
@@ -135,7 +135,7 @@ public class PropertyHolder {
         try {
             return readMethod.invoke(source);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Failed to read property '{}' from bean of type '{}'", name, source.getClass().getName(), e);
+            LOGGER.error("Failed to read property '{}' from bean of type '{}'", name, source.getClass().getName(), e);
             throw new IllegalStateException("Failed to read property: " + name, e);
         }
     }
@@ -159,7 +159,7 @@ public class PropertyHolder {
      * @since 2.0
      */
     public Object writeTo(Object target, Object value) {
-        log.debug("Writing %s to property '%s' on %s", value, name, target);
+        LOGGER.debug("Writing %s to property '%s' on %s", value, name, target);
         requireNonNull(target, "Bean must not be null");
         Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, target);
 
@@ -171,7 +171,7 @@ public class PropertyHolder {
                 var result = writeMethod.invoke(target, value);
                 return Objects.requireNonNullElse(result, target);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                log.error("Failed to write property '{}' to bean of type '{}'", name, target.getClass().getName(), e);
+                LOGGER.error("Failed to write property '{}' to bean of type '{}'", name, target.getClass().getName(), e);
                 throw new IllegalStateException("Failed to write property: " + name, e);
             }
         }
@@ -209,7 +209,7 @@ public class PropertyHolder {
             var descriptor = mutableList(info.getPropertyDescriptors()).stream()
                     .filter(desc -> attributeName.equalsIgnoreCase(desc.getName())).findFirst();
             if (descriptor.isEmpty()) {
-                log.debug(UNABLE_TO_LOAD_PROPERTY_DESCRIPTOR, attributeName, beanType);
+                LOGGER.debug("Property '%s' not found within %s", attributeName, beanType);
                 return buildByReflection(beanType, attributeName);
             }
             return doBuild(descriptor.get(), beanType, attributeName);
@@ -232,9 +232,10 @@ public class PropertyHolder {
     }
 
     static Optional<PropertyHolder> buildByReflection(Class<?> beanType, String attributeName) {
-        log.trace("Trying reflection for determining attribute '%s' on type '%s'", attributeName, beanType);
+        LOGGER.trace("Trying reflection for determining attribute '%s' on type '%s'", attributeName, beanType);
         var field = MoreReflection.accessField(beanType, attributeName);
         if (field.isEmpty()) {
+            LOGGER.debug("Property '%s' not found within %s", attributeName, beanType);
             return Optional.empty();
         }
         var builder = builder();
