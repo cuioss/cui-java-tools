@@ -31,10 +31,11 @@ public final class ExceptionHelper {
 
     /**
      * Extracts a message from a given throwable in a safe manner. It specially
-     * handles {@link InvocationTargetException}
+     * handles {@link InvocationTargetException}.
      *
-     * @param throwable
-     * @return the extract message;
+     * @param throwable The throwable from which to extract the message. May be null.
+     * @return The extracted message in the format "ExceptionClassName message". If the throwable
+     *         is null, returns "No exception message could be extracted".
      */
     public static String extractMessageFromThrowable(final Throwable throwable) {
         if (null == throwable) {
@@ -44,11 +45,13 @@ public final class ExceptionHelper {
     }
 
     /**
-     * Extracts a message from a given throwable in a safe manner. It specially
-     * handles {@link InvocationTargetException}
+     * Extracts a message from a given throwable's cause in a safe manner. It specially
+     * handles {@link InvocationTargetException} by extracting the message from its target exception.
      *
-     * @param throwable
-     * @return the extract message;
+     * @param throwable The throwable from which to extract the cause's message. May be null.
+     * @return The extracted message from the cause in the format "ExceptionClassName message".
+     *         For {@link InvocationTargetException}, returns the message from the target exception.
+     *         If the throwable is null, returns "No exception message could be extracted".
      */
     public static String extractCauseMessageFromThrowable(final Throwable throwable) {
         if (null == throwable) {

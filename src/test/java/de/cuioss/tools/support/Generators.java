@@ -34,9 +34,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Generators {
 
     /**
-     * @param count
-     * @return a {@link List} containing a number random String derived by
-     *         {@link UUID}
+     * Generates a list of random strings using UUID.
+     *
+     * @param count The number of random strings to generate. Must be non-negative.
+     * @return a {@link List} containing the specified number of random strings, each derived from
+     *         {@link UUID#randomUUID()}
+     * @throws IllegalArgumentException if count is negative
      */
     public static List<String> randomStrings(int count) {
         List<String> result = new ArrayList<>();
@@ -47,17 +50,21 @@ public class Generators {
     }
 
     /**
-     * @return a {@link List} containing a number random String derived by
-     *         {@link UUID}
+     * Generates a random string using UUID.
+     *
+     * @return a random string derived from {@link UUID#randomUUID()}
      */
     public static String randomString() {
         return UUID.randomUUID().toString();
     }
 
     /**
-     * @param lowerBound
-     * @param upperBound
-     * @return a pseudo random number in between the given boundaries
+     * Generates a random integer within the specified bounds (inclusive).
+     *
+     * @param lowerBound The minimum value (inclusive) that can be returned
+     * @param upperBound The maximum value (inclusive) that can be returned
+     * @return a pseudo-random number between lowerBound and upperBound (inclusive)
+     * @throws IllegalArgumentException if upperBound is not larger than lowerBound
      */
     public static int randomInt(int lowerBound, int upperBound) {
         checkArgument(upperBound > lowerBound, "UpperBound must be larger than lower bound");
@@ -65,7 +72,9 @@ public class Generators {
     }
 
     /**
-     * @return a pseudo random boolean
+     * Generates a random boolean value.
+     *
+     * @return a pseudo-random boolean value, either true or false with equal probability
      */
     public static boolean randomBoolean() {
         return ThreadLocalRandom.current().nextBoolean();
