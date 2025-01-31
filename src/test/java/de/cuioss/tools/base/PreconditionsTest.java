@@ -22,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -193,13 +194,15 @@ class PreconditionsTest {
         @Test
         @DisplayName("handle message with more placeholders than arguments")
         void shouldHandleMorePlaceholdersThanArgs() {
-            var ex = assertThrows(IllegalArgumentException.class,
-                    () -> checkArgument(false, "%s %s %s", "one", "two"));
+            var template = "%s %s %s";
+            var value = "value";
 
-            // The remaining %s placeholder is left as-is
+            var ex = assertThrows(IllegalArgumentException.class, () -> {
+                checkArgument(false, template, value);
+            });
+
             var message = ex.getMessage();
-            System.out.println("Actual message: " + message);
-            assertTrue(message.startsWith("one two %s"), "Message should start with 'one two %s' but was: " + message);
+            assertEquals("value %s %s", message);
         }
 
         @Test
@@ -299,8 +302,11 @@ class PreconditionsTest {
                             iteration
                         };
                         // Single point of potential exception
-                        assertThrows(IllegalStateException.class, () ->
-                                checkState(false, "Complex message %s with iteration %s", messageParams));
+                        Callable<Void> result = () -> {
+                            checkState(false, "Complex message %s with iteration %s", messageParams);
+                            return null;
+                        };
+                        assertThrows(IllegalStateException.class, () -> result.call());
                         return null;
                     }));
                 }
