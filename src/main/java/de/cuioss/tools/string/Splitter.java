@@ -280,6 +280,9 @@ public final class Splitter {
      *
      * @return an immutable list of the segments split from the parameter
      */
+    @SuppressWarnings("java:S5852") // owolff:
+    // This is a false positive,
+    // because the splitter-separator is coded / configured value, no user-payload
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
             return Collections.emptyList();
