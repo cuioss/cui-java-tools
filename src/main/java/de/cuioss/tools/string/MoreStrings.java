@@ -39,7 +39,49 @@ import java.util.function.Predicate;
  *   <li>Efficient string formatting with improved null handling</li>
  *   <li>Comprehensive string validation and transformation utilities</li>
  *   <li>Performance-optimized string manipulation methods</li>
+ *   <li>Consistent error handling and validation</li>
  * </ul>
+ *
+ * <h2>Method Categories</h2>
+ * <ol>
+ *   <li><b>Null and Empty Handling</b>
+ *     <ul>
+ *       <li>{@link #nullToEmpty(String)} - Convert null to empty string</li>
+ *       <li>{@link #emptyToNull(String)} - Convert empty string to null</li>
+ *       <li>{@link #isEmpty(CharSequence)} - Check if string is null or empty</li>
+ *       <li>{@link #isBlank(CharSequence)} - Check if string is null, empty, or whitespace</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Validation</b>
+ *     <ul>
+ *       <li>{@link #isAllLowerCase(CharSequence)} - Check for lowercase content</li>
+ *       <li>{@link #isAllUpperCase(CharSequence)} - Check for uppercase content</li>
+ *       <li>{@link #isNumeric(CharSequence)} - Check for numeric content</li>
+ *       <li>{@link #hasNonWhitespaceChar(CharSequence)} - Check for non-whitespace content</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Transformation</b>
+ *     <ul>
+ *       <li>{@link #unquote(String)} - Remove surrounding quotes</li>
+ *       <li>{@link #trimOrNull(String)} - Trim or return null</li>
+ *       <li>{@link #stripEnd(String, String)} - Remove characters from end</li>
+ *       <li>{@link #leftPad(String, int)} - Add padding to left side</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Search and Manipulation</b>
+ *     <ul>
+ *       <li>{@link #indexOf(CharSequence, int)} - Find character position</li>
+ *       <li>{@link #countMatches(CharSequence, CharSequence)} - Count occurrences</li>
+ *       <li>{@link #repeat(char, int)} - Repeat character</li>
+ *       <li>{@link #ensureEndsWith(String, String)} - Ensure suffix presence</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Formatting</b>
+ *     <ul>
+ *       <li>{@link #lenientFormat(String, Object...)} - Safe string formatting</li>
+ *     </ul>
+ *   </li>
+ * </ol>
  *
  * <h2>Usage Examples</h2>
  *
@@ -48,7 +90,7 @@ import java.util.function.Predicate;
  * // Safe null handling
  * String nullString = null;
  * assertEquals("", nullToEmpty(nullString));
- * assertEquals("default", nullToDefault(nullString, "default"));
+ * assertEquals("default", firstNonEmpty(nullString, "default").orElse(""));
  *
  * // Safe empty handling
  * String emptyString = "";
@@ -57,71 +99,96 @@ import java.util.function.Predicate;
  * assertFalse(isEmpty("  not empty  "));
  * </pre>
  *
- * <h3>2. String Formatting</h3>
+ * <h3>2. String Validation</h3>
  * <pre>
- * // Simple parameter replacement
- * String result = lenientFormat("User %s logged in from %s", "admin", "localhost");
- * assertEquals("User admin logged in from localhost", result);
+ * // Case validation
+ * assertTrue(isAllLowerCase("lowercase"));
+ * assertTrue(isAllUpperCase("UPPERCASE"));
+ * assertFalse(isAllLowerCase("Mixed"));
  *
- * // Mixed placeholders (both %s and {})
- * String mixed = lenientFormat("Value: {} equals %s", 42, "forty-two");
- * assertEquals("Value: 42 equals forty-two", mixed);
- *
- * // Handling null parameters
- * String withNull = lenientFormat("Nullable: %s", (Object) null);
- * assertEquals("Nullable: null", withNull);
+ * // Content validation
+ * assertTrue(isNumeric("12345"));
+ * assertTrue(hasNonWhitespaceChar("  text  "));
+ * assertFalse(isNumeric("12.34")); // decimals not considered numeric
  * </pre>
  *
- * <h3>3. String Validation</h3>
+ * <h3>3. String Transformation</h3>
  * <pre>
- * // String presence checks
- * assertTrue(isEmpty(null));
- * assertTrue(isEmpty(""));
- * assertFalse(isEmpty(" "));
+ * // Quoting
+ * assertEquals("text", unquote("'text'"));
+ * assertEquals("text", unquote("\"text\""));
  *
- * assertTrue(isBlank(null));
- * assertTrue(isBlank(""));
- * assertTrue(isBlank("   "));
- * assertFalse(isBlank("text"));
+ * // Padding
+ * assertEquals("  text", leftPad("text", 6));
+ * assertEquals("00123", leftPad("123", 5, '0'));
+ *
+ * // Stripping
+ * assertEquals("123", stripEnd("123.00", ".0"));
+ * assertEquals("text", stripEnd("text   ", null));
  * </pre>
  *
- * <h3>4. String Transformation</h3>
+ * <h3>4. String Search and Manipulation</h3>
  * <pre>
- * // Safe trimming
- * assertEquals("text", trimToEmpty("  text  "));
- * assertEquals("", trimToEmpty(null));
+ * // Searching
+ * assertEquals(2, countMatches("banana", "a"));
+ * assertEquals(1, indexOf("hello", 'e'));
  *
- * // Case conversion
- * assertEquals("TEXT", toUpperCase("text"));
- * assertEquals("", toUpperCase(null));
- *
- * assertEquals("text", toLowerCase("TEXT"));
- * assertEquals("", toLowerCase(null));
+ * // Manipulation
+ * assertEquals("***", repeat('*', 3));
+ * assertEquals("file.txt", ensureEndsWith("file", ".txt"));
  * </pre>
  *
- * <h2>Best Practices</h2>
+ * <h3>5. Safe String Formatting</h3>
+ * <pre>
+ * // Basic formatting
+ * assertEquals("Hello, world!", lenientFormat("Hello, %s!", "world"));
+ *
+ * // Null argument handling
+ * assertEquals("Value: null", lenientFormat("Value: %s", null));
+ *
+ * // Extra arguments handling
+ * assertEquals("Hello! [world, extra]", lenientFormat("Hello!", "world", "extra"));
+ * </pre>
+ *
+ * <h2>Migration Guide</h2>
+ * <h3>From Apache Commons Lang StringUtils</h3>
+ * <pre>
+ * // Commons Lang                     // MoreStrings
+ * StringUtils.isEmpty(str)            isEmpty(str)
+ * StringUtils.isBlank(str)           isBlank(str)
+ * StringUtils.defaultString(str, "") nullToEmpty(str)
+ * StringUtils.strip(str)             trimOrNull(str)
+ * StringUtils.leftPad(str, n)        leftPad(str, n)
+ * </pre>
+ *
+ * <h3>From Google Guava Strings</h3>
+ * <pre>
+ * // Guava                           // MoreStrings
+ * Strings.nullToEmpty(str)           nullToEmpty(str)
+ * Strings.emptyToNull(str)           emptyToNull(str)
+ * Strings.repeat(str, n)             repeat(str.charAt(0), n) // for single char
+ * Strings.lenientFormat(str, args)   lenientFormat(str, args)
+ * </pre>
+ *
+ * <h2>Performance Considerations</h2>
  * <ul>
- *   <li>Always use null-safe methods when handling potentially null strings</li>
- *   <li>Prefer lenientFormat over String.format for better null handling</li>
- *   <li>Use isEmpty() for null-safe empty checks</li>
- *   <li>Use isBlank() when whitespace should be considered empty</li>
+ *   <li><b>String Creation</b>: Methods minimize object creation by reusing constants like {@link #EMPTY} and {@link #SPACE}</li>
+ *   <li><b>StringBuilder Usage</b>: String concatenation operations use StringBuilder for better performance</li>
+ *   <li><b>Early Returns</b>: Methods implement early returns for null/empty cases to avoid unnecessary processing</li>
+ *   <li><b>Memory Usage</b>: The {@link #PAD_LIMIT} constant prevents excessive memory allocation in padding operations</li>
+ *   <li><b>Iteration Efficiency</b>: Character iteration is optimized using direct char access instead of substring operations</li>
+ *   <li><b>Null Safety</b>: Null checks are performed before string operations to prevent NPEs without sacrificing performance</li>
  * </ul>
  *
- * <h2>Performance Notes</h2>
- * <ul>
- *   <li>Methods are optimized for minimal object creation</li>
- *   <li>String concatenation is avoided in favor of StringBuilder</li>
- *   <li>Null checks are performed before any string operations</li>
- *   <li>Regular expressions are precompiled where possible</li>
- * </ul>
+ * <h2>Thread Safety</h2>
+ * <p>All methods in this class are stateless and thread-safe. They can be safely used in multi-threaded environments.</p>
  *
  * @author Oliver Wolff
  * @author Sven Haag
  *
  * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang StringUtils</a>
- * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/CharSequenceUtils.java">Apache Commons Lang CharSequenceUtils</a>
- * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework StringUtils</a>
  * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava Strings</a>
+ * @see <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework StringUtils</a>
  */
 @UtilityClass
 public final class MoreStrings {
@@ -846,7 +913,7 @@ public final class MoreStrings {
      * @param str the {@code String} to check (maybe {@code null})
      * @return {@code true} if the {@code String} is not {@code null}, its length is
      * greater than 0, and it does not contain whitespace only
-     * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework</a>
+     * @see <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework</a>
      */
     public static boolean hasNonWhitespaceChar(final CharSequence str) {
         if (isEmpty(str)) {
