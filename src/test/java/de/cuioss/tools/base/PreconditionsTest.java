@@ -92,6 +92,22 @@ class PreconditionsTest {
                     () -> checkArgument(false, MESSAGE_TEMPLATE, (Object) null));
             assertEquals("message null", ex.getMessage());
         }
+
+        @Test
+        void shouldHandleNullPointerOnAssertArgumentFalse() {
+            assertThrows(NullPointerException.class, () -> {
+                Boolean value = null;
+                checkArgument(value);
+            });
+        }
+
+        @Test
+        void shouldHandleNullPointerOnAssertArgumentTrue() {
+            assertThrows(NullPointerException.class, () -> {
+                Boolean value = null;
+                checkArgument(value);
+            });
+        }
     }
 
     @Nested

@@ -15,10 +15,9 @@
  */
 package de.cuioss.tools.property;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.Serializable;
 import java.lang.reflect.Modifier;
+import java.util.Optional;
 
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;

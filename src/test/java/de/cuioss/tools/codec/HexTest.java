@@ -54,23 +54,6 @@ class HexTest {
         return ByteBuffer.allocate(capacity);
     }
 
-    /**
-     * Encodes the given string into a byte buffer using the UTF-8 charset.
-     *
-     * <p>
-     * The buffer is allocated using {@link #allocate(int)}.
-     *
-     * @param string the String to encode
-     * @return the byte buffer
-     */
-    private ByteBuffer getByteBufferUtf8(final String string) {
-        final var bytes = string.getBytes(StandardCharsets.UTF_8);
-        final var bb = allocate(bytes.length);
-        bb.put(bytes);
-        bb.flip();
-        return bb;
-    }
-
     private boolean charsetSanityCheck(final String name) {
         final var source = "the quick brown dog jumped over the lazy fox";
         try {
