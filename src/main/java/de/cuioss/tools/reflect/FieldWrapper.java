@@ -35,6 +35,7 @@ import java.util.Optional;
  * </ul>
  *
  * @author Oliver Wolff
+ * @since 1.0
  */
 @SuppressWarnings("java:S3011") // owolff: The warning is "Reflection should not be used to
 // increase accessibility of classes, methods, or fields"
@@ -49,6 +50,8 @@ public class FieldWrapper {
     private final Class<?> declaringClass;
 
     /**
+     * Creates a new field wrapper.
+     *
      * @param field must not be null
      */
     public FieldWrapper(@NonNull Field field) {
@@ -61,8 +64,7 @@ public class FieldWrapper {
      * It implicitly sets the field accessible if needed.
      *
      * @param source the object to read from
-     * @return the field value
-     * @throws IllegalArgumentException if the source is null or the field cannot be accessed
+     * @return an Optional containing the field value if successful, empty Optional otherwise
      */
     public Optional<Object> readValue(Object source) {
         if (null == source) {
@@ -97,7 +99,7 @@ public class FieldWrapper {
 
     /**
      * Reads the value from the field in the given object. It implicitly sets and
-     * resets the {@link Field#isAccessible()} flag.
+     * resets the field accessibility.
      *
      * @param fieldName to be read
      * @param object    to be read from
@@ -119,7 +121,8 @@ public class FieldWrapper {
      *
      * @param target the object to write to
      * @param value  the value to write
-     * @throws IllegalArgumentException if the target is null or the field cannot be accessed
+     * @throws IllegalStateException if the field cannot be accessed
+     * @throws NullPointerException if target is null
      */
     public void writeValue(@NonNull Object target, Object value) {
         var initialAccessible = field.canAccess(target);
