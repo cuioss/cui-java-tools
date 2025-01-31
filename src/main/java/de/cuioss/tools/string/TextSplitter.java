@@ -315,10 +315,10 @@ public class TextSplitter implements Serializable {
     }
 
     private static List<String> getSplitByZWSP(final String value) {
-        return Splitter.on(ZERO_WIDTH_SPACE).splitToList(value);
+        return Splitter.on(Pattern.compile(Pattern.quote(ZERO_WIDTH_SPACE))).splitToList(value);
     }
 
     private List<String> getSourceSplit() {
-        return Splitter.on(" ").splitToList(source);
+        return Splitter.on(Pattern.compile("\\s+")).splitToList(source);
     }
 }

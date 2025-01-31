@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * A string splitting utility inspired by Google Guava's Splitter, providing a more
@@ -121,7 +122,37 @@ public final class Splitter {
      */
     public static Splitter on(final char separator) {
         requireNonNull(separator);
-        return new Splitter(SplitterConfig.builder().separator(String.valueOf(separator)).build());
+        var separatorStr = String.valueOf(separator);
+        return new Splitter(SplitterConfig.builder()
+                .separator(separatorStr)
+                .pattern(Pattern.compile(Pattern.quote(separatorStr)))
+                .build());
+    }
+
+    /**
+     * Creates a splitter that uses the given string as a separator pattern.
+     * The string will be treated as a literal pattern, not a regular expression.
+     *
+     * <pre>
+     * // Split on a string
+     * Splitter.on(",").splitToList("a,b,c")     = ["a", "b", "c"]
+     * Splitter.on(", ").splitToList("a, b, c")  = ["a", "b", "c"]
+     * </pre>
+     *
+     * @param separator the string to use as a separator, must not be null
+     * @return a new {@link Splitter} instance configured with the given separator
+     * @throws NullPointerException if separator is null
+     * @throws IllegalArgumentException if separator is empty
+     */
+    public static Splitter on(final String separator) {
+        requireNonNull(separator, "separator must not be null");
+        if (separator.isEmpty()) {
+            throw new IllegalArgumentException("separator must not be empty");
+        }
+        return new Splitter(SplitterConfig.builder()
+                .separator(separator)
+                .pattern(Pattern.compile(Pattern.quote(separator)))
+                .build());
     }
 
     /**
@@ -141,8 +172,11 @@ public final class Splitter {
      * @throws NullPointerException if separatorPattern is null
      */
     public static Splitter on(final Pattern separatorPattern) {
-        requireNonNull(separatorPattern);
-        return new Splitter(SplitterConfig.builder().pattern(separatorPattern).build());
+        requireNonNull(separatorPattern, "separatorPattern must not be null");
+        return new Splitter(SplitterConfig.builder()
+                .separator(separatorPattern.pattern())
+                .pattern(separatorPattern)
+                .build());
     }
 
     /**
@@ -150,11 +184,11 @@ public final class Splitter {
      * After the limit is reached, the remainder of the string is treated as the final element.
      *
      * <pre>
-     * // Basic limit usage
+     * Basic limit usage
      * Splitter.on(',').limit(2).splitToList("a,b,c")      = ["a", "b,c"]
      * Splitter.on(',').limit(3).splitToList("a,b,c,d")    = ["a", "b", "c,d"]
      *
-     * // Limit with empty strings
+     * Limit with empty strings
      * Splitter.on(',').limit(2).splitToList("a,,c")       = ["a", ",c"]
      * </pre>
      *
@@ -163,8 +197,14 @@ public final class Splitter {
      * @throws IllegalArgumentException if limit is not positive
      */
     public Splitter limit(final int limit) {
-        checkArgument(limit > 0, "The limit must be greater than 0");
-        return new Splitter(splitterConfig.copy().maxItems(limit).build());
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit must be greater than 0");
+        }
+        var newConfig = splitterConfig.copy()
+                .maxItems(limit)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
     }
 
     /**
@@ -172,10 +212,10 @@ public final class Splitter {
      * Whitespace is defined by {@link String#trim()}.
      *
      * <pre>
-     * // Basic trimming
+     * Basic trimming
      * Splitter.on(',').trimResults().splitToList(" a , b ")   = ["a", "b"]
      *
-     * // Trimming with empty strings
+     * Trimming with empty strings
      * Splitter.on(',').trimResults().splitToList("a, ,c")     = ["a", "", "c"]
      * </pre>
      *
@@ -183,7 +223,11 @@ public final class Splitter {
      * @see String#trim()
      */
     public Splitter trimResults() {
-        return new Splitter(splitterConfig.copy().trimResults(true).build());
+        var newConfig = splitterConfig.copy()
+                .trimResults(true)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
     }
 
     /**
@@ -191,10 +235,10 @@ public final class Splitter {
      * An empty string is defined as a string of length zero.
      *
      * <pre>
-     * // Basic empty string omission
+     * Basic empty string omission
      * Splitter.on(',').omitEmptyStrings().splitToList("a,,c")     = ["a", "c"]
      *
-     * // With trimming
+     * With trimming
      * Splitter.on(',').trimResults().omitEmptyStrings()
      *     .splitToList("a, ,c")                                    = ["a", "c"]
      * </pre>
@@ -202,7 +246,34 @@ public final class Splitter {
      * @return this {@link Splitter} instance for method chaining
      */
     public Splitter omitEmptyStrings() {
-        return new Splitter(splitterConfig.copy().omitEmptyStrings(true).build());
+        var newConfig = splitterConfig.copy()
+                .omitEmptyStrings(true)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
+    }
+
+    /**
+     * Configures this splitter to use the separator string as a literal pattern without escaping special regex characters.
+     * This is useful when you want to split on a regular expression pattern.
+     *
+     * <pre>
+     * Without doNotModifySeparatorString()
+     * Splitter.on("[").splitToList("[a][b]")      // Throws IllegalArgumentException
+     *
+     * With doNotModifySeparatorString()
+     * Splitter.on("[").doNotModifySeparatorString().splitToList("[a][b]")  = ["", "a", "[b]"]
+     * </pre>
+     *
+     * @return a new {@link Splitter} instance with the same configuration but with doNotModifySeparatorString set to true
+     */
+    public Splitter doNotModifySeparatorString() {
+        var separator = splitterConfig.getSeparator();
+        var newConfig = splitterConfig.copy()
+                .doNotModifySeparatorString(true)
+                .pattern(Pattern.compile(Pattern.quote(separator)))
+                .build();
+        return new Splitter(newConfig);
     }
 
     /**
@@ -214,29 +285,34 @@ public final class Splitter {
      * @return an immutable list of the segments split from the parameter
      */
     public List<String> splitToList(String sequence) {
+        if (null == sequence) {
+            return Collections.emptyList();
+        }
+        if (splitterConfig.isDoNotModifySeparatorString() && 
+            splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
+            throw new IllegalArgumentException("Invalid regex pattern: " + splitterConfig.getSeparator());
+        }
         log.trace("Splitting String {} with configuration {}", sequence, splitterConfig);
         if (isEmpty(sequence)) {
             return Collections.emptyList();
         }
-        var splitted = sequence.split(handleSplitCharacter(splitterConfig.getSeparator()),
-                splitterConfig.getMaxItems());
+
+        var pattern = splitterConfig.getPattern();
+        if (pattern == null) {
+            pattern = Pattern.compile(Pattern.quote(splitterConfig.getSeparator()));
+        }
+
+        var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
         if (null == splitted || 0 == splitted.length) {
             log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();
         }
-        var builder = new CollectionBuilder<String>();
 
+        var builder = new CollectionBuilder<String>();
         for (String element : splitted) {
             addIfApplicable(builder, element);
         }
         return builder.toImmutableList();
-    }
-
-    private String handleSplitCharacter(String separator) {
-        if (splitterConfig.isDoNotModifySeparatorString()) {
-            return separator;
-        }
-        return Pattern.quote(separator);
     }
 
     private void addIfApplicable(CollectionBuilder<String> builder, String element) {
@@ -247,11 +323,7 @@ public final class Splitter {
         if (splitterConfig.isTrimResults()) {
             toDo = toDo.trim();
         }
-        if (!splitterConfig.isOmitEmptyStrings()) {
-            builder.add(toDo);
-            return;
-        }
-        if (!toDo.isEmpty()) { // Omit empty strings
+        if (!splitterConfig.isOmitEmptyStrings() || !toDo.isEmpty()) {
             builder.add(toDo);
         }
     }

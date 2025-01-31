@@ -20,6 +20,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.regex.Pattern;
+
 /**
  * Configuration class for the {@link Splitter} utility, providing a flexible way to
  * customize string splitting behavior. This class uses the builder pattern via Lombok
@@ -74,6 +76,12 @@ class SplitterConfig {
      */
     @Getter
     private final String separator;
+
+    /**
+     * The compiled pattern used to split input strings.
+     */
+    @Getter
+    private final Pattern pattern;
 
     /**
      * Whether to exclude empty strings from the split results.

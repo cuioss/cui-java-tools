@@ -56,7 +56,7 @@ public class StructuredFilename implements Serializable {
     // it better readable
     public StructuredFilename(final String filename) {
         originalName = filename;
-        final var list = Splitter.on(".").omitEmptyStrings().splitToList(filename);
+        final var list = Splitter.on('.').omitEmptyStrings().splitToList(filename);
         switch (list.size()) {
             case 0:
                 namePart = filename;

@@ -19,7 +19,9 @@ import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.net.URLEncoder.encode;
 import static java.util.Objects.requireNonNull;
+import static java.util.regex.Pattern.compile;
 
+import java.util.regex.Pattern;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.collect.MoreCollections;
 import de.cuioss.tools.logging.CuiLogger;
@@ -256,11 +258,11 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             log.debug("Given String solely consists of '?' symbol, ignoring");
             return Collections.emptyList();
         }
-        var elements = Splitter.on("&").omitEmptyStrings().splitToList(cleaned);
+        var elements = Splitter.on(Pattern.compile("&")).trimResults().omitEmptyStrings().splitToList(cleaned);
         var builder = new CollectionBuilder<UrlParameter>();
         for (String element : elements) {
             if (element.contains("=")) {
-                var splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
+                var splitted = Splitter.on(Pattern.compile("=")).omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
                     case 0:
                         log.debug(
