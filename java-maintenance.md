@@ -2,11 +2,11 @@
 
 ## Current Status
 - Module: cui-java-tools
-- Package: de.cuioss.tools.codec
+- Package: de.cuioss.tools.collect
 - Phase: Initial Review
-- Last Successful Step: Started codec package review
+- Last Successful Step: Started collect package review
 - Start Time: 2025-01-31T10:17:10+01:00
-- Current Time: 2025-01-31T13:53:16+01:00
+- Current Time: 2025-01-31T13:55:05+01:00
 
 ## Package Structure
 - [ ] de.cuioss.tools.base
@@ -117,12 +117,57 @@
   - `src/main/java/de/cuioss/tools/base/Preconditions.java`
   - `src/main/java/de/cuioss/tools/string/Splitter.java`
 
-## Current Package Progress (de.cuioss.tools.codec)
+## Current Package Progress (de.cuioss.tools.collect)
 ### Initial Review
 - [x] Package structure review completed
-  - Core class: `Hex.java` for hex encoding/decoding
-  - Exception classes: `DecoderException.java`, `EncoderException.java`
-  - Well-documented `package-info.java`
+  - Core Builder Classes:
+    - `CollectionBuilder.java` - Type-safe collection creation
+    - `MapBuilder.java` - Type-safe map creation
+  - Collection Operations:
+    - `MoreCollections.java` - Utility methods
+    - `MapDifference.java` & `MapDiffenceImpl.java` - Map comparison
+  - Specialized Collections:
+    - `PartialArrayList.java` & `PartialCollection.java` - Views of collections
+  - Utilities:
+    - `CollectionLiterals.java` - Factory methods
+
+### Planned Improvements
+
+#### Documentation Enhancement
+- [ ] Add comprehensive performance guide
+  - Collection type selection criteria
+  - Size considerations
+  - Memory impact
+  - Iteration performance
+- [ ] Enhance thread-safety documentation
+  - Document concurrent collection options
+  - Explain synchronization requirements
+  - Best practices for concurrent access
+- [ ] Expand usage examples
+  - Complex collection transformations
+  - Custom comparator examples
+  - Memory-efficient collection usage
+  - Stream integration patterns
+
+#### Test Enhancement
+- [ ] Add performance tests
+  - Large collection operations (>100k elements)
+  - Memory usage patterns
+  - Collection type comparisons
+- [ ] Add concurrent modification tests
+  - Thread safety verification
+  - Concurrent builder usage
+  - Partial collection thread safety
+- [ ] Expand parameterized tests
+  - More collection types
+  - Various sizes and content types
+  - Edge cases
+- [ ] Add documentation coverage metrics
+
+### Impact Assessment
+- No breaking changes planned
+- Focus on documentation and testing improvements
+- All changes maintain backward compatibility
 
 ## Important Notes
 - Following strict dependency management constraints:
@@ -134,10 +179,10 @@
 - Test framework already using JUnit 5 effectively
 
 ## Next Steps
-1. Implement additional test cases for codec package
+1. Implement additional test cases for collect package
 2. Move to code refactoring phase
 3. Update documentation
-4. Proceed to next package (collect)
+4. Proceed to next package (concurrent)
 
 ## Maintenance Log 2024-01
 
@@ -407,4 +452,4 @@ All changes maintain backward compatibility while improving documentation clarit
 - All changes maintain backward compatibility
 
 ## Next Steps
-The codec package improvements are now in progress. We will proceed with the planned improvements and then move to the next package for similar documentation and code quality improvements.
+The collect package improvements are now in progress. We will proceed with the planned improvements and then move to the next package for similar documentation and code quality improvements.
