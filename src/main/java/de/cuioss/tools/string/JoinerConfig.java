@@ -56,7 +56,8 @@ import lombok.ToString;
 @Builder
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("squid:S1170") // Sonar doesn't recognize Lombok's @Builder.Default annotations
+@SuppressWarnings("squid:S1170")
+// Sonar doesn't recognize Lombok's @Builder.Default annotations
 class JoinerConfig {
 
     /**

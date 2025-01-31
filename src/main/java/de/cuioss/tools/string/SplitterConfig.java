@@ -65,7 +65,8 @@ import java.util.regex.Pattern;
 @Builder
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("squid:S1170") // Sonar doesn't recognize Lombok's @Builder.Default annotations
+@SuppressWarnings("squid:S1170")
+// Sonar doesn't recognize Lombok's @Builder.Default annotations
 class SplitterConfig {
 
     /**

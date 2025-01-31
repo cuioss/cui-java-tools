@@ -161,17 +161,17 @@ class PropertyHolderTest {
         // Test type mismatch
         var wrongType = "not an integer";
         assertThrows(IllegalArgumentException.class, () ->
-            holder.writeTo(bean, wrongType),
-            "Should throw IllegalArgumentException for type mismatch");
+                        holder.writeTo(bean, wrongType),
+                "Should throw IllegalArgumentException for type mismatch");
 
         // Test null target
         assertThrows(NullPointerException.class, () ->
-            holder.writeTo(null, 42),
-            "Should throw NullPointerException for null target");
+                        holder.writeTo(null, 42),
+                "Should throw NullPointerException for null target");
 
         // Verify builder chain works
         var result = holder.writeTo(bean, 42);
         assertTrue(result instanceof BeanWithBuilderStyleAccessor,
-            "Should return builder instance for chaining");
+                "Should return builder instance for chaining");
     }
 }

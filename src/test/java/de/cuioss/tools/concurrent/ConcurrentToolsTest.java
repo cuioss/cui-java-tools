@@ -15,18 +15,18 @@
  */
 package de.cuioss.tools.concurrent;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/util/concurrent/UninterruptiblesTest.java">...</a>
@@ -88,18 +88,18 @@ class ConcurrentToolsTest {
         @DisplayName("handle long overflow")
         void shouldHandleLongOverflow() {
             assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MIN_VALUE)),
-                "Should handle minimum long value");
+                    "Should handle minimum long value");
             assertEquals(Long.MAX_VALUE, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MAX_VALUE)),
-                "Should handle maximum long value");
+                    "Should handle maximum long value");
         }
 
         @Test
         @DisplayName("handle zero and negative durations")
         void shouldHandleZeroAndNegative() {
             assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ZERO),
-                "Should handle zero duration");
+                    "Should handle zero duration");
             assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ofNanos(-1)),
-                "Should handle negative duration");
+                    "Should handle negative duration");
         }
     }
 

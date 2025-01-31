@@ -25,18 +25,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @DisplayName("BooleanOperations should")
 class BooleanOperationsTest {
@@ -56,15 +56,15 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle isAnyTrue")
     class IsAnyTrueTest {
-        
+
         @ParameterizedTest(name = "return {1} when checking array [{0}] for any true value")
         @CsvSource({
-            "'true', true",
-            "'true,true', true",
-            "'true,false', true",
-            "'false,true,false', true",
-            "'false,false', false",
-            "'', false"
+                "'true', true",
+                "'true,true', true",
+                "'true,false', true",
+                "'false,true,false', true",
+                "'false,false', false",
+                "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
             assertEquals(expected, isAnyTrue(toBooleanArray(input)));
@@ -82,15 +82,15 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle isAnyFalse")
     class IsAnyFalseTest {
-        
+
         @ParameterizedTest(name = "return {1} when checking array [{0}] for any false value")
         @CsvSource({
-            "'true', false",
-            "'true,false', true",
-            "'false,false', true",
-            "'true,false,true', true",
-            "'true,true', false",
-            "'', false"
+                "'true', false",
+                "'true,false', true",
+                "'false,false', true",
+                "'true,false,true', true",
+                "'true,true', false",
+                "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
             assertEquals(expected, isAnyFalse(toBooleanArray(input)));
@@ -108,15 +108,15 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle areAllFalse")
     class AreAllFalseTest {
-        
+
         @ParameterizedTest(name = "return {1} when checking if all values are false in array [{0}]")
         @CsvSource({
-            "'true', false",
-            "'true,false', false",
-            "'false,false', true",
-            "'false,false,false', true",
-            "'true,true', false",
-            "'', false"
+                "'true', false",
+                "'true,false', false",
+                "'false,false', true",
+                "'false,false,false', true",
+                "'true,true', false",
+                "'', false"
         })
         void shouldHandleValidCases(String input, boolean expected) {
             assertEquals(expected, areAllFalse(toBooleanArray(input)));
@@ -134,15 +134,15 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle areAllTrue")
     class AreAllTrueTest {
-        
+
         @ParameterizedTest(name = "return {1} when checking if all values are true in array [{0}]")
         @CsvSource({
-            "'true', true",
-            "'true,false', false",
-            "'false,false', false",
-            "'true,true,true', true",
-            "'true,true', true",
-            "'', true"
+                "'true', true",
+                "'true,false', false",
+                "'false,false', false",
+                "'true,true,true', true",
+                "'true,true', true",
+                "'', true"
         })
         void shouldHandleValidCases(String input, boolean expected) {
             assertEquals(expected, areAllTrue(toBooleanArray(input)));
@@ -162,13 +162,13 @@ class BooleanOperationsTest {
     class IsValidBooleanTest {
 
         @ParameterizedTest(name = "recognize valid boolean value: {0}")
-        @ValueSource(strings = { "true", "TRUE", "True", "false", "FALSE", "False" })
+        @ValueSource(strings = {"true", "TRUE", "True", "false", "FALSE", "False"})
         void shouldRecognizeValidBooleans(String input) {
             assertTrue(isValidBoolean(input));
         }
 
         @ParameterizedTest(name = "reject invalid boolean value: {0}")
-        @ValueSource(strings = { "yes", "no", "1", "0", "on", "off", " true", "true ", "t", "f" })
+        @ValueSource(strings = {"yes", "no", "1", "0", "on", "off", " true", "true ", "t", "f"})
         void shouldRejectInvalidBooleans(String input) {
             assertFalse(isValidBoolean(input));
         }
@@ -191,16 +191,16 @@ class BooleanOperationsTest {
                 isValidBoolean("invalid");
             }
             var duration = System.nanoTime() - start;
-            assertTrue(duration < TimeUnit.SECONDS.toNanos(1), 
-                "Operation should complete within 1 second, took " + 
-                TimeUnit.NANOSECONDS.toMillis(duration) + "ms");
+            assertTrue(duration < TimeUnit.SECONDS.toNanos(1),
+                    "Operation should complete within 1 second, took " +
+                            TimeUnit.NANOSECONDS.toMillis(duration) + "ms");
         }
     }
 
     @Nested
     @DisplayName("handle performance")
     class PerformanceTest {
-        
+
         @Test
         @DisplayName("handle large arrays efficiently")
         void shouldHandleLargeArrays() {
@@ -210,53 +210,53 @@ class BooleanOperationsTest {
             for (int i = 0; i < size; i++) {
                 largeArray[i] = i % 2 == 0;
             }
-            
+
             // Test isAnyTrue performance
             assertDoesNotThrow(() -> {
                 var result = isAnyTrue(largeArray);
                 assertTrue(result, "Should find true in alternating array");
             });
-            
+
             // Test isAnyFalse performance
             assertDoesNotThrow(() -> {
                 var result = isAnyFalse(largeArray);
                 assertTrue(result, "Should find false in alternating array");
             });
-            
+
             // Test areAllTrue performance
             assertDoesNotThrow(() -> {
                 var result = areAllTrue(largeArray);
                 assertFalse(result, "Should not be all true in alternating array");
             });
-            
+
             // Test areAllFalse performance
             assertDoesNotThrow(() -> {
                 var result = areAllFalse(largeArray);
                 assertFalse(result, "Should not be all false in alternating array");
             });
         }
-        
+
         @Test
         @DisplayName("handle worst-case scenarios efficiently")
         void shouldHandleWorstCaseScenarios() {
             var size = 10000;
-            
+
             // Test finding single true at end
             var singleTrueAtEnd = new boolean[size];
             singleTrueAtEnd[size - 1] = true;
-            
+
             assertDoesNotThrow(() -> {
                 var result = isAnyTrue(singleTrueAtEnd);
                 assertTrue(result, "Should find single true at end");
             });
-            
+
             // Test finding single false at end
             var singleFalseAtEnd = new boolean[size];
             for (int i = 0; i < size; i++) {
                 singleFalseAtEnd[i] = true;
             }
             singleFalseAtEnd[size - 1] = false;
-            
+
             assertDoesNotThrow(() -> {
                 var result = isAnyFalse(singleFalseAtEnd);
                 assertTrue(result, "Should find single false at end");
@@ -267,7 +267,7 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle concurrent access")
     class ConcurrentTest {
-        
+
         @Test
         @DisplayName("handle concurrent reads safely")
         void shouldHandleConcurrentReads() {
@@ -276,11 +276,11 @@ class BooleanOperationsTest {
             for (int i = 0; i < size; i++) {
                 sharedArray[i] = i % 2 == 0;
             }
-            
+
             var threadCount = 10;
             var executor = Executors.newFixedThreadPool(threadCount);
             var futures = new ArrayList<Future<?>>();
-            
+
             try {
                 // Submit multiple concurrent read tasks
                 for (int i = 0; i < threadCount; i++) {
@@ -294,7 +294,7 @@ class BooleanOperationsTest {
                         return null;
                     }));
                 }
-                
+
                 // Wait for all tasks to complete
                 for (var future : futures) {
                     assertDoesNotThrow(() -> future.get(5, TimeUnit.SECONDS));

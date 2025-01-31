@@ -179,7 +179,7 @@ public class TextSplitter implements Serializable {
 
         if (!isEmpty(source)) {
             final List<String> sourceSplitted = getSourceSplit();
-            result = sourceSplitted.size() == 1 
+            result = sourceSplitted.size() == 1
                     ? abridgeComputerProducedText()
                     : abridgeHumanProducedText(sourceSplitted);
         }
@@ -303,7 +303,7 @@ public class TextSplitter implements Serializable {
 
         while (remaining.length() > maxLength) {
             builder.append(remaining, 0, maxLength)
-                   .append(ZERO_WIDTH_SPACE);
+                    .append(ZERO_WIDTH_SPACE);
             remaining = remaining.substring(maxLength);
         }
 

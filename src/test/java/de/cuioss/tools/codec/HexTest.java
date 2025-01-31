@@ -17,23 +17,19 @@ package de.cuioss.tools.codec;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Random;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests for {@link Hex} class, based on Apache Commons Codec's HexTest.
@@ -89,13 +85,13 @@ class HexTest {
     @Nested
     @DisplayName("handle charset operations")
     class CharsetOperations {
-        
+
         @Test
         @DisplayName("use custom charset")
         void testCustomCharset() {
-            final var customCharsetNames = new String[]{"UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE", 
-                "US-ASCII", "ISO-8859-1"};
-            
+            final var customCharsetNames = new String[]{"UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE",
+                    "US-ASCII", "ISO-8859-1"};
+
             for (String name : customCharsetNames) {
                 if (charsetSanityCheck(name)) {
                     final var charset = Charset.forName(name);
@@ -205,14 +201,14 @@ class HexTest {
         void testRoundTripRandom() throws EncoderException, DecoderException {
             final var hex = new Hex();
             final var random = new Random();
-            
+
             for (int i = 0; i < 100; i++) {
                 final var bytes = new byte[random.nextInt(256)];
                 random.nextBytes(bytes);
-                
+
                 final var encoded = hex.encode(bytes);
                 final var decoded = hex.decode(encoded);
-                
+
                 assertArrayEquals(bytes, decoded);
             }
         }
@@ -222,11 +218,11 @@ class HexTest {
         void testRoundTripCaseSensitivity() throws EncoderException, DecoderException {
             final var hex = new Hex();
             final var data = "Hello World".getBytes(StandardCharsets.UTF_8);
-            
+
             final var encoded = hex.encodeHexString(data);
             final var upperCase = encoded.toUpperCase();
             final var lowerCase = encoded.toLowerCase();
-            
+
             assertArrayEquals(data, (byte[]) hex.decode(upperCase));
             assertArrayEquals(data, (byte[]) hex.decode(lowerCase));
         }

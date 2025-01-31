@@ -287,8 +287,8 @@ public final class Splitter {
         if (null == sequence) {
             return Collections.emptyList();
         }
-        if (splitterConfig.isDoNotModifySeparatorString() && 
-            splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
+        if (splitterConfig.isDoNotModifySeparatorString() &&
+                splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
             throw new IllegalArgumentException("Invalid regex pattern: " + splitterConfig.getSeparator());
         }
         log.trace("Splitting String {} with configuration {}", sequence, splitterConfig);

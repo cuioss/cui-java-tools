@@ -25,6 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,19 +37,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 @DisplayName("CollectionBuilder should")
 class CollectionBuilderTest {
 
     @Nested
     @DisplayName("handle add operations")
     class AddOperations {
-        
+
         @Test
         @DisplayName("handle various add methods")
         void shouldHandleAddMethods() {
@@ -103,7 +101,7 @@ class CollectionBuilderTest {
     @Nested
     @DisplayName("handle object operations")
     class ObjectOperations {
-        
+
         @Test
         @DisplayName("properly implement Object methods")
         void shouldHandleObjectMethods() {
@@ -119,7 +117,7 @@ class CollectionBuilderTest {
     @Nested
     @DisplayName("handle collection variants")
     class CollectionVariants {
-        
+
         @Test
         @DisplayName("build different collection types")
         void shouldBuildCollectionVariants() {
@@ -169,7 +167,7 @@ class CollectionBuilderTest {
     @Nested
     @DisplayName("handle copy operations")
     class CopyOperations {
-        
+
         @Test
         @DisplayName("copy from list")
         void shouldCreateCopyFromList() {
@@ -223,7 +221,7 @@ class CollectionBuilderTest {
     @Nested
     @DisplayName("handle sorting and filtering")
     class SortingAndFiltering {
-        
+
         @Test
         @DisplayName("sort list elements")
         void shouldSort() {

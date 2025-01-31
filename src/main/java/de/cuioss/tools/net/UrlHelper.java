@@ -21,13 +21,13 @@ import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
 import de.cuioss.tools.string.Splitter;
 import lombok.experimental.UtilityClass;
-import java.util.regex.Pattern;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Provides some utility methods for url / path related data

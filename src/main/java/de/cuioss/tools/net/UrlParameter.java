@@ -21,7 +21,6 @@ import static java.net.URLEncoder.encode;
 import static java.util.Objects.requireNonNull;
 import static java.util.regex.Pattern.compile;
 
-import java.util.regex.Pattern;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.collect.MoreCollections;
 import de.cuioss.tools.logging.CuiLogger;
@@ -44,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * Simple wrapper around an Url Parameter Object.
