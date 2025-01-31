@@ -48,31 +48,30 @@ import java.util.regex.PatternSyntaxException;
  * <h3>1. Basic Splitting</h3>
  * <pre>
  * // Split on a string delimiter
- * List<String> result1 = Splitter.on(", ").splitToList("foo, bar, baz");
- * // Result: ["foo", "bar", "baz"]
+ * List&lt;String&gt; result1 = Splitter.on(", ").splitToList("foo, bar, baz");
+ * // result1 = ["foo", "bar", "baz"]
  *
- * // Split on a character
- * List<String> result2 = Splitter.on(',').splitToList("a,b,c");
- * // Result: ["a", "b", "c"]
+ * // Split on a single character
+ * List&lt;String&gt; result2 = Splitter.on(',').splitToList("a,b,c");
+ * // result2 = ["a", "b", "c"]
  * </pre>
  *
- * <h3>2. Trimming and Empty String Handling</h3>
+ * <h3>2. Handling Empty and Null Values</h3>
  * <pre>
- * // Trim results and omit empty strings
- * List<String> result = Splitter.on(',')
- *     .trimResults()
+ * // Omit empty strings from results
+ * List&lt;String&gt; result = Splitter.on(',')
  *     .omitEmptyStrings()
- *     .splitToList("a, b,,  c");
- * // Result: ["a", "b", "c"]
+ *     .splitToList("a,,c");
+ * // result = ["a", "c"]
  * </pre>
  *
- * <h3>3. Using Limits</h3>
+ * <h3>3. Trimming Results</h3>
  * <pre>
- * // Limit the number of splits
- * List<String> result = Splitter.on(',')
- *     .limit(2)
- *     .splitToList("a,b,c,d");
- * // Result: ["a", "b,c,d"]
+ * // Trim whitespace from results
+ * List&lt;String&gt; result = Splitter.on(',')
+ *     .trimResults()
+ *     .splitToList(" a , b , c ");
+ * // result = ["a", "b", "c"]
  * </pre>
  *
  * <h2>Implementation Notes</h2>
