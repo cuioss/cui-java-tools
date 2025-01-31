@@ -120,10 +120,13 @@ public class PropertyUtil {
         Preconditions.checkArgument(reader.isPresent(), UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass());
         try {
             return reader.get().invoke(bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            log.debug("Property read failed due to access restrictions", e);
+        } catch (InvocationTargetException e) {
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass()), e);
         }
+        return null;
     }
 
     /**
@@ -144,12 +147,15 @@ public class PropertyUtil {
         try {
             var result = writeMethod.invoke(bean, propertyValue);
             return Objects.requireNonNullElse(result, bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            log.debug("Property write failed due to access restrictions", e);
+        } catch (InvocationTargetException e) {
             var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass(), target),
                     e);
         }
+        return bean;
     }
 
     /**

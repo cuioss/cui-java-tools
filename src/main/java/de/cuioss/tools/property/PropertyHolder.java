@@ -245,4 +245,11 @@ public class PropertyHolder {
         return Optional.of(builder.build());
     }
 
+    public PropertyHolder build() {
+        requireNonNull(name, "name must not be null");
+        requireNonNull(type, "type must not be null");
+        requireNonNull(memberInfo, "memberInfo must not be null");
+        requireNonNull(readWrite, "readWrite must not be null");
+        return new PropertyHolder(name, type, memberInfo, readWrite, readMethod, writeMethod);
+    }
 }
