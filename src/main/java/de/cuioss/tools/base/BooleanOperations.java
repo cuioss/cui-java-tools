@@ -171,14 +171,33 @@ public final class BooleanOperations {
     }
 
     /**
-     * Checks if a string represents a valid boolean value.
-     *
-     * @param value to be checked
-     * @return true if the given value represents a boolean value ("true" or "false",
-     * case-insensitive). Returns false for null or any other string value.
+     * Checks if a string represents a valid boolean value according to Java's boolean
+     * parsing rules. This method is case-insensitive and considers only "true" and
+     * "false" as valid boolean strings.
+     * 
+     * <h3>Examples:</h3>
+     * <pre>
+     * isValidBoolean("true")  -> true
+     * isValidBoolean("TRUE")  -> true
+     * isValidBoolean("false") -> true
+     * isValidBoolean("False") -> true
+     * isValidBoolean("yes")   -> false
+     * isValidBoolean("1")     -> false
+     * isValidBoolean(null)    -> false
+     * isValidBoolean("")      -> false
+     * </pre>
+     * 
+     * @param value the string to be checked, may be null
+     * @return {@code true} if the given value represents a valid boolean string
+     *         ("true" or "false", case-insensitive), {@code false} otherwise
+     *         including null and empty strings
+     * @since 2.1
      */
     public static boolean isValidBoolean(final String value) {
-        return (Boolean.TRUE.toString().equalsIgnoreCase(value) ||
-                Boolean.FALSE.toString().equalsIgnoreCase(value));
+        if (null == value || value.isEmpty()) {
+            return false;
+        }
+        final var lowerCase = value.toLowerCase();
+        return "true".equals(lowerCase) || "false".equals(lowerCase);
     }
 }

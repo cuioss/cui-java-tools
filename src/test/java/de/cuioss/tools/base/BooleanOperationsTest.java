@@ -19,6 +19,7 @@ import static de.cuioss.tools.base.BooleanOperations.areAllFalse;
 import static de.cuioss.tools.base.BooleanOperations.areAllTrue;
 import static de.cuioss.tools.base.BooleanOperations.isAnyFalse;
 import static de.cuioss.tools.base.BooleanOperations.isAnyTrue;
+import static de.cuioss.tools.base.BooleanOperations.isValidBoolean;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -157,38 +158,42 @@ class BooleanOperationsTest {
     }
 
     @Nested
-    @DisplayName("handle isValidBoolean")
+    @DisplayName("isValidBoolean should")
     class IsValidBooleanTest {
-        
-        @ParameterizedTest(name = "return true for valid boolean string '{0}'")
-        @ValueSource(strings = {
-            "true", "false",
-            "TrUe", "FaLsE",
-            "TRUE", "FALSE"
-        })
-        void shouldHandleValidCases(String input) {
-            assertTrue(BooleanOperations.isValidBoolean(input),
-                () -> "Should accept '" + input + "' as valid boolean string");
+
+        @ParameterizedTest(name = "recognize valid boolean value: {0}")
+        @ValueSource(strings = { "true", "TRUE", "True", "false", "FALSE", "False" })
+        void shouldRecognizeValidBooleans(String input) {
+            assertTrue(isValidBoolean(input));
         }
 
-        @ParameterizedTest(name = "return false for invalid boolean string '{0}'")
-        @ValueSource(strings = {
-            "", " ", "\t", "\n",
-            " true ", "true ",
-            "yes", "no",
-            "0", "1",
-            "on", "off"
-        })
-        void shouldHandleInvalidCases(String input) {
-            assertFalse(BooleanOperations.isValidBoolean(input),
-                () -> "Should reject '" + input + "' as invalid boolean string");
+        @ParameterizedTest(name = "reject invalid boolean value: {0}")
+        @ValueSource(strings = { "yes", "no", "1", "0", "on", "off", " true", "true ", "t", "f" })
+        void shouldRejectInvalidBooleans(String input) {
+            assertFalse(isValidBoolean(input));
         }
 
         @Test
-        @DisplayName("handle null input")
-        void shouldHandleNullCase() {
-            assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null),
-                "Should not throw exception for null input"));
+        @DisplayName("handle edge cases correctly")
+        void shouldHandleEdgeCases() {
+            assertFalse(isValidBoolean(null), "null should be invalid");
+            assertFalse(isValidBoolean(""), "empty string should be invalid");
+            assertFalse(isValidBoolean(" "), "whitespace should be invalid");
+        }
+
+        @Test
+        @DisplayName("be performant with many calls")
+        void shouldBePerformant() {
+            var start = System.nanoTime();
+            for (int i = 0; i < 100_000; i++) {
+                isValidBoolean("true");
+                isValidBoolean("false");
+                isValidBoolean("invalid");
+            }
+            var duration = System.nanoTime() - start;
+            assertTrue(duration < TimeUnit.SECONDS.toNanos(1), 
+                "Operation should complete within 1 second, took " + 
+                TimeUnit.NANOSECONDS.toMillis(duration) + "ms");
         }
     }
 
