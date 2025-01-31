@@ -15,19 +15,18 @@
  */
 package de.cuioss.tools.concurrent;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Provides some helper-methods taken from com.google.common.util.concurrent
  * package
  *
  * @author Oliver Wolff
- *
  */
 @UtilityClass
 public class ConcurrentTools {
@@ -37,7 +36,6 @@ public class ConcurrentTools {
      * uninterruptedly.
      *
      * @param sleepFor duration
-     *
      */
     public static void sleepUninterruptedly(Duration sleepFor) {
         sleepUninterruptedly(saturatedToNanos(sleepFor), TimeUnit.NANOSECONDS);
@@ -48,7 +46,7 @@ public class ConcurrentTools {
      * uninterruptedly.
      *
      * @param sleepFor number
-     * @param unit TimeUnit
+     * @param unit     TimeUnit
      */
     public static void sleepUninterruptedly(long sleepFor, TimeUnit unit) {
         var interrupted = false;
@@ -74,14 +72,14 @@ public class ConcurrentTools {
 
     /**
      * Convert the given duration to nanoseconds, saturating at {@link Long#MAX_VALUE}
-     * in case of overflow and {@link Long#MIN_VALUE} in case of negative durations.
+     * in case of overflow and 0 in case of negative durations.
      *
      * @param duration to be converted
      * @return the duration in nanoseconds
      */
-    private static long saturatedToNanos(Duration duration) {
-        if (duration.isNegative()) {
-            return Long.MIN_VALUE;
+    static long saturatedToNanos(Duration duration) {
+        if (duration.isNegative() || duration.isZero()) {
+            return 0L;
         }
         try {
             return duration.toNanos();

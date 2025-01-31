@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -49,7 +50,7 @@ class ConcurrentToolsTest {
         @Test
         @DisplayName("complete despite interruption")
         void sleepSingleInterrupt() {
-            requestInterruptIn(10);
+            requestInterruptIn();
             sleepSuccessfully(50);
             assertInterrupted();
         }
@@ -76,6 +77,29 @@ class ConcurrentToolsTest {
             var completed = new Completion(0);
             ConcurrentTools.sleepUninterruptedly(Duration.ofMillis(-10));
             completed.assertCompletionExpected();
+        }
+    }
+
+    @Nested
+    @DisplayName("handle duration conversion")
+    class DurationConversionTest {
+
+        @Test
+        @DisplayName("handle long overflow")
+        void shouldHandleLongOverflow() {
+            assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MIN_VALUE)),
+                "Should handle minimum long value");
+            assertEquals(Long.MAX_VALUE, ConcurrentTools.saturatedToNanos(Duration.ofMillis(Long.MAX_VALUE)),
+                "Should handle maximum long value");
+        }
+
+        @Test
+        @DisplayName("handle zero and negative durations")
+        void shouldHandleZeroAndNegative() {
+            assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ZERO),
+                "Should handle zero duration");
+            assertEquals(0L, ConcurrentTools.saturatedToNanos(Duration.ofNanos(-1)),
+                "Should handle negative duration");
         }
     }
 
@@ -131,11 +155,11 @@ class ConcurrentToolsTest {
      * Interrupts the current thread after sleeping for the specified delay.
      */
     @SuppressWarnings("squid:S2925") // owolff: ok for testing
-    static void requestInterruptIn(final long time) {
+    static void requestInterruptIn() {
         final var interruptee = Thread.currentThread();
         new Thread(() -> {
             try {
-                TimeUnit.MILLISECONDS.sleep(time);
+                TimeUnit.MILLISECONDS.sleep(10);
             } catch (InterruptedException wontHappen) {
                 throw new AssertionError(wontHappen);
             }
