@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * <p>
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ * 
  * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package de.cuioss.tools.net;
-
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
@@ -27,12 +25,15 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
 /**
  * Provides some utility methods for url / path related data
- *
+ * 
  * @author Oliver Wolff
- *
+ * 
  */
 @UtilityClass
 public final class UrlHelper {
@@ -96,7 +97,7 @@ public final class UrlHelper {
     /**
      * Split the given path String in a unified view with a list of {@link String}.
      * The individual path-elements are implicitly trimmed
-     *
+     * 
      * @param pathString if it is null or empty an empty List will be returned
      * @return the list view on the path elements. never null but may be empty
      */
@@ -104,7 +105,21 @@ public final class UrlHelper {
         if (isEmpty(pathString)) {
             return Collections.emptyList();
         }
-        return Splitter.on("/").trimResults().omitEmptyStrings().splitToList(pathString);
+        return Splitter.on(Pattern.compile("/")).trimResults().omitEmptyStrings().splitToList(pathString);
+    }
+
+    /**
+     * Split the given host String in a unified view with a list of {@link String}.
+     * The individual host-elements are implicitly trimmed
+     * 
+     * @param host if it is null or empty an empty List will be returned
+     * @return the list view on the host elements. never null but may be empty
+     */
+    public static List<String> splitHost(String host) {
+        if (isEmpty(host)) {
+            return Collections.emptyList();
+        }
+        return Splitter.on(Pattern.compile("\\.")).trimResults().omitEmptyStrings().splitToList(host);
     }
 
     /**

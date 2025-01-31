@@ -15,13 +15,13 @@
  */
 package de.cuioss.tools.logging;
 
-import static de.cuioss.tools.reflect.MoreReflection.findCaller;
-
 import de.cuioss.tools.collect.CollectionLiterals;
 import lombok.experimental.UtilityClass;
 
 import java.util.Set;
 import java.util.function.Supplier;
+
+import static de.cuioss.tools.reflect.MoreReflection.findCaller;
 
 /**
  * Class provide factory method for CuiLogger instance

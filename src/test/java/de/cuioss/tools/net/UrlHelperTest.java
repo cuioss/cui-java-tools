@@ -15,22 +15,25 @@
  */
 package de.cuioss.tools.net;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.net.UrlHelper.addPrecedingSlashToPath;
-import static de.cuioss.tools.net.UrlHelper.addTrailingSlashToUrl;
-import static de.cuioss.tools.net.UrlHelper.removePrecedingSlashFromPath;
-import static de.cuioss.tools.net.UrlHelper.removeTrailingSlashesFromUrl;
-import static de.cuioss.tools.net.UrlHelper.splitPath;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
+import static de.cuioss.tools.net.UrlHelper.addPrecedingSlashToPath;
+import static de.cuioss.tools.net.UrlHelper.addTrailingSlashToUrl;
+import static de.cuioss.tools.net.UrlHelper.isValidUri;
+import static de.cuioss.tools.net.UrlHelper.removePrecedingSlashFromPath;
+import static de.cuioss.tools.net.UrlHelper.removeTrailingSlashesFromUrl;
+import static de.cuioss.tools.net.UrlHelper.splitHost;
+import static de.cuioss.tools.net.UrlHelper.splitPath;
+import static de.cuioss.tools.net.UrlHelper.tryParseUri;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UrlHelperTest {
 
@@ -41,6 +44,9 @@ class UrlHelperTest {
     private static final String DOUBLE_PRECEDING_SLASHED = "//a/b/c";
     private static final String VALID_URI = "https://foo.bar";
     private static final String INVALID_URI = "~~b:0:0:m~~";
+    private static final String VALID_HOST = "foo.bar.baz";
+    private static final String INVALID_HOST = "foo..bar";
+    private static final String COMPLEX_URI = "https://user:pass@example.com:8080/path?query=value#fragment";
 
     @Test
     void shouldSuffixSlashToUrls() {
@@ -87,24 +93,66 @@ class UrlHelperTest {
 
     @Test
     void parsesValidUri() {
-        Optional<URI> result = assertDoesNotThrow(() -> UrlHelper.tryParseUri(VALID_URI));
+        Optional<URI> result = assertDoesNotThrow(() -> tryParseUri(VALID_URI));
         assertTrue(result.isPresent());
         assertEquals(VALID_URI, result.get().toString());
     }
 
     @Test
     void parsesInvalidUri() {
-        Optional<URI> result = assertDoesNotThrow(() -> UrlHelper.tryParseUri(INVALID_URI));
+        Optional<URI> result = assertDoesNotThrow(() -> tryParseUri(INVALID_URI));
         assertTrue(result.isEmpty());
     }
 
     @Test
     void checksValidUri() {
-        assertTrue(assertDoesNotThrow(() -> UrlHelper.isValidUri(VALID_URI)));
+        assertTrue(assertDoesNotThrow(() -> isValidUri(VALID_URI)));
     }
 
     @Test
     void checksInvalidUri() {
-        assertFalse(assertDoesNotThrow(() -> UrlHelper.isValidUri(INVALID_URI)));
+        assertFalse(assertDoesNotThrow(() -> isValidUri(INVALID_URI)));
+    }
+
+    @Test
+    void shouldHandleNullAndEmptyForUriValidation() {
+        assertTrue(assertDoesNotThrow(() -> isValidUri("")));
+        assertTrue(assertDoesNotThrow(() -> isValidUri(null)));
+
+        Optional<URI> emptyResult = assertDoesNotThrow(() -> tryParseUri(""));
+        assertTrue(emptyResult.isEmpty());
+        Optional<URI> nullResult = assertDoesNotThrow(() -> tryParseUri(null));
+        assertTrue(nullResult.isEmpty());
+    }
+
+    @Test
+    void shouldHandleComplexUri() {
+        Optional<URI> result = assertDoesNotThrow(() -> tryParseUri(COMPLEX_URI));
+        assertTrue(result.isPresent());
+        URI uri = result.get();
+        assertEquals("https", uri.getScheme());
+        assertEquals("user:pass", uri.getUserInfo());
+        assertEquals("example.com", uri.getHost());
+        assertEquals(8080, uri.getPort());
+        assertEquals("/path", uri.getPath());
+        assertEquals("query=value", uri.getQuery());
+        assertEquals("fragment", uri.getFragment());
+    }
+
+    @Test
+    void shouldSplitHostCorrectly() {
+        assertTrue(splitHost("").isEmpty());
+        assertTrue(splitHost(null).isEmpty());
+
+        List<String> expected = immutableList("foo", "bar", "baz");
+        assertEquals(expected, splitHost(VALID_HOST));
+
+        // Handle malformed host with consecutive dots
+        List<String> malformed = splitHost(INVALID_HOST);
+        assertEquals(immutableList("foo", "bar"), malformed);
+
+        // Handle host with spaces
+        List<String> withSpaces = splitHost("foo . bar");
+        assertEquals(immutableList("foo", "bar"), withSpaces);
     }
 }

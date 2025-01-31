@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import de.cuioss.tools.formatting.support.PersonAddress;
 import de.cuioss.tools.formatting.support.PersonAddressGenerator;
 import de.cuioss.tools.formatting.support.PersonName;
@@ -32,6 +29,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BracketLexerTest {
 

@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.property;
 
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
@@ -28,6 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
+
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Helper class providing convenient methods for reading from and writing to Java beans.
@@ -82,7 +82,7 @@ import java.util.Optional;
 @UtilityClass
 public class PropertyUtil {
 
-    private static final CuiLogger log = new CuiLogger(PropertyUtil.class);
+    private static final CuiLogger LOGGER = new CuiLogger(PropertyUtil.class);
 
     /**
      * Error message template for property read failures
@@ -113,17 +113,20 @@ public class PropertyUtil {
      */
     @SuppressWarnings("java:S3655") // owolff: False Positive, isPresent is checked
     public static Object readProperty(Object bean, String propertyName) {
-        log.debug("Reading property '%s' from %s", propertyName, bean);
+        LOGGER.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
         var reader = MoreReflection.retrieveAccessMethod(bean.getClass(), propertyName);
         Preconditions.checkArgument(reader.isPresent(), UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass());
         try {
             return reader.get().invoke(bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            LOGGER.debug("Property read failed due to access restrictions", e);
+        } catch (InvocationTargetException e) {
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass()), e);
         }
+        return null;
     }
 
     /**
@@ -137,19 +140,22 @@ public class PropertyUtil {
      * @since 2.0
      */
     public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
-        log.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
+        LOGGER.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
         var writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
         try {
             var result = writeMethod.invoke(bean, propertyValue);
             return Objects.requireNonNullElse(result, bean);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            LOGGER.debug("Property write failed due to access restrictions", e);
+        } catch (InvocationTargetException e) {
             var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass(), target),
                     e);
         }
+        return bean;
     }
 
     /**
@@ -163,22 +169,22 @@ public class PropertyUtil {
     public static Optional<Class<?>> resolvePropertyType(Class<?> beanClass, String propertyName) {
         var retrieveAccessMethod = MoreReflection.retrieveAccessMethod(beanClass, propertyName);
         if (retrieveAccessMethod.isPresent()) {
-            log.trace("Found read-method on class '%s' for property-name '%s'", beanClass, propertyName);
+            LOGGER.trace("Found read-method on class '%s' for property-name '%s'", beanClass, propertyName);
             return Optional.of(retrieveAccessMethod.get().getReturnType());
         }
         var field = MoreReflection.accessField(beanClass, propertyName);
         if (field.isPresent()) {
-            log.trace("Found field on class '%s' with name '%s'", beanClass, propertyName);
+            LOGGER.trace("Found field on class '%s' with name '%s'", beanClass, propertyName);
             return Optional.of(field.get().getType());
         }
-        log.debug(
+        LOGGER.debug(
                 "Neither read-method nor field found on class '%s' for property-name '%s', checking write methods, returning first type found",
                 beanClass, propertyName);
         var candidates = MoreReflection.retrieveWriteMethodCandidates(beanClass, propertyName);
         if (!candidates.isEmpty()) {
             return Optional.of(candidates.iterator().next().getParameterTypes()[0]);
         }
-        log.debug("Unable to detect property-type on class '%s' for property-name '%s'", beanClass, propertyName);
+        LOGGER.debug("Unable to detect property-type on class '%s' for property-name '%s'", beanClass, propertyName);
         return Optional.empty();
     }
 
@@ -198,14 +204,14 @@ public class PropertyUtil {
         Preconditions.checkArgument(!candidates.isEmpty(), UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(),
                 target);
         if (null == propertyValue) {
-            log.trace("No / Null propertyValue given, so any method should suffice to write property '%s' to %s",
+            LOGGER.trace("No / Null propertyValue given, so any method should suffice to write property '%s' to %s",
                     propertyName, bean);
             return candidates.iterator().next();
         }
         for (Method candidate : candidates) {
             if (MoreReflection.checkWhetherParameterIsAssignable(candidate.getParameterTypes()[0],
                     propertyValue.getClass())) {
-                log.trace("Found method %s to write property '%s' to %s", candidate, propertyName, bean);
+                LOGGER.trace("Found method %s to write property '%s' to %s", candidate, propertyName, bean);
                 return candidate;
             }
         }

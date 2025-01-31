@@ -15,6 +15,14 @@
  */
 package de.cuioss.tools.net;
 
+import de.cuioss.tools.support.ObjectMethodsAsserts;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.net.UrlParameter.createParameterMap;
@@ -26,14 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.cuioss.tools.support.ObjectMethodsAsserts;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 class UrlParameterTest {
 

@@ -31,13 +31,13 @@ public class NoPublicZeroArgConstructor implements FormatterSupport {
 
     @Override
     public Map<String, Serializable> getAvailablePropertyValues() {
-        // TODO Auto-generated method stub
+        // Empty, for testing purpose only
         return null;
     }
 
     @Override
     public List<String> getSupportedPropertyNames() {
-        // TODO Auto-generated method stub
+        // Empty, for testing purpose only
         return null;
     }
 }

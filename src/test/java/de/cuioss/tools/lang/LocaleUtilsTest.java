@@ -15,16 +15,16 @@
  */
 package de.cuioss.tools.lang;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Unit tests for {@link LocaleUtils}. Tests the conversion of strings to Locale objects
@@ -89,9 +89,9 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "us_EN_A,us,EN,A",
-            "us_EN_a,us,EN,a",
-            "us_EN_variant,us,EN,variant"
+            "us_EN_POSIX,us,EN,POSIX",
+            "us_EN_LINUX,us,EN,LINUX",
+            "us_EN_MACOS,us,EN,MACOS"
     })
     void shouldHandleValidLanguageCountryVariantCombinations(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 package de.cuioss.tools.string;
-
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
 
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
@@ -30,142 +25,251 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
+
 /**
- * Derived from Googles Splitter.
- * <p>
- * It uses internally the {@link String#split(String)} implementation of java
- * and provides a guava like wrapper. This results in an implicit splitting of
- * the whole String compared to the lazy / deferred splitting of guava. It
- * focuses and RegEx-based splitting and omits the fixedLength and Map based
- * variants.
- * </p>
+ * A string splitting utility inspired by Google Guava's Splitter, providing a more
+ * straightforward and efficient implementation based on Java's native {@link String#split(String)}.
+ *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>RegEx-based splitting with simple configuration</li>
+ *   <li>Options to trim results and omit empty strings</li>
+ *   <li>Limit control for split results</li>
+ *   <li>Fluent builder-style API</li>
+ * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ *
+ * <h3>1. Basic Splitting</h3>
+ * <pre>
+ * // Split on a string delimiter
+ * List&lt;String&gt; result1 = Splitter.on(", ").splitToList("foo, bar, baz");
+ * // result1 = ["foo", "bar", "baz"]
+ *
+ * // Split on a single character
+ * List&lt;String&gt; result2 = Splitter.on(',').splitToList("a,b,c");
+ * // result2 = ["a", "b", "c"]
+ * </pre>
+ *
+ * <h3>2. Handling Empty and Null Values</h3>
+ * <pre>
+ * // Omit empty strings from results
+ * List&lt;String&gt; result = Splitter.on(',')
+ *     .omitEmptyStrings()
+ *     .splitToList("a,,c");
+ * // result = ["a", "c"]
+ * </pre>
+ *
+ * <h3>3. Trimming Results</h3>
+ * <pre>
+ * // Trim whitespace from results
+ * List&lt;String&gt; result = Splitter.on(',')
+ *     .trimResults()
+ *     .splitToList(" a , b , c ");
+ * // result = ["a", "b", "c"]
+ * </pre>
+ *
+ * <h2>Implementation Notes</h2>
+ * <ul>
+ *   <li>Uses Java's {@link String#split(String)} internally for efficient splitting</li>
+ *   <li>Processes the entire string at once (eager splitting) unlike Guava's lazy approach</li>
+ *   <li>Focuses on RegEx-based splitting, omitting fixed-length and map-based variants</li>
+ * </ul>
+ *
  * <h2>Migrating from Guava</h2>
- * <p>
- * In order to migrate for most case you only need to replace the package name
- * on the import. A major different is that the split method provided is
- * {@link #splitToList(String)}, the variant split() is replaced by it
- * completely.
- * </p>
- * <h2>Changes to Guavas-Splitter</h2>
- * <p>
- * It is quite similar to the guava variant but behaves a little different in
- * certain details, especially in the context of {@link Splitter#limit(int)} and
- * {@link Splitter#trimResults()}, {@link Splitter#omitEmptyStrings()}. While
- * guavas version will filter the limit elements after the application of omit /
- * trim, this version will do it the other way round, resulting in a different
- * result compared to the guava version.
- * </p>
+ * <ol>
+ *   <li>Update imports from {@code com.google.common.base.Splitter} to {@code de.cuioss.tools.string.Splitter}</li>
+ *   <li>Replace {@code split()} calls with {@link #splitToList(String)}</li>
+ *   <li>Note the different behavior of {@link #limit(int)} when used with {@link #trimResults()} or {@link #omitEmptyStrings()}:
+ *     <ul>
+ *       <li>This implementation applies limit first, then trim/omit</li>
+ *       <li>Guava applies trim/omit first, then limit</li>
+ *     </ul>
+ *   </li>
+ * </ol>
  *
  * @author Oliver Wolff
- *
+ * @see String#split(String)
+ * @see Pattern
+ * @see SplitterConfig
  */
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Splitter {
 
-    private static final CuiLogger log = new CuiLogger(Splitter.class);
+    private static final CuiLogger LOGGER = new CuiLogger(Splitter.class);
 
     @NonNull
     private final SplitterConfig splitterConfig;
 
     /**
-     * Returns a splitter that uses the given fixed string as a separator. For
-     * example, {@code
-     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing
-     * {@code ["foo",
-     * "bar,baz"]}.
+     * Creates a splitter that uses the given character as a separator pattern.
+     * The character is automatically escaped if it has special meaning in regex.
      *
-     * @param separator the literal, nonempty string to recognize as a separator
+     * <pre>
+     * Splitter.on(',').splitToList("a,b,c")     = ["a", "b", "c"]
+     * Splitter.on('.').splitToList("a.b.c")     = ["a", "b", "c"]  // '.' is escaped
+     * </pre>
      *
-     * @return a splitter, with default settings, that recognizes that separator
-     */
-    public static Splitter on(final String separator) {
-        requireNotEmpty(separator);
-        return new Splitter(SplitterConfig.builder().separator(separator).build());
-    }
-
-    /**
-     * Returns a splitter that uses the given fixed string as a separator. For
-     * example, {@code
-     * Splitter.on(", ").split("foo, bar,baz")} returns an iterable containing
-     * {@code ["foo",
-     * "bar,baz"]}.
-     *
-     * @param separator the literal, nonempty string to recognize as a separator
-     *
-     * @return a splitter, with default settings, that recognizes that separator
+     * @param separator the character to use as a separator, must not be null
+     * @return a new {@link Splitter} instance configured with the given separator
+     * @throws NullPointerException if separator is null
      */
     public static Splitter on(final char separator) {
-        requireNonNull(separator);
-        return new Splitter(SplitterConfig.builder().separator(String.valueOf(separator)).build());
+        requireNonNull(separator, "separator must not be null");
+        var separatorStr = String.valueOf(separator);
+        return new Splitter(SplitterConfig.builder()
+                .separator(separatorStr)
+                .pattern(Pattern.compile(Pattern.quote(separatorStr)))
+                .build());
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter, but
-     * automatically omits empty strings from the results. For example, {@code
-     * Splitter.on(',').omitEmptyStrings().split(",a,,,b,c,,")} returns an iterable
-     * containing only {@code ["a", "b", "c"]}.
+     * Creates a splitter that uses the given string as a separator pattern.
+     * The string will be treated as a literal pattern, not a regular expression.
      *
-     * <p>
-     * If either {@code trimResults} option is also specified when creating a
-     * splitter, that splitter always trims results first before checking for
-     * emptiness. So, for example, {@code
-     * Splitter.on(':').omitEmptyStrings().trimResults().split(": : : ")} returns an
-     * empty iterable.
+     * <pre>
+     * // Split on a string
+     * Splitter.on(",").splitToList("a,b,c")     = ["a", "b", "c"]
+     * Splitter.on(", ").splitToList("a, b, c")  = ["a", "b", "c"]
+     * </pre>
      *
-     * @return a splitter with the desired configuration
+     * @param separator the string to use as a separator, must not be null
+     * @return a new {@link Splitter} instance configured with the given separator
+     * @throws NullPointerException if separator is null
+     * @throws IllegalArgumentException if separator is empty
      */
-    public Splitter omitEmptyStrings() {
-        return new Splitter(splitterConfig.copy().omitEmptyStrings(true).build());
+    public static Splitter on(final String separator) {
+        requireNonNull(separator, "separator must not be null");
+        if (separator.isEmpty()) {
+            throw new IllegalArgumentException("separator must not be empty");
+        }
+        return new Splitter(SplitterConfig.builder()
+                .separator(separator)
+                .pattern(Pattern.compile(Pattern.quote(separator)))
+                .build());
     }
 
     /**
-     * Usually the separator will be pre-processed before being passed to
-     * {@link String#split(String)}. This is needed to mask special characters that
-     * will harm {@link Pattern#compile(String)}. If you want to disable this
-     * behavior and take care for your self you can change this method by calling
-     * this method.
+     * Creates a splitter that uses the given regular expression pattern as a separator.
+     * This is useful for more complex splitting requirements.
      *
-     * @return a splitter with the desired configuration
+     * <pre>
+     * // Split on whitespace
+     * Splitter.on(Pattern.compile("\\s+")).splitToList("a b   c")  = ["a", "b", "c"]
+     *
+     * // Split on word boundaries
+     * Splitter.on(Pattern.compile("\\b")).splitToList("foo:bar")   = ["foo", ":", "bar"]
+     * </pre>
+     *
+     * @param separatorPattern the pattern to use for splitting, must not be null
+     * @return a new {@link Splitter} instance configured with the given pattern
+     * @throws NullPointerException if separatorPattern is null
      */
-    public Splitter doNotModifySeparatorString() {
-        return new Splitter(splitterConfig.copy().doNotModifySeparatorString(true).build());
+    public static Splitter on(final Pattern separatorPattern) {
+        requireNonNull(separatorPattern, "separatorPattern must not be null");
+        return new Splitter(SplitterConfig.builder()
+                .separator(separatorPattern.pattern())
+                .pattern(separatorPattern)
+                .build());
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter, but
-     * automatically removes leading and trailing whitespace from each returned
-     * substring. For example,
-     * {@code Splitter.on(',').trimResults().split(" a, b ,c ")} returns an iterable
-     * containing {@code ["a", "b", "c"]}.
+     * Sets a limit on the number of splits to be performed.
+     * After the limit is reached, the remainder of the string is treated as the final element.
      *
-     * @return a splitter with the desired configuration
+     * <pre>
+     * Basic limit usage
+     * Splitter.on(',').limit(2).splitToList("a,b,c")      = ["a", "b,c"]
+     * Splitter.on(',').limit(3).splitToList("a,b,c,d")    = ["a", "b", "c,d"]
+     *
+     * Limit with empty strings
+     * Splitter.on(',').limit(2).splitToList("a,,c")       = ["a", ",c"]
+     * </pre>
+     *
+     * @param limit the maximum number of splits to perform, must be greater than 0
+     * @return this {@link Splitter} instance for method chaining
+     * @throws IllegalArgumentException if limit is not positive
+     */
+    public Splitter limit(final int limit) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("limit must be greater than 0");
+        }
+        var newConfig = splitterConfig.copy()
+                .maxItems(limit)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
+    }
+
+    /**
+     * Configures this splitter to trim whitespace from the beginning and end of each result.
+     * Whitespace is defined by {@link String#trim()}.
+     *
+     * <pre>
+     * Basic trimming
+     * Splitter.on(',').trimResults().splitToList(" a , b ")   = ["a", "b"]
+     *
+     * Trimming with empty strings
+     * Splitter.on(',').trimResults().splitToList("a, ,c")     = ["a", "", "c"]
+     * </pre>
+     *
+     * @return this {@link Splitter} instance for method chaining
+     * @see String#trim()
      */
     public Splitter trimResults() {
-        return new Splitter(splitterConfig.copy().trimResults(true).build());
+        var newConfig = splitterConfig.copy()
+                .trimResults(true)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
     }
 
     /**
-     * Returns a splitter that behaves equivalently to {@code this} splitter but
-     * stops splitting after it reaches the limit. The limit defines the maximum
-     * number of items returned by the iterator, or the maximum size of the list
-     * returned by {@link #splitToList}.
+     * Configures this splitter to skip empty strings in the results.
+     * An empty string is defined as a string of length zero.
      *
-     * <p>
-     * For example, {@code Splitter.on(',').limit(3).split("a,b,c,d")} returns an
-     * iterable containing {@code ["a", "b", "c,d"]}. When omitting empty strings,
-     * the omitted strings do not count. Hence,
-     * {@code Splitter.on(',').limit(3).omitEmptyStrings().split("a,,,b,,,c,d")}
-     * returns an iterable containing {@code ["a", "b", "c,d"}. When trim is
-     * requested, all entries are trimmed, including the last. Hence
-     * {@code Splitter.on(',').limit(3).trimResults().split(" a , b
-     * , c , d ")} results in {@code ["a", "b", "c , d"]}.
+     * <pre>
+     * Basic empty string omission
+     * Splitter.on(',').omitEmptyStrings().splitToList("a,,c")     = ["a", "c"]
      *
-     * @param maxItems the maximum number of items returned
-     * @return a splitter with the desired configuration
+     * With trimming
+     * Splitter.on(',').trimResults().omitEmptyStrings()
+     *     .splitToList("a, ,c")                                    = ["a", "c"]
+     * </pre>
+     *
+     * @return this {@link Splitter} instance for method chaining
      */
-    public Splitter limit(int maxItems) {
-        checkArgument(maxItems > 0, "must be greater than zero: %s");
-        return new Splitter(splitterConfig.copy().maxItems(maxItems).build());
+    public Splitter omitEmptyStrings() {
+        var newConfig = splitterConfig.copy()
+                .omitEmptyStrings(true)
+                .pattern(splitterConfig.getPattern())
+                .build();
+        return new Splitter(newConfig);
+    }
+
+    /**
+     * Configures this splitter to use the separator string as a literal pattern without escaping special regex characters.
+     * This is useful when you want to split on a regular expression pattern.
+     *
+     * <pre>
+     * Without doNotModifySeparatorString()
+     * Splitter.on("[").splitToList("[a][b]")      // Throws IllegalArgumentException
+     *
+     * With doNotModifySeparatorString()
+     * Splitter.on("[").doNotModifySeparatorString().splitToList("[a][b]")  = ["", "a", "[b]"]
+     * </pre>
+     *
+     * @return a new {@link Splitter} instance with the same configuration but with doNotModifySeparatorString set to true
+     */
+    public Splitter doNotModifySeparatorString() {
+        var separator = splitterConfig.getSeparator();
+        var newConfig = splitterConfig.copy()
+                .doNotModifySeparatorString(true)
+                .pattern(Pattern.compile(Pattern.quote(separator)))
+                .build();
+        return new Splitter(newConfig);
     }
 
     /**
@@ -176,30 +280,39 @@ public final class Splitter {
      *
      * @return an immutable list of the segments split from the parameter
      */
+    @SuppressWarnings("java:S5852") // owolff:
+    // This is a false positive,
+    // because the splitter-separator is coded / configured value,
+    // no user-payload
     public List<String> splitToList(String sequence) {
-        log.trace("Splitting String {} with configuration {}", sequence, splitterConfig);
+        if (null == sequence) {
+            return Collections.emptyList();
+        }
+        if (splitterConfig.isDoNotModifySeparatorString() &&
+                splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
+            throw new IllegalArgumentException("Invalid regex pattern: " + splitterConfig.getSeparator());
+        }
+        LOGGER.debug("Splitting '%s' with pattern '%s'", sequence, splitterConfig.getSeparator());
         if (isEmpty(sequence)) {
             return Collections.emptyList();
         }
-        var splitted = sequence.split(handleSplitCharacter(splitterConfig.getSeparator()),
-                splitterConfig.getMaxItems());
-        if (null == splitted || 0 == splitted.length) {
-            log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
+
+        var pattern = splitterConfig.getPattern();
+        if (pattern == null) {
+            pattern = Pattern.compile(Pattern.quote(splitterConfig.getSeparator()));
+        }
+
+        var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
+        if (0 == splitted.length) {
+            LOGGER.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();
         }
-        var builder = new CollectionBuilder<String>();
 
+        var builder = new CollectionBuilder<String>();
         for (String element : splitted) {
             addIfApplicable(builder, element);
         }
         return builder.toImmutableList();
-    }
-
-    private String handleSplitCharacter(String separator) {
-        if (splitterConfig.isDoNotModifySeparatorString()) {
-            return separator;
-        }
-        return Pattern.quote(separator);
     }
 
     private void addIfApplicable(CollectionBuilder<String> builder, String element) {
@@ -210,11 +323,7 @@ public final class Splitter {
         if (splitterConfig.isTrimResults()) {
             toDo = toDo.trim();
         }
-        if (!splitterConfig.isOmitEmptyStrings()) {
-            builder.add(toDo);
-            return;
-        }
-        if (!toDo.isEmpty()) { // Omit empty strings
+        if (!splitterConfig.isOmitEmptyStrings() || !toDo.isEmpty()) {
             builder.add(toDo);
         }
     }

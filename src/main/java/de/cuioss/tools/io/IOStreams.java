@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-
 import de.cuioss.tools.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
@@ -35,6 +33,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 
 /**
  * Provides a number of utilities in context {@link InputStream} and

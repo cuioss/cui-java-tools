@@ -23,18 +23,97 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * <h2>Overview</h2> Converts hexadecimal Strings. The Charset used for certain
- * operation can be set, the default is set in {@link StandardCharsets#UTF_8}
+ * <h2>Overview</h2>
+ * Converts hexadecimal Strings to and from bytes. The Charset used for string operations
+ * can be configured, with UTF-8 as the default ({@link StandardCharsets#UTF_8}).
  * <p>
- * This class is thread-safe.
- * <h3>Usage</h3>
+ * This class is thread-safe and optimized for performance through direct array manipulation
+ * and minimal object creation.
  *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>Thread-safe implementation</li>
+ *   <li>Configurable character encoding</li>
+ *   <li>Support for both upper and lowercase hex output</li>
+ *   <li>ByteBuffer support for efficient memory usage</li>
+ *   <li>Direct array manipulation for optimal performance</li>
+ * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ *
+ * <h3>Basic String Conversion</h3>
  * <pre>
- * String roundtrip = "roundtrip";
- * assertEquals(roundtrip, new String(Hex.decodeHex(Hex.encodeHex(roundtrip.getBytes()))));
+ * // Basic encoding/decoding
+ * String text = "Hello World";
+ * byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
+ * String hex = Hex.encodeHexString(bytes);
+ * byte[] original = Hex.decodeHex(hex);
+ * String result = new String(original, StandardCharsets.UTF_8);
  * </pre>
  *
- * @author <a href="https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/binary/Hex.java">commons-codec</a>
+ * <h3>Case Control</h3>
+ * <pre>
+ * // Uppercase hex output
+ * String upperHex = Hex.encodeHexString(bytes, false);
+ * // Lowercase hex output
+ * String lowerHex = Hex.encodeHexString(bytes, true);
+ * </pre>
+ *
+ * <h3>Using ByteBuffer</h3>
+ * <pre>
+ * // Efficient handling of large data
+ * ByteBuffer buffer = ByteBuffer.allocate(1024);
+ * buffer.put("Large content".getBytes(StandardCharsets.UTF_8));
+ * buffer.flip();
+ * String hex = Hex.encodeHexString(buffer);
+ * </pre>
+ *
+ * <h3>Custom Charset</h3>
+ * <pre>
+ * // Using a specific charset
+ * Hex customHex = new Hex(StandardCharsets.ISO_8859_1);
+ * byte[] encoded = customHex.encode("Special chars".getBytes());
+ * byte[] decoded = customHex.decode(encoded);
+ * </pre>
+ *
+ * <h2>Performance Notes</h2>
+ * <ul>
+ *   <li>The implementation avoids creating intermediate String objects where possible</li>
+ *   <li>Direct char[] manipulation is used instead of StringBuilder for better performance</li>
+ *   <li>Static methods use UTF-8 by default to avoid charset lookup overhead</li>
+ *   <li>ByteBuffer methods support zero-copy operations when possible</li>
+ *   <li>Instance reuse is recommended when using custom charsets</li>
+ * </ul>
+ *
+ * <h2>Thread Safety</h2>
+ * <ul>
+ *   <li>All instance methods are thread-safe</li>
+ *   <li>All static methods are thread-safe</li>
+ *   <li>Charset field is final and immutable</li>
+ *   <li>No shared mutable state between operations</li>
+ * </ul>
+ *
+ * <h2>Error Handling</h2>
+ * <ul>
+ *   <li>Invalid hex strings throw {@link DecoderException}</li>
+ *   <li>Odd-length hex strings throw {@link DecoderException}</li>
+ *   <li>Invalid character encodings throw {@link java.nio.charset.UnsupportedCharsetException}</li>
+ *   <li>Null inputs throw {@link IllegalArgumentException}</li>
+ * </ul>
+ *
+ * <h2>Migration Notes</h2>
+ * This implementation is API-compatible with Apache Commons Codec's Hex class,
+ * allowing for easy migration. Key differences:
+ * <ul>
+ *   <li>Simplified API focused on essential operations</li>
+ *   <li>Improved performance through optimized implementation</li>
+ *   <li>Enhanced ByteBuffer support</li>
+ *   <li>Stricter null checking</li>
+ * </ul>
+ *
+ * @see java.nio.charset.StandardCharsets
+ * @see java.nio.ByteBuffer
+ * @see <a href="https://github.com/apache/commons-codec/blob/master/src/main/java/org/apache/commons/codec/binary/Hex.java">Apache Commons Codec Reference</a>
  */
 @ToString
 public class Hex {

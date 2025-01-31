@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.formatting;
 
-import static de.cuioss.tools.collect.MoreCollections.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.emptyToNull;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -27,6 +24,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static de.cuioss.tools.collect.MoreCollections.isEmpty;
+import static de.cuioss.tools.string.MoreStrings.emptyToNull;
 
 /**
  * Provide concatenation of strings by using

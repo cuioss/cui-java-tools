@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.formatting.template;
 
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-
 import lombok.Data;
 
 import java.io.Serializable;
@@ -25,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
 /**
  * Example implementation of FormatterSupport

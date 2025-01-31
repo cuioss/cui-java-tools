@@ -15,11 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.base.Preconditions.checkState;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,6 +25,11 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.net.URL;
 import java.util.Optional;
+
+import static de.cuioss.tools.base.Preconditions.checkState;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Variant of {@link FileLoader} that loads files from the classpath.
@@ -43,7 +43,7 @@ public class ClassPathLoader implements FileLoader {
     @Serial
     private static final long serialVersionUID = 9140071059594577808L;
 
-    private static final CuiLogger log = new CuiLogger(ClassPathLoader.class);
+    private static final CuiLogger LOGGER = new CuiLogger(ClassPathLoader.class);
 
     private final String normalizedPathName;
 
@@ -127,21 +127,21 @@ public class ClassPathLoader implements FileLoader {
     }
 
     private static URL resolveUrl(String path) {
-        log.debug("Resolving URL for '{}'", path);
+        LOGGER.debug("Resolving URL for '%s'", path);
         var url = ClassPathLoader.class.getResource(path);
         if (null != url) {
-            log.debug("Resolved '{}' from ClassPathLoader.class", path);
+            LOGGER.debug("Resolved '%s' from ClassPathLoader.class", path);
             return url;
         }
         var loader = Optional.ofNullable(Thread.currentThread().getContextClassLoader());
         if (loader.isPresent()) {
             url = loader.get().getResource(path);
             if (null != url) {
-                log.debug("Resolved '{}' from ContextClassLoader", path);
+                LOGGER.debug("Resolved '%s' from ContextClassLoader", path);
                 return url;
             }
         }
-        log.info("Unable to resolve '{}' from classpath", path);
+        LOGGER.info("Unable to resolve '%s' from classpath", path);
         return null;
     }
 

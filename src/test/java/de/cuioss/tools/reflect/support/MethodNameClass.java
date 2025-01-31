@@ -18,7 +18,7 @@ package de.cuioss.tools.reflect.support;
 import lombok.Getter;
 import lombok.Setter;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "java:S1172"})
 public class MethodNameClass {
 
     private String name;
@@ -70,6 +70,7 @@ public class MethodNameClass {
     }
 
     public void setWrongParameterCount(String param, String parameter) {
+        // Empty, for testing purpose only
     }
 
     public static String getStatic() {
@@ -77,6 +78,6 @@ public class MethodNameClass {
     }
 
     public static void setStatic(String staticString) {
-
+        // Empty, for testing purpose only
     }
 }

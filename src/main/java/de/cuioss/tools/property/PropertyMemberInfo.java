@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.reflect.MoreReflection;
 
-import java.io.Serializable;
 import java.lang.reflect.Modifier;
 
 /**
@@ -73,6 +73,8 @@ public enum PropertyMemberInfo {
      */
     UNDEFINED;
 
+    private static final CuiLogger LOGGER = new CuiLogger(PropertyMemberInfo.class);
+
     /**
      * Resolves {@link PropertyMemberInfo} for a given property using reflection.
      * This method can distinguish between {@link #UNDEFINED}, {@link #DEFAULT}
@@ -87,6 +89,7 @@ public enum PropertyMemberInfo {
     public static PropertyMemberInfo resolveForBean(final Class<?> beanType, final String propertyName) {
         var fieldOption = MoreReflection.accessField(beanType, propertyName);
         if (fieldOption.isEmpty()) {
+            LOGGER.debug("No property descriptor found for property %s on type %s", propertyName, beanType);
             return UNDEFINED;
         }
         if (Modifier.isTransient(fieldOption.get().getModifiers())) {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,29 +15,73 @@
  */
 package de.cuioss.tools.string;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+
 /**
  * Provides enhanced String handling utilities focusing on null-safety, performance,
  * and common string manipulation tasks. This class serves as a lightweight alternative
- * to larger utility libraries.
+ * to larger utility libraries while maintaining high standards for code quality
+ * and usability.
  *
  * <h2>Key Features</h2>
  * <ul>
- *   <li>Null-safe string operations</li>
- *   <li>Efficient string formatting</li>
- *   <li>String validation and transformation</li>
- *   <li>Common string manipulation tasks</li>
+ *   <li>Null-safe string operations with consistent behavior</li>
+ *   <li>Efficient string formatting with improved null handling</li>
+ *   <li>Comprehensive string validation and transformation utilities</li>
+ *   <li>Performance-optimized string manipulation methods</li>
+ *   <li>Consistent error handling and validation</li>
  * </ul>
+ *
+ * <h2>Method Categories</h2>
+ * <ol>
+ *   <li><b>Null and Empty Handling</b>
+ *     <ul>
+ *       <li>{@link #nullToEmpty(String)} - Convert null to empty string</li>
+ *       <li>{@link #emptyToNull(String)} - Convert empty string to null</li>
+ *       <li>{@link #isEmpty(CharSequence)} - Check if string is null or empty</li>
+ *       <li>{@link #isBlank(CharSequence)} - Check if string is null, empty, or whitespace</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Validation</b>
+ *     <ul>
+ *       <li>{@link #isAllLowerCase(CharSequence)} - Check for lowercase content</li>
+ *       <li>{@link #isAllUpperCase(CharSequence)} - Check for uppercase content</li>
+ *       <li>{@link #isNumeric(CharSequence)} - Check for numeric content</li>
+ *       <li>{@link #hasNonWhitespaceChar(CharSequence)} - Check for non-whitespace content</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Transformation</b>
+ *     <ul>
+ *       <li>{@link #unquote(String)} - Remove surrounding quotes</li>
+ *       <li>{@link #trimOrNull(String)} - Trim or return null</li>
+ *       <li>{@link #stripEnd(String, String)} - Remove characters from end</li>
+ *       <li>{@link #leftPad(String, int)} - Add padding to left side</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Search and Manipulation</b>
+ *     <ul>
+ *       <li>{@link #indexOf(CharSequence, int)} - Find character position</li>
+ *       <li>{@link #countMatches(CharSequence, CharSequence)} - Count occurrences</li>
+ *       <li>{@link #repeat(char, int)} - Repeat character</li>
+ *       <li>{@link #ensureEndsWith(String, String)} - Ensure suffix presence</li>
+ *     </ul>
+ *   </li>
+ *   <li><b>String Formatting</b>
+ *     <ul>
+ *       <li>{@link #lenientFormat(String, Object...)} - Safe string formatting</li>
+ *     </ul>
+ *   </li>
+ * </ol>
  *
  * <h2>Usage Examples</h2>
  *
@@ -46,7 +90,7 @@ import java.util.function.Predicate;
  * // Safe null handling
  * String nullString = null;
  * assertEquals("", nullToEmpty(nullString));
- * assertEquals("default", nullToDefault(nullString, "default"));
+ * assertEquals("default", firstNonEmpty(nullString, "default").orElse(""));
  *
  * // Safe empty handling
  * String emptyString = "";
@@ -55,106 +99,142 @@ import java.util.function.Predicate;
  * assertFalse(isEmpty("  not empty  "));
  * </pre>
  *
- * <h3>2. String Formatting</h3>
+ * <h3>2. String Validation</h3>
  * <pre>
- * // Simple parameter replacement
- * String result = lenientFormat("User %s logged in from %s", "admin", "localhost");
- * assertEquals("User admin logged in from localhost", result);
+ * // Case validation
+ * assertTrue(isAllLowerCase("lowercase"));
+ * assertTrue(isAllUpperCase("UPPERCASE"));
+ * assertFalse(isAllLowerCase("Mixed"));
  *
- * // Mixed placeholders (both %s and {})
- * String mixed = lenientFormat("Value: {} equals %s", 42, "forty-two");
- * assertEquals("Value: 42 equals forty-two", mixed);
- *
- * // Handling null parameters
- * String withNull = lenientFormat("Nullable: %s", (Object) null);
- * assertEquals("Nullable: null", withNull);
+ * // Content validation
+ * assertTrue(isNumeric("12345"));
+ * assertTrue(hasNonWhitespaceChar("  text  "));
+ * assertFalse(isNumeric("12.34")); // decimals not considered numeric
  * </pre>
  *
- * <h3>3. String Validation</h3>
+ * <h3>3. String Transformation</h3>
  * <pre>
- * // String presence checks
- * assertTrue(isEmpty(null));
- * assertTrue(isEmpty(""));
- * assertFalse(isEmpty(" "));
+ * // Quoting
+ * assertEquals("text", unquote("'text'"));
+ * assertEquals("text", unquote("\"text\""));
  *
- * assertTrue(isBlank(null));
- * assertTrue(isBlank(""));
- * assertTrue(isBlank("   "));
- * assertFalse(isBlank("text"));
+ * // Padding
+ * assertEquals("  text", leftPad("text", 6));
+ * assertEquals("00123", leftPad("123", 5, '0'));
+ *
+ * // Stripping
+ * assertEquals("123", stripEnd("123.00", ".0"));
+ * assertEquals("text", stripEnd("text   ", null));
  * </pre>
  *
- * <h3>4. String Transformation</h3>
+ * <h3>4. String Search and Manipulation</h3>
  * <pre>
- * // Safe trimming
- * assertEquals("text", trimToEmpty("  text  "));
- * assertEquals("", trimToEmpty(null));
+ * // Searching
+ * assertEquals(2, countMatches("banana", "a"));
+ * assertEquals(1, indexOf("hello", 'e'));
  *
- * // Case conversion
- * assertEquals("TEXT", toUpperCase("text"));
- * assertEquals("", toUpperCase(null));
- *
- * assertEquals("text", toLowerCase("TEXT"));
- * assertEquals("", toLowerCase(null));
+ * // Manipulation
+ * assertEquals("***", repeat('*', 3));
+ * assertEquals("file.txt", ensureEndsWith("file", ".txt"));
  * </pre>
  *
+ * <h3>5. Safe String Formatting</h3>
+ * <pre>
+ * // Basic formatting
+ * assertEquals("Hello, world!", lenientFormat("Hello, %s!", "world"));
  *
+ * // Null argument handling
+ * assertEquals("Value: null", lenientFormat("Value: %s", null));
  *
- * <h2>Best Practices</h2>
+ * // Extra arguments handling
+ * assertEquals("Hello! [world, extra]", lenientFormat("Hello!", "world", "extra"));
+ * </pre>
+ *
+ * <h2>Migration Guide</h2>
+ * <h3>From Apache Commons Lang StringUtils</h3>
+ * <pre>
+ * // Commons Lang                     // MoreStrings
+ * StringUtils.isEmpty(str)            isEmpty(str)
+ * StringUtils.isBlank(str)           isBlank(str)
+ * StringUtils.defaultString(str, "") nullToEmpty(str)
+ * StringUtils.strip(str)             trimOrNull(str)
+ * StringUtils.leftPad(str, n)        leftPad(str, n)
+ * </pre>
+ *
+ * <h3>From Google Guava Strings</h3>
+ * <pre>
+ * // Guava                           // MoreStrings
+ * Strings.nullToEmpty(str)           nullToEmpty(str)
+ * Strings.emptyToNull(str)           emptyToNull(str)
+ * Strings.repeat(str, n)             repeat(str.charAt(0), n) // for single char
+ * Strings.lenientFormat(str, args)   lenientFormat(str, args)
+ * </pre>
+ *
+ * <h2>Performance Considerations</h2>
  * <ul>
- *   <li>Always use null-safe methods when handling potentially null strings</li>
- *   <li>Prefer lenientFormat over String.format for better null handling</li>
- *   <li>Use isEmpty() for null-safe empty checks</li>
- *   <li>Use isBlank() when whitespace should be considered empty</li>
+ *   <li><b>String Creation</b>: Methods minimize object creation by reusing constants like {@link #EMPTY} and {@link #SPACE}</li>
+ *   <li><b>StringBuilder Usage</b>: String concatenation operations use StringBuilder for better performance</li>
+ *   <li><b>Early Returns</b>: Methods implement early returns for null/empty cases to avoid unnecessary processing</li>
+ *   <li><b>Memory Usage</b>: The {@link #PAD_LIMIT} constant prevents excessive memory allocation in padding operations</li>
+ *   <li><b>Iteration Efficiency</b>: Character iteration is optimized using direct char access instead of substring operations</li>
+ *   <li><b>Null Safety</b>: Null checks are performed before string operations to prevent NPEs without sacrificing performance</li>
  * </ul>
  *
- * <h2>Performance Notes</h2>
- * <ul>
- *   <li>Methods are optimized for minimal object creation</li>
- *   <li>String concatenation is avoided in favor of StringBuilder</li>
- *   <li>Null checks are performed before any string operations</li>
- *   <li>Regular expressions are precompiled where possible</li>
- * </ul>
+ * <h2>Thread Safety</h2>
+ * <p>All methods in this class are stateless and thread-safe. They can be safely used in multi-threaded environments.</p>
  *
  * @author Oliver Wolff
  * @author Sven Haag
- * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">StringUtils</a>
- * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/CharSequenceUtils.java">CharSequenceUtils</a>
- * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">StringUtils</a>
- * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Guava-String</a>
+ *
+ * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang StringUtils</a>
+ * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava Strings</a>
+ * @see <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework StringUtils</a>
  */
 @UtilityClass
 public final class MoreStrings {
 
-    private static final CuiLogger log = new CuiLogger(MoreStrings.class);
+    private static final CuiLogger LOGGER = new CuiLogger(MoreStrings.class);
 
     /**
      * The empty String {@code ""}.
+     * Used as a constant to avoid creating empty strings repeatedly.
      */
     public static final String EMPTY = "";
 
     /**
-     * <p>
-     * The maximum size to which the padding constant(s) can expand.
-     * </p>
-     */
-    private static final int PAD_LIMIT = 8192;
-
-    /**
      * A String for a space character.
+     * Used for consistent space representation across the codebase.
      */
     public static final String SPACE = " ";
 
     /**
      * Represents a failed index search.
+     * Used to indicate when a search operation finds no match.
      */
     public static final int INDEX_NOT_FOUND = -1;
 
     /**
-     * "Unquotes" a String, saying if the given String starts and ends with the
-     * token "'" or """ the quotes will be stripped
+     * The maximum size to which the padding constant(s) can expand.
+     * This limit prevents excessive memory allocation in padding operations.
+     */
+    private static final int PAD_LIMIT = 8192;
+
+    /**
+     * "Unquotes" a String by removing surrounding single or double quotes if present.
+     * This method is particularly useful when processing user input or configuration values
+     * that may contain quoted strings.
      *
-     * @param original may be null or empty
-     * @return the unquoted String or the original in none could be found
+     * <h3>Examples:</h3>
+     * <pre>
+     * unquote(null)      = null
+     * unquote("")        = ""
+     * unquote("'text'")  = "text"
+     * unquote("\"text\"") = "text"
+     * unquote("text")    = "text"
+     * </pre>
+     *
+     * @param original the string to unquote, may be null or empty
+     * @return the unquoted String, or the original if no quotes were found or input was null/empty
      */
     public static String unquote(final String original) {
         if (isEmpty(original)) {
@@ -833,7 +913,7 @@ public final class MoreStrings {
      * @param str the {@code String} to check (maybe {@code null})
      * @return {@code true} if the {@code String} is not {@code null}, its length is
      * greater than 0, and it does not contain whitespace only
-     * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework</a>
+     * @see <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework</a>
      */
     public static boolean hasNonWhitespaceChar(final CharSequence str) {
         if (isEmpty(str)) {
@@ -1029,6 +1109,7 @@ public final class MoreStrings {
             builder.append(']');
         }
 
+        LOGGER.debug("No args given, returning template '%s'", template);
         return builder.toString();
     }
 
@@ -1049,11 +1130,33 @@ public final class MoreStrings {
      */
     static String lenientToString(Object o) {
         try {
+            if (o != null && o.getClass().isArray()) {
+                if (o instanceof Object[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof int[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof long[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof double[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof float[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof boolean[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof byte[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof short[] arr) {
+                    return Arrays.toString(arr);
+                } else if (o instanceof char[] arr) {
+                    return Arrays.toString(arr);
+                }
+            }
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            var objectToString = o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
-            log.warn(e, "Exception during lenientFormat for {}", objectToString);
+            var objectToString = (o == null) ? "null" :
+                    o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
+            LOGGER.warn(e, "Exception during lenientFormat for {}", objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }
     }

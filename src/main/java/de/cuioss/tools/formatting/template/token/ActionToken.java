@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -27,6 +24,9 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 /**
  * String Action Token store template and attribute name, and replace attribute

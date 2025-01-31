@@ -36,7 +36,7 @@
  *
  * <h2>Best Practices</h2>
  * <ul>
- *   <li>Use {@link PropertyHolder} for type-safe property access</li>
+ *   <li>Use {@link de.cuioss.tools.property.PropertyHolder} for type-safe property access</li>
  *   <li>Prefer standard getter/setter methods over reflection</li>
  *   <li>Handle property access exceptions appropriately</li>
  * </ul>

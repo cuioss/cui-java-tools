@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.collect;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static java.util.Objects.isNull;
-
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
@@ -25,6 +22,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static java.util.Objects.isNull;
 
 /**
  * <h2>Overview</h2> Utility Methods for Collections and some types to be used

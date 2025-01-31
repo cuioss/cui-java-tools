@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.formatting.template;
 
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.lexer.Lexer;
 import de.cuioss.tools.formatting.template.lexer.LexerBuilder;
 import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  *

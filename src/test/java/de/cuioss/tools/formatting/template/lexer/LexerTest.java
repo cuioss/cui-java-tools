@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.token.Token;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serial;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LexerTest {
 

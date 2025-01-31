@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.logging;
 
-import static de.cuioss.tools.string.MoreStrings.lenientFormat;
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.function.Supplier;
+
+import static de.cuioss.tools.string.MoreStrings.lenientFormat;
+import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 
 /**
  * Implementation of {@link LogRecord} that provides a builder-based approach to creating

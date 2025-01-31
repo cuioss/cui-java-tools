@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.formatting.support;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import lombok.EqualsAndHashCode;
@@ -30,6 +26,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * PersonAddress consolidate several Address Objects by make a one-way

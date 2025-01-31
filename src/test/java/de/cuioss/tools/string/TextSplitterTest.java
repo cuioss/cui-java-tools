@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.string;
 
+import org.junit.jupiter.api.Test;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.valueOf;
@@ -22,8 +24,6 @@ import static java.lang.Integer.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
 
 class TextSplitterTest {
 

@@ -15,10 +15,10 @@
  */
 package de.cuioss.tools.property;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PropertyMemberInfoTest {
 

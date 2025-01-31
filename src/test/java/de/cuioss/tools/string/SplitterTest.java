@@ -15,15 +15,15 @@
  */
 package de.cuioss.tools.string;
 
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * Initially taken from
@@ -240,5 +240,13 @@ class SplitterTest {
         var splitter = Splitter.on("[").doNotModifySeparatorString();
         assertThrows(IllegalArgumentException.class, () ->
                 splitter.splitToList("[boom]"));
+    }
+
+    @Test
+    void onCharacterWithNullSeparator() {
+        assertThrows(NullPointerException.class, () -> {
+            Character nullChar = null;
+            Splitter.on(nullChar);
+        }, "separator must not be null");
     }
 }

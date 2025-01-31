@@ -15,72 +15,292 @@
  */
 package de.cuioss.tools.base;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import static de.cuioss.tools.base.BooleanOperations.areAllFalse;
 import static de.cuioss.tools.base.BooleanOperations.areAllTrue;
 import static de.cuioss.tools.base.BooleanOperations.isAnyFalse;
 import static de.cuioss.tools.base.BooleanOperations.isAnyTrue;
+import static de.cuioss.tools.base.BooleanOperations.isValidBoolean;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-
+@DisplayName("BooleanOperations should")
 class BooleanOperationsTest {
 
-    @Test
-    void shouldDetectAnyTrue() {
-        assertTrue(isAnyTrue(true));
-        assertTrue(isAnyTrue(true, true));
-        assertTrue(isAnyTrue(true, false));
-        assertFalse(isAnyTrue(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(isAnyTrue());
-        assertFalse(isAnyTrue(null));
+    private boolean[] toBooleanArray(String input) {
+        if (input == null || input.isEmpty()) {
+            return new boolean[0];
+        }
+        var values = input.split(",");
+        var booleans = new boolean[values.length];
+        for (int i = 0; i < values.length; i++) {
+            booleans[i] = Boolean.parseBoolean(values[i]);
+        }
+        return booleans;
     }
 
-    @Test
-    void shouldDetectAnyFalse() {
-        assertFalse(isAnyFalse(true));
-        assertTrue(isAnyFalse(true, false));
-        assertTrue(isAnyFalse(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(isAnyFalse());
-        assertFalse(isAnyFalse(null));
+    @Nested
+    @DisplayName("handle isAnyTrue")
+    class IsAnyTrueTest {
+
+        @ParameterizedTest(name = "return {1} when checking array [{0}] for any true value")
+        @CsvSource({
+                "'true', true",
+                "'true,true', true",
+                "'true,false', true",
+                "'false,true,false', true",
+                "'false,false', false",
+                "'', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            assertEquals(expected, isAnyTrue(toBooleanArray(input)));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(isAnyTrue(), "Empty varargs should return false");
+            assertFalse(isAnyTrue((boolean[]) null), "Null array should return false");
+            assertFalse(isAnyTrue(), "Empty array should return false");
+        }
     }
 
-    @Test
-    void shouldDetectAllFalse() {
-        assertFalse(areAllFalse(true));
-        assertFalse(areAllFalse(true, false));
-        assertFalse(areAllFalse(true, true));
-        assertTrue(areAllFalse(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertFalse(areAllFalse());
-        assertFalse(areAllFalse(null));
+    @Nested
+    @DisplayName("handle isAnyFalse")
+    class IsAnyFalseTest {
+
+        @ParameterizedTest(name = "return {1} when checking array [{0}] for any false value")
+        @CsvSource({
+                "'true', false",
+                "'true,false', true",
+                "'false,false', true",
+                "'true,false,true', true",
+                "'true,true', false",
+                "'', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            assertEquals(expected, isAnyFalse(toBooleanArray(input)));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(isAnyFalse(), "Empty varargs should return false");
+            assertFalse(isAnyFalse((boolean[]) null), "Null array should return false");
+            assertFalse(isAnyFalse(), "Empty array should return false");
+        }
     }
 
-    @Test
-    void shouldDetectAllTrue() {
-        assertTrue(areAllTrue(true));
-        assertFalse(areAllTrue(true, false));
-        assertTrue(areAllTrue(true, true));
-        assertFalse(areAllTrue(false, false));
-        // Not really sensible, but defined contract -> Corner Case
-        assertTrue(areAllTrue());
-        assertTrue(areAllTrue(null));
+    @Nested
+    @DisplayName("handle areAllFalse")
+    class AreAllFalseTest {
+
+        @ParameterizedTest(name = "return {1} when checking if all values are false in array [{0}]")
+        @CsvSource({
+                "'true', false",
+                "'true,false', false",
+                "'false,false', true",
+                "'false,false,false', true",
+                "'true,true', false",
+                "'', false"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            assertEquals(expected, areAllFalse(toBooleanArray(input)));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertFalse(areAllFalse(), "Empty varargs should return false");
+            assertFalse(areAllFalse((boolean[]) null), "Null array should return false");
+            assertFalse(areAllFalse(), "Empty array should return false");
+        }
     }
 
-    @Test
-    void isValidBoolean() {
-        assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null)));
-        assertFalse(BooleanOperations.isValidBoolean(""));
-        assertFalse(BooleanOperations.isValidBoolean(" "));
-        assertFalse(BooleanOperations.isValidBoolean(" true "));
-        assertFalse(BooleanOperations.isValidBoolean("true "));
+    @Nested
+    @DisplayName("handle areAllTrue")
+    class AreAllTrueTest {
 
-        assertTrue(BooleanOperations.isValidBoolean("true"));
-        assertTrue(BooleanOperations.isValidBoolean("false"));
-        assertTrue(BooleanOperations.isValidBoolean("TrUe"));
-        assertTrue(BooleanOperations.isValidBoolean("FaLsE"));
+        @ParameterizedTest(name = "return {1} when checking if all values are true in array [{0}]")
+        @CsvSource({
+                "'true', true",
+                "'true,false', false",
+                "'false,false', false",
+                "'true,true,true', true",
+                "'true,true', true",
+                "'', true"
+        })
+        void shouldHandleValidCases(String input, boolean expected) {
+            assertEquals(expected, areAllTrue(toBooleanArray(input)));
+        }
+
+        @Test
+        @DisplayName("handle edge cases")
+        void shouldHandleEdgeCases() {
+            assertTrue(areAllTrue(), "Empty varargs should return true");
+            assertTrue(areAllTrue((boolean[]) null), "Null array should return true");
+            assertTrue(areAllTrue(), "Empty array should return true");
+        }
+    }
+
+    @Nested
+    @DisplayName("isValidBoolean should")
+    class IsValidBooleanTest {
+
+        @ParameterizedTest(name = "recognize valid boolean value: {0}")
+        @ValueSource(strings = {"true", "TRUE", "True", "false", "FALSE", "False"})
+        void shouldRecognizeValidBooleans(String input) {
+            assertTrue(isValidBoolean(input));
+        }
+
+        @ParameterizedTest(name = "reject invalid boolean value: {0}")
+        @ValueSource(strings = {"yes", "no", "1", "0", "on", "off", " true", "true ", "t", "f"})
+        void shouldRejectInvalidBooleans(String input) {
+            assertFalse(isValidBoolean(input));
+        }
+
+        @Test
+        @DisplayName("handle edge cases correctly")
+        void shouldHandleEdgeCases() {
+            assertFalse(isValidBoolean(null), "null should be invalid");
+            assertFalse(isValidBoolean(""), "empty string should be invalid");
+            assertFalse(isValidBoolean(" "), "whitespace should be invalid");
+        }
+
+        @Test
+        @DisplayName("be performant with many calls")
+        void shouldBePerformant() {
+            var start = System.nanoTime();
+            for (int i = 0; i < 100_000; i++) {
+                isValidBoolean("true");
+                isValidBoolean("false");
+                isValidBoolean("invalid");
+            }
+            var duration = System.nanoTime() - start;
+            assertTrue(duration < TimeUnit.SECONDS.toNanos(1),
+                    "Operation should complete within 1 second, took " +
+                            TimeUnit.NANOSECONDS.toMillis(duration) + "ms");
+        }
+    }
+
+    @Nested
+    @DisplayName("handle performance")
+    class PerformanceTest {
+
+        @Test
+        @DisplayName("handle large arrays efficiently")
+        void shouldHandleLargeArrays() {
+            // Create large array with alternating values
+            var size = 10000;
+            var largeArray = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                largeArray[i] = i % 2 == 0;
+            }
+
+            // Test isAnyTrue performance
+            assertDoesNotThrow(() -> {
+                var result = isAnyTrue(largeArray);
+                assertTrue(result, "Should find true in alternating array");
+            });
+
+            // Test isAnyFalse performance
+            assertDoesNotThrow(() -> {
+                var result = isAnyFalse(largeArray);
+                assertTrue(result, "Should find false in alternating array");
+            });
+
+            // Test areAllTrue performance
+            assertDoesNotThrow(() -> {
+                var result = areAllTrue(largeArray);
+                assertFalse(result, "Should not be all true in alternating array");
+            });
+
+            // Test areAllFalse performance
+            assertDoesNotThrow(() -> {
+                var result = areAllFalse(largeArray);
+                assertFalse(result, "Should not be all false in alternating array");
+            });
+        }
+
+        @Test
+        @DisplayName("handle worst-case scenarios efficiently")
+        void shouldHandleWorstCaseScenarios() {
+            var size = 10000;
+
+            // Test finding single true at end
+            var singleTrueAtEnd = new boolean[size];
+            singleTrueAtEnd[size - 1] = true;
+
+            assertDoesNotThrow(() -> {
+                var result = isAnyTrue(singleTrueAtEnd);
+                assertTrue(result, "Should find single true at end");
+            });
+
+            // Test finding single false at end
+            var singleFalseAtEnd = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                singleFalseAtEnd[i] = true;
+            }
+            singleFalseAtEnd[size - 1] = false;
+
+            assertDoesNotThrow(() -> {
+                var result = isAnyFalse(singleFalseAtEnd);
+                assertTrue(result, "Should find single false at end");
+            });
+        }
+    }
+
+    @Nested
+    @DisplayName("handle concurrent access")
+    class ConcurrentTest {
+
+        @Test
+        @DisplayName("handle concurrent reads safely")
+        void shouldHandleConcurrentReads() {
+            var size = 1000;
+            var sharedArray = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                sharedArray[i] = i % 2 == 0;
+            }
+
+            var threadCount = 10;
+            var executor = Executors.newFixedThreadPool(threadCount);
+            var futures = new ArrayList<Future<?>>();
+
+            try {
+                // Submit multiple concurrent read tasks
+                for (int i = 0; i < threadCount; i++) {
+                    futures.add(executor.submit(() -> {
+                        assertDoesNotThrow(() -> {
+                            isAnyTrue(sharedArray);
+                            isAnyFalse(sharedArray);
+                            areAllTrue(sharedArray);
+                            areAllFalse(sharedArray);
+                        });
+                        return null;
+                    }));
+                }
+
+                // Wait for all tasks to complete
+                for (var future : futures) {
+                    assertDoesNotThrow(() -> future.get(5, TimeUnit.SECONDS));
+                }
+            } finally {
+                executor.shutdownNow();
+            }
+        }
     }
 }

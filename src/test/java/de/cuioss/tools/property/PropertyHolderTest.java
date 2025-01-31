@@ -15,6 +15,17 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
+import de.cuioss.tools.property.support.BeanWithMethodOverload;
+import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
+import de.cuioss.tools.property.support.ExplodingBean;
+import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
+import de.cuioss.tools.property.support.StringTypedGenericType;
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
+import java.io.Serializable;
+
 import static de.cuioss.tools.property.PropertyHolder.from;
 import static de.cuioss.tools.property.PropertyReadWrite.READ_ONLY;
 import static de.cuioss.tools.property.PropertyReadWrite.READ_WRITE;
@@ -26,21 +37,11 @@ import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRI
 import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_WRITE_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
-import de.cuioss.tools.property.support.BeanWithMethodOverload;
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
-import de.cuioss.tools.property.support.ExplodingBean;
-import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
-import de.cuioss.tools.property.support.StringTypedGenericType;
-import de.cuioss.tools.support.Generators;
-import org.junit.jupiter.api.Test;
-
-import java.io.Serializable;
 
 class PropertyHolderTest {
 
@@ -148,5 +149,29 @@ class PropertyHolderTest {
     void shouldHandleBoundGenerics() {
         var holder = from(StringTypedGenericType.class, "key").get();
         assertEquals(String.class, holder.getType());
+    }
+
+    @Test
+    void shouldHandleBuilderStylePropertyEdgeCases() {
+        var bean = new BeanWithBuilderStyleAccessor();
+        var holder = from(BeanWithBuilderStyleAccessor.class, PROPERTY_NAME).get();
+
+        // Test null value
+        assertNotNull(holder.writeTo(bean, null));
+
+        // Test type mismatch
+        var wrongType = "not an integer";
+        assertThrows(IllegalArgumentException.class, () ->
+                        holder.writeTo(bean, wrongType),
+                "Should throw IllegalArgumentException for type mismatch");
+
+        // Test null target
+        assertThrows(NullPointerException.class, () ->
+                        holder.writeTo(null, 42),
+                "Should throw NullPointerException for null target");
+
+        // Verify builder chain works
+        var result = holder.writeTo(bean, 42);
+        assertInstanceOf(BeanWithBuilderStyleAccessor.class, result, "Should return builder instance for chaining");
     }
 }

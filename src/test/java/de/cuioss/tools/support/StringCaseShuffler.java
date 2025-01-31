@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.support;
 
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-
 import lombok.experimental.UtilityClass;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
 /**
  * Simple Helper that shuffle lower / uppercase for strings.

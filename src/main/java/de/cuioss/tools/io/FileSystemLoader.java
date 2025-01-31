@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
@@ -34,6 +31,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
+
 /**
  * File-system based variant. Responsible for all non
  * {@link FileTypePrefix#CLASSPATH} files.
@@ -47,7 +47,7 @@ public class FileSystemLoader implements FileReaderWriter {
     @Serial
     private static final long serialVersionUID = -1278929108857440808L;
 
-    private static final CuiLogger LOG = new CuiLogger(FileSystemLoader.class);
+    private static final CuiLogger LOGGER = new CuiLogger(FileSystemLoader.class);
 
     private final String normalizedPathName;
 
@@ -122,9 +122,9 @@ public class FileSystemLoader implements FileReaderWriter {
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             try {
                 newPathName = new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
-                LOG.debug("Loading config file from external path: {}", newPathName);
+                LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
-                LOG.error("Retrieving the current dir failed: ", e);
+                LOGGER.error("Retrieving the current dir failed: ", e);
             }
         }
 

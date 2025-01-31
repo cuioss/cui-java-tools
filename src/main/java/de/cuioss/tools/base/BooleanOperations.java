@@ -73,6 +73,22 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class BooleanOperations {
 
+    /**
+     * Efficient check for an empty boolean array, handling both null and zero-length cases.
+     *
+     * @param parameter the boolean array to check
+     * @return true if the array is null or empty, false otherwise
+     */
+    private static boolean isEmpty(final boolean... parameter) {
+        return parameter == null || parameter.length == 0;
+    }
+
+    /**
+     * Helper method to check if array contains at least one true value.
+     *
+     * @param parameter array to check
+     * @return true if array contains at least one true value, false otherwise
+     */
     private static boolean containsTrue(final boolean... parameter) {
         if (isEmpty(parameter)) {
             return false;
@@ -85,10 +101,12 @@ public final class BooleanOperations {
         return false;
     }
 
-    private static boolean isEmpty(boolean[] parameter) {
-        return null == parameter || 0 == parameter.length;
-    }
-
+    /**
+     * Helper method to check if an array contains at least one false value.
+     *
+     * @param parameter array to check
+     * @return true if an array contains at least one false value, false otherwise
+     */
     private static boolean containsFalse(final boolean... parameter) {
         if (isEmpty(parameter)) {
             return false;
@@ -106,18 +124,30 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if one of parameters is {@code true}, {@code false}
-     * otherwise
+     * otherwise.
+     * If no parameter is given or parameter is null, returns {@code false}.
      */
     public static boolean isAnyTrue(final boolean... parameter) {
         return containsTrue(parameter);
     }
 
     /**
+     * Shorthand for checking if at least one of the given booleans is {@code false}
+     *
+     * @param parameter ellipsis of boolean values
+     * @return {@code true} if one of parameters is {@code false}, {@code false}
+     * otherwise. If no parameter is given or parameter is null, returns {@code false}.
+     */
+    public static boolean isAnyFalse(final boolean... parameter) {
+        return containsFalse(parameter);
+    }
+
+    /**
      * Shorthand for checking if all the given booleans are {@code true}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all parameters are {@code true} or no parameter is
-     * given ratio: no given false, {@code false} otherwise
+     * @return {@code true} if all parameters are {@code true} or if no parameter is
+     * given (including null case). Returns {@code false} if any parameter is {@code false}.
      */
     public static boolean areAllTrue(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -130,9 +160,8 @@ public final class BooleanOperations {
      * Shorthand for checking if all given booleans are {@code false}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all parameters are {@code false}, {@code true}
-     * otherwise.
-     * if no parameter is passed, ratio: no given -> false
+     * @return {@code true} if all parameters are {@code false}, {@code false}
+     * otherwise. If no parameter is given or parameter is null, returns {@code false}.
      */
     public static boolean areAllFalse(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -142,22 +171,33 @@ public final class BooleanOperations {
     }
 
     /**
-     * Shorthand for checking if at least one of the given booleans is {@code false}
-     *
-     * @param parameter ellipsis of boolean values
-     * @return {@code true} if one of parameters is {@code false}, {@code true}
-     * otherwise
+     * Checks if a string represents a valid boolean value according to Java's boolean
+     * parsing rules. This method is case-insensitive and considers only "true" and
+     * "false" as valid boolean strings.
+     * 
+     * <h3>Examples:</h3>
+     * <pre>
+     * isValidBoolean("true")  -> true
+     * isValidBoolean("TRUE")  -> true
+     * isValidBoolean("false") -> true
+     * isValidBoolean("False") -> true
+     * isValidBoolean("yes")   -> false
+     * isValidBoolean("1")     -> false
+     * isValidBoolean(null)    -> false
+     * isValidBoolean("")      -> false
+     * </pre>
+     * 
+     * @param value the string to be checked, may be null
+     * @return {@code true} if the given value represents a valid boolean string
+     *         ("true" or "false", case-insensitive), {@code false} otherwise
+     *         including null and empty strings
+     * @since 2.1
      */
-    public static boolean isAnyFalse(final boolean... parameter) {
-        return containsFalse(parameter);
-    }
-
-    /**
-     * @param value to be checked
-     * @return true, if the given value represents a boolean value i.e. "true" or
-     * "false" ignoring case.
-     */
-    public static boolean isValidBoolean(String value) {
-        return Boolean.TRUE.toString().equalsIgnoreCase(value) || Boolean.FALSE.toString().equalsIgnoreCase(value);
+    public static boolean isValidBoolean(final String value) {
+        if (null == value || value.isEmpty()) {
+            return false;
+        }
+        final var lowerCase = value.toLowerCase();
+        return "true".equals(lowerCase) || "false".equals(lowerCase);
     }
 }

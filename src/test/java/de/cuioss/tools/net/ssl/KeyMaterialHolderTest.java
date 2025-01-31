@@ -15,15 +15,15 @@
  */
 package de.cuioss.tools.net.ssl;
 
+import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
-import de.cuioss.tools.support.Generators;
-import org.junit.jupiter.api.Test;
 
 class KeyMaterialHolderTest {
 

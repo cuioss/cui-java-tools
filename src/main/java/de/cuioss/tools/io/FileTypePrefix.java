@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.io;
 
-import static java.util.Objects.requireNonNull;
-
 import lombok.Getter;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Utility class to define file type prefixes.

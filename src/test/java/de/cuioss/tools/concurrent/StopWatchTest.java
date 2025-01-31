@@ -15,217 +15,225 @@
  */
 package de.cuioss.tools.concurrent;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
 
 /**
  * @author <a href="https://github.com/google/guava/blob/master/guava-tests/test/com/google/common/base/StopwatchTest.java">...</a>
- *
  */
+@DisplayName("StopWatch should")
 class StopWatchTest {
 
     private final FakeTicker ticker = new FakeTicker();
     private final StopWatch stopwatch = new StopWatch(ticker);
 
-    @Test
-    void createStarted() {
-        var startedStopwatch = StopWatch.createStarted();
-        assertTrue(startedStopwatch.isRunning());
+    @Nested
+    @DisplayName("handle factory methods")
+    class FactoryMethodsTest {
+
+        @Test
+        @DisplayName("create started stopwatch")
+        void createStarted() {
+            var startedStopwatch = StopWatch.createStarted();
+            assertTrue(startedStopwatch.isRunning(), "Stopwatch should be running");
+        }
+
+        @Test
+        @DisplayName("create unstarted stopwatch")
+        void createUnstarted() {
+            var unstartedStopwatch = StopWatch.createUnstarted();
+            assertFalse(unstartedStopwatch.isRunning(), "Stopwatch should not be running");
+            assertEquals(0, unstartedStopwatch.elapsed(NANOSECONDS), "Elapsed time should be 0");
+        }
     }
 
-    @Test
-    void createUnstarted() {
-        var unstartedStopwatch = StopWatch.createUnstarted();
-        assertFalse(unstartedStopwatch.isRunning());
-        assertEquals(0, unstartedStopwatch.elapsed(NANOSECONDS));
-    }
+    @Nested
+    @DisplayName("handle state transitions")
+    class StateTransitionTest {
 
-    @Test
-    void initialState() {
-        assertFalse(stopwatch.isRunning());
-        assertEquals(0, stopwatch.elapsed(NANOSECONDS));
-    }
+        @Test
+        @DisplayName("have correct initial state")
+        void initialState() {
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running initially");
+            assertEquals(0, stopwatch.elapsed(NANOSECONDS), "Initial elapsed time should be 0");
+        }
 
-    @Test
-    void start() {
-        assertSame(stopwatch, stopwatch.start());
-        assertTrue(stopwatch.isRunning());
-    }
+        @Test
+        @DisplayName("start correctly")
+        void start() {
+            assertSame(stopwatch, stopwatch.start(), "Should return self for chaining");
+            assertTrue(stopwatch.isRunning(), "Stopwatch should be running after start");
+        }
 
-    @Test
-    void startWhileRunning() {
-        stopwatch.start();
-        try {
+        @Test
+        @DisplayName("throw exception when starting while running")
+        void startWhileRunning() {
             stopwatch.start();
-            fail();
-        } catch (IllegalStateException expected) {
+            assertThrows(IllegalStateException.class, stopwatch::start,
+                    "Should throw when starting already running stopwatch");
+            assertTrue(stopwatch.isRunning(), "Stopwatch should still be running");
         }
-        assertTrue(stopwatch.isRunning());
-    }
 
-    @Test
-    void stop() {
-        stopwatch.start();
-        assertSame(stopwatch, stopwatch.stop());
-        assertFalse(stopwatch.isRunning());
-    }
+        @Test
+        @DisplayName("stop correctly")
+        void stop() {
+            stopwatch.start();
+            assertSame(stopwatch, stopwatch.stop(), "Should return self for chaining");
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running after stop");
+        }
 
-    @Test
-    void stopNew() {
-        try {
+        @Test
+        @DisplayName("throw exception when stopping new stopwatch")
+        void stopNew() {
+            assertThrows(IllegalStateException.class, stopwatch::stop,
+                    "Should throw when stopping new stopwatch");
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running");
+        }
+
+        @Test
+        @DisplayName("throw exception when stopping already stopped stopwatch")
+        void stopAlreadyStopped() {
+            stopwatch.start();
             stopwatch.stop();
-            fail();
-        } catch (IllegalStateException expected) {
+            assertThrows(IllegalStateException.class, stopwatch::stop,
+                    "Should throw when stopping already stopped stopwatch");
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running");
         }
-        assertFalse(stopwatch.isRunning());
+
+        @Test
+        @DisplayName("reset new stopwatch")
+        void resetNew() {
+            ticker.advance(1);
+            stopwatch.reset();
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running after reset");
+            ticker.advance(2);
+            assertEquals(0, stopwatch.elapsed(NANOSECONDS), "Elapsed time should be 0 after reset");
+            stopwatch.start();
+            ticker.advance(3);
+            assertEquals(3, stopwatch.elapsed(NANOSECONDS), "Should measure time after reset and start");
+        }
+
+        @Test
+        @DisplayName("reset running stopwatch")
+        void resetWhileRunning() {
+            ticker.advance(1);
+            stopwatch.start();
+            assertEquals(0, stopwatch.elapsed(NANOSECONDS), "Initial elapsed time should be 0");
+            ticker.advance(2);
+            assertEquals(2, stopwatch.elapsed(NANOSECONDS), "Should measure elapsed time");
+            stopwatch.reset();
+            assertFalse(stopwatch.isRunning(), "Stopwatch should not be running after reset");
+            ticker.advance(3);
+            assertEquals(0, stopwatch.elapsed(NANOSECONDS), "Elapsed time should be 0 after reset");
+        }
     }
 
-    @Test
-    void stopAlreadyStopped() {
-        stopwatch.start();
-        stopwatch.stop();
-        try {
+    @Nested
+    @DisplayName("handle elapsed time")
+    class ElapsedTimeTest {
+
+        @Test
+        @DisplayName("measure time while running")
+        void elapsedWhileRunning() {
+            ticker.advance(78);
+            stopwatch.start();
+            assertEquals(0, stopwatch.elapsed(NANOSECONDS), "Initial elapsed time should be 0");
+            ticker.advance(345);
+            assertEquals(345, stopwatch.elapsed(NANOSECONDS), "Should measure elapsed time");
+        }
+
+        @Test
+        @DisplayName("measure time when not running")
+        void elapsedNotRunning() {
+            ticker.advance(1);
+            stopwatch.start();
+            ticker.advance(4);
             stopwatch.stop();
-            fail();
-        } catch (IllegalStateException expected) {
+            ticker.advance(9);
+            assertEquals(4, stopwatch.elapsed(NANOSECONDS), "Should keep last elapsed time");
         }
-        assertFalse(stopwatch.isRunning());
+
+        @Test
+        @DisplayName("measure time across multiple segments")
+        void elapsedMultipleSegments() {
+            stopwatch.start();
+            ticker.advance(9);
+            stopwatch.stop();
+
+            ticker.advance(16);
+
+            stopwatch.start();
+            assertEquals(9, stopwatch.elapsed(NANOSECONDS), "Should keep previous elapsed time");
+            ticker.advance(25);
+            assertEquals(34, stopwatch.elapsed(NANOSECONDS), "Should accumulate elapsed time");
+
+            stopwatch.stop();
+            ticker.advance(36);
+            assertEquals(34, stopwatch.elapsed(NANOSECONDS), "Should keep accumulated time");
+        }
+
+        @Test
+        @DisplayName("handle microsecond precision")
+        void elapsedMicros() {
+            stopwatch.start();
+            ticker.advance(999);
+            assertEquals(0, stopwatch.elapsed(MICROSECONDS), "Should round down to 0 microseconds");
+            ticker.advance(1);
+            assertEquals(1, stopwatch.elapsed(MICROSECONDS), "Should measure 1 microsecond");
+        }
+
+        @Test
+        @DisplayName("handle millisecond precision")
+        void elapsedMillis() {
+            stopwatch.start();
+            ticker.advance(999999);
+            assertEquals(0, stopwatch.elapsed(MILLISECONDS), "Should round down to 0 milliseconds");
+            ticker.advance(1);
+            assertEquals(1, stopwatch.elapsed(MILLISECONDS), "Should measure 1 millisecond");
+        }
+
+        @Test
+        @DisplayName("handle Duration")
+        void elapsedDuration() {
+            stopwatch.start();
+            ticker.advance(999999);
+            assertEquals(Duration.ofNanos(999999), stopwatch.elapsed(), "Should measure exact nanoseconds");
+            ticker.advance(1);
+            assertEquals(Duration.ofMillis(1), stopwatch.elapsed(), "Should measure milliseconds");
+        }
     }
 
-    @Test
-    void resetNew() {
-        ticker.advance(1);
-        stopwatch.reset();
-        assertFalse(stopwatch.isRunning());
-        ticker.advance(2);
-        assertEquals(0, stopwatch.elapsed(NANOSECONDS));
-        stopwatch.start();
-        ticker.advance(3);
-        assertEquals(3, stopwatch.elapsed(NANOSECONDS));
+    @Nested
+    @DisplayName("handle string representation")
+    class StringRepresentationTest {
+
+        @Test
+        @DisplayName("format elapsed time correctly")
+        void testToString() {
+            stopwatch.start();
+            assertEquals("0.000 ns", stopwatch.toString(), "Should format 0 nanoseconds");
+            ticker.advance(1);
+            assertEquals("1.000 ns", stopwatch.toString(), "Should format 1 nanosecond");
+            ticker.advance(998);
+            assertEquals("999.000 ns", stopwatch.toString(), "Should format 999 nanoseconds");
+            ticker.advance(1);
+            assertEquals("1.000 μs", stopwatch.toString(), "Should format 1 microsecond");
+            ticker.advance(1);
+            assertEquals("1.001 μs", stopwatch.toString(), "Should format 1.001 microseconds");
+            ticker.advance(999998);
+            assertEquals("1.001 ms", stopwatch.toString(), "Should format 1 millisecond");
+        }
     }
-
-    @Test
-    void resetWhileRunning() {
-        ticker.advance(1);
-        stopwatch.start();
-        assertEquals(0, stopwatch.elapsed(NANOSECONDS));
-        ticker.advance(2);
-        assertEquals(2, stopwatch.elapsed(NANOSECONDS));
-        stopwatch.reset();
-        assertFalse(stopwatch.isRunning());
-        ticker.advance(3);
-        assertEquals(0, stopwatch.elapsed(NANOSECONDS));
-    }
-
-    @Test
-    void elapsedWhileRunning() {
-        ticker.advance(78);
-        stopwatch.start();
-        assertEquals(0, stopwatch.elapsed(NANOSECONDS));
-
-        ticker.advance(345);
-        assertEquals(345, stopwatch.elapsed(NANOSECONDS));
-    }
-
-    @Test
-    void elapsedNotRunning() {
-        ticker.advance(1);
-        stopwatch.start();
-        ticker.advance(4);
-        stopwatch.stop();
-        ticker.advance(9);
-        assertEquals(4, stopwatch.elapsed(NANOSECONDS));
-    }
-
-    @Test
-    void elapsedMultipleSegments() {
-        stopwatch.start();
-        ticker.advance(9);
-        stopwatch.stop();
-
-        ticker.advance(16);
-
-        stopwatch.start();
-        assertEquals(9, stopwatch.elapsed(NANOSECONDS));
-        ticker.advance(25);
-        assertEquals(34, stopwatch.elapsed(NANOSECONDS));
-
-        stopwatch.stop();
-        ticker.advance(36);
-        assertEquals(34, stopwatch.elapsed(NANOSECONDS));
-    }
-
-    @Test
-    void elapsedMicros() {
-        stopwatch.start();
-        ticker.advance(999);
-        assertEquals(0, stopwatch.elapsed(MICROSECONDS));
-        ticker.advance(1);
-        assertEquals(1, stopwatch.elapsed(MICROSECONDS));
-    }
-
-    @Test
-    void elapsedMillis() {
-        stopwatch.start();
-        ticker.advance(999999);
-        assertEquals(0, stopwatch.elapsed(MILLISECONDS));
-        ticker.advance(1);
-        assertEquals(1, stopwatch.elapsed(MILLISECONDS));
-    }
-
-    @Test
-    void elapsedDuration() {
-        stopwatch.start();
-        ticker.advance(999999);
-        assertEquals(Duration.ofNanos(999999), stopwatch.elapsed());
-        ticker.advance(1);
-        assertEquals(Duration.ofMillis(1), stopwatch.elapsed());
-    }
-
-    @Test
-    void testToString() {
-        stopwatch.start();
-        assertEquals("0.000 ns", stopwatch.toString());
-        ticker.advance(1);
-        assertEquals("1.000 ns", stopwatch.toString());
-        ticker.advance(998);
-        assertEquals("999.0 ns", stopwatch.toString());
-        ticker.advance(1);
-        assertEquals("1.000 \u03bcs", stopwatch.toString());
-        ticker.advance(1);
-        assertEquals("1.001 \u03bcs", stopwatch.toString());
-        ticker.advance(8998);
-        assertEquals("9.999 \u03bcs", stopwatch.toString());
-        stopwatch.reset();
-        stopwatch.start();
-        ticker.advance(1234567);
-        assertEquals("1.235 ms", stopwatch.toString());
-        stopwatch.reset();
-        stopwatch.start();
-        ticker.advance(5000000000L);
-        assertEquals("5.000 s", stopwatch.toString());
-        stopwatch.reset();
-        stopwatch.start();
-        ticker.advance((long) (1.5 * 60 * 1000000000L));
-        assertEquals("1.500 min", stopwatch.toString());
-        stopwatch.reset();
-        stopwatch.start();
-        ticker.advance((long) (2.5 * 60 * 60 * 1000000000L));
-        assertEquals("2.500 h", stopwatch.toString());
-        stopwatch.reset();
-        stopwatch.start();
-        ticker.advance((long) (7.25 * 24 * 60 * 60 * 1000000000L));
-        assertEquals("7.250 d", stopwatch.toString());
-    }
-
 }

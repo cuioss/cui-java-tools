@@ -36,7 +36,7 @@
  *
  * <h2>Best Practices</h2>
  * <ul>
- *   <li>Use {@link FieldWrapper} for type-safe field access</li>
+ *   <li>Use {@link de.cuioss.tools.reflect.FieldWrapper} for type-safe field access</li>
  *   <li>Leverage caching for better performance</li>
  *   <li>Handle security exceptions appropriately</li>
  *   <li>Consider using property utilities for Java Bean access</li>

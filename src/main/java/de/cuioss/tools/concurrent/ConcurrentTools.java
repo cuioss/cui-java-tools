@@ -15,42 +15,40 @@
  */
 package de.cuioss.tools.concurrent;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Provides some helper-methods taken from com.google.common.util.concurrent
  * package
  *
  * @author Oliver Wolff
- *
  */
 @UtilityClass
 public class ConcurrentTools {
 
     /**
      * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-     * uninterruptibly.
+     * uninterruptedly.
      *
-     * @param sleepFor
-     *
+     * @param sleepFor duration
      */
-    public static void sleepUninterruptibly(Duration sleepFor) {
-        sleepUninterruptibly(saturatedToNanos(sleepFor), TimeUnit.NANOSECONDS);
+    public static void sleepUninterruptedly(Duration sleepFor) {
+        sleepUninterruptedly(saturatedToNanos(sleepFor), TimeUnit.NANOSECONDS);
     }
 
     /**
      * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-     * uninterruptibly.
+     * uninterruptedly.
      *
-     * @param sleepFor
-     * @param unit
+     * @param sleepFor number
+     * @param unit     TimeUnit
      */
-    public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
+    public static void sleepUninterruptedly(long sleepFor, TimeUnit unit) {
         var interrupted = false;
         try {
             var remainingNanos = unit.toNanos(sleepFor);
@@ -73,25 +71,20 @@ public class ConcurrentTools {
     }
 
     /**
-     * Returns the number of nanoseconds of the given duration without throwing or
-     * overflowing.
+     * Convert the given duration to nanoseconds, saturating at {@link Long#MAX_VALUE}
+     * in case of overflow and 0 in case of negative durations.
      *
-     * <p>
-     * Instead of throwing {@link ArithmeticException}, this method silently
-     * saturates to either {@link Long#MAX_VALUE} or {@link Long#MIN_VALUE}. This
-     * behavior can be useful when decomposing a duration in order to call a legacy
-     * API which requires a {@code long, TimeUnit} pair.
-     *
-     * @author com.google.common.util.concurrent.Internal
+     * @param duration to be converted
+     * @return the duration in nanoseconds
      */
     static long saturatedToNanos(Duration duration) {
-        // Using a try/catch seems lazy, but the catch block will rarely get invoked
-        // (except for
-        // durations longer than approximately +/- 292 years).
+        if (duration.isNegative() || duration.isZero()) {
+            return 0L;
+        }
         try {
             return duration.toNanos();
-        } catch (ArithmeticException tooBig) {
-            return duration.isNegative() ? Long.MIN_VALUE : Long.MAX_VALUE;
+        } catch (ArithmeticException e) {
+            return Long.MAX_VALUE;
         }
     }
 }

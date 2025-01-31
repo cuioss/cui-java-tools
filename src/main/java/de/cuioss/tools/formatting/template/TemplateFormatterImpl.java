@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.formatting.template;
 
-import static de.cuioss.tools.base.Preconditions.checkState;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.lexer.Lexer;
 import de.cuioss.tools.formatting.template.lexer.LexerBuilder;
 import de.cuioss.tools.formatting.template.token.Token;
@@ -28,6 +25,9 @@ import lombok.ToString;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+
+import static de.cuioss.tools.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Formatter which is able to replace parameter inside the template based on

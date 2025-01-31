@@ -15,11 +15,6 @@
  */
 package de.cuioss.tools.net;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
-import static java.net.URLEncoder.encode;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.collect.MoreCollections;
 import de.cuioss.tools.logging.CuiLogger;
@@ -42,6 +37,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
+
+import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
+import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
+import static java.net.URLEncoder.encode;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Simple wrapper around an Url Parameter Object.
@@ -58,7 +59,7 @@ import java.util.Map.Entry;
 @ToString
 public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
-    private static final CuiLogger log = new CuiLogger(UrlParameter.class);
+    private static final CuiLogger LOGGER = new CuiLogger(UrlParameter.class);
 
     /** Shortcut constant for faces redirect parameter. */
     public static final UrlParameter FACES_REDIRECT = new UrlParameter("faces-redirect", "true");
@@ -184,7 +185,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                 try {
                     extracted.add(new UrlParameter(key, value, encode));
                 } catch (final IllegalArgumentException e) {
-                    log.debug("Unable to read url parameter due to missing parameter name", e.getMessage());
+                    LOGGER.debug("Unable to read url parameter due to missing parameter name", e.getMessage());
                 }
             }
         }
@@ -244,7 +245,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      *         {@link UrlParameter} otherwise
      */
     public static List<UrlParameter> fromQueryString(String queryString) {
-        log.trace("Parsing Query String %s", queryString);
+        LOGGER.trace("Parsing Query String %s", queryString);
         if (MoreStrings.isEmpty(queryString)) {
             return Collections.emptyList();
         }
@@ -253,17 +254,17 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             cleaned = cleaned.substring(1);
         }
         if (MoreStrings.isEmpty(cleaned)) {
-            log.debug("Given String solely consists of '?' symbol, ignoring");
+            LOGGER.debug("Given String solely consists of '?' symbol, ignoring");
             return Collections.emptyList();
         }
-        var elements = Splitter.on("&").omitEmptyStrings().splitToList(cleaned);
+        var elements = Splitter.on(Pattern.compile("&")).trimResults().omitEmptyStrings().splitToList(cleaned);
         var builder = new CollectionBuilder<UrlParameter>();
         for (String element : elements) {
             if (element.contains("=")) {
-                var splitted = Splitter.on("=").omitEmptyStrings().splitToList(element);
+                var splitted = Splitter.on(Pattern.compile("=")).omitEmptyStrings().splitToList(element);
                 switch (splitted.size()) {
                     case 0:
-                        log.debug(
+                        LOGGER.debug(
                                 "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
                                 queryString, element);
                         break;
@@ -274,7 +275,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                         builder.add(createDecoded(splitted.get(0), splitted.get(1)));
                         break;
                     default:
-                        log.debug(
+                        LOGGER.debug(
                                 "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
                                 queryString);
                         break;

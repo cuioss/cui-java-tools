@@ -15,16 +15,16 @@
  */
 package de.cuioss.tools.formatting.template;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import de.cuioss.tools.formatting.support.PersonName;
 import de.cuioss.tools.formatting.template.TemplateManager.TemplateManagerBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TemplateManagerTest {
 

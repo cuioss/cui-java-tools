@@ -15,13 +15,6 @@
  */
 package de.cuioss.tools.reflect;
 
-import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
 import de.cuioss.tools.reflect.support.ChildAnnotatedClass;
 import de.cuioss.tools.reflect.support.FieldNameClass;
@@ -38,6 +31,13 @@ import java.lang.reflect.InvocationHandler;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("deprecation")
 class MoreReflectionTest {
