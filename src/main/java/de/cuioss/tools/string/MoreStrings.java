@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,14 +30,15 @@ import java.util.function.Predicate;
 /**
  * Provides enhanced String handling utilities focusing on null-safety, performance,
  * and common string manipulation tasks. This class serves as a lightweight alternative
- * to larger utility libraries.
+ * to larger utility libraries while maintaining high standards for code quality
+ * and usability.
  *
  * <h2>Key Features</h2>
  * <ul>
- *   <li>Null-safe string operations</li>
- *   <li>Efficient string formatting</li>
- *   <li>String validation and transformation</li>
- *   <li>Common string manipulation tasks</li>
+ *   <li>Null-safe string operations with consistent behavior</li>
+ *   <li>Efficient string formatting with improved null handling</li>
+ *   <li>Comprehensive string validation and transformation utilities</li>
+ *   <li>Performance-optimized string manipulation methods</li>
  * </ul>
  *
  * <h2>Usage Examples</h2>
@@ -98,8 +99,6 @@ import java.util.function.Predicate;
  * assertEquals("", toLowerCase(null));
  * </pre>
  *
- *
- *
  * <h2>Best Practices</h2>
  * <ul>
  *   <li>Always use null-safe methods when handling potentially null strings</li>
@@ -118,10 +117,11 @@ import java.util.function.Predicate;
  *
  * @author Oliver Wolff
  * @author Sven Haag
- * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">StringUtils</a>
- * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/CharSequenceUtils.java">CharSequenceUtils</a>
- * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">StringUtils</a>
- * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Guava-String</a>
+ *
+ * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang StringUtils</a>
+ * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/CharSequenceUtils.java">Apache Commons Lang CharSequenceUtils</a>
+ * @see <a href="https://github.com/spring-projects/spring-framework/blob/v5.1.8.RELEASE/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework StringUtils</a>
+ * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava Strings</a>
  */
 @UtilityClass
 public final class MoreStrings {
@@ -130,32 +130,44 @@ public final class MoreStrings {
 
     /**
      * The empty String {@code ""}.
+     * Used as a constant to avoid creating empty strings repeatedly.
      */
     public static final String EMPTY = "";
 
     /**
-     * <p>
-     * The maximum size to which the padding constant(s) can expand.
-     * </p>
-     */
-    private static final int PAD_LIMIT = 8192;
-
-    /**
      * A String for a space character.
+     * Used for consistent space representation across the codebase.
      */
     public static final String SPACE = " ";
 
     /**
      * Represents a failed index search.
+     * Used to indicate when a search operation finds no match.
      */
     public static final int INDEX_NOT_FOUND = -1;
 
     /**
-     * "Unquotes" a String, saying if the given String starts and ends with the
-     * token "'" or """ the quotes will be stripped
+     * The maximum size to which the padding constant(s) can expand.
+     * This limit prevents excessive memory allocation in padding operations.
+     */
+    private static final int PAD_LIMIT = 8192;
+
+    /**
+     * "Unquotes" a String by removing surrounding single or double quotes if present.
+     * This method is particularly useful when processing user input or configuration values
+     * that may contain quoted strings.
      *
-     * @param original may be null or empty
-     * @return the unquoted String or the original in none could be found
+     * <h3>Examples:</h3>
+     * <pre>
+     * unquote(null)      = null
+     * unquote("")        = ""
+     * unquote("'text'")  = "text"
+     * unquote("\"text\"") = "text"
+     * unquote("text")    = "text"
+     * </pre>
+     *
+     * @param original the string to unquote, may be null or empty
+     * @return the unquoted String, or the original if no quotes were found or input was null/empty
      */
     public static String unquote(final String original) {
         if (isEmpty(original)) {
