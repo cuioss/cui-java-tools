@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 the original author or authors.
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,41 +30,66 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
- * Inspired by Googles Joiner.
- * <p>
- * It uses internally the {@link String#join(CharSequence, Iterable)}
- * implementation of java and provides a guava like wrapper. It focuses on the
- * simplified Joining and omits the Map based variants.
- * </p>
- * <h2>Usage</h2>
+ * A flexible string joining utility inspired by Google Guava's Joiner.
+ * This implementation builds upon Java's {@link String#join(CharSequence, Iterable)}
+ * while providing a more intuitive and feature-rich API.
  *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>Configurable separator (string or character)</li>
+ *   <li>Flexible null value handling (skip or replace)</li>
+ *   <li>Options to skip empty or blank strings</li>
+ *   <li>Fluent builder-style API</li>
+ * </ul>
+ *
+ * <h2>Usage Examples</h2>
+ *
+ * <h3>1. Basic Joining</h3>
  * <pre>
+ * // Simple key-value joining
  * assertEquals("key=value", Joiner.on('=').join("key", "value"));
+ *
+ * // Join multiple values
+ * assertEquals("a,b,c", Joiner.on(',').join("a", "b", "c"));
+ * </pre>
+ *
+ * <h3>2. Null Handling</h3>
+ * <pre>
+ * // Replace null with custom value
  * assertEquals("key=no value", Joiner.on('=').useForNull("no value").join("key", null));
+ *
+ * // Skip null values entirely
  * assertEquals("key", Joiner.on('=').skipNulls().join("key", null));
+ * </pre>
+ *
+ * <h3>3. Empty and Blank String Handling</h3>
+ * <pre>
+ * // Skip empty strings
  * assertEquals("key", Joiner.on('=').skipEmptyStrings().join("key", ""));
+ *
+ * // Skip blank strings (empty or whitespace)
  * assertEquals("key", Joiner.on('=').skipBlankStrings().join("key", " "));
  * </pre>
  *
  * <h2>Migrating from Guava</h2>
- * <p>
- * In order to migrate for most case you only need to replace the package name
- * on the import.
- * </p>
- * <h2>Changes to Guavas-Joiner</h2>
- * <p>
- * In case of content to be joined containing {@code null}-values and not set to
- * skip nulls, {@link #skipNulls()} it does not throw an
- * {@link NullPointerException} but writes "null" for each {@code null} element.
- * You can define a different String by calling {@link #useForNull(String)}
- * </p>
- * <p>
- * In addition to {@link #skipEmptyStrings()} it provides a variant
- * {@link #skipBlankStrings()}
- * </p>
+ * To migrate from Guava's Joiner:
+ * <ol>
+ *   <li>Update imports from {@code com.google.common.base.Joiner} to {@code de.cuioss.tools.string.Joiner}</li>
+ *   <li>Review null handling - this implementation writes "null" by default instead of throwing exceptions</li>
+ *   <li>Consider using new features like {@link #skipBlankStrings()} where appropriate</li>
+ * </ol>
+ *
+ * <h2>Key Differences from Guava</h2>
+ * <ul>
+ *   <li>Null handling: Writes "null" by default instead of throwing {@link NullPointerException}</li>
+ *   <li>Additional {@link #skipBlankStrings()} feature</li>
+ *   <li>Simplified API focusing on string joining (no map support)</li>
+ *   <li>Built on Java's native {@link String#join} implementation for better performance</li>
+ * </ul>
  *
  * @author Oliver Wolff
- *
+ * @see String#join(CharSequence, Iterable)
+ * @see JoinerConfig
  */
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Joiner {
@@ -75,13 +100,17 @@ public final class Joiner {
     private final JoinerConfig joinerConfig;
 
     /**
-     * Returns a Joiner that uses the given fixed string as a separator. For
-     * example, {@code
-     * Joiner.on("-").join("foo", "bar")} returns a String "foo-bar"
+     * Creates a new Joiner that uses the given string as a separator.
+     * The separator will be inserted between consecutive elements in the output.
      *
-     * @param separator the literal, nonempty string to recognize as a separator
+     * <pre>
+     * Joiner.on("-").join("foo", "bar")      = "foo-bar"
+     * Joiner.on(", ").join("a", "b", "c")    = "a, b, c"
+     * </pre>
      *
-     * @return a {@link Joiner}, with default settings, that uses that separator
+     * @param separator the string to use as a separator, must not be null
+     * @return a new {@link Joiner} instance configured with the given separator
+     * @throws NullPointerException if separator is null
      */
     public static Joiner on(final String separator) {
         requireNonNull(separator);
