@@ -253,7 +253,9 @@ class PreconditionsTest {
                     futures.add(executor.submit(() -> {
                         synchronized (lock) {
                             if (state) {
-                                checkState(state, "State check on iteration %s", iteration);
+                                // Single point of potential exception
+                                boolean result = state;
+                                checkState(result, "State check on iteration %s", iteration);
                                 state = false;
                             } else {
                                 state = true;
@@ -286,15 +288,19 @@ class PreconditionsTest {
                 for (int i = 0; i < threadCount; i++) {
                     final int iteration = i;
                     futures.add(executor.submit(() -> {
+                        // Prepare message parameters before assertion
+                        var messageParams = new Object[] {
+                            new Object() {
+                                @Override
+                                public String toString() {
+                                    return "Object[" + iteration + "]";
+                                }
+                            },
+                            iteration
+                        };
+                        // Single point of potential exception
                         assertThrows(IllegalStateException.class, () ->
-                                checkState(false, "Complex message %s with iteration %s",
-                                        new Object() {
-                                            @Override
-                                            public String toString() {
-                                                return "Object[" + iteration + "]";
-                                            }
-                                        },
-                                        iteration));
+                                checkState(false, "Complex message %s with iteration %s", messageParams));
                         return null;
                     }));
                 }
