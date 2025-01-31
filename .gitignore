@@ -10,4 +10,20 @@
 .asciidoctorconfig.adoc
 /bin/
 .vscode/settings.json
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Maven
+target/
+.flattened-pom.xml
+
+# Maintenance tracking
 java-maintenance.md

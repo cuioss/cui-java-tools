@@ -24,6 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -183,6 +189,114 @@ class BooleanOperationsTest {
         void shouldHandleNullCase() {
             assertFalse(assertDoesNotThrow(() -> BooleanOperations.isValidBoolean(null),
                 "Should not throw exception for null input"));
+        }
+    }
+
+    @Nested
+    @DisplayName("handle performance")
+    class PerformanceTest {
+        
+        @Test
+        @DisplayName("handle large arrays efficiently")
+        void shouldHandleLargeArrays() {
+            // Create large array with alternating values
+            var size = 10000;
+            var largeArray = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                largeArray[i] = i % 2 == 0;
+            }
+            
+            // Test isAnyTrue performance
+            assertDoesNotThrow(() -> {
+                var result = isAnyTrue(largeArray);
+                assertTrue(result, "Should find true in alternating array");
+            });
+            
+            // Test isAnyFalse performance
+            assertDoesNotThrow(() -> {
+                var result = isAnyFalse(largeArray);
+                assertTrue(result, "Should find false in alternating array");
+            });
+            
+            // Test areAllTrue performance
+            assertDoesNotThrow(() -> {
+                var result = areAllTrue(largeArray);
+                assertFalse(result, "Should not be all true in alternating array");
+            });
+            
+            // Test areAllFalse performance
+            assertDoesNotThrow(() -> {
+                var result = areAllFalse(largeArray);
+                assertFalse(result, "Should not be all false in alternating array");
+            });
+        }
+        
+        @Test
+        @DisplayName("handle worst-case scenarios efficiently")
+        void shouldHandleWorstCaseScenarios() {
+            var size = 10000;
+            
+            // Test finding single true at end
+            var singleTrueAtEnd = new boolean[size];
+            singleTrueAtEnd[size - 1] = true;
+            
+            assertDoesNotThrow(() -> {
+                var result = isAnyTrue(singleTrueAtEnd);
+                assertTrue(result, "Should find single true at end");
+            });
+            
+            // Test finding single false at end
+            var singleFalseAtEnd = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                singleFalseAtEnd[i] = true;
+            }
+            singleFalseAtEnd[size - 1] = false;
+            
+            assertDoesNotThrow(() -> {
+                var result = isAnyFalse(singleFalseAtEnd);
+                assertTrue(result, "Should find single false at end");
+            });
+        }
+    }
+
+    @Nested
+    @DisplayName("handle concurrent access")
+    class ConcurrentTest {
+        
+        @Test
+        @DisplayName("handle concurrent reads safely")
+        void shouldHandleConcurrentReads() {
+            var size = 1000;
+            var sharedArray = new boolean[size];
+            for (int i = 0; i < size; i++) {
+                sharedArray[i] = i % 2 == 0;
+            }
+            
+            var threadCount = 10;
+            var executor = Executors.newFixedThreadPool(threadCount);
+            var futures = new ArrayList<Future<?>>();
+            
+            try {
+                // Submit multiple concurrent read tasks
+                for (int i = 0; i < threadCount; i++) {
+                    futures.add(executor.submit(() -> {
+                        assertDoesNotThrow(() -> {
+                            isAnyTrue(sharedArray);
+                            isAnyFalse(sharedArray);
+                            areAllTrue(sharedArray);
+                            areAllFalse(sharedArray);
+                        });
+                        return null;
+                    }));
+                }
+                
+                // Wait for all tasks to complete
+                for (var future : futures) {
+                    assertDoesNotThrow(() -> future.get(5, TimeUnit.SECONDS));
+                }
+            } finally {
+                executor.shutdownNow();
+            }
         }
     }
 }
