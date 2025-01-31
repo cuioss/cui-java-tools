@@ -241,4 +241,12 @@ class SplitterTest {
         assertThrows(IllegalArgumentException.class, () ->
                 splitter.splitToList("[boom]"));
     }
+
+    @Test
+    void onCharacterWithNullSeparator() {
+        assertThrows(NullPointerException.class, () -> {
+            Character nullChar = null;
+            Splitter.on(nullChar);
+        }, "separator must not be null");
+    }
 }

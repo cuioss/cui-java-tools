@@ -117,6 +117,7 @@ public final class Splitter {
      * @throws NullPointerException if separator is null
      */
     public static Splitter on(final char separator) {
+        requireNonNull(separator, "separator must not be null");
         var separatorStr = String.valueOf(separator);
         return new Splitter(SplitterConfig.builder()
                 .separator(separatorStr)
