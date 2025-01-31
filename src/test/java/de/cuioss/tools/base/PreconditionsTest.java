@@ -96,18 +96,7 @@ class PreconditionsTest {
 
         @Test
         void shouldHandleNullPointerOnAssertArgumentFalse() {
-            assertThrows(NullPointerException.class, () -> {
-                Boolean value = null;
-                checkArgument(value);
-            });
-        }
-
-        @Test
-        void shouldHandleNullPointerOnAssertArgumentTrue() {
-            assertThrows(NullPointerException.class, () -> {
-                Boolean value = null;
-                checkArgument(value);
-            });
+            assertThrows(NullPointerException.class, () -> checkArgument((Boolean) null));
         }
     }
 
@@ -197,9 +186,7 @@ class PreconditionsTest {
             var template = "%s %s %s";
             var value = "value";
 
-            var ex = assertThrows(IllegalArgumentException.class, () -> {
-                checkArgument(false, template, value);
-            });
+            var ex = assertThrows(IllegalArgumentException.class, () -> checkArgument(false, template, value));
 
             var message = ex.getMessage();
             assertEquals("value %s %s", message);
@@ -224,9 +211,9 @@ class PreconditionsTest {
             var template = "Outer{%s}";
             var inner = "Inner{%s}";
             var value = "value";
-
+            var formatted = String.format(inner, value);
             var ex = assertThrows(IllegalArgumentException.class,
-                    () -> checkArgument(false, template, String.format(inner, value)));
+                    () -> checkArgument(false, template, formatted));
 
             // The nested template is evaluated before being passed to lenientFormat
             var message = ex.getMessage();
@@ -292,21 +279,21 @@ class PreconditionsTest {
                     final int iteration = i;
                     futures.add(executor.submit(() -> {
                         // Prepare message parameters before assertion
-                        var messageParams = new Object[] {
-                            new Object() {
-                                @Override
-                                public String toString() {
-                                    return "Object[" + iteration + "]";
-                                }
-                            },
-                            iteration
+                        var messageParams = new Object[]{
+                                new Object() {
+                                    @Override
+                                    public String toString() {
+                                        return "Object[" + iteration + "]";
+                                    }
+                                },
+                                iteration
                         };
                         // Single point of potential exception
                         Callable<Void> result = () -> {
                             checkState(false, "Complex message %s with iteration %s", messageParams);
                             return null;
                         };
-                        assertThrows(IllegalStateException.class, () -> result.call());
+                        assertThrows(IllegalStateException.class, result::call);
                         return null;
                     }));
                 }
