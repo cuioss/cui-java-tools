@@ -89,9 +89,9 @@ class LocaleUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "us_EN_A,us,EN,A",
-            "us_EN_a,us,EN,a",
-            "us_EN_variant,us,EN,variant"
+            "us_EN_POSIX,us,EN,POSIX",
+            "us_EN_LINUX,us,EN,LINUX",
+            "us_EN_MACOS,us,EN,MACOS"
     })
     void shouldHandleValidLanguageCountryVariantCombinations(String localeString, String language, String country, String variant) {
         var locale = LocaleUtils.toLocale(localeString);

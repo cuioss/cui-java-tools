@@ -82,7 +82,7 @@ public class LocaleUtils {
 
     private static Locale toLocaleInternal(final String str) {
         if (str.isEmpty()) {
-            return new Locale("", "");
+            return new Locale.Builder().setLanguage("").setRegion("").build();
         }
         Preconditions.checkArgument(!str.contains("#"), INVALID_LOCALE_FORMAT + str);
 
@@ -116,11 +116,11 @@ public class LocaleUtils {
         final var parts = str.split("_", 3);
         if (parts.length == 2) {
             validateCountryCode(parts[1]);
-            return new Locale("", parts[1]);
+            return new Locale.Builder().setLanguage("").setRegion(parts[1]).build();
         }
         if (parts.length == 3) {
             validateCountryCode(parts[1]);
-            return new Locale("", parts[1], parts[2]);
+            return new Locale.Builder().setLanguage("").setRegion(parts[1]).setVariant(parts[2]).build();
         }
         throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
     }
@@ -128,23 +128,23 @@ public class LocaleUtils {
     private static Locale handleSimpleLocale(final String str) {
         Preconditions.checkArgument(str.length() == 2 || str.length() == 3, "Must be 2 chars if less than 5");
         Preconditions.checkArgument(str.equals(str.toLowerCase()), INVALID_LOCALE_FORMAT + str);
-        return new Locale(str);
+        return new Locale.Builder().setLanguage(str).build();
     }
 
     private static Locale handleSinglePart(final String language) {
-        return new Locale(language.toLowerCase());
+        return new Locale.Builder().setLanguage(language.toLowerCase()).build();
     }
 
     private static Locale handleTwoParts(final String language, final String country) {
         validateLanguageCode(language);
         if (country.matches("\\d{3}")) {
-            return new Locale(language, country);
+            return new Locale.Builder().setLanguage(language).setRegion(country).build();
         }
         validateCountryCode(country);
         if (language.isEmpty()) {
-            return new Locale("", country);
+            return new Locale.Builder().setLanguage("").setRegion(country).build();
         }
-        return new Locale(language, country);
+        return new Locale.Builder().setLanguage(language).setRegion(country).build();
     }
 
     private static Locale handleThreeParts(final String str, final String[] parts) {
@@ -152,14 +152,19 @@ public class LocaleUtils {
                 "Must be 3, 5 or 7+ in length");
         validateLanguageCode(parts[0]);
         
+        var builder = new Locale.Builder().setLanguage(parts[0]);
+        
         if (parts[1].isEmpty() && !parts[2].isEmpty()) {
-            return new Locale(parts[0], "", parts[2]);
+            validateVariant(parts[2]);
+            return builder.setVariant(parts[2]).build();
         }
         if (parts[1].matches("\\d{3}")) {
-            return new Locale(parts[0], parts[1], parts[2]);
+            validateVariant(parts[2]);
+            return builder.setRegion(parts[1]).setVariant(parts[2]).build();
         }
         validateCountryCode(parts[1]);
-        return new Locale(parts[0], parts[1], parts[2]);
+        validateVariant(parts[2]);
+        return builder.setRegion(parts[1]).setVariant(parts[2]).build();
     }
 
     private static void validateLanguageCode(final String language) {
@@ -169,5 +174,10 @@ public class LocaleUtils {
     private static void validateCountryCode(final String country) {
         Preconditions.checkArgument(country.equals(country.toUpperCase()) && country.matches("[A-Z]{2}"),
                 "Country code must be uppercase");
+    }
+
+    private static void validateVariant(final String variant) {
+        Preconditions.checkArgument(variant.matches("[A-Za-z0-9]{5,8}((_[A-Za-z0-9]{5,8})*)?"),
+                "Variant must be 5-8 alphanumeric characters or sequence of such strings separated by underscore");
     }
 }
