@@ -17,9 +17,18 @@ package de.cuioss.tools.base;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.base.Preconditions.checkState;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -136,6 +145,155 @@ class PreconditionsTest {
             var ex = assertThrows(IllegalStateException.class, 
                 () -> checkState(false, MESSAGE_TEMPLATE, (Object) null));
             assertEquals("message null", ex.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("handle complex message formatting")
+    class ComplexMessageFormattingTest {
+
+        @Test
+        @DisplayName("format complex object arrays")
+        void shouldFormatComplexObjects() {
+            var complexObj = new Object() {
+                @Override
+                public String toString() {
+                    return "CustomObject{with special chars: %s, {}, []}";
+                }
+            };
+            
+            var ex = assertThrows(IllegalArgumentException.class, 
+                () -> checkArgument(false, "Complex format: %s, %s", complexObj, new int[]{1, 2, 3}));
+            
+            var message = ex.getMessage();
+            assertNotNull(message);
+            System.out.println("Actual message: " + message);
+            // The message should start with the format string prefix
+            assertTrue(message.startsWith("Complex format: "), "Message should start with 'Complex format: ' but was: " + message);
+            // The complex object's toString() is inserted verbatim
+            assertTrue(message.contains("CustomObject{with special chars: %s, {}, []}"), "Message should contain CustomObject but was: " + message);
+            // The array is converted to string using Arrays.toString()
+            assertTrue(message.contains("[1, 2, 3]"), "Message should contain [1, 2, 3] but was: " + message);
+        }
+
+        @Test
+        @DisplayName("handle message with more placeholders than arguments")
+        void shouldHandleMorePlaceholdersThanArgs() {
+            var ex = assertThrows(IllegalArgumentException.class,
+                () -> checkArgument(false, "%s %s %s", "one", "two"));
+            
+            // The remaining %s placeholder is left as-is
+            var message = ex.getMessage();
+            System.out.println("Actual message: " + message);
+            assertTrue(message.startsWith("one two %s"), "Message should start with 'one two %s' but was: " + message);
+        }
+
+        @Test
+        @DisplayName("handle message with fewer placeholders than arguments")
+        void shouldHandleFewerPlaceholdersThanArgs() {
+            var ex = assertThrows(IllegalArgumentException.class,
+                () -> checkArgument(false, "%s %s", "one", "two", "three"));
+            
+            // Extra arguments are appended in square brackets
+            var message = ex.getMessage();
+            System.out.println("Actual message: " + message);
+            assertTrue(message.startsWith("one two"), "Message should start with 'one two' but was: " + message);
+            assertTrue(message.contains("[three]"), "Message should contain [three] but was: " + message);
+        }
+
+        @Test
+        @DisplayName("handle nested message templates")
+        void shouldHandleNestedTemplates() {
+            var template = "Outer{%s}";
+            var inner = "Inner{%s}";
+            var value = "value";
+            
+            var ex = assertThrows(IllegalArgumentException.class,
+                () -> checkArgument(false, template, String.format(inner, value)));
+            
+            // The nested template is evaluated before being passed to lenientFormat
+            var message = ex.getMessage();
+            System.out.println("Actual message: " + message);
+            assertEquals("Outer{Inner{value}}", message);
+        }
+    }
+
+    @Nested
+    @DisplayName("handle concurrent state checks")
+    class ConcurrentStateTest {
+
+        private volatile boolean state = true;
+        private final Object lock = new Object();
+
+        @Test
+        @DisplayName("handle concurrent state changes")
+        void shouldHandleConcurrentStateChanges() {
+            var threadCount = 10;
+            var executor = Executors.newFixedThreadPool(threadCount);
+            var futures = new ArrayList<Future<?>>();
+            
+            try {
+                // Submit state-checking tasks
+                for (int i = 0; i < threadCount; i++) {
+                    final int iteration = i;
+                    futures.add(executor.submit(() -> {
+                        synchronized (lock) {
+                            if (state) {
+                                checkState(state, "State check on iteration %s", iteration);
+                                state = false;
+                            } else {
+                                state = true;
+                            }
+                        }
+                        return null;
+                    }));
+                }
+                
+                // Wait for all tasks to complete
+                for (var future : futures) {
+                    future.get(5, TimeUnit.SECONDS);
+                }
+            } catch (Exception e) {
+                throw new AssertionError("Concurrent execution failed", e);
+            } finally {
+                executor.shutdownNow();
+            }
+        }
+
+        @Test
+        @DisplayName("handle concurrent error message formatting")
+        void shouldHandleConcurrentMessageFormatting() {
+            var threadCount = 10;
+            var executor = Executors.newFixedThreadPool(threadCount);
+            var futures = new ArrayList<Future<?>>();
+            
+            try {
+                // Submit message formatting tasks
+                for (int i = 0; i < threadCount; i++) {
+                    final int iteration = i;
+                    futures.add(executor.submit(() -> {
+                        assertThrows(IllegalStateException.class, () ->
+                            checkState(false, "Complex message %s with iteration %s",
+                                new Object() {
+                                    @Override
+                                    public String toString() {
+                                        return "Object[" + iteration + "]";
+                                    }
+                                },
+                                iteration));
+                        return null;
+                    }));
+                }
+                
+                // Wait for all tasks to complete
+                for (var future : futures) {
+                    future.get(5, TimeUnit.SECONDS);
+                }
+            } catch (Exception e) {
+                throw new AssertionError("Concurrent execution failed", e);
+            } finally {
+                executor.shutdownNow();
+            }
         }
     }
 }

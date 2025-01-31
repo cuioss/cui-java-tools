@@ -22,6 +22,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -1049,6 +1050,27 @@ public final class MoreStrings {
      */
     static String lenientToString(Object o) {
         try {
+            if (o != null && o.getClass().isArray()) {
+                if (o instanceof Object[]) {
+                    return Arrays.toString((Object[]) o);
+                } else if (o instanceof int[]) {
+                    return Arrays.toString((int[]) o);
+                } else if (o instanceof long[]) {
+                    return Arrays.toString((long[]) o);
+                } else if (o instanceof double[]) {
+                    return Arrays.toString((double[]) o);
+                } else if (o instanceof float[]) {
+                    return Arrays.toString((float[]) o);
+                } else if (o instanceof boolean[]) {
+                    return Arrays.toString((boolean[]) o);
+                } else if (o instanceof byte[]) {
+                    return Arrays.toString((byte[]) o);
+                } else if (o instanceof short[]) {
+                    return Arrays.toString((short[]) o);
+                } else if (o instanceof char[]) {
+                    return Arrays.toString((char[]) o);
+                }
+            }
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
