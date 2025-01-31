@@ -4,9 +4,9 @@
 - Module: cui-java-tools
 - Package: de.cuioss.tools.base
 - Phase: Test Refactoring
-- Last Successful Step: Enhanced BooleanOperations class and tests
+- Last Successful Step: Enhanced Javadoc in Preconditions and Splitter Classes
 - Start Time: 2025-01-31T10:17:10+01:00
-- Current Time: 2025-01-31T13:43:42+01:00
+- Current Time: 2025-01-31T13:51:02+01:00
 
 ## Package Structure
 - [ ] de.cuioss.tools.base
@@ -98,6 +98,24 @@
   ### Files Changed
   - `src/main/java/de/cuioss/tools/base/BooleanOperations.java`
   - `src/test/java/de/cuioss/tools/base/BooleanOperationsTest.java`
+- [x] 2025-01-31 Enhanced Javadoc in Preconditions and Splitter Classes
+  ### Changes Made
+  - Fixed HTML special characters in code examples using proper escaping
+  - Properly escaped generic type declarations in examples
+  - Improved code example formatting and readability
+  - Added clearer section headings and comments
+  - Enhanced documentation structure with better organization
+  - Fixed all javadoc build errors
+
+  ### Impact
+  - Improved documentation readability and correctness
+  - Fixed javadoc generation issues
+  - Better developer experience with clearer examples
+  - No functional changes to code behavior
+
+  ### Files Changed
+  - `src/main/java/de/cuioss/tools/base/Preconditions.java`
+  - `src/main/java/de/cuioss/tools/string/Splitter.java`
 
 ## Current Package Progress (de.cuioss.tools.base)
 ### Test Refactoring
