@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.lexer.BracketLexer.Brackets;
 import de.cuioss.tools.formatting.template.lexer.Lexer.ExpressionLanguage;
@@ -25,6 +23,8 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Eugen Fischer

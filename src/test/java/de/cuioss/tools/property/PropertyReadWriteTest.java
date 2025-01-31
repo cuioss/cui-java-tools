@@ -15,6 +15,12 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
+import org.junit.jupiter.api.Test;
+
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.property.PropertyReadWrite.NONE;
 import static de.cuioss.tools.property.PropertyReadWrite.READ_ONLY;
@@ -30,12 +36,6 @@ import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRI
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
-import org.junit.jupiter.api.Test;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
 
 class PropertyReadWriteTest {
 

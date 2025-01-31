@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.logging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestLogHandler extends Handler {
 
@@ -31,16 +31,18 @@ public class TestLogHandler extends Handler {
     Level lastLevel = Level.FINEST;
 
     @Override
-    public void publish(LogRecord record) {
-        records.add(record);
+    public void publish(LogRecord logRecord) {
+        records.add(logRecord);
     }
 
     @Override
     public void close() {
+        // Empty, for testing purpose only
     }
 
     @Override
     public void flush() {
+        // Empty, for testing purpose only
     }
 
     void assertMessagePresent(String message, Level level) {

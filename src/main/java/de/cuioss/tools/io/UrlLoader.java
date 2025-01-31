@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -29,6 +27,8 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * This {@link FileLoader} takes a {@link URL} as its parameter which is useful

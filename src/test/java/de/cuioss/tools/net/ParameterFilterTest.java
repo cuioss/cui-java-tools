@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.net;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ParameterFilterTest {
 

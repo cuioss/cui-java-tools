@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.reflect;
 
-import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
@@ -41,6 +38,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
+
+import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides a number of methods simplifying the usage of Reflection-based access.

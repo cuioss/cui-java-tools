@@ -15,9 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
@@ -33,6 +30,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * File-system based variant. Responsible for all non

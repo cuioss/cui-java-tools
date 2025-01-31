@@ -15,11 +15,6 @@
  */
 package de.cuioss.tools.string;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.AccessLevel;
@@ -29,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A string splitting utility inspired by Google Guava's Splitter, providing a more

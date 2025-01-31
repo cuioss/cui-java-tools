@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.formatting.support;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.TypedGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +27,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test class for {@link PersonName} which verifies:

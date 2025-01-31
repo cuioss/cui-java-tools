@@ -15,6 +15,17 @@
  */
 package de.cuioss.tools.collect;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableSet;
@@ -27,17 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.stream.Stream;
 
 @DisplayName("Collection Literals Test Suite")
 class CollectionLiteralsTest {

@@ -15,11 +15,6 @@
  */
 package de.cuioss.tools.io;
 
-import static de.cuioss.tools.base.Preconditions.checkState;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,6 +25,11 @@ import java.io.InputStream;
 import java.io.Serial;
 import java.net.URL;
 import java.util.Optional;
+
+import static de.cuioss.tools.base.Preconditions.checkState;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Variant of {@link FileLoader} that loads files from the classpath.

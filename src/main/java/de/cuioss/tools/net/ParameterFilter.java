@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.net;
 
-import static java.util.Objects.requireNonNull;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,6 +24,8 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Defines a filter identifying which parameters are not to be included within

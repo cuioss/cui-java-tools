@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.codec;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +26,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for {@link Hex} class, based on Apache Commons Codec's HexTest.
@@ -175,20 +175,19 @@ class HexTest {
 
         @ParameterizedTest(name = "encode '{0}' correctly")
         @ValueSource(strings = {"Hello World", "The quick brown fox jumps over the lazy dog"})
-        void testEncodeString(String input) throws EncoderException {
+        void testEncodeString(String input) {
             final var hex = new Hex();
             final var expected = new String(hex.encode(input.getBytes(StandardCharsets.UTF_8)));
-            assertEquals(expected, hex.encodeHexString(input.getBytes(StandardCharsets.UTF_8)));
+            assertEquals(expected, Hex.encodeHexString(input.getBytes(StandardCharsets.UTF_8)));
         }
 
         @Test
         @DisplayName("handle read-only byte buffer")
         void testEncodeReadOnlyByteBuffer() {
-            final var hex = new Hex();
             final var bb = ByteBuffer.allocate(16);
-            final var expected = hex.encodeHexString(bb.array());
+            final var expected = Hex.encodeHexString(bb.array());
             bb.asReadOnlyBuffer();
-            assertEquals(expected, hex.encodeHexString(bb));
+            assertEquals(expected, Hex.encodeHexString(bb));
         }
     }
 
@@ -198,7 +197,7 @@ class HexTest {
 
         @Test
         @DisplayName("correctly encode and decode random data")
-        void testRoundTripRandom() throws EncoderException, DecoderException {
+        void testRoundTripRandom() throws DecoderException {
             final var hex = new Hex();
             final var random = new Random();
 
@@ -215,11 +214,11 @@ class HexTest {
 
         @Test
         @DisplayName("correctly handle case sensitivity")
-        void testRoundTripCaseSensitivity() throws EncoderException, DecoderException {
+        void testRoundTripCaseSensitivity() throws DecoderException {
             final var hex = new Hex();
             final var data = "Hello World".getBytes(StandardCharsets.UTF_8);
 
-            final var encoded = hex.encodeHexString(data);
+            final var encoded = Hex.encodeHexString(data);
             final var upperCase = encoded.toUpperCase();
             final var lowerCase = encoded.toLowerCase();
 

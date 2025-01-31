@@ -15,6 +15,20 @@
  */
 package de.cuioss.tools.io;
 
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static de.cuioss.tools.io.MorePaths.BACKUP_DIR_NAME;
 import static de.cuioss.tools.io.MorePaths.BACKUP_FILE_SUFFIX;
 import static de.cuioss.tools.io.MorePaths.backupFile;
@@ -34,20 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import de.cuioss.tools.support.Generators;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 class MorePathsTest {
 
@@ -138,9 +138,6 @@ class MorePathsTest {
         assertFalse(checkExecutablePath(NOT_EXISTING_DIRECTORY, false));
 
         var testFile = copyTestFileToPlayground();
-        // testFile.toFile().setExecutable(false);
-        // assertFalse(checkExecutablePath(testFile, true));
-        // assertFalse(checkExecutablePath(testFile, false));
 
         testFile.toFile().setExecutable(true);
         assertTrue(checkExecutablePath(testFile, true));

@@ -15,12 +15,12 @@
  */
 package de.cuioss.tools.concurrent;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Provides some helper-methods taken from com.google.common.util.concurrent

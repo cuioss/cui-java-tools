@@ -15,6 +15,18 @@
  */
 package de.cuioss.tools.base;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import static de.cuioss.tools.base.BooleanOperations.areAllFalse;
 import static de.cuioss.tools.base.BooleanOperations.areAllTrue;
 import static de.cuioss.tools.base.BooleanOperations.isAnyFalse;
@@ -24,19 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 @DisplayName("BooleanOperations should")
 class BooleanOperationsTest {
@@ -75,7 +74,7 @@ class BooleanOperationsTest {
         void shouldHandleEdgeCases() {
             assertFalse(isAnyTrue(), "Empty varargs should return false");
             assertFalse(isAnyTrue((boolean[]) null), "Null array should return false");
-            assertFalse(isAnyTrue(new boolean[0]), "Empty array should return false");
+            assertFalse(isAnyTrue(), "Empty array should return false");
         }
     }
 
@@ -101,7 +100,7 @@ class BooleanOperationsTest {
         void shouldHandleEdgeCases() {
             assertFalse(isAnyFalse(), "Empty varargs should return false");
             assertFalse(isAnyFalse((boolean[]) null), "Null array should return false");
-            assertFalse(isAnyFalse(new boolean[0]), "Empty array should return false");
+            assertFalse(isAnyFalse(), "Empty array should return false");
         }
     }
 
@@ -127,7 +126,7 @@ class BooleanOperationsTest {
         void shouldHandleEdgeCases() {
             assertFalse(areAllFalse(), "Empty varargs should return false");
             assertFalse(areAllFalse((boolean[]) null), "Null array should return false");
-            assertFalse(areAllFalse(new boolean[0]), "Empty array should return false");
+            assertFalse(areAllFalse(), "Empty array should return false");
         }
     }
 
@@ -153,7 +152,7 @@ class BooleanOperationsTest {
         void shouldHandleEdgeCases() {
             assertTrue(areAllTrue(), "Empty varargs should return true");
             assertTrue(areAllTrue((boolean[]) null), "Null array should return true");
-            assertTrue(areAllTrue(new boolean[0]), "Empty array should return true");
+            assertTrue(areAllTrue(), "Empty array should return true");
         }
     }
 

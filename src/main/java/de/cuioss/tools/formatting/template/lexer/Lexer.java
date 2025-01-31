@@ -15,11 +15,6 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.token.Token;
 import lombok.AccessLevel;
@@ -30,6 +25,11 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Functionality of scanning plain text and split this to tokens

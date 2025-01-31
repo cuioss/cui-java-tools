@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.logging;
 
-import static de.cuioss.tools.logging.CuiLoggerFactory.MARKER_CLASS_NAMES;
-import static de.cuioss.tools.string.MoreStrings.lenientFormat;
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-
 import de.cuioss.tools.collect.CollectionLiterals;
 import de.cuioss.tools.reflect.MoreReflection;
 import lombok.AccessLevel;
@@ -31,6 +27,10 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.cuioss.tools.logging.CuiLoggerFactory.MARKER_CLASS_NAMES;
+import static de.cuioss.tools.string.MoreStrings.lenientFormat;
+import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 
 /**
  * Defines the log-levels with implicit mapping

@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.string;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -26,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * Provides enhanced String handling utilities focusing on null-safety, performance,

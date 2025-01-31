@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.net.ssl;
 
-import static de.cuioss.tools.base.Preconditions.checkState;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.base.BooleanOperations;
 import de.cuioss.tools.io.MorePaths;
 import de.cuioss.tools.logging.CuiLogger;
@@ -44,6 +40,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Collection;
 import java.util.Optional;
+
+import static de.cuioss.tools.base.Preconditions.checkState;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides access to a {@link KeyStore}. The store can be loaded from a file or

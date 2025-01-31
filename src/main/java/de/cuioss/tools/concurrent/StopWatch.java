@@ -15,6 +15,12 @@
  */
 package de.cuioss.tools.concurrent;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Duration;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import static de.cuioss.tools.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -24,12 +30,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 /**
  * An object that measures elapsed time in nanoseconds. It is useful to measure

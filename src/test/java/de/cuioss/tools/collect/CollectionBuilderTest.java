@@ -15,16 +15,6 @@
  */
 package de.cuioss.tools.collect;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static de.cuioss.tools.collect.CollectionLiterals.mutableSortedSet;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,6 +26,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
+import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
+import static de.cuioss.tools.collect.CollectionLiterals.mutableSortedSet;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("CollectionBuilder should")
 class CollectionBuilderTest {

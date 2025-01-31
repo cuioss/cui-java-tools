@@ -15,11 +15,11 @@
  */
 package de.cuioss.tools.io.support;
 
-import static de.cuioss.tools.io.IOStreams.EOF;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static de.cuioss.tools.io.IOStreams.EOF;
 
 /**
  * A Proxy stream which acts as expected, that is it passes the method calls on

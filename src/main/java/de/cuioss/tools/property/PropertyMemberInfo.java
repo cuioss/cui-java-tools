@@ -17,7 +17,6 @@ package de.cuioss.tools.property;
 
 import de.cuioss.tools.reflect.MoreReflection;
 
-import java.io.Serializable;
 import java.lang.reflect.Modifier;
 
 /**

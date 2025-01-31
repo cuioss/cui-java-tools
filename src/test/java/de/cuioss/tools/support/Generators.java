@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.support;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * Provides a number of simple generators for unit-tests

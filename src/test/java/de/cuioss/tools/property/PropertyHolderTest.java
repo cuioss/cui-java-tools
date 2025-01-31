@@ -15,6 +15,17 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
+import de.cuioss.tools.property.support.BeanWithMethodOverload;
+import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
+import de.cuioss.tools.property.support.ExplodingBean;
+import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
+import de.cuioss.tools.property.support.StringTypedGenericType;
+import de.cuioss.tools.support.Generators;
+import org.junit.jupiter.api.Test;
+
+import java.io.Serializable;
+
 import static de.cuioss.tools.property.PropertyHolder.from;
 import static de.cuioss.tools.property.PropertyReadWrite.READ_ONLY;
 import static de.cuioss.tools.property.PropertyReadWrite.READ_WRITE;
@@ -26,21 +37,11 @@ import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRI
 import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_WRITE_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
-import de.cuioss.tools.property.support.BeanWithMethodOverload;
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
-import de.cuioss.tools.property.support.ExplodingBean;
-import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
-import de.cuioss.tools.property.support.StringTypedGenericType;
-import de.cuioss.tools.support.Generators;
-import org.junit.jupiter.api.Test;
-
-import java.io.Serializable;
 
 class PropertyHolderTest {
 
@@ -171,7 +172,6 @@ class PropertyHolderTest {
 
         // Verify builder chain works
         var result = holder.writeTo(bean, 42);
-        assertTrue(result instanceof BeanWithBuilderStyleAccessor,
-                "Should return builder instance for chaining");
+        assertInstanceOf(BeanWithBuilderStyleAccessor.class, result, "Should return builder instance for chaining");
     }
 }

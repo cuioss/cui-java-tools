@@ -15,11 +15,11 @@
  */
 package de.cuioss.tools.io.support;
 
-import static de.cuioss.tools.io.IOStreams.EOF;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static de.cuioss.tools.io.IOStreams.EOF;
 
 /**
  * A functional, light weight {@link InputStream} that emulates a stream of a

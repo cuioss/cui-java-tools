@@ -15,12 +15,12 @@
  */
 package de.cuioss.tools.lang;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static de.cuioss.tools.collect.MoreCollections.isEmpty;
-
 import lombok.experimental.UtilityClass;
 
 import java.util.function.Supplier;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 
 /**
  * Provides some utilities in the context of {@link Object}

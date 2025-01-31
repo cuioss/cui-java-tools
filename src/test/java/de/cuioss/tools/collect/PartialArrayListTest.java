@@ -15,6 +15,11 @@
  */
 package de.cuioss.tools.collect;
 
+import de.cuioss.tools.support.ObjectMethodsAsserts;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+
 import static de.cuioss.tools.collect.PartialArrayList.emptyList;
 import static de.cuioss.tools.collect.PartialArrayList.of;
 import static de.cuioss.tools.support.Generators.randomInt;
@@ -22,11 +27,6 @@ import static de.cuioss.tools.support.Generators.randomStrings;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import de.cuioss.tools.support.ObjectMethodsAsserts;
-import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 class PartialArrayListTest {
 

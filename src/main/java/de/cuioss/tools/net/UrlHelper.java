@@ -15,8 +15,6 @@
  */
 package de.cuioss.tools.net;
 
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-
 import de.cuioss.tools.logging.CuiLogger;
 import de.cuioss.tools.string.MoreStrings;
 import de.cuioss.tools.string.Splitter;
@@ -28,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
 
 /**
  * Provides some utility methods for url / path related data

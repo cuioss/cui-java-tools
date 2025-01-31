@@ -15,10 +15,6 @@
  */
 package de.cuioss.tools.formatting.template.lexer;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
-import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
-
 import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.formatting.template.token.ActionToken;
 import de.cuioss.tools.formatting.template.token.StringToken;
@@ -32,6 +28,10 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static de.cuioss.tools.base.Preconditions.checkArgument;
+import static de.cuioss.tools.string.MoreStrings.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Simple lexer which supports parsing of template pattern where attributes are

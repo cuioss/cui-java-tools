@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.base;
 
-import static de.cuioss.tools.string.MoreStrings.lenientFormat;
-
 import lombok.experimental.UtilityClass;
+
+import static de.cuioss.tools.string.MoreStrings.lenientFormat;
 
 /**
  * Static utility methods for validating method arguments and state. This class

@@ -15,14 +15,14 @@
  */
 package de.cuioss.tools.formatting.template;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import de.cuioss.tools.formatting.support.PersonName;
 import de.cuioss.tools.formatting.template.lexer.Lexer;
 import de.cuioss.tools.formatting.template.lexer.LexerBuilder;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TemplateFormatterTest {
 
