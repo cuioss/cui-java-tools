@@ -117,7 +117,6 @@ public final class Splitter {
      * @throws NullPointerException if separator is null
      */
     public static Splitter on(final char separator) {
-        requireNonNull(separator);
         var separatorStr = String.valueOf(separator);
         return new Splitter(SplitterConfig.builder()
                 .separator(separatorStr)
@@ -282,7 +281,8 @@ public final class Splitter {
      */
     @SuppressWarnings("java:S5852") // owolff:
     // This is a false positive,
-    // because the splitter-separator is coded / configured value, no user-payload
+    // because the splitter-separator is coded / configured value,
+    // no user-payload
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
             return Collections.emptyList();
@@ -302,7 +302,7 @@ public final class Splitter {
         }
 
         var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
-        if (null == splitted || 0 == splitted.length) {
+        if (0 == splitted.length) {
             log.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
             return Collections.emptyList();
         }
