@@ -74,8 +74,8 @@ public class PropertyHolder {
 
     private static final String UNABLE_TO_LOAD_PROPERTY_DESCRIPTOR = "Unable to load property-descriptor for attribute '%s' on type '%s'";
     private static final String NO_READ_METHOD = "No read method available for property '%s'";
-    private static final String NO_WRITE_METHOD = "No write method available for property '%s'";
-    private static final String TYPE_MISMATCH = "Value type mismatch. Expected: %s, Got: %s";
+    private static final String NO_WRITE_METHOD = "No write method available for property '%s'. Check if the property has a setter method or a builder-style method.";
+    private static final String TYPE_MISMATCH = "Value type mismatch for property '%s'. Expected: %s, Got: %s";
 
     private static final CuiLogger log = new CuiLogger(PropertyHolder.class);
 
@@ -142,14 +142,21 @@ public class PropertyHolder {
 
     /**
      * Writes the given value to the property of the bean.
+     * This method supports both traditional setters and builder-style methods.
+     *
+     * <h2>Builder-Style Support</h2>
+     * For builder-style methods (methods that return the bean instance), the method
+     * will return the builder instance. This enables fluent method chaining.
      *
      * @param target the bean to write to, must not be null
      * @param value the value to write, may be null if the property type allows it
      * @return In case the property set method is void the given bean will be returned.
-     *         Otherwise, the return value of the method invocation, assuming the setMethods
+     *         Otherwise, the return value of the method invocation, assuming the setMethod
      *         is a builder / fluent-api type.
      * @throws IllegalArgumentException if the bean is null or if the property is not
      *                                  writeable according to the property's write permissions
+     * @throws IllegalStateException if no write method is available or if the write operation fails
+     * @since 2.0
      */
     public Object writeTo(Object target, Object value) {
         log.debug("Writing %s to property '%s' on %s", value, name, target);
@@ -158,7 +165,7 @@ public class PropertyHolder {
 
         if (writeMethod != null) {
             if (value != null && !type.isInstance(value)) {
-                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, type.getName(), value.getClass().getName()));
+                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, name, type.getName(), value.getClass().getName()));
             }
             try {
                 var result = writeMethod.invoke(target, value);
@@ -175,11 +182,20 @@ public class PropertyHolder {
 
     /**
      * Factory Method for creating a concrete {@link PropertyHolder}.
+     * This method supports both traditional Java Bean properties and builder-style
+     * properties.
+     *
+     * <h2>Property Resolution</h2>
+     * <ul>
+     *   <li>First attempts to resolve using standard Java Bean conventions</li>
+     *   <li>Falls back to builder-style methods if standard resolution fails</li>
+     *   <li>Supports generics with proper type resolution</li>
+     * </ul>
      *
      * @param beanType      the type to create the holder for, must not be null
      * @param attributeName the name of the property to access, must not be null nor empty
      * @return an {@link Optional} containing the concrete {@link PropertyHolder} if
-     * applicable
+     *         applicable
      * @throws IllegalArgumentException if {@link Introspector} is not capable of resolving
      *                                  a {@link PropertyDescriptor}.
      *                                  This usually occurs with invalid Java beans.
