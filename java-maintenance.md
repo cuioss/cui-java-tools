@@ -65,6 +65,18 @@
 
   ### Files Changed
   - `src/test/java/de/cuioss/tools/base/BooleanOperationsTest.java`
+- [x] 2025-01-31 Fixed build process to use maven wrapper consistently
+  ### Changes Made
+  - Corrected build commands to always use maven wrapper (./mvnw)
+  - Standardized build process using './mvnw clean verify'
+  - Documented build profiles for javadoc generation
+    - Single module: '-Pjavadoc'
+    - Multi module: '-Pjavadoc-mm-reporting'
+
+  ### Impact
+  - Ensures consistent build environment across all developers
+  - Follows project standards for build tooling
+  - Improves build reproducibility
 
 ## Current Package Progress (de.cuioss.tools.base)
 ### Test Refactoring
