@@ -24,6 +24,3 @@
 # Maven
 target/
 .flattened-pom.xml
-
-# Maintenance tracking
-java-maintenance.md
