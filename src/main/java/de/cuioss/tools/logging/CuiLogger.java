@@ -149,6 +149,8 @@ import static java.util.Objects.requireNonNull;
  * @see LogRecordModel
  * @see java.util.logging.Logger
  */
+@SuppressWarnings("javaarchitecture:S7091") // Owolff: The only way to fix the cycle-warning it to replicate code.
+// Therefore, suppressed
 public class CuiLogger {
 
     private final Logger delegate;
