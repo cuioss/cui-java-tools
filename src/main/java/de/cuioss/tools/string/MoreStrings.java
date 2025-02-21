@@ -15,7 +15,6 @@
  */
 package de.cuioss.tools.string;
 
-import de.cuioss.tools.logging.CuiLogger;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
@@ -24,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 
@@ -185,7 +186,6 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
  *
  * @author Oliver Wolff
  * @author Sven Haag
- *
  * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang StringUtils</a>
  * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava Strings</a>
  * @see <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/StringUtils.java">Spring Framework StringUtils</a>
@@ -193,7 +193,7 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 @UtilityClass
 public final class MoreStrings {
 
-    private static final CuiLogger LOGGER = new CuiLogger(MoreStrings.class);
+    private static final Logger LOGGER = Logger.getLogger(MoreStrings.class.getName());
 
     /**
      * The empty String {@code ""}.
@@ -1069,7 +1069,7 @@ public final class MoreStrings {
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
      */
     public static String lenientFormat(String template, Object... args) {
-        template = String.valueOf(template); // null -> "null"
+        final String templateString = String.valueOf(template); // null -> "null"
 
         final List<Object> lenientArgs;
 
@@ -1084,19 +1084,19 @@ public final class MoreStrings {
         }
 
         // start substituting the arguments into the '%s' placeholders
-        StringBuilder builder = new StringBuilder(template.length() + 16 * lenientArgs.size());
+        StringBuilder builder = new StringBuilder(templateString.length() + 16 * lenientArgs.size());
         int templateStart = 0;
         int i = 0;
         while (i < lenientArgs.size()) {
-            int placeholderStart = template.indexOf("%s", templateStart);
+            int placeholderStart = templateString.indexOf("%s", templateStart);
             if (placeholderStart == -1) {
                 break;
             }
-            builder.append(template, templateStart, placeholderStart);
+            builder.append(templateString, templateStart, placeholderStart);
             builder.append(lenientArgs.get(i++));
             templateStart = placeholderStart + 2;
         }
-        builder.append(template, templateStart, template.length());
+        builder.append(templateString, templateStart, templateString.length());
 
         // if we run out of placeholders, append the extra args in square braces
         if (i < lenientArgs.size()) {
@@ -1108,8 +1108,7 @@ public final class MoreStrings {
             }
             builder.append(']');
         }
-
-        LOGGER.debug("No args given, returning template '%s'", template);
+        LOGGER.log(Level.FINE, () -> "No args given, returning template " + templateString);
         return builder.toString();
     }
 
@@ -1154,9 +1153,9 @@ public final class MoreStrings {
             return String.valueOf(o);
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
-            var objectToString = (o == null) ? "null" :
+            final var objectToString = (o == null) ? "null" :
                     o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
-            LOGGER.warn(e, "Exception during lenientFormat for {}", objectToString);
+            LOGGER.log(Level.WARNING, e, () -> "Exception during lenientFormat for " + objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
         }
     }
