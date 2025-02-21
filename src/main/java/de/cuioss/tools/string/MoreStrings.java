@@ -193,6 +193,7 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 @UtilityClass
 public final class MoreStrings {
 
+    // We do not use CUILogger here to avoid circular dependencies
     private static final Logger LOGGER = Logger.getLogger(MoreStrings.class.getName());
 
     /**
