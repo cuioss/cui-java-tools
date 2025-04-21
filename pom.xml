@@ -27,7 +27,7 @@
         <tag>HEAD</tag>
     </scm>
     <properties>
-        <version.cui.parent>0.9.3</version.cui.parent>
+        <version.cui.parent>0.9.5</version.cui.parent>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
     </properties>
 
