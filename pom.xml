@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>de.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
         <version>0.9.9.2</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>cui-java-tools</artifactId>
@@ -37,12 +38,12 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- owolff: Kept locally, because solely used for module testing -->
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.80</version>
-                <scope>test</scope>
+                <groupId>de.cuioss</groupId>
+                <artifactId>java-ee-orthogonal</artifactId>
+                <version>${version.cui.parent}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>jakarta.annotation</groupId>
@@ -69,10 +70,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
