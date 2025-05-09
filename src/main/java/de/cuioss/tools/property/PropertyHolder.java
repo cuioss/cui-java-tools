@@ -130,7 +130,7 @@ public class PropertyHolder {
         requireNonNull(source, "Bean must not be null");
         Preconditions.checkState(readWrite.isReadable(), "Property '%s' on bean '%s' can not be read", name, source);
         if (null == readMethod) {
-            throw new IllegalStateException(String.format(NO_READ_METHOD, name));
+            throw new IllegalStateException(NO_READ_METHOD.formatted(name));
         }
         try {
             return readMethod.invoke(source);
@@ -165,7 +165,7 @@ public class PropertyHolder {
 
         if (writeMethod != null) {
             if (value != null && !type.isInstance(value)) {
-                throw new IllegalArgumentException(String.format(TYPE_MISMATCH, name, type.getName(), value.getClass().getName()));
+                throw new IllegalArgumentException(TYPE_MISMATCH.formatted(name, type.getName(), value.getClass().getName()));
             }
             try {
                 var result = writeMethod.invoke(target, value);

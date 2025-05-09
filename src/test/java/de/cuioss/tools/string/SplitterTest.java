@@ -239,8 +239,8 @@ class SplitterTest {
 
     @Test
     void onCharacterWithNullSeparator() {
+        Character nullChar = null;
         assertThrows(NullPointerException.class, () -> {
-            Character nullChar = null;
             Splitter.on(nullChar);
         }, "separator must not be null");
     }

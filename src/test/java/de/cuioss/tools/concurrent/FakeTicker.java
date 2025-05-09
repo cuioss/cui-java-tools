@@ -18,6 +18,7 @@ package de.cuioss.tools.concurrent;
 import de.cuioss.tools.base.Preconditions;
 
 import java.io.Serial;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,7 +46,7 @@ public class FakeTicker extends Ticker {
      * Advances the ticker value by {@code duration}.
      *
      */
-    public FakeTicker advance(java.time.Duration duration) {
+    public FakeTicker advance(Duration duration) {
         return advance(duration.toNanos());
     }
 
@@ -70,7 +71,7 @@ public class FakeTicker extends Ticker {
      * The default behavior is to auto increment by zero. i.e: The ticker is left
      * unchanged when queried.
      */
-    public FakeTicker setAutoIncrementStep(java.time.Duration autoIncrementStep) {
+    public FakeTicker setAutoIncrementStep(Duration autoIncrementStep) {
         return setAutoIncrementStep(autoIncrementStep.toNanos(), TimeUnit.NANOSECONDS);
     }
 

@@ -36,9 +36,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          server-id: sonatype-nexus-snapshots
+          server-id: central
           server-username: MAVEN_USERNAME
-          server-password: MAVEN_CENTRAL_TOKEN
+          server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           cache: maven
@@ -58,7 +58,7 @@ jobs:
           ./mvnw -B -Prelease release:perform -DskipTests
         env:
           MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
-          MAVEN_CENTRAL_TOKEN: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+          MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Deploy Maven Site to cuioss.github.io -> ${{steps.metadata.outputs.pages-reference}}🚀

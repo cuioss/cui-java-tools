@@ -71,7 +71,7 @@ class HexTest {
 
         @Test
         @DisplayName("use custom charset")
-        void testCustomCharset() {
+        void customCharset() {
             final var customCharsetNames = new String[]{"UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE",
                     "US-ASCII", "ISO-8859-1"};
 
@@ -86,7 +86,7 @@ class HexTest {
 
         @Test
         @DisplayName("throw exception for invalid charset name")
-        void testCustomCharsetBadName() {
+        void customCharsetBadName() {
             assertThrows(UnsupportedCharsetException.class, () -> new Hex(BAD_ENCODING_NAME));
         }
     }
@@ -97,31 +97,31 @@ class HexTest {
 
         @Test
         @DisplayName("throw exception for bad character at position 0")
-        void testDecodeBadCharacterPos0() {
+        void decodeBadCharacterPos0() {
             assertThrows(DecoderException.class, () -> new Hex().decode("q0"));
         }
 
         @Test
         @DisplayName("throw exception for bad character at position 1")
-        void testDecodeBadCharacterPos1() {
+        void decodeBadCharacterPos1() {
             assertThrows(DecoderException.class, () -> new Hex().decode("0q"));
         }
 
         @Test
         @DisplayName("handle empty byte array")
-        void testDecodeByteArrayEmpty() throws DecoderException {
+        void decodeByteArrayEmpty() throws DecoderException {
             assertArrayEquals(new byte[0], new Hex().decode(new byte[0]));
         }
 
         @Test
         @DisplayName("handle empty byte buffer")
-        void testDecodeByteBufferEmpty() throws DecoderException {
+        void decodeByteBufferEmpty() throws DecoderException {
             assertArrayEquals(new byte[0], new Hex().decode(ByteBuffer.allocate(0)));
         }
 
         @Test
         @DisplayName("throw exception for odd number of characters")
-        void testDecodeByteArrayOddCharacters() {
+        void decodeByteArrayOddCharacters() {
             assertThrows(DecoderException.class, () -> new Hex().decode(new byte[]{65}));
             assertThrows(DecoderException.class, () -> new Hex().decode(ByteBuffer.wrap(new byte[]{65})));
             assertThrows(DecoderException.class, () -> new Hex().decode("ABC"));
@@ -129,7 +129,7 @@ class HexTest {
 
         @Test
         @DisplayName("throw exception for invalid class type")
-        void testDecodeClassCastException() {
+        void decodeClassCastException() {
             assertThrows(DecoderException.class, () -> new Hex().decode(new int[]{65}));
         }
     }
@@ -140,25 +140,25 @@ class HexTest {
 
         @Test
         @DisplayName("handle empty byte array")
-        void testEncodeByteArrayEmpty() {
+        void encodeByteArrayEmpty() {
             assertArrayEquals(new byte[0], new Hex().encode(new byte[0]));
         }
 
         @Test
         @DisplayName("handle empty byte buffer")
-        void testEncodeByteBufferEmpty() {
+        void encodeByteBufferEmpty() {
             assertArrayEquals(new byte[0], new Hex().encode(ByteBuffer.allocate(0)));
         }
 
         @Test
         @DisplayName("throw exception for invalid class type")
-        void testEncodeClassCastException() {
+        void encodeClassCastException() {
             assertThrows(EncoderException.class, () -> new Hex().encode(new int[]{65}));
         }
 
         @ParameterizedTest(name = "encode '{0}' correctly")
         @ValueSource(strings = {"Hello World", "The quick brown fox jumps over the lazy dog"})
-        void testEncodeString(String input) {
+        void encodeString(String input) {
             final var hex = new Hex();
             final var expected = new String(hex.encode(input.getBytes(StandardCharsets.UTF_8)));
             assertEquals(expected, Hex.encodeHexString(input.getBytes(StandardCharsets.UTF_8)));
@@ -166,7 +166,7 @@ class HexTest {
 
         @Test
         @DisplayName("handle read-only byte buffer")
-        void testEncodeReadOnlyByteBuffer() {
+        void encodeReadOnlyByteBuffer() {
             final var bb = ByteBuffer.allocate(16);
             final var expected = Hex.encodeHexString(bb.array());
             bb.asReadOnlyBuffer();
@@ -180,7 +180,7 @@ class HexTest {
 
         @Test
         @DisplayName("correctly encode and decode random data")
-        void testRoundTripRandom() throws DecoderException {
+        void roundTripRandom() throws DecoderException {
             final var hex = new Hex();
             final var random = new Random();
 
@@ -197,7 +197,7 @@ class HexTest {
 
         @Test
         @DisplayName("correctly handle case sensitivity")
-        void testRoundTripCaseSensitivity() throws DecoderException {
+        void roundTripCaseSensitivity() throws DecoderException {
             final var hex = new Hex();
             final var data = "Hello World".getBytes(StandardCharsets.UTF_8);
 

@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -121,7 +122,7 @@ public class FileSystemLoader implements FileReaderWriter {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             try {
-                newPathName = new java.io.File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
+                newPathName = new File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
                 LOGGER.error("Retrieving the current dir failed: ", e);

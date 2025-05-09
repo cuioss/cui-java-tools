@@ -182,7 +182,7 @@ public class LogRecordModel implements LogRecord {
     @Override
     public String resolveIdentifierString() {
         if (null == parsedIdentifier) {
-            parsedIdentifier = String.format(PREFIX_IDENTIFIER_TEMPLATE, getPrefix(), getIdentifier());
+            parsedIdentifier = PREFIX_IDENTIFIER_TEMPLATE.formatted(getPrefix(), getIdentifier());
         }
         return parsedIdentifier;
     }

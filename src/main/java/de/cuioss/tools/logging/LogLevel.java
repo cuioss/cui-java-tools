@@ -137,7 +137,7 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final var replacedTemplate = de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
+            final var replacedTemplate = CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
                     .replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), null);
         }
@@ -155,7 +155,7 @@ public enum LogLevel {
     // False positive, logger state explicitly checked
     void log(final Logger logger, final Throwable throwable, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
-            final var replacedTemplate = de.cuioss.tools.logging.CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
+            final var replacedTemplate = CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
                     .replaceAll("%s");
             doLog(logger, lenientFormat(replacedTemplate, parameter), throwable);
         }

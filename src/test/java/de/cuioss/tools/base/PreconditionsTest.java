@@ -211,7 +211,7 @@ class PreconditionsTest {
             var template = "Outer{%s}";
             var inner = "Inner{%s}";
             var value = "value";
-            var formatted = String.format(inner, value);
+            var formatted = inner.formatted(value);
             var ex = assertThrows(IllegalArgumentException.class,
                     () -> checkArgument(false, template, formatted));
 

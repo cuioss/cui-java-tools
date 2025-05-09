@@ -455,7 +455,7 @@ public final class MorePaths {
         backupFile(filePath);
 
         // Replace original with temp file
-        java.nio.file.Files.copy(temp, filePath, StandardCopyOption.REPLACE_EXISTING,
+        Files.copy(temp, filePath, StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES);
     }
 

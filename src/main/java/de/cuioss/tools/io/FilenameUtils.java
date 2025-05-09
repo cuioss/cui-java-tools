@@ -1372,7 +1372,7 @@ public class FilenameUtils {
             // loop whilst tokens and text left to process
             while (wcsIdx < wcs.length) {
 
-                if (wcs[wcsIdx].equals("?")) {
+                if ("?".equals(wcs[wcsIdx])) {
                     // ? so move to next text char
                     textIdx++;
                     if (textIdx > filename.length()) {
@@ -1380,7 +1380,7 @@ public class FilenameUtils {
                     }
                     anyChars = false;
 
-                } else if (wcs[wcsIdx].equals("*")) {
+                } else if ("*".equals(wcs[wcsIdx])) {
                     // set any chars status
                     anyChars = true;
                     if (wcsIdx == wcs.length - 1) {

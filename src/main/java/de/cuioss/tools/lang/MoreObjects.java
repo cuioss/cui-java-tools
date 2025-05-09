@@ -55,8 +55,7 @@ public class MoreObjects {
         if (expectedType.isInstance(underCheck)) {
             return (T) underCheck;
         }
-        throw new IllegalArgumentException(String.format(
-                "Object to be checked '%s' is not assignable to '%s'",
+        throw new IllegalArgumentException("Object to be checked '%s' is not assignable to '%s'".formatted(
                 underCheck.getClass().getName(),
                 expectedType.getName()));
     }

@@ -151,9 +151,9 @@ public class LocaleUtils {
         Preconditions.checkArgument(str.length() == 3 || str.length() == 5 || str.length() >= 7,
                 "Must be 3, 5 or 7+ in length");
         validateLanguageCode(parts[0]);
-        
+
         var builder = new Locale.Builder().setLanguage(parts[0]);
-        
+
         if (parts[1].isEmpty() && !parts[2].isEmpty()) {
             validateVariant(parts[2]);
             return builder.setVariant(parts[2]).build();

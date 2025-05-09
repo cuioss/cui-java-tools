@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -74,7 +75,7 @@ class CuiLoggerTest {
     class LogLevelTests {
         @Test
         void shouldHandleLogGuard() {
-            var reference = java.util.logging.Logger.getLogger(CuiLogger.class.getName());
+            var reference = Logger.getLogger(CuiLogger.class.getName());
 
             assertEquals(underTest.isTraceEnabled(), reference.isLoggable(Level.FINER));
             assertEquals(underTest.isDebugEnabled(), reference.isLoggable(Level.FINE));
