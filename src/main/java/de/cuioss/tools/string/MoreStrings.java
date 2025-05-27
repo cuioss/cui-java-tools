@@ -440,7 +440,11 @@ public final class MoreStrings {
      * @param cs the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is null, empty or whitespace only
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
+     * @deprecated For {@link String} instances, use {@link String#isBlank()} directly.
+     * For other {@link CharSequence} implementations, this method can still be used if
+     * a conversion to String (e.g., via {@code cs.toString().isBlank()}) is not preferred.
      */
+    @Deprecated
     public static boolean isBlank(final CharSequence cs) {
         final int strLen;
         if (cs == null || (strLen = cs.length()) == 0) {
@@ -467,18 +471,18 @@ public final class MoreStrings {
      * </p>
      *
      * <pre>
-     * MoreStrings.isBlank(null)      = false
-     * MoreStrings.isBlank("")        = false
-     * MoreStrings.isBlank(" ")       = false
-     * MoreStrings.isBlank("bob")     = true
-     * MoreStrings.isBlank("  bob  ") = true
+     * MoreStrings.isNotBlank(null)      = false // equivalent to !(null == null || null.toString().isBlank())
+     * MoreStrings.isNotBlank("")        = false // equivalent to !("".isEmpty() || "".isBlank())
+     * MoreStrings.isNotBlank(" ")       = false // equivalent to !(" ".isEmpty() || " ".isBlank())
+     * MoreStrings.isNotBlank("bob")     = true  // equivalent to !("bob".isEmpty() || "bob".isBlank())
+     * MoreStrings.isNotBlank("  bob  ") = true  // equivalent to !("  bob  ".isEmpty() || "  bob  ".isBlank())
      * </pre>
      *
      * @param cs to be checked
      * @return {@code true} if the given string is no blank, {@code false} otherwise
      */
     public static boolean isNotBlank(final CharSequence cs) {
-        return !isBlank(cs);
+        return !MoreStrings.isBlank(cs);
     }
 
     /**
@@ -592,7 +596,7 @@ public final class MoreStrings {
         if (pads > PAD_LIMIT) {
             return leftPad(str, size, String.valueOf(padChar));
         }
-        return repeat(padChar, pads).concat(str);
+        return String.valueOf(padChar).repeat(pads).concat(str);
     }
 
     /**
@@ -683,7 +687,10 @@ public final class MoreStrings {
      * @param repeat number of times to repeat char, negative treated as zero
      * @return String with repeated character
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
+     * @deprecated Use {@link String#valueOf(char) String.valueOf(char).repeat(int)} instead.
+     * This method will be removed in a future version.
      */
+    @Deprecated
     public static String repeat(final char ch, final int repeat) {
         if (repeat <= 0) {
             return EMPTY;
@@ -730,7 +737,12 @@ public final class MoreStrings {
      * @param stripChars the set of characters to remove, null treated as whitespace
      * @return the stripped String, {@code null} if null String input
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
+     * @deprecated If {@code stripChars} is {@code null} (meaning strip whitespace), use {@link String#stripTrailing()} instead.
+     * If {@code stripChars} is not {@code null}, this method provides functionality not available in standard Java String methods
+     * (which only strip whitespace) and can continue to be used. This method may be removed in a future version if an alternative
+     * for specific character stripping becomes standard.
      */
+    @Deprecated
     public static String stripEnd(final String str, final String stripChars) {
         int end;
         if (str == null || (end = str.length()) == 0) {
@@ -963,7 +975,7 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck) {
-        checkArgument(!isBlank(underCheck), "Attribute must not be blank");
+        checkArgument(!MoreStrings.isBlank(underCheck), "Attribute must not be blank");
         return underCheck;
     }
 
@@ -976,7 +988,7 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck, final String attributeName) {
-        checkArgument(!isBlank(underCheck), "Attribute with name '" + attributeName + "' must not be blank");
+        checkArgument(!MoreStrings.isBlank(underCheck), "Attribute with name '" + attributeName + "' must not be blank");
         return underCheck;
     }
 

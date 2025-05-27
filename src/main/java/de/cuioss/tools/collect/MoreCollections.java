@@ -73,9 +73,7 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterable<?> elements) {
-        return Optional.ofNullable(elements)
-                .map(it -> !it.iterator().hasNext())
-                .orElse(true);
+        return elements == null || !elements.iterator().hasNext();
     }
 
     /**
@@ -112,9 +110,7 @@ public final class MoreCollections {
      * @return {@code true} is the given elements are {@code null} or {@code empty}
      */
     public static boolean isEmpty(Iterator<?> elements) {
-        return Optional.ofNullable(elements)
-                .map(it -> !it.hasNext())
-                .orElse(true);
+        return elements == null || !elements.hasNext();
     }
 
     /**

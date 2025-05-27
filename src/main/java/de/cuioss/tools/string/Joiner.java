@@ -159,8 +159,9 @@ public final class Joiner {
 
     /**
      * @return a joiner with the same behavior as this one, except automatically
-     *         skipping String-values that evaluate to a blank String as defined
-     *         within {@link MoreStrings#isBlank(CharSequence)}
+     *         skipping String-values that evaluate to a blank String.
+     *         For {@link String}s, this is equivalent to {@link String#isBlank()}.
+     *         For other {@link CharSequence}s, it's equivalent to {@code cs == null || cs.toString().isBlank()}.
      */
     public Joiner skipBlankStrings() {
         return new Joiner(joinerConfig.copy().skipBlank(true).build());
@@ -221,7 +222,7 @@ public final class Joiner {
         }
 
         if (joinerConfig.isSkipBlank()) {
-            builder = builder.stream().filter(element -> !isBlank(element))
+            builder = builder.stream().filter(element -> !MoreStrings.isBlank(element))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         return String.join(joinerConfig.getSeparator(), builder);
