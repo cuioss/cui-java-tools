@@ -2,9 +2,9 @@ name: Master Build
 
 on:
   push:
-    branches: [ "master", "feature/*" ]
+    branches: [ "main", "feature/*" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -75,7 +75,7 @@ jobs:
 
   deploy-snapshot:
     needs: sonar-build
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
