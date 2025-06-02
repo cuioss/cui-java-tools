@@ -45,8 +45,6 @@ import java.time.Duration;
  *       an {@link IllegalStateException} during build.</li>
  *   <li>For HTTPS connections, a valid {@link SSLContext} is required. If not explicitly
  *       provided, one will be automatically created during build.</li>
- *   <li>If an HTTPS connection is attempted without a valid SSL context, an
- *       {@link IllegalStateException} will be thrown.</li>
  * </ul>
  *
  * Use the builder to create instances of this class:
@@ -182,23 +180,15 @@ public final class HttpHandler {
      * This method can be used to get a pre-configured HttpClient for making HTTP requests.
      *
      * @return A configured {@link HttpClient} with the SSL context and timeout
-     * @throws IllegalStateException if the URI uses HTTPS but no SSL context is available
      */
     public HttpClient createHttpClient() {
         HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(requestTimeoutSeconds));
 
-        // For HTTPS URIs, SSL context must be set and not null
+        // For HTTPS URIs, SSL context must be set
         if ("https".equalsIgnoreCase(uri.getScheme())) {
-            if (sslContext == null) {
-                throw new IllegalStateException("SSL context is required for HTTPS URI: " + uri);
-            }
-            httpClientBuilder.sslContext(sslContext);
-        } else if (sslContext != null) {
-            // For non-HTTPS URIs, still use the SSL context if provided
             httpClientBuilder.sslContext(sslContext);
         }
-
         return httpClientBuilder.build();
     }
 

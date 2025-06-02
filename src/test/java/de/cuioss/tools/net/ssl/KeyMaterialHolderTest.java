@@ -30,7 +30,7 @@ class KeyMaterialHolderTest {
     @Test
     void shouldBuildWithKeyMaterialOnly() {
         var builder = KeyMaterialHolder.builder();
-        assertThrows(NullPointerException.class, builder::build, "KeyMaterial must not be null");
+        assertThrows(NullPointerException.class, builder::build, "expected at least keyMaterial");
     }
 
     @Test
