@@ -37,7 +37,6 @@ import java.time.Duration;
 /**
  * A common wrapper around {@link HttpClient} that provides a builder for collecting
  * HTTP request attributes and methods for executing HTTP requests.
- * This class is designed to be easily extractable to a separate module in the future.
  * It provides a consistent way to configure and execute HTTP requests with proper
  * SSL context handling and timeout configuration.
  * <strong>Contract:</strong>
