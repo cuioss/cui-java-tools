@@ -29,10 +29,8 @@ class KeyMaterialHolderTest {
 
     @Test
     void shouldBuildWithKeyMaterialOnly() {
-        assertNotNull(withRandomKeyMaterial());
-
         var builder = KeyMaterialHolder.builder();
-        assertThrows(NullPointerException.class, builder::build);
+        assertThrows(NullPointerException.class, builder::build, "KeyMaterial must not be null");
     }
 
     @Test

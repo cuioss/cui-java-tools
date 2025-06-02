@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.string;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.regex.Pattern;
@@ -62,84 +62,118 @@ import java.util.regex.Pattern;
  * @see Splitter
  * @see Pattern
  */
-@Builder
+@RequiredArgsConstructor(staticName = "of")
+@Getter
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("squid:S1170")
-// Sonar doesn't recognize Lombok's @Builder.Default annotations
 class SplitterConfig {
-
-    /**
-     * The string or pattern used to split input strings.
-     * When {@link #doNotModifySeparatorString} is false (default), special regex characters
-     * will be automatically escaped.
-     * This is a required field and must be set in the builder.
-     */
-    @Getter
     private final String separator;
-
-    /**
-     * The compiled pattern used to split input strings.
-     */
-    @Getter
     private final Pattern pattern;
+    private final boolean omitEmptyStrings;
+    private final boolean trimResults;
+    private final int maxItems;
+    private final boolean doNotModifySeparatorString;
 
     /**
-     * Whether to exclude empty strings from the split results.
-     * An empty string is defined as a string of length zero.
-     * Default is false.
+     * Builder for {@link SplitterConfig}.
+     * Use the fluent API to configure and call {@link #build()} to create an immutable config.
      */
-    @Builder.Default
-    @Getter
-    private final boolean omitEmptyStrings = false;
+    static class Builder {
+        private String separator;
+        private boolean omitEmptyStrings = false;
+        private boolean trimResults = false;
+        private int maxItems = 0;
+        private boolean doNotModifySeparatorString = false;
+        private Pattern pattern;
 
-    /**
-     * Whether to trim whitespace from the beginning and end of each split result.
-     * Trimming is performed using {@link String#trim()}.
-     * Default is false.
-     */
-    @Builder.Default
-    @Getter
-    private final boolean trimResults = false;
+        /**
+         * Sets the separator string.
+         * @param separator the separator to use
+         * @return this builder
+         */
+        Builder separator(String separator) {
+            this.separator = separator;
+            return this;
+        }
 
-    /**
-     * Maximum number of splits to perform.
-     * After this limit is reached, the remainder of the input string becomes the last element.
-     * A value of 0 (default) means no limit.
-     */
-    @Builder.Default
-    @Getter
-    private final int maxItems = 0;
+        /**
+         * Whether to omit empty strings from the result.
+         * @param omitEmptyStrings true to omit empty strings
+         * @return this builder
+         */
+        Builder omitEmptyStrings(boolean omitEmptyStrings) {
+            this.omitEmptyStrings = omitEmptyStrings;
+            return this;
+        }
 
-    /**
-     * Whether to use the separator string as-is without escaping special regex characters.
-     * When true, the separator is used directly as a regex pattern.
-     * When false (default), special regex characters are escaped.
-     */
-    @Builder.Default
-    @Getter
-    private final boolean doNotModifySeparatorString = false;
+        /**
+         * Whether to trim results.
+         * @param trimResults true to trim results
+         * @return this builder
+         */
+        Builder trimResults(boolean trimResults) {
+            this.trimResults = trimResults;
+            return this;
+        }
 
-    /**
-     * Empty class required for proper JavaDoc generation with Lombok's @Builder.
-     * See <a href="https://stackoverflow.com/questions/51947791">StackOverflow discussion</a>.
-     */
-    @SuppressWarnings("java:S2094") // Empty class required for JavaDoc
-    public static class SplitterConfigBuilder {
+        /**
+         * Sets the maximum number of items to split.
+         * @param maxItems the split limit
+         * @return this builder
+         */
+        Builder maxItems(int maxItems) {
+            this.maxItems = maxItems;
+            return this;
+        }
+
+        /**
+         * Whether to use the separator string as-is.
+         * @param doNotModifySeparatorString true to use as-is
+         * @return this builder
+         */
+        Builder doNotModifySeparatorString(boolean doNotModifySeparatorString) {
+            this.doNotModifySeparatorString = doNotModifySeparatorString;
+            return this;
+        }
+
+        /**
+         * Sets the pattern to use for splitting.
+         * @param pattern the regex pattern
+         * @return this builder
+         */
+        Builder pattern(Pattern pattern) {
+            this.pattern = pattern;
+            return this;
+        }
+
+        /**
+         * Builds the immutable {@link SplitterConfig} instance.
+         * @return a new config
+         */
+        SplitterConfig build() {
+            return SplitterConfig.of(separator, pattern, omitEmptyStrings, trimResults, maxItems, doNotModifySeparatorString);
+        }
     }
 
     /**
-     * Creates a new builder instance with all current configuration values.
-     * Useful for creating modified copies of an existing configuration.
-     *
-     * @return a new builder initialized with this configuration's values
+     * Creates a new builder for {@link SplitterConfig}.
+     * @return a new builder
      */
-    SplitterConfigBuilder copy() {
+    static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a builder pre-populated with this config's values.
+     * @return a builder with copied values
+     */
+    Builder copy() {
         return builder()
                 .separator(getSeparator())
+                .omitEmptyStrings(isOmitEmptyStrings())
+                .trimResults(isTrimResults())
                 .maxItems(getMaxItems())
                 .doNotModifySeparatorString(isDoNotModifySeparatorString())
-                .omitEmptyStrings(isOmitEmptyStrings())
-                .trimResults(isTrimResults());
+                .pattern(getPattern());
     }
 }
