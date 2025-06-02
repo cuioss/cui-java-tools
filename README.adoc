@@ -698,3 +698,32 @@ assertEquals("null [5, 6]", MoreStrings.lenientFormat(null, 5, 6));
 assertEquals("null", MoreStrings.lenientFormat("%s", (Object) null));
 assertEquals("(Object[])null", MoreStrings.lenientFormat("%s", (Object[]) null));
 ----
+
+[[iocuiutilnet]]
+=== de.cuioss.tools.net
+
+Provides utilities for network operations, including URL handling, internet address support, SSL, and HTTP helpers.
+
+==== de.cuioss.tools.net.http
+
+HTTP-related utilities, such as:
+
+* HttpHandler – HTTP request/response handling
+* HttpStatusFamily – HTTP status family detection
+* SecureSSLContextProvider – Secure SSL context for HTTP
+
+==== de.cuioss.tools.net.ssl
+
+SSL-related helpers, including:
+
+* KeyStoreProvider – KeyStore management
+* KeyMaterialHolder – Key material handling
+* KeyAlgorithm – Supported algorithms
+* KeyStoreType – KeyStore types
+
+==== de.cuioss.tools.net (core)
+
+* UrlHelper – URL manipulation utilities
+* UrlParameter – URL parameter handling
+* ParameterFilter – Parameter filtering
+* IDNInternetAddress – IDN support and internationalized domain handling

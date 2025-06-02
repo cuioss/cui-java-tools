@@ -15,9 +15,9 @@
  */
 package de.cuioss.tools.string;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -53,76 +53,105 @@ import lombok.ToString;
  * @author Oliver Wolff
  * @see Joiner
  */
-@Builder
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("squid:S1170")
-// Sonar doesn't recognize Lombok's @Builder.Default annotations
+@RequiredArgsConstructor
+@Getter
 class JoinerConfig {
-
-    /**
-     * The string used to join elements together.
-     * This is a required field and must be set in the builder.
-     */
-    @Getter
     private final String separator;
+    private final boolean skipNulls;
+    private final boolean skipEmpty;
+    private final boolean skipBlank;
+    private final String useForNull;
 
     /**
-     * Whether to skip null values during joining.
-     * If true, null values are omitted from the output.
-     * If false, null values are replaced with {@link #useForNull}.
-     * Default is false.
+     * Builder for {@link JoinerConfig}.
+     * Use the fluent API to configure and call {@link #build()} to create an immutable config.
      */
-    @Builder.Default
-    @Getter
-    private final boolean skipNulls = false;
+    static class Builder {
+        private String separator;
+        private boolean skipNulls = false;
+        private boolean skipEmpty = false;
+        private boolean skipBlank = false;
+        private String useForNull = "null";
 
-    /**
-     * Whether to skip empty strings (length = 0) during joining.
-     * Takes precedence over {@link #useForNull} if the value is null.
-     * Default is false.
-     */
-    @Builder.Default
-    @Getter
-    private final boolean skipEmpty = false;
+        /**
+         * Sets the separator string.
+         * @param separator the separator to use
+         * @return this builder
+         */
+        Builder separator(String separator) {
+            this.separator = separator;
+            return this;
+        }
 
-    /**
-     * Whether to skip blank strings (empty or whitespace-only) during joining.
-     * Takes precedence over both {@link #skipEmpty} and {@link #useForNull}.
-     * Default is false.
-     */
-    @Builder.Default
-    @Getter
-    private final boolean skipBlank = false;
+        /**
+         * Whether to skip null values.
+         * @param skipNulls true to skip nulls
+         * @return this builder
+         */
+        Builder skipNulls(boolean skipNulls) {
+            this.skipNulls = skipNulls;
+            return this;
+        }
 
-    /**
-     * The string to use in place of null values when {@link #skipNulls} is false.
-     * Default is "null".
-     */
-    @Builder.Default
-    @Getter
-    private final String useForNull = "null";
+        /**
+         * Whether to skip empty strings.
+         * @param skipEmpty true to skip empty strings
+         * @return this builder
+         */
+        Builder skipEmpty(boolean skipEmpty) {
+            this.skipEmpty = skipEmpty;
+            return this;
+        }
 
-    /**
-     * Empty class required for proper JavaDoc generation with Lombok's @Builder.
-     * See <a href="https://stackoverflow.com/questions/51947791">StackOverflow discussion</a>.
-     */
-    @SuppressWarnings("java:S2094") // Empty class required for JavaDoc
-    public static class JoinerConfigBuilder {
+        /**
+         * Whether to skip blank strings (whitespace only).
+         * @param skipBlank true to skip blank strings
+         * @return this builder
+         */
+        Builder skipBlank(boolean skipBlank) {
+            this.skipBlank = skipBlank;
+            return this;
+        }
+
+        /**
+         * Sets the string to use for null values.
+         * @param useForNull replacement for nulls
+         * @return this builder
+         */
+        Builder useForNull(String useForNull) {
+            this.useForNull = useForNull;
+            return this;
+        }
+
+        /**
+         * Builds the immutable {@link JoinerConfig} instance.
+         * @return a new config
+         */
+        JoinerConfig build() {
+            return new JoinerConfig(separator, skipNulls, skipEmpty, skipBlank, useForNull);
+        }
     }
 
     /**
-     * Creates a new builder instance with all current configuration values.
-     * Useful for creating modified copies of an existing configuration.
-     *
-     * @return a new builder initialized with this configuration's values
+     * Creates a new builder for {@link JoinerConfig}.
+     * @return a new builder
      */
-    JoinerConfigBuilder copy() {
+    static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a builder pre-populated with this config's values.
+     * @return a builder with copied values
+     */
+    Builder copy() {
         return builder()
                 .separator(getSeparator())
-                .useForNull(getUseForNull())
+                .skipNulls(isSkipNulls())
                 .skipEmpty(isSkipEmpty())
                 .skipBlank(isSkipBlank())
-                .skipNulls(isSkipNulls());
+                .useForNull(getUseForNull());
     }
 }
