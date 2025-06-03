@@ -4,7 +4,7 @@
 
 image:https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml]
 image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
-image:https://maven-badges.herokuapp.com/maven-central/de.cuioss/cui-java-tools/badge.svg[Maven Central,link=https://maven-badges.herokuapp.com/maven-central/de.cuioss/cui-java-tools]
+image:https://img.shields.io/maven-central/v/de.cuioss/cui-java-tools.svg?label=Maven%20Central["Maven Central", link="https://search.maven.org/artifact/de.cuioss/cui-java-tools"]
 
 https://sonarcloud.io/summary/new_code?id=cuioss_cui-java-tools[image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cui-java-tools&metric=alert_status[Quality Gate Status]]
 image:https://sonarcloud.io/api/project_badges/measure?project=cuioss_cui-java-tools&metric=ncloc[Lines of Code,link=https://sonarcloud.io/summary/new_code?id=cuioss_cui-java-tools]
