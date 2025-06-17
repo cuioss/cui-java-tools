@@ -37,7 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class HttpHandlerTest {
 
     private static final String VALID_URL = "https://example.com";
-    private static final int CUSTOM_TIMEOUT = 20;
+    private static final int CUSTOM_CONNECTION_TIMEOUT = 15;
+    private static final int CUSTOM_READ_TIMEOUT = 20;
 
     @Nested
     @DisplayName("Builder Tests")
@@ -53,7 +54,8 @@ class HttpHandlerTest {
             assertNotNull(handler);
             assertEquals(VALID_URL, handler.getUrl().toString());
             assertEquals(URI.create(VALID_URL), handler.getUri());
-            assertEquals(HttpHandler.DEFAULT_REQUEST_TIMEOUT_SECONDS, handler.getRequestTimeoutSeconds());
+            assertEquals(HttpHandler.DEFAULT_CONNECTION_TIMEOUT_SECONDS, handler.getConnectionTimeoutSeconds());
+            assertEquals(HttpHandler.DEFAULT_READ_TIMEOUT_SECONDS, handler.getReadTimeoutSeconds());
         }
 
         @Test
@@ -79,7 +81,8 @@ class HttpHandlerTest {
             assertNotNull(handler);
             assertEquals(VALID_URL, handler.getUrl().toString());
             assertEquals(URI.create(VALID_URL), handler.getUri());
-            assertEquals(HttpHandler.DEFAULT_REQUEST_TIMEOUT_SECONDS, handler.getRequestTimeoutSeconds());
+            assertEquals(HttpHandler.DEFAULT_CONNECTION_TIMEOUT_SECONDS, handler.getConnectionTimeoutSeconds());
+            assertEquals(HttpHandler.DEFAULT_READ_TIMEOUT_SECONDS, handler.getReadTimeoutSeconds());
         }
 
         @Test
@@ -96,15 +99,17 @@ class HttpHandlerTest {
         }
 
         @Test
-        @DisplayName("Should build with custom timeout")
-        void shouldBuildWithCustomTimeout() {
+        @DisplayName("Should build with custom timeouts")
+        void shouldBuildWithCustomTimeouts() {
             HttpHandler handler = HttpHandler.builder()
                     .url(VALID_URL)
-                    .requestTimeoutSeconds(CUSTOM_TIMEOUT)
+                    .connectionTimeoutSeconds(CUSTOM_CONNECTION_TIMEOUT)
+                    .readTimeoutSeconds(CUSTOM_READ_TIMEOUT)
                     .build();
 
             assertNotNull(handler);
-            assertEquals(CUSTOM_TIMEOUT, handler.getRequestTimeoutSeconds());
+            assertEquals(CUSTOM_CONNECTION_TIMEOUT, handler.getConnectionTimeoutSeconds());
+            assertEquals(CUSTOM_READ_TIMEOUT, handler.getReadTimeoutSeconds());
         }
 
         @Test
@@ -178,21 +183,39 @@ class HttpHandlerTest {
         }
 
         @Test
-        @DisplayName("Should throw exception for negative timeout")
-        void shouldThrowExceptionForNegativeTimeout() {
-            var builder = HttpHandler.builder().url(VALID_URL).requestTimeoutSeconds(-1);
+        @DisplayName("Should throw exception for negative connection timeout")
+        void shouldThrowExceptionForNegativeConnectionTimeout() {
+            var builder = HttpHandler.builder().url(VALID_URL).connectionTimeoutSeconds(-1);
             var exception = assertThrows(IllegalArgumentException.class, builder::build);
 
-            assertEquals("Request timeout must be positive", exception.getMessage());
+            assertEquals("Connection timeout must be positive", exception.getMessage());
         }
 
         @Test
-        @DisplayName("Should throw exception for zero timeout")
-        void shouldThrowExceptionForZeroTimeout() {
-            var builder = HttpHandler.builder().url(VALID_URL).requestTimeoutSeconds(0);
+        @DisplayName("Should throw exception for zero connection timeout")
+        void shouldThrowExceptionForZeroConnectionTimeout() {
+            var builder = HttpHandler.builder().url(VALID_URL).connectionTimeoutSeconds(0);
             var exception = assertThrows(IllegalArgumentException.class, builder::build);
 
-            assertEquals("Request timeout must be positive", exception.getMessage());
+            assertEquals("Connection timeout must be positive", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should throw exception for negative read timeout")
+        void shouldThrowExceptionForNegativeReadTimeout() {
+            var builder = HttpHandler.builder().url(VALID_URL).readTimeoutSeconds(-1);
+            var exception = assertThrows(IllegalArgumentException.class, builder::build);
+
+            assertEquals("Read timeout must be positive", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should throw exception for zero read timeout")
+        void shouldThrowExceptionForZeroReadTimeout() {
+            var builder = HttpHandler.builder().url(VALID_URL).readTimeoutSeconds(0);
+            var exception = assertThrows(IllegalArgumentException.class, builder::build);
+
+            assertEquals("Read timeout must be positive", exception.getMessage());
         }
 
         @Test
@@ -259,7 +282,7 @@ class HttpHandlerTest {
         void shouldCreateRequestBuilderWithCorrectTimeout() {
             HttpHandler handler = HttpHandler.builder()
                     .url(VALID_URL)
-                    .requestTimeoutSeconds(CUSTOM_TIMEOUT)
+                    .readTimeoutSeconds(CUSTOM_READ_TIMEOUT)
                     .build();
 
             HttpRequest.Builder builder = handler.requestBuilder();
@@ -269,7 +292,7 @@ class HttpHandlerTest {
             // Build a request to check the timeout
             HttpRequest request = builder.GET().build();
             assertTrue(request.timeout().isPresent());
-            assertEquals(Duration.ofSeconds(CUSTOM_TIMEOUT), request.timeout().get());
+            assertEquals(Duration.ofSeconds(CUSTOM_READ_TIMEOUT), request.timeout().get());
         }
     }
 
@@ -365,18 +388,21 @@ class HttpHandlerTest {
         }
 
         @Test
-        @DisplayName("asBuilder should preserve timeout")
-        void asBuilderShouldPreserveTimeout() {
+        @DisplayName("asBuilder should preserve timeouts")
+        void asBuilderShouldPreserveTimeouts() {
             HttpHandler handler = HttpHandler.builder()
                     .url(VALID_URL)
-                    .requestTimeoutSeconds(CUSTOM_TIMEOUT)
+                    .connectionTimeoutSeconds(CUSTOM_CONNECTION_TIMEOUT)
+                    .readTimeoutSeconds(CUSTOM_READ_TIMEOUT)
                     .build();
 
             HttpHandler newHandler = handler.asBuilder()
                     .url(VALID_URL) // Need to set URL again as asBuilder doesn't copy it
                     .build();
-            assertEquals(CUSTOM_TIMEOUT, newHandler.getRequestTimeoutSeconds(),
-                    "The new handler should have the same timeout as the original");
+            assertEquals(CUSTOM_CONNECTION_TIMEOUT, newHandler.getConnectionTimeoutSeconds(),
+                    "The new handler should have the same connection timeout as the original");
+            assertEquals(CUSTOM_READ_TIMEOUT, newHandler.getReadTimeoutSeconds(),
+                    "The new handler should have the same read timeout as the original");
         }
 
         @Test
@@ -400,7 +426,8 @@ class HttpHandlerTest {
         void asBuilderShouldAllowChangingUrl() {
             HttpHandler handler = HttpHandler.builder()
                     .url(VALID_URL)
-                    .requestTimeoutSeconds(CUSTOM_TIMEOUT)
+                    .connectionTimeoutSeconds(CUSTOM_CONNECTION_TIMEOUT)
+                    .readTimeoutSeconds(CUSTOM_READ_TIMEOUT)
                     .build();
 
             String newUrl = "https://example.org";
@@ -410,8 +437,10 @@ class HttpHandlerTest {
 
             assertEquals(URI.create(newUrl), newHandler.getUri(),
                     "The new handler should have the updated URI");
-            assertEquals(CUSTOM_TIMEOUT, newHandler.getRequestTimeoutSeconds(),
-                    "The new handler should preserve the original timeout");
+            assertEquals(CUSTOM_CONNECTION_TIMEOUT, newHandler.getConnectionTimeoutSeconds(),
+                    "The new handler should preserve the original connection timeout");
+            assertEquals(CUSTOM_READ_TIMEOUT, newHandler.getReadTimeoutSeconds(),
+                    "The new handler should preserve the original read timeout");
         }
     }
 }
