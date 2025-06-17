@@ -71,7 +71,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./mvnw -B verify -Psonar -Dsonar.projectKey=${{steps.metadata.outputs.sonar-project-key}} sonar:sonar
+        run: ./mvnw -B --no-transfer-progress verify -Psonar -Dsonar.projectKey=${{steps.metadata.outputs.sonar-project-key}} sonar:sonar
 
   deploy-snapshot:
     needs: sonar-build
@@ -103,7 +103,7 @@ jobs:
       - name: Deploy Snapshot with Maven, version ${{ steps.project.outputs.version }}
         if: ${{endsWith(steps.project.outputs.version, '-SNAPSHOT')}}
         run: |
-          ./mvnw -B -Prelease-snapshot,javadoc deploy -Dmaven.test.skip=true
+          ./mvnw -B --no-transfer-progress -Prelease-snapshot,javadoc deploy -Dmaven.test.skip=true
         env:
           MAVEN_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
