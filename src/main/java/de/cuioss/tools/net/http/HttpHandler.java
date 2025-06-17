@@ -1,12 +1,12 @@
-/*
- * Copyright 2023 the original author or authors.
- * <p>
+/**
+ * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * https://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,8 @@ import java.time.Duration;
  * <pre>
  * HttpHandler handler = HttpHandler.builder()
  *     .uri("https://example.com/api")
- *     .requestTimeoutSeconds(10)
+ *     .connectionTimeoutSeconds(5)
+ *     .readTimeoutSeconds(10)
  *     .build();
  * </pre>
  */
@@ -62,7 +63,8 @@ import java.time.Duration;
 public final class HttpHandler {
 
     private static final CuiLogger LOGGER = new CuiLogger(HttpHandler.class);
-    public static final int DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
+    public static final int DEFAULT_CONNECTION_TIMEOUT_SECONDS = 10;
+    public static final int DEFAULT_READ_TIMEOUT_SECONDS = 10;
 
     /**
      * The URI to be used for HTTP requests.
@@ -83,10 +85,16 @@ public final class HttpHandler {
     private final SSLContext sslContext;
 
     /**
-     * The timeout in seconds for HTTP requests.
+     * The connection timeout in seconds for HTTP requests.
      */
     @Getter
-    private final int requestTimeoutSeconds;
+    private final int connectionTimeoutSeconds;
+
+    /**
+     * The read timeout in seconds for HTTP requests.
+     */
+    @Getter
+    private final int readTimeoutSeconds;
 
 
     /**
@@ -100,28 +108,29 @@ public final class HttpHandler {
 
     /**
      * Creates a pre-configured {@link HttpRequest.Builder} for the URI contained in this handler.
-     * The builder is configured with the timeout from this handler.
+     * The builder is configured with the read timeout from this handler.
      *
      * @return A pre-configured {@link HttpRequest.Builder}
      */
     public HttpRequest.Builder requestBuilder() {
         return HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofSeconds(requestTimeoutSeconds));
+                .timeout(Duration.ofSeconds(readTimeoutSeconds));
     }
 
     /**
      * Creates a pre-configured {@link HttpHandlerBuilder} with the same configuration as this handler.
-     * The builder is configured with the timeout and sslContext from this handler.
+     * The builder is configured with the connection timeout, read timeout and sslContext from this handler.
      * 
      * <p>This method allows creating a new builder based on the current handler's configuration,
      * which can be used to create a new handler with modified URL.</p>
      *
-     * @return A pre-configured {@link HttpHandlerBuilder} with the same timeout as this handler
+     * @return A pre-configured {@link HttpHandlerBuilder} with the same timeouts as this handler
      */
     public HttpHandlerBuilder asBuilder() {
         return builder()
-                .requestTimeoutSeconds(requestTimeoutSeconds)
+                .connectionTimeoutSeconds(connectionTimeoutSeconds)
+                .readTimeoutSeconds(readTimeoutSeconds)
                 .sslContext(sslContext);
     }
 
@@ -176,14 +185,14 @@ public final class HttpHandler {
     }
 
     /**
-     * Creates an {@link HttpClient} with the configured SSL context and timeout.
+     * Creates an {@link HttpClient} with the configured SSL context and connection timeout.
      * This method can be used to get a pre-configured HttpClient for making HTTP requests.
      *
-     * @return A configured {@link HttpClient} with the SSL context and timeout
+     * @return A configured {@link HttpClient} with the SSL context and connection timeout
      */
     public HttpClient createHttpClient() {
         HttpClient.Builder httpClientBuilder = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(requestTimeoutSeconds));
+                .connectTimeout(Duration.ofSeconds(connectionTimeoutSeconds));
 
         // For HTTPS URIs, SSL context must be set
         if ("https".equalsIgnoreCase(uri.getScheme())) {
@@ -201,7 +210,8 @@ public final class HttpHandler {
         private String urlString;
         private SSLContext sslContext;
         private SecureSSLContextProvider secureSSLContextProvider;
-        private Integer requestTimeoutSeconds;
+        private Integer connectionTimeoutSeconds;
+        private Integer readTimeoutSeconds;
 
         /**
          * Sets the URI as a string.
@@ -297,17 +307,32 @@ public final class HttpHandler {
         }
 
         /**
-         * Sets the timeout in seconds for HTTP requests.
+         * Sets the connection timeout in seconds for HTTP requests.
          * <p>
          * If not set, a default timeout of 10 seconds will be used.
          * </p>
          *
-         * @param requestTimeoutSeconds The request timeout in seconds.
-         *                             Must be positive.
+         * @param connectionTimeoutSeconds The connection timeout in seconds.
+         *                                Must be positive.
          * @return This builder instance.
          */
-        public HttpHandlerBuilder requestTimeoutSeconds(int requestTimeoutSeconds) {
-            this.requestTimeoutSeconds = requestTimeoutSeconds;
+        public HttpHandlerBuilder connectionTimeoutSeconds(int connectionTimeoutSeconds) {
+            this.connectionTimeoutSeconds = connectionTimeoutSeconds;
+            return this;
+        }
+
+        /**
+         * Sets the read timeout in seconds for HTTP requests.
+         * <p>
+         * If not set, a default timeout of 10 seconds will be used.
+         * </p>
+         *
+         * @param readTimeoutSeconds The read timeout in seconds.
+         *                          Must be positive.
+         * @return This builder instance.
+         */
+        public HttpHandlerBuilder readTimeoutSeconds(int readTimeoutSeconds) {
+            this.readTimeoutSeconds = readTimeoutSeconds;
             return this;
         }
 
@@ -321,11 +346,18 @@ public final class HttpHandler {
             // Resolve the URI from the provided inputs
             resolveUri();
 
-            // Validate request timeout
-            int actualRequestTimeoutSeconds = requestTimeoutSeconds != null ?
-                    requestTimeoutSeconds : DEFAULT_REQUEST_TIMEOUT_SECONDS;
-            if (actualRequestTimeoutSeconds <= 0) {
-                throw new IllegalArgumentException("Request timeout must be positive");
+            // Validate connection timeout
+            int actualConnectionTimeoutSeconds = connectionTimeoutSeconds != null ?
+                    connectionTimeoutSeconds : DEFAULT_CONNECTION_TIMEOUT_SECONDS;
+            if (actualConnectionTimeoutSeconds <= 0) {
+                throw new IllegalArgumentException("Connection timeout must be positive");
+            }
+
+            // Validate read timeout
+            int actualReadTimeoutSeconds = readTimeoutSeconds != null ?
+                    readTimeoutSeconds : DEFAULT_READ_TIMEOUT_SECONDS;
+            if (actualReadTimeoutSeconds <= 0) {
+                throw new IllegalArgumentException("Read timeout must be positive");
             }
 
             // Convert the URI to a URL
@@ -344,7 +376,7 @@ public final class HttpHandler {
                 secureContext = actualSecureSSLContextProvider.getOrCreateSecureSSLContext(sslContext);
             }
 
-            return new HttpHandler(uri, verifiedUrl, secureContext, actualRequestTimeoutSeconds);
+            return new HttpHandler(uri, verifiedUrl, secureContext, actualConnectionTimeoutSeconds, actualReadTimeoutSeconds);
         }
 
         /**
