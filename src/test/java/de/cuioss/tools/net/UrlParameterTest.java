@@ -98,8 +98,9 @@ class UrlParameterTest {
         testMap.put("name1", mutableList("value"));
         testMap.put("name2", mutableList("value1", "value2"));
         var parameters = getUrlParameterFromMap(testMap, null, true);
-        assertEquals("name1", parameters.getFirst().getName());
-        assertEquals("value", parameters.getFirst().getValue());
+        final var firstParameter = parameters.getFirst();
+        assertEquals("name1", firstParameter.getName());
+        assertEquals("value", firstParameter.getValue());
         assertEquals("name2", parameters.get(1).getName());
         assertEquals("value1", parameters.get(1).getValue());
         testMap.clear();
