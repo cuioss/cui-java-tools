@@ -538,15 +538,18 @@ public class Hex {
      */
     public Object encode(final Object object) throws EncoderException {
         byte[] byteArray;
-        if (object instanceof String string) {
-            byteArray = string.getBytes(getCharset());
-        } else if (object instanceof ByteBuffer buffer) {
-            byteArray = toByteArray(buffer);
-        } else {
-            try {
-                byteArray = (byte[]) object;
-            } catch (final ClassCastException e) {
-                throw new EncoderException(e.getMessage(), e);
+        switch (object) {
+            case String string ->
+                byteArray = string.getBytes(getCharset());
+            case ByteBuffer buffer ->
+                byteArray = toByteArray(buffer);
+
+            default -> {
+                try {
+                    byteArray = (byte[]) object;
+                } catch (final ClassCastException e) {
+                    throw new EncoderException(e.getMessage(), e);
+                }
             }
         }
         return encodeHex(byteArray);

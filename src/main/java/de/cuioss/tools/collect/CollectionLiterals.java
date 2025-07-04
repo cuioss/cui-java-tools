@@ -84,7 +84,8 @@ import static de.cuioss.tools.collect.MoreCollections.isEmpty;
  *
  * @author Oliver Wolff
  */
-@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency within collection utilities
+@SuppressWarnings("javaarchitecture:S7027")
+// Intended circular dependency within collection utilities
 @UtilityClass
 public class CollectionLiterals {
 

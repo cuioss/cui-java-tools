@@ -85,7 +85,8 @@ import java.util.Deque;
  * </p>
  *
  */
-@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency with IOCase
+@SuppressWarnings("javaarchitecture:S7027")
+// Intended circular dependency with IOCase
 @UtilityClass
 public class FilenameUtils {
 
@@ -96,12 +97,6 @@ public class FilenameUtils {
      *
      */
     public static final char EXTENSION_SEPARATOR = '.';
-
-    /**
-     * The extension separator String.
-     *
-     */
-    public static final String EXTENSION_SEPARATOR_STR = Character.toString(EXTENSION_SEPARATOR);
 
     /**
      * The Unix separator character.
@@ -539,11 +534,30 @@ public class FilenameUtils {
             throw new IllegalArgumentException("Directory must not be null");
         }
 
-        if (canonicalChild == null || IOCase.SYSTEM.checkEquals(canonicalParent, canonicalChild)) {
+        if (canonicalChild == null) {
             return false;
         }
 
-        return IOCase.SYSTEM.checkStartsWith(canonicalChild, canonicalParent);
+        // Normalize paths to handle trailing separators consistently
+        final String normalizedParent = normalizeNoEndSeparator(canonicalParent);
+        final String normalizedChild = normalizeNoEndSeparator(canonicalChild);
+
+        // A directory does not contain itself
+        if (normalizedParent == null || normalizedChild == null ||
+                IOCase.SYSTEM.checkEquals(normalizedParent, normalizedChild)) {
+            return false;
+        }
+
+        // Check if child path starts with parent path followed by a separator
+        // Special case: if parent is root directory, don't add extra separator
+        if ("/".equals(normalizedParent) || "\\".equals(normalizedParent) ||
+                (normalizedParent.length() >= 2 && normalizedParent.charAt(1) == ':' &&
+                        (normalizedParent.endsWith("/") || normalizedParent.endsWith("\\")))) {
+            return IOCase.SYSTEM.checkStartsWith(normalizedChild, normalizedParent) &&
+                    !IOCase.SYSTEM.checkEquals(normalizedParent, normalizedChild);
+        }
+
+        return IOCase.SYSTEM.checkStartsWith(normalizedChild, normalizedParent + SYSTEM_SEPARATOR);
     }
 
     // -----------------------------------------------------------------------
@@ -1445,7 +1459,7 @@ public class FilenameUtils {
         char prevChar = 0;
         for (final char ch : array) {
             if (ch == '?' || ch == '*') {
-                if (buffer.length() != 0) {
+                if (!buffer.isEmpty()) {
                     list.add(buffer.toString());
                     buffer.setLength(0);
                 }
@@ -1459,11 +1473,11 @@ public class FilenameUtils {
             }
             prevChar = ch;
         }
-        if (buffer.length() != 0) {
+        if (!buffer.isEmpty()) {
             list.add(buffer.toString());
         }
 
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
 }

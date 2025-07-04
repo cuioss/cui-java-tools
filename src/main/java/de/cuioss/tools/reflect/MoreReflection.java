@@ -410,7 +410,7 @@ public final class MoreReflection {
         if (extracted.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(extracted.iterator().next());
+        return Optional.of(extracted.getFirst());
     }
 
     /**

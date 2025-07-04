@@ -61,12 +61,6 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
     private static final CuiLogger LOGGER = new CuiLogger(UrlParameter.class);
 
-    /** Shortcut constant for faces redirect parameter. */
-    public static final UrlParameter FACES_REDIRECT = new UrlParameter("faces-redirect", "true");
-
-    /** Shortcut constant parameter for includeViewParams. */
-    public static final UrlParameter INCLUDE_VIEW_PARAMETER = new UrlParameter("includeViewParams", "true");
-
     @Serial
     private static final long serialVersionUID = 634175928228707534L;
 
@@ -135,8 +129,8 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /**
      * Create a String-representation of the URL-Parameter
      *
-     * @param encode
-     * @param parameters
+     * @param encode indicating whether the string elements should be encoded or not
+     * @param parameters to be appended, must not be null
      * @return the created parameter String
      */
     public static String createParameterString(final boolean encode, final UrlParameter... parameters) {
@@ -169,7 +163,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      *         is null or empty. The List is always sorted by #getName()
      */
     @SuppressWarnings("squid:S1166") // now need to throw exception
-    public static final List<UrlParameter> getUrlParameterFromMap(final Map<String, List<String>> map,
+    public static List<UrlParameter> getUrlParameterFromMap(final Map<String, List<String>> map,
             final ParameterFilter parameterFilter, final boolean encode) {
         if (MoreCollections.isEmpty(map)) {
             return Collections.emptyList();
@@ -178,7 +172,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         for (final Entry<String, List<String>> entry : map.entrySet()) {
             String value = null;
             if (!MoreCollections.isEmpty(entry.getValue())) {
-                value = entry.getValue().get(0);
+                value = entry.getValue().getFirst();
             }
             final var key = entry.getKey();
             if (null == parameterFilter || !parameterFilter.isExcluded(key)) {
@@ -224,7 +218,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * @return parameter Map, may be empty if urlParameters is empty. The list of
      *         String will solely contain one element.
      */
-    public static final Map<String, List<String>> createParameterMap(final List<UrlParameter> urlParameters) {
+    public static Map<String, List<String>> createParameterMap(final List<UrlParameter> urlParameters) {
         final Map<String, List<String>> result = new HashMap<>();
         if (null != urlParameters && !urlParameters.isEmpty()) {
             for (final UrlParameter urlParameter : urlParameters) {
@@ -269,10 +263,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                                 queryString, element);
                         break;
                     case 1:
-                        builder.add(createDecoded(splitted.get(0), null));
+                        builder.add(createDecoded(splitted.getFirst(), null));
                         break;
                     case 2:
-                        builder.add(createDecoded(splitted.get(0), splitted.get(1)));
+                        builder.add(createDecoded(splitted.getFirst(), splitted.getLast()));
                         break;
                     default:
                         LOGGER.debug(

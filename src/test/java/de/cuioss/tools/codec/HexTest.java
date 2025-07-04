@@ -30,6 +30,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link Hex} class, based on Apache Commons Codec's HexTest.
@@ -38,21 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class HexTest {
 
     private static final String BAD_ENCODING_NAME = "UNKNOWN";
-
-    /**
-     * Allocate a ByteBuffer.
-     *
-     * <p>
-     * The default implementation uses {@link ByteBuffer#allocate(int)}. The method
-     * is overridden in AllocateDirectHexTest to use
-     * {@link ByteBuffer#allocateDirect(int)}
-     *
-     * @param capacity the capacity
-     * @return the byte buffer
-     */
-    protected ByteBuffer allocate(final int capacity) {
-        return ByteBuffer.allocate(capacity);
-    }
 
     private boolean charsetSanityCheck(final String name) {
         final var source = "the quick brown dog jumped over the lazy fox";
@@ -171,6 +157,169 @@ class HexTest {
             final var expected = Hex.encodeHexString(bb.array());
             bb.asReadOnlyBuffer();
             assertEquals(expected, Hex.encodeHexString(bb));
+        }
+    }
+
+    @Nested
+    @DisplayName("handle static method operations")
+    class StaticMethodOperations {
+
+        @Test
+        @DisplayName("decode hex string correctly")
+        void decodeHexString() throws DecoderException {
+            final var input = "48656c6c6f20576f726c64";
+            final var expected = "Hello World".getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected, Hex.decodeHex(input));
+        }
+
+        @Test
+        @DisplayName("decode hex char array correctly")
+        void decodeHexCharArray() throws DecoderException {
+            final var input = "48656c6c6f20576f726c64".toCharArray();
+            final var expected = "Hello World".getBytes(StandardCharsets.UTF_8);
+            assertArrayEquals(expected, Hex.decodeHex(input));
+        }
+
+        @Test
+        @DisplayName("throw exception for odd length hex string")
+        void decodeHexOddLength() {
+            assertThrows(DecoderException.class, () -> Hex.decodeHex("ABC"));
+            assertThrows(DecoderException.class, () -> Hex.decodeHex("ABC".toCharArray()));
+        }
+
+        @Test
+        @DisplayName("throw exception for invalid hex characters")
+        void decodeHexInvalidCharacters() {
+            assertThrows(DecoderException.class, () -> Hex.decodeHex("XY"));
+            assertThrows(DecoderException.class, () -> Hex.decodeHex("XY".toCharArray()));
+        }
+
+        @Test
+        @DisplayName("encode byte array to hex chars")
+        void encodeHexByteArray() {
+            final var input = "Hello World".getBytes(StandardCharsets.UTF_8);
+            final var result = Hex.encodeHex(input);
+            final var expected = "48656c6c6f20576f726c64".toCharArray();
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
+        @DisplayName("encode byte buffer to hex chars")
+        void encodeHexByteBuffer() {
+            final var input = "Hello World".getBytes(StandardCharsets.UTF_8);
+            final var buffer = ByteBuffer.wrap(input);
+            final var result = Hex.encodeHex(buffer);
+            final var expected = "48656c6c6f20576f726c64".toCharArray();
+            assertArrayEquals(expected, result);
+        }
+
+        @Test
+        @DisplayName("encode byte array with case control")
+        void encodeHexByteArrayWithCase() {
+            final var input = new byte[]{(byte) 0xAB, (byte) 0xCD, (byte) 0xEF};
+
+            final var lowerResult = Hex.encodeHex(input, true);
+            assertArrayEquals("abcdef".toCharArray(), lowerResult);
+
+            final var upperResult = Hex.encodeHex(input, false);
+            assertArrayEquals("ABCDEF".toCharArray(), upperResult);
+        }
+
+        @Test
+        @DisplayName("encode byte buffer with case control")
+        void encodeHexByteBufferWithCase() {
+            final var input = new byte[]{(byte) 0xAB, (byte) 0xCD, (byte) 0xEF};
+            final var buffer = ByteBuffer.wrap(input);
+
+            final var lowerResult = Hex.encodeHex(buffer, true);
+            assertArrayEquals("abcdef".toCharArray(), lowerResult);
+
+            buffer.rewind();
+            final var upperResult = Hex.encodeHex(buffer, false);
+            assertArrayEquals("ABCDEF".toCharArray(), upperResult);
+        }
+
+        @Test
+        @DisplayName("encode hex string from byte array")
+        void encodeHexStringByteArray() {
+            final var input = "Hello World".getBytes(StandardCharsets.UTF_8);
+            final var result = Hex.encodeHexString(input);
+            assertEquals("48656c6c6f20576f726c64", result);
+        }
+
+        @Test
+        @DisplayName("encode hex string from byte array with case control")
+        void encodeHexStringByteArrayWithCase() {
+            final var input = new byte[]{(byte) 0xAB, (byte) 0xCD, (byte) 0xEF};
+
+            final var lowerResult = Hex.encodeHexString(input, true);
+            assertEquals("abcdef", lowerResult);
+
+            final var upperResult = Hex.encodeHexString(input, false);
+            assertEquals("ABCDEF", upperResult);
+        }
+
+        @Test
+        @DisplayName("encode hex string from byte buffer")
+        void encodeHexStringByteBuffer() {
+            final var input = "Hello World".getBytes(StandardCharsets.UTF_8);
+            final var buffer = ByteBuffer.wrap(input);
+            final var result = Hex.encodeHexString(buffer);
+            assertEquals("48656c6c6f20576f726c64", result);
+        }
+
+        @Test
+        @DisplayName("encode hex string from byte buffer with case control")
+        void encodeHexStringByteBufferWithCase() {
+            final var input = new byte[]{(byte) 0xAB, (byte) 0xCD, (byte) 0xEF};
+            final var buffer = ByteBuffer.wrap(input);
+
+            final var lowerResult = Hex.encodeHexString(buffer, true);
+            assertEquals("abcdef", lowerResult);
+
+            buffer.rewind();
+            final var upperResult = Hex.encodeHexString(buffer, false);
+            assertEquals("ABCDEF", upperResult);
+        }
+
+        @Test
+        @DisplayName("handle empty inputs")
+        void handleEmptyInputs() throws DecoderException {
+            // Empty string decode
+            assertArrayEquals(new byte[0], Hex.decodeHex(""));
+            assertArrayEquals(new byte[0], Hex.decodeHex(new char[0]));
+
+            // Empty byte array encode
+            assertArrayEquals(new char[0], Hex.encodeHex(new byte[0]));
+            assertEquals("", Hex.encodeHexString(new byte[0]));
+
+            // Empty byte buffer encode
+            final var emptyBuffer = ByteBuffer.allocate(0);
+            assertArrayEquals(new char[0], Hex.encodeHex(emptyBuffer));
+
+            emptyBuffer.rewind();
+            assertEquals("", Hex.encodeHexString(emptyBuffer));
+        }
+    }
+
+    @Nested
+    @DisplayName("handle constructor operations")
+    class ConstructorOperations {
+
+        @Test
+        @DisplayName("create with default constructor")
+        void defaultConstructor() {
+            final var hex = new Hex();
+            assertEquals(StandardCharsets.UTF_8, hex.getCharset());
+        }
+
+        @Test
+        @DisplayName("verify toString method")
+        void toStringMethod() {
+            final var hex = new Hex();
+            final var result = hex.toString();
+            // Just verify it doesn't throw and contains class name
+            assertTrue(result.contains("Hex"));
         }
     }
 
