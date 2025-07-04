@@ -85,7 +85,8 @@ import java.util.Deque;
  * </p>
  *
  */
-@SuppressWarnings("javaarchitecture:S7027") // Intended circular dependency with IOCase
+@SuppressWarnings("javaarchitecture:S7027")
+// Intended circular dependency with IOCase
 @UtilityClass
 public class FilenameUtils {
 

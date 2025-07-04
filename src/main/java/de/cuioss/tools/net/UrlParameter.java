@@ -178,7 +178,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         for (final Entry<String, List<String>> entry : map.entrySet()) {
             String value = null;
             if (!MoreCollections.isEmpty(entry.getValue())) {
-                value = entry.getValue().get(0);
+                value = entry.getValue().getFirst();
             }
             final var key = entry.getKey();
             if (null == parameterFilter || !parameterFilter.isExcluded(key)) {
@@ -269,10 +269,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                                 queryString, element);
                         break;
                     case 1:
-                        builder.add(createDecoded(splitted.get(0), null));
+                        builder.add(createDecoded(splitted.getFirst(), null));
                         break;
                     case 2:
-                        builder.add(createDecoded(splitted.get(0), splitted.get(1)));
+                        builder.add(createDecoded(splitted.getFirst(), splitted.get(1)));
                         break;
                     default:
                         LOGGER.debug(

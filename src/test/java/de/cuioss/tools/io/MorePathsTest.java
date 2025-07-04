@@ -167,10 +167,10 @@ class MorePathsTest {
 
         final List<Path> children = Files.list(playGroundBackup).toList();
         assertEquals(1, children.size());
-        final var fileName = children.iterator().next().getFileName().toString();
+        final var fileName = children.getFirst().getFileName().toString();
         assertTrue(fileName.startsWith(POM_XML + BACKUP_FILE_SUFFIX));
 
-        MorePaths.contentEquals(existing, children.get(0));
+        MorePaths.contentEquals(existing, children.getFirst());
 
     }
 

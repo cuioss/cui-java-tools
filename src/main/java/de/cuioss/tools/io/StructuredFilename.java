@@ -63,11 +63,11 @@ public class StructuredFilename implements Serializable {
                 suffix = null;
                 break;
             case 2:
-                namePart = list.get(0);
+                namePart = list.getFirst();
                 suffix = list.get(1);
                 break;
             default:
-                suffix = list.get(list.size() - 1);
+                suffix = list.getLast();
                 namePart = String.join(".", list.subList(0, list.size() - 1));
                 break;
         }

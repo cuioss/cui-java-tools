@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ 17,21,24 ]
+        version: [ 21,24 ]
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -45,10 +45,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17 for Sonar-build
+      - name: Set up JDK 21 for Sonar-build
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
@@ -84,10 +84,10 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Set up JDK 17 for snapshot release
+      - name: Set up JDK 21 for snapshot release
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           server-id: central
           server-username: MAVEN_USERNAME

@@ -98,8 +98,8 @@ class UrlParameterTest {
         testMap.put("name1", mutableList("value"));
         testMap.put("name2", mutableList("value1", "value2"));
         var parameters = getUrlParameterFromMap(testMap, null, true);
-        assertEquals("name1", parameters.get(0).getName());
-        assertEquals("value", parameters.get(0).getValue());
+        assertEquals("name1", parameters.getFirst().getName());
+        assertEquals("value", parameters.getFirst().getValue());
         assertEquals("name2", parameters.get(1).getName());
         assertEquals("value1", parameters.get(1).getValue());
         testMap.clear();
@@ -107,7 +107,7 @@ class UrlParameterTest {
         testMap.put("name2", mutableList("value"));
         testMap.put("name1", mutableList("value1"));
         parameters = getUrlParameterFromMap(testMap, null, true);
-        assertEquals("name1", parameters.get(0).getName());
+        assertEquals("name1", parameters.getFirst().getName());
         assertEquals("name2", parameters.get(1).getName());
         // Check exclude
         testMap.clear();
@@ -116,7 +116,7 @@ class UrlParameterTest {
         final var filter = new ParameterFilter(immutableList("name2"), true);
         parameters = getUrlParameterFromMap(testMap, filter, true);
         assertEquals(1, parameters.size());
-        assertEquals("name1", parameters.get(0).getName());
+        assertEquals("name1", parameters.getFirst().getName());
     }
 
     @Test
@@ -175,7 +175,7 @@ class UrlParameterTest {
 
         final var filtered = UrlParameter.filterParameter(list, filter);
         assertEquals(2, filtered.size());
-        assertEquals(param2, filtered.get(0));
+        assertEquals(param2, filtered.getFirst());
         assertEquals(param3, filtered.get(1));
     }
 
@@ -210,7 +210,7 @@ class UrlParameterTest {
     void parseQueryParameterShouldHandleHappyCaseKeyValue() {
         var fromQueryString = fromQueryString("name1=value1");
         assertEquals(1, fromQueryString.size());
-        var urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.getFirst();
         assertEquals("name1", urlParameter.getName());
         assertEquals("value1", urlParameter.getValue());
     }
@@ -219,13 +219,13 @@ class UrlParameterTest {
     void parseQueryParameterShouldHandleHappyCaseKeyOnly() {
         var fromQueryString = fromQueryString("name1=");
         assertEquals(1, fromQueryString.size());
-        var urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.getFirst();
         assertEquals("name1", urlParameter.getName());
         assertNull(urlParameter.getValue());
 
         fromQueryString = fromQueryString("name1");
         assertEquals(1, fromQueryString.size());
-        urlParameter = fromQueryString.get(0);
+        urlParameter = fromQueryString.getFirst();
         assertEquals("name1", urlParameter.getName());
         assertNull(urlParameter.getValue());
     }
@@ -234,7 +234,7 @@ class UrlParameterTest {
     void parseQueryParameterShouldHandleHappyCaseComlexSample() {
         var fromQueryString = fromQueryString("?name1=value1&name2&name3=&");
         assertEquals(3, fromQueryString.size());
-        var urlParameter = fromQueryString.get(0);
+        var urlParameter = fromQueryString.getFirst();
         assertEquals("name1", urlParameter.getName());
         assertEquals("value1", urlParameter.getValue());
     }
