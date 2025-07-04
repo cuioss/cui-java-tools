@@ -1070,4 +1070,73 @@ class FilenameUtilsTest {
         assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new ArrayList<>(List.of("TXT"))));
         assertFalse(FilenameUtils.isExtension("a.b\\file.txt", new ArrayList<>(Arrays.asList("TXT", "RTF"))));
     }
+
+    @Test
+    void directoryContains() {
+        // Test null parent - should throw IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.directoryContains(null, "/child"));
+        assertThrows(IllegalArgumentException.class, () -> FilenameUtils.directoryContains(null, null));
+
+        // Test null child - should return false
+        assertFalse(FilenameUtils.directoryContains("/parent", null));
+
+        // Test same paths - should return false (directory does not contain itself)
+        assertFalse(FilenameUtils.directoryContains("/parent", "/parent"));
+        assertFalse(FilenameUtils.directoryContains("/parent/", "/parent/"));
+        assertFalse(FilenameUtils.directoryContains("/parent", "/parent/"));
+        assertFalse(FilenameUtils.directoryContains("/parent/", "/parent"));
+
+        // Test normal containment cases - Unix style paths
+        assertTrue(FilenameUtils.directoryContains("/parent", "/parent/child"));
+        assertTrue(FilenameUtils.directoryContains("/parent", "/parent/child/grandchild"));
+        assertTrue(FilenameUtils.directoryContains("/parent/", "/parent/child"));
+        assertTrue(FilenameUtils.directoryContains("/parent", "/parent/child/"));
+        assertTrue(FilenameUtils.directoryContains("/parent/", "/parent/child/"));
+
+        // Test normal containment cases - Windows style paths
+        assertTrue(FilenameUtils.directoryContains("C:\\parent", "C:\\parent\\child"));
+        assertTrue(FilenameUtils.directoryContains("C:\\parent", "C:\\parent\\child\\grandchild"));
+        assertTrue(FilenameUtils.directoryContains("C:\\parent\\", "C:\\parent\\child"));
+        assertTrue(FilenameUtils.directoryContains("C:\\parent", "C:\\parent\\child\\"));
+        assertTrue(FilenameUtils.directoryContains("C:\\parent\\", "C:\\parent\\child\\"));
+
+        // Test non-containment cases
+        assertFalse(FilenameUtils.directoryContains("/parent", "/other"));
+        assertFalse(FilenameUtils.directoryContains("/parent", "/parent2"));
+        assertFalse(FilenameUtils.directoryContains("/parent", "/parentchild"));
+        assertFalse(FilenameUtils.directoryContains("/parent/child", "/parent"));
+        assertFalse(FilenameUtils.directoryContains("/parent/child", "/parent/sibling"));
+
+        // Test mixed separators
+        assertTrue(FilenameUtils.directoryContains("/parent", "/parent\\child"));
+        assertTrue(FilenameUtils.directoryContains("C:\\parent", "C:\\parent/child"));
+
+        // Test relative paths
+        assertTrue(FilenameUtils.directoryContains("parent", "parent/child"));
+        assertTrue(FilenameUtils.directoryContains("parent", "parent\\child"));
+        assertFalse(FilenameUtils.directoryContains("parent", "parent"));
+        assertFalse(FilenameUtils.directoryContains("parent", "other"));
+
+        // Test empty strings
+        assertFalse(FilenameUtils.directoryContains("", "child"));
+        assertFalse(FilenameUtils.directoryContains("parent", ""));
+        assertFalse(FilenameUtils.directoryContains("", ""));
+
+        // Test root directory cases
+        assertTrue(FilenameUtils.directoryContains("/", "/child"));
+        assertTrue(FilenameUtils.directoryContains("C:\\", "C:\\child"));
+        assertFalse(FilenameUtils.directoryContains("/", "/"));
+        assertFalse(FilenameUtils.directoryContains("C:\\", "C:\\"));
+
+        // Test complex paths
+        assertTrue(FilenameUtils.directoryContains("/home/user", "/home/user/documents"));
+        assertTrue(FilenameUtils.directoryContains("/home/user", "/home/user/documents/file.txt"));
+        assertFalse(FilenameUtils.directoryContains("/home/user", "/home/other"));
+        assertFalse(FilenameUtils.directoryContains("/home/user", "/home/username"));
+
+        // Test UNC paths (Windows network paths)
+        assertTrue(FilenameUtils.directoryContains("\\\\server\\share", "\\\\server\\share\\folder"));
+        assertFalse(FilenameUtils.directoryContains("\\\\server\\share", "\\\\server\\share"));
+        assertFalse(FilenameUtils.directoryContains("\\\\server\\share", "\\\\other\\share\\folder"));
+    }
 }

@@ -52,8 +52,6 @@ public class StructuredFilename implements Serializable {
      *
      * @param filename to be checked
      */
-    @SuppressWarnings("squid:S1871") // owolff: Although duplicate code for case 0 and case 1 I find
-    // it better readable
     public StructuredFilename(final String filename) {
         originalName = filename;
         final var list = Splitter.on('.').omitEmptyStrings().splitToList(filename);
@@ -63,6 +61,7 @@ public class StructuredFilename implements Serializable {
                 suffix = null;
                 break;
             case 2:
+                namePart = list.getFirst();
                 suffix = list.getLast();
                 break;
             default:
