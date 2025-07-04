@@ -63,8 +63,7 @@ public class StructuredFilename implements Serializable {
                 suffix = null;
                 break;
             case 2:
-                namePart = list.getFirst();
-                suffix = list.get(1);
+                suffix = list.getLast();
                 break;
             default:
                 suffix = list.getLast();
