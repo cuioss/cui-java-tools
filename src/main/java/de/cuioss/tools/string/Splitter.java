@@ -113,7 +113,6 @@ public final class Splitter {
      *
      * @param separator the character to use as a separator, must not be null
      * @return a new {@link Splitter} instance configured with the given separator
-     * @throws NullPointerException if separator is null
      */
     @NonNull
     public static Splitter on(final char separator) {
@@ -164,7 +163,6 @@ public final class Splitter {
      *
      * @param separatorPattern the pattern to use for splitting, must not be null
      * @return a new {@link Splitter} instance configured with the given pattern
-     * @throws NullPointerException if separatorPattern is null
      */
     @NonNull
     public static Splitter on(@NonNull final Pattern separatorPattern) {

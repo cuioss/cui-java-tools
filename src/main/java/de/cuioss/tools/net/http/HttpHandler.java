@@ -402,19 +402,15 @@ public final class HttpHandler {
 
             // If urlString is set, convert it to URI
             if (!MoreStrings.isBlank(urlString)) {
-                try {
-                    // Check if the URL has a scheme, if not prepend https://
-                    String urlToUse = urlString;
-                    if (!urlToUse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
-                        LOGGER.debug(() -> "URL missing scheme, prepending https:// to %s".formatted(urlString));
-                        urlToUse = "https://" + urlToUse;
-                    }
-
-                    uri = URI.create(urlToUse);
-                    return;
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid URI: " + urlString, e);
+                // Check if the URL has a scheme, if not prepend https://
+                String urlToUse = urlString;
+                if (!urlToUse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
+                    LOGGER.debug(() -> "URL missing scheme, prepending https:// to %s".formatted(urlString));
+                    urlToUse = "https://" + urlToUse;
                 }
+
+                uri = URI.create(urlToUse);
+                return;
             }
 
             // If we get here, no valid URI source was provided
