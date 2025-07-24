@@ -414,11 +414,14 @@ public class FilenameUtils {
 
     private static int removeAdjoiningSlashes(NormalizationContext context) {
         var size = context.size;
-        for (var i = context.prefix + 1; i < size; i++) {
+        var i = context.prefix + 1;
+        while (i < size) {
             if (context.array[i] == context.separator && context.array[i - 1] == context.separator) {
                 System.arraycopy(context.array, i, context.array, i - 1, size - i);
                 size--;
-                i--;
+                // Don't increment i to recheck this position
+            } else {
+                i++;
             }
         }
         return size;
@@ -426,7 +429,8 @@ public class FilenameUtils {
 
     private static void removeDotSlashes(NormalizationContext context) {
         var size = context.size;
-        for (var i = context.prefix + 1; i < size; i++) {
+        var i = context.prefix + 1;
+        while (i < size) {
             if (context.array[i] == context.separator && context.array[i - 1] == '.'
                     && (i == context.prefix + 1 || context.array[i - 2] == context.separator)) {
                 if (i == size - 1) {
@@ -434,7 +438,9 @@ public class FilenameUtils {
                 }
                 System.arraycopy(context.array, i + 1, context.array, i - 1, size - i);
                 size -= 2;
-                i--;
+                // Don't increment i to recheck this position
+            } else {
+                i++;
             }
         }
         context.size = size;
