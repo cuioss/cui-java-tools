@@ -455,11 +455,11 @@ public class FilenameUtils {
                     context.size = -1; // Signal invalid path
                     return;
                 }
-                
+
                 if (i == size - 1) {
                     context.lastIsDirectory = true;
                 }
-                
+
                 var result = findAndRemoveParentDirectory(context, i, size);
                 if (result != null) {
                     size = result.newSize;
@@ -474,14 +474,14 @@ public class FilenameUtils {
         }
         context.size = size;
     }
-    
+
     private static boolean isDoubleDotPattern(NormalizationContext context, int i) {
-        return context.array[i] == context.separator 
-                && context.array[i - 1] == '.' 
+        return context.array[i] == context.separator
+                && context.array[i - 1] == '.'
                 && context.array[i - 2] == '.'
                 && (i == context.prefix + 2 || context.array[i - 3] == context.separator);
     }
-    
+
     private static RemovalResult findAndRemoveParentDirectory(NormalizationContext context, int i, int size) {
         for (var j = i - 4; j >= context.prefix; j--) {
             if (context.array[j] == context.separator) {
@@ -492,22 +492,15 @@ public class FilenameUtils {
         }
         return null;
     }
-    
-    private static class RemovalResult {
-        final int newSize;
-        final int newPosition;
-        
-        RemovalResult(int newSize, int newPosition) {
-            this.newSize = newSize;
-            this.newPosition = newPosition;
-        }
+
+    private record RemovalResult(int newSize, int newPosition) {
     }
 
     private static String buildNormalizedPath(NormalizationContext context, boolean keepSeparator) {
         if (context.size < 0) {
             return null; // Invalid path from double-dot processing
         }
-        if (context.size <= 0) { // should never be less than 0
+        if (context.size == 0) { // should never be less than 0
             return "";
         }
         if (context.size <= context.prefix || context.lastIsDirectory && keepSeparator) {
