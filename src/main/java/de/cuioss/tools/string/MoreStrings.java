@@ -990,6 +990,7 @@ public final class MoreStrings {
      * @return {@code string} itself if it is non-null; {@code ""} if it is null
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
      */
+    @NonNull
     public static String nullToEmpty(String string) {
         if (null == string) {
             return "";
@@ -1069,6 +1070,7 @@ public final class MoreStrings {
      * @return the resulting formatting String
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
      */
+    @NonNull
     public static String lenientFormat(String template, Object... args) {
         final String templateString = String.valueOf(template); // null -> "null"
 
@@ -1168,6 +1170,7 @@ public final class MoreStrings {
      * @return first string that is accepted by the given {@link Predicate} or
      * {@link Optional#empty()}
      */
+    @NonNull
     public static Optional<String> coalesce(Predicate<String> checker, String... values) {
         if (null != values) {
             for (String value : values) {
@@ -1183,6 +1186,7 @@ public final class MoreStrings {
      * @param values to be evaluated
      * @return first string that is not {@link #isEmpty(CharSequence)}
      */
+    @NonNull
     public static Optional<String> firstNonEmpty(String... values) {
         return coalesce(MoreStrings::isEmpty, values);
     }
@@ -1191,6 +1195,7 @@ public final class MoreStrings {
      * @param values to be evaluated
      * @return first string that is not {@link #isBlank(CharSequence)}
      */
+    @NonNull
     public static Optional<String> firstNonBlank(String... values) {
         return coalesce(MoreStrings::isBlank, values);
     }

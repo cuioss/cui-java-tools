@@ -238,6 +238,31 @@ class SplitterTest {
     }
 
     @Test
+    void doNotModifySeparatorStringWithAllRegexMetacharacters() {
+        // Test all regex metacharacters that should be detected
+        String[] regexMetacharacters = {"[", "]", "{", "}", "(", ")", "*", "+", "?", "^", "$", "|", "\\", "."};
+
+        for (String metachar : regexMetacharacters) {
+            var splitter = Splitter.on(metachar).doNotModifySeparatorString();
+            var ex = assertThrows(IllegalArgumentException.class, () ->
+                            splitter.splitToList("test" + metachar + "data"),
+                    "Should throw for metacharacter: " + metachar
+            );
+            assertTrue(ex.getMessage().contains("regex metacharacters"),
+                    "Error message should mention regex metacharacters for: " + metachar);
+        }
+
+        // Test that normal characters work fine
+        String[] normalSeparators = {",", ";", ":", "-", "_", "@", "#", "~"};
+        for (String separator : normalSeparators) {
+            var splitter = Splitter.on(separator).doNotModifySeparatorString();
+            var result = splitter.splitToList("test" + separator + "data");
+            assertEquals(immutableList("test", "data"), result,
+                    "Normal separator should work: " + separator);
+        }
+    }
+
+    @Test
     void onCharacterWithNullSeparator() {
         Character nullChar = null;
         assertThrows(NullPointerException.class, () -> {

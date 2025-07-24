@@ -98,6 +98,9 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Splitter {
 
+    private static final String REGEX_METACHARACTERS = ".*[\\[\\]{}()*.+?^$|\\\\].*";
+    private static final String REGEX_METACHARACTER_ERROR = "Separator contains regex metacharacters but doNotModifySeparatorString is true: ";
+
     private static final CuiLogger LOGGER = new CuiLogger(Splitter.class);
 
     @NonNull
@@ -116,8 +119,8 @@ public final class Splitter {
      * @return a new {@link Splitter} instance configured with the given separator
      * @throws NullPointerException if separator is null
      */
+    @NonNull
     public static Splitter on(final char separator) {
-        requireNonNull(separator, "separator must not be null");
         var separatorStr = String.valueOf(separator);
         return new Splitter(SplitterConfig.builder()
                 .separator(separatorStr)
@@ -140,7 +143,8 @@ public final class Splitter {
      * @throws NullPointerException if separator is null
      * @throws IllegalArgumentException if separator is empty
      */
-    public static Splitter on(final String separator) {
+    @NonNull
+    public static Splitter on(@NonNull final String separator) {
         requireNonNull(separator, "separator must not be null");
         if (separator.isEmpty()) {
             throw new IllegalArgumentException("separator must not be empty");
@@ -167,7 +171,8 @@ public final class Splitter {
      * @return a new {@link Splitter} instance configured with the given pattern
      * @throws NullPointerException if separatorPattern is null
      */
-    public static Splitter on(final Pattern separatorPattern) {
+    @NonNull
+    public static Splitter on(@NonNull final Pattern separatorPattern) {
         requireNonNull(separatorPattern, "separatorPattern must not be null");
         return new Splitter(SplitterConfig.builder()
                 .separator(separatorPattern.pattern())
@@ -280,17 +285,19 @@ public final class Splitter {
      *
      * @return an immutable list of the segments split from the parameter
      */
-    @SuppressWarnings("java:S5852") // owolff:
+    @SuppressWarnings("java:S5852")
+    // owolff:
     // This is a false positive,
     // because the splitter-separator is coded / configured value,
     // no user-payload
+    @NonNull
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
             return Collections.emptyList();
         }
         if (splitterConfig.isDoNotModifySeparatorString() &&
-                splitterConfig.getSeparator().matches(".*[\\[\\]\\{\\}\\(\\)\\*\\+\\?\\^\\$\\|\\\\].*")) {
-            throw new IllegalArgumentException("Invalid regex pattern: " + splitterConfig.getSeparator());
+                splitterConfig.getSeparator().matches(REGEX_METACHARACTERS)) {
+            throw new IllegalArgumentException(REGEX_METACHARACTER_ERROR + splitterConfig.getSeparator());
         }
         LOGGER.debug("Splitting '%s' with pattern '%s'", sequence, splitterConfig.getSeparator());
         if (isEmpty(sequence)) {

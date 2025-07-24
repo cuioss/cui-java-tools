@@ -227,7 +227,7 @@ public class SecureSSLContextProvider {
             // If we can't create a secure context, use the provided context or try to get the default
             try {
                 return sslContext != null ? sslContext : SSLContext.getDefault();
-            } catch (Exception ex) {
+            } catch (NoSuchAlgorithmException ex) {
                 // This should never happen, but just in case
                 throw new IllegalStateException("Failed to create SSL context", ex);
             }

@@ -28,6 +28,7 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -178,7 +179,7 @@ public final class HttpHandler {
             Thread.currentThread().interrupt();
             LOGGER.warn("Interrupted while pinging URI %s: %s", uri, e.getMessage());
             return HttpStatusFamily.UNKNOWN;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | SecurityException e) {
             LOGGER.warn(e, "Error while pinging URI %s: %s", uri, e.getMessage());
             return HttpStatusFamily.UNKNOWN;
         }
@@ -394,7 +395,7 @@ public final class HttpHandler {
                 try {
                     uri = url.toURI();
                     return;
-                } catch (Exception e) {
+                } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("Invalid URL: " + url, e);
                 }
             }
