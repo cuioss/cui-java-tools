@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ package de.cuioss.tools.net.ssl;
 
 import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
 import de.cuioss.tools.support.Generators;
+import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -65,6 +66,18 @@ class KeyMaterialHolderTest {
         final var roundtripResult = KeyMaterialHolder
                 .deserializeKeyMaterial(KeyMaterialHolder.serializeKeyMaterial(kmh.getKeyMaterial()));
         assertArrayEquals(kmh.getKeyMaterial(), roundtripResult, "byte arrays should be equal");
+    }
+
+    @Test
+    void shouldBehaveWell() {
+        ObjectMethodsAsserts.assertNiceObject(withRandomKeyMaterial()
+                .name(Generators.randomString())
+                .description(Generators.randomString())
+                .keyAlias(Generators.randomString())
+                .keyPassword(Generators.randomString())
+                .keyHolderType(KeyHolderType.KEY_STORE)
+                .keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
+                .build());
     }
 
     private byte[] randomKeyMaterial() {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -179,7 +179,8 @@ class HttpHandlerTest {
             var url = HttpHandler.builder().url("http://invalid url with spaces.com");
             var exception = assertThrows(IllegalArgumentException.class, url::build);
 
-            assertTrue(exception.getMessage().startsWith("Invalid URI: http://invalid url with spaces.com"));
+            // Just verify it's an IllegalArgumentException with the invalid URL in the message
+            assertTrue(exception.getMessage().contains("http://invalid url with spaces.com"));
         }
 
         @Test

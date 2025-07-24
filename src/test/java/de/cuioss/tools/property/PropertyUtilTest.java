@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SuppressWarnings("java:S5738")
 class PropertyUtilTest {
 
     static final String PROPERTY_NAME = "property";
@@ -77,7 +78,7 @@ class PropertyUtilTest {
         assertEquals(number, readProperty(underTest, PROPERTY_NAME));
 
         assertNotNull(writeProperty(underTest, PROPERTY_NAME, "5"));
-        assertEquals(Integer.valueOf(5), readProperty(underTest, PROPERTY_NAME));
+        assertEquals(5, readProperty(underTest, PROPERTY_NAME));
 
         var propertyValue = new ArrayList<>();
         assertThrows(IllegalArgumentException.class, () ->

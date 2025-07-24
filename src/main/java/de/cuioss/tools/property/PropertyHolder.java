@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -177,7 +177,7 @@ public class PropertyHolder {
         }
 
         // Fallback to PropertyUtil for builder-style methods
-        return PropertyUtil.writeProperty(target, name, value);
+        return PropertyUtil.writePropertyWithChaining(target, name, value);
     }
 
     /**

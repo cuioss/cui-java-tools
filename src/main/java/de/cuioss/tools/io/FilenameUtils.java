@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -348,8 +348,6 @@ public class FilenameUtils {
      * @param keepSeparator true to keep the final separator
      * @return the normalized filename. Null bytes inside string will be removed.
      */
-    @SuppressWarnings({"squid:S3776", "squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck",
-            "java:S6541"}) // owolff: original code
     private static String doNormalize(final String filename, final char separator, final boolean keepSeparator) {
         if (filename == null) {
             return null;
@@ -369,77 +367,146 @@ public class FilenameUtils {
         final var array = new char[size + 2]; // +1 for possible extra slash, +2 for arraycopy
         filename.getChars(0, filename.length(), array, 0);
 
-        // fix separators throughout
-        final var otherSeparator = separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR;
-        for (var i = 0; i < array.length; i++) {
-            if (array[i] == otherSeparator) {
-                array[i] = separator;
+        // Normalize path components
+        var context = new NormalizationContext(array, size, prefix, separator);
+        fixSeparators(context);
+        context.lastIsDirectory = addTrailingSeparatorIfNeeded(context);
+        context.size = removeAdjoiningSlashes(context);
+        removeDotSlashes(context);
+        removeDoubleDotSlashes(context);
+
+        return buildNormalizedPath(context, keepSeparator);
+    }
+
+    private static class NormalizationContext {
+        final char[] array;
+        int size;
+        final int prefix;
+        final char separator;
+        boolean lastIsDirectory;
+
+        NormalizationContext(char[] array, int size, int prefix, char separator) {
+            this.array = array;
+            this.size = size;
+            this.prefix = prefix;
+            this.separator = separator;
+            this.lastIsDirectory = true;
+        }
+    }
+
+    private static void fixSeparators(NormalizationContext context) {
+        final var otherSeparator = context.separator == SYSTEM_SEPARATOR ? OTHER_SEPARATOR : SYSTEM_SEPARATOR;
+        for (var i = 0; i < context.array.length; i++) {
+            if (context.array[i] == otherSeparator) {
+                context.array[i] = context.separator;
             }
         }
+    }
 
-        // add extra separator on the end to simplify code below
-        var lastIsDirectory = true;
-        if (array[size - 1] != separator) {
-            array[size] = separator;
-            size++;
-            lastIsDirectory = false;
+    private static boolean addTrailingSeparatorIfNeeded(NormalizationContext context) {
+        if (context.array[context.size - 1] != context.separator) {
+            context.array[context.size] = context.separator;
+            context.size++;
+            return false;
         }
+        return true;
+    }
 
-        // adjoining slashes
-        for (var i = prefix + 1; i < size; i++) {
-            if (array[i] == separator && array[i - 1] == separator) {
-                System.arraycopy(array, i, array, i - 1, size - i);
+    private static int removeAdjoiningSlashes(NormalizationContext context) {
+        var size = context.size;
+        var i = context.prefix + 1;
+        while (i < size) {
+            if (context.array[i] == context.separator && context.array[i - 1] == context.separator) {
+                System.arraycopy(context.array, i, context.array, i - 1, size - i);
                 size--;
-                i--;
+                // Don't increment i to recheck this position
+            } else {
+                i++;
             }
         }
+        return size;
+    }
 
-        // dot slash
-        for (var i = prefix + 1; i < size; i++) {
-            if (array[i] == separator && array[i - 1] == '.' && (i == prefix + 1 || array[i - 2] == separator)) {
+    private static void removeDotSlashes(NormalizationContext context) {
+        var size = context.size;
+        var i = context.prefix + 1;
+        while (i < size) {
+            if (context.array[i] == context.separator && context.array[i - 1] == '.'
+                    && (i == context.prefix + 1 || context.array[i - 2] == context.separator)) {
                 if (i == size - 1) {
-                    lastIsDirectory = true;
+                    context.lastIsDirectory = true;
                 }
-                System.arraycopy(array, i + 1, array, i - 1, size - i);
+                System.arraycopy(context.array, i + 1, context.array, i - 1, size - i);
                 size -= 2;
-                i--;
+                // Don't increment i to recheck this position
+            } else {
+                i++;
             }
         }
+        context.size = size;
+    }
 
-        // double dot slash
-        outer: for (var i = prefix + 2; i < size; i++) {
-            if (array[i] == separator && array[i - 1] == '.' && array[i - 2] == '.'
-                    && (i == prefix + 2 || array[i - 3] == separator)) {
-                if (i == prefix + 2) {
-                    return null;
+    @SuppressWarnings("squid:ForLoopCounterChangedCheck") // loop counter modification needed for algorithm
+    private static void removeDoubleDotSlashes(NormalizationContext context) {
+        var size = context.size;
+        for (var i = context.prefix + 2; i < size; i++) {
+            if (isDoubleDotPattern(context, i)) {
+                if (i == context.prefix + 2) {
+                    context.size = -1; // Signal invalid path
+                    return;
                 }
+
                 if (i == size - 1) {
-                    lastIsDirectory = true;
+                    context.lastIsDirectory = true;
                 }
-                int j;
-                for (j = i - 4; j >= prefix; j--) {
-                    if (array[j] == separator) {
-                        // remove b/../ from a/b/../c
-                        System.arraycopy(array, i + 1, array, j + 1, size - i);
-                        size -= i - j;
-                        i = j + 1;
-                        continue outer;
-                    }
+
+                var result = findAndRemoveParentDirectory(context, i, size);
+                if (result != null) {
+                    size = result.newSize;
+                    i = result.newPosition - 1; // Will be incremented by loop
+                } else {
+                    // remove a/../ from a/../c
+                    System.arraycopy(context.array, i + 1, context.array, context.prefix, size - i);
+                    size -= i + 1 - context.prefix;
+                    i = context.prefix;
                 }
-                // remove a/../ from a/../c
-                System.arraycopy(array, i + 1, array, prefix, size - i);
-                size -= i + 1 - prefix;
-                i = prefix + 1;
             }
         }
+        context.size = size;
+    }
 
-        if (size <= 0) { // should never be less than 0
+    private static boolean isDoubleDotPattern(NormalizationContext context, int i) {
+        return context.array[i] == context.separator
+                && context.array[i - 1] == '.'
+                && context.array[i - 2] == '.'
+                && (i == context.prefix + 2 || context.array[i - 3] == context.separator);
+    }
+
+    private static RemovalResult findAndRemoveParentDirectory(NormalizationContext context, int i, int size) {
+        for (var j = i - 4; j >= context.prefix; j--) {
+            if (context.array[j] == context.separator) {
+                // remove b/../ from a/b/../c
+                System.arraycopy(context.array, i + 1, context.array, j + 1, size - i);
+                return new RemovalResult(size - (i - j), j + 1);
+            }
+        }
+        return null;
+    }
+
+    private record RemovalResult(int newSize, int newPosition) {
+    }
+
+    private static String buildNormalizedPath(NormalizationContext context, boolean keepSeparator) {
+        if (context.size < 0) {
+            return null; // Invalid path from double-dot processing
+        }
+        if (context.size == 0) { // should never be less than 0
             return "";
         }
-        if (size <= prefix || lastIsDirectory && keepSeparator) {
-            return new String(array, 0, size); // keep trailing separator
+        if (context.size <= context.prefix || context.lastIsDirectory && keepSeparator) {
+            return new String(context.array, 0, context.size); // keep trailing separator
         }
-        return new String(array, 0, size - 1); // lose trailing separator
+        return new String(context.array, 0, context.size - 1); // lose trailing separator
     }
 
     // -----------------------------------------------------------------------

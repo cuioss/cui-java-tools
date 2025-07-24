@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,16 +95,12 @@ public class LocaleUtils {
         }
 
         final var parts = str.split("_", 3);
-        try {
-            return switch (parts.length) {
-                case 1 -> handleSinglePart(parts[0]);
-                case 2 -> handleTwoParts(parts[0], parts[1]);
-                case 3 -> handleThreeParts(str, parts);
-                default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-            };
-        } catch (final IllegalArgumentException iae) {
-            throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str, iae);
-        }
+        return switch (parts.length) {
+            case 1 -> handleSinglePart(parts[0]);
+            case 2 -> handleTwoParts(parts[0], parts[1]);
+            case 3 -> handleThreeParts(str, parts);
+            default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
+        };
     }
 
     private static Locale handleUnderscorePrefixedLocale(final String str) {

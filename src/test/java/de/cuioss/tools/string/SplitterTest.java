@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -233,8 +233,30 @@ class SplitterTest {
         }
 
         var splitter = Splitter.on("[").doNotModifySeparatorString();
-        assertThrows(IllegalArgumentException.class, () ->
-                splitter.splitToList("[boom]"));
+        var result = splitter.splitToList("[boom]");
+        assertEquals(immutableList("", "boom]"), result);
+    }
+
+    @Test
+    void doNotModifySeparatorStringWithAllRegexMetacharacters() {
+        // Test all regex metacharacters work as literal separators when using doNotModifySeparatorString
+        String[] regexMetacharacters = {"[", "]", "{", "}", "(", ")", "*", "+", "?", "^", "$", "|", "\\", "."};
+
+        for (String metachar : regexMetacharacters) {
+            var splitter = Splitter.on(metachar).doNotModifySeparatorString();
+            var result = splitter.splitToList("test" + metachar + "data");
+            assertEquals(immutableList("test", "data"), result,
+                    "Regex metacharacter should work as literal separator: " + metachar);
+        }
+
+        // Test that normal characters work fine
+        String[] normalSeparators = {",", ";", ":", "-", "_", "@", "#", "~"};
+        for (String separator : normalSeparators) {
+            var splitter = Splitter.on(separator).doNotModifySeparatorString();
+            var result = splitter.splitToList("test" + separator + "data");
+            assertEquals(immutableList("test", "data"), result,
+                    "Normal separator should work: " + separator);
+        }
     }
 
     @Test

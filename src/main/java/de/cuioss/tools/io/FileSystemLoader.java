@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -145,7 +145,7 @@ public class FileSystemLoader implements FileReaderWriter {
         try {
             return getPath().toUri().toURL();
         } catch (final MalformedURLException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Unable to convert path to URL: " + getPath(), e);
         }
     }
 

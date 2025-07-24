@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.isBlank;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A flexible string joining utility inspired by Google Guava's Joiner.
@@ -112,8 +111,8 @@ public final class Joiner {
      * @return a new {@link Joiner} instance configured with the given separator
      * @throws NullPointerException if separator is null
      */
-    public static Joiner on(final String separator) {
-        requireNonNull(separator);
+    @NonNull
+    public static Joiner on(@NonNull final String separator) {
         return new Joiner(JoinerConfig.builder().separator(separator).build());
     }
 
@@ -126,8 +125,8 @@ public final class Joiner {
      *
      * @return a {@link Joiner}, with default settings, that uses that separator
      */
+    @NonNull
     public static Joiner on(final char separator) {
-        requireNonNull(separator);
         return on(String.valueOf(separator));
     }
 

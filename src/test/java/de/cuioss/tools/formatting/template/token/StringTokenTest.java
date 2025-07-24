@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
+import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class StringTokenTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        ObjectMethodsAsserts.assertNiceObject(new StringToken("abc"));
+        ObjectMethodsAsserts.assertNiceObject(new StringToken(Generators.randomString()));
     }
 
 }

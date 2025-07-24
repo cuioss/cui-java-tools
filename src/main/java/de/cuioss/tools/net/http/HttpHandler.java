@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -121,7 +122,7 @@ public final class HttpHandler {
     /**
      * Creates a pre-configured {@link HttpHandlerBuilder} with the same configuration as this handler.
      * The builder is configured with the connection timeout, read timeout and sslContext from this handler.
-     * 
+     *
      * <p>This method allows creating a new builder based on the current handler's configuration,
      * which can be used to create a new handler with modified URL.</p>
      *
@@ -178,7 +179,7 @@ public final class HttpHandler {
             Thread.currentThread().interrupt();
             LOGGER.warn("Interrupted while pinging URI %s: %s", uri, e.getMessage());
             return HttpStatusFamily.UNKNOWN;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | SecurityException e) {
             LOGGER.warn(e, "Error while pinging URI %s: %s", uri, e.getMessage());
             return HttpStatusFamily.UNKNOWN;
         }
@@ -394,26 +395,22 @@ public final class HttpHandler {
                 try {
                     uri = url.toURI();
                     return;
-                } catch (Exception e) {
+                } catch (URISyntaxException e) {
                     throw new IllegalArgumentException("Invalid URL: " + url, e);
                 }
             }
 
             // If urlString is set, convert it to URI
             if (!MoreStrings.isBlank(urlString)) {
-                try {
-                    // Check if the URL has a scheme, if not prepend https://
-                    String urlToUse = urlString;
-                    if (!urlToUse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
-                        LOGGER.debug(() -> "URL missing scheme, prepending https:// to %s".formatted(urlString));
-                        urlToUse = "https://" + urlToUse;
-                    }
-
-                    uri = URI.create(urlToUse);
-                    return;
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid URI: " + urlString, e);
+                // Check if the URL has a scheme, if not prepend https://
+                String urlToUse = urlString;
+                if (!urlToUse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*:.*")) {
+                    LOGGER.debug(() -> "URL missing scheme, prepending https:// to %s".formatted(urlString));
+                    urlToUse = "https://" + urlToUse;
                 }
+
+                uri = URI.create(urlToUse);
+                return;
             }
 
             // If we get here, no valid URI source was provided
