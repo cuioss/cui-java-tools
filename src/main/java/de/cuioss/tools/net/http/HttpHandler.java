@@ -122,7 +122,7 @@ public final class HttpHandler {
     /**
      * Creates a pre-configured {@link HttpHandlerBuilder} with the same configuration as this handler.
      * The builder is configured with the connection timeout, read timeout and sslContext from this handler.
-     * 
+     *
      * <p>This method allows creating a new builder based on the current handler's configuration,
      * which can be used to create a new handler with modified URL.</p>
      *
