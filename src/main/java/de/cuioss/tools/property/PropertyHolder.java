@@ -177,7 +177,7 @@ public class PropertyHolder {
         }
 
         // Fallback to PropertyUtil for builder-style methods
-        return PropertyUtil.writeProperty(target, name, value);
+        return PropertyUtil.writePropertyWithChaining(target, name, value);
     }
 
     /**

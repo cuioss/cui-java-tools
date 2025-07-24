@@ -52,11 +52,11 @@ import static java.util.Objects.requireNonNull;
  * Object value = PropertyUtil.readProperty(bean, propertyName);
  *
  * // Write property value with type checking
- * PropertyUtil.writeProperty(bean, propertyName, "John");
+ * PropertyUtil.setProperty(bean, propertyName, "John");
  *
  * // Handle potential exceptions
  * try {
- *     PropertyUtil.writeProperty(bean, propertyName, value);
+ *     PropertyUtil.setProperty(bean, propertyName, value);
  * } catch (IllegalArgumentException e) {
  *     // Handle invalid property name or type
  * } catch (IllegalStateException e) {
@@ -161,7 +161,17 @@ public class PropertyUtil {
         return writePropertyWithChaining(bean, propertyName, propertyValue);
     }
 
-    private static Object writePropertyWithChaining(Object bean, String propertyName, Object propertyValue) {
+    /**
+     * Internal method for property writing with return value support.
+     * Used by PropertyHolder and other internal components that need the return value.
+     *
+     * @param bean          the bean to write to, must not be null
+     * @param propertyName  the name of the property to write, must not be null or empty
+     * @param propertyValue the value to write to the property
+     * @return the bean instance (for method chaining)
+     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     */
+    static Object writePropertyWithChaining(Object bean, String propertyName, Object propertyValue) {
         LOGGER.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
