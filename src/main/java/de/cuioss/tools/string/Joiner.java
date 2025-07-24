@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.collect.MoreCollections.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.isBlank;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A flexible string joining utility inspired by Google Guava's Joiner.
@@ -114,7 +113,6 @@ public final class Joiner {
      */
     @NonNull
     public static Joiner on(@NonNull final String separator) {
-        requireNonNull(separator);
         return new Joiner(JoinerConfig.builder().separator(separator).build());
     }
 
