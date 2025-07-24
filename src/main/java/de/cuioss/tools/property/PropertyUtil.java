@@ -131,6 +131,22 @@ public class PropertyUtil {
 
     /**
      * Writes a value to a property of a bean using reflection.
+     * This is a pure command operation with no return value, following Command-Query Separation.
+     *
+     * @param bean          the bean to write to, must not be null
+     * @param propertyName  the name of the property to write, must not be null or empty
+     * @param propertyValue the value to write to the property
+     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @since 2.4.1
+     */
+    public static void setProperty(Object bean, String propertyName, Object propertyValue) {
+        writePropertyWithChaining(bean, propertyName, propertyValue);
+    }
+
+    /**
+     * Writes a value to a property of a bean using reflection and returns the bean for method chaining.
+     * This method violates Command-Query Separation by both modifying state and returning a value.
+     * Consider using {@link #setProperty(Object, String, Object)} for pure command operations.
      *
      * @param bean          the bean to write to, must not be null
      * @param propertyName  the name of the property to write, must not be null or empty
@@ -138,8 +154,14 @@ public class PropertyUtil {
      * @return the bean instance (for method chaining)
      * @throws IllegalArgumentException if the property cannot be written or does not exist
      * @since 2.0
+     * @deprecated Use {@link #setProperty(Object, String, Object)} for pure command operations
      */
+    @Deprecated(since = "2.4.1")
     public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
+        return writePropertyWithChaining(bean, propertyName, propertyValue);
+    }
+
+    private static Object writePropertyWithChaining(Object bean, String propertyName, Object propertyValue) {
         LOGGER.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);

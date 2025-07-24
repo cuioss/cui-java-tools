@@ -25,8 +25,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Defines a filter identifying which parameters are not to be included within
  * url parameter handling. Therefore, it filters parameter prefixed with
@@ -61,8 +59,7 @@ public class ParameterFilter implements Serializable {
      * @param value as key of view parameter. Must not be null
      * @return true if value belongs to excluded values
      */
-    public boolean isExcluded(final String value) {
-        requireNonNull(value);
+    public boolean isExcluded(@NonNull final String value) {
         var excluded = false;
         if (excludeFacesParameter) {
             excluded = value.startsWith(JAVAX_FACES);

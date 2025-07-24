@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A string splitting utility inspired by Google Guava's Splitter, providing a more
@@ -142,7 +141,6 @@ public final class Splitter {
      */
     @NonNull
     public static Splitter on(@NonNull final String separator) {
-        requireNonNull(separator, "separator must not be null");
         if (separator.isEmpty()) {
             throw new IllegalArgumentException("separator must not be empty");
         }
@@ -170,7 +168,6 @@ public final class Splitter {
      */
     @NonNull
     public static Splitter on(@NonNull final Pattern separatorPattern) {
-        requireNonNull(separatorPattern, "separatorPattern must not be null");
         return new Splitter(SplitterConfig.builder()
                 .separator(separatorPattern.pattern())
                 .pattern(separatorPattern)
