@@ -446,36 +446,61 @@ public class FilenameUtils {
         context.size = size;
     }
 
-    @SuppressWarnings({"squid:LabelsShouldNotBeUsedCheck", "squid:ForLoopCounterChangedCheck"}) // labeled loop needed for algorithm
+    @SuppressWarnings("squid:ForLoopCounterChangedCheck") // loop counter modification needed for algorithm
     private static void removeDoubleDotSlashes(NormalizationContext context) {
         var size = context.size;
-        outer: for (var i = context.prefix + 2; i < size; i++) {
-            if (context.array[i] == context.separator && context.array[i - 1] == '.' && context.array[i - 2] == '.'
-                    && (i == context.prefix + 2 || context.array[i - 3] == context.separator)) {
+        for (var i = context.prefix + 2; i < size; i++) {
+            if (isDoubleDotPattern(context, i)) {
                 if (i == context.prefix + 2) {
                     context.size = -1; // Signal invalid path
                     return;
                 }
+                
                 if (i == size - 1) {
                     context.lastIsDirectory = true;
                 }
-                int j;
-                for (j = i - 4; j >= context.prefix; j--) {
-                    if (context.array[j] == context.separator) {
-                        // remove b/../ from a/b/../c
-                        System.arraycopy(context.array, i + 1, context.array, j + 1, size - i);
-                        size -= i - j;
-                        i = j + 1;
-                        continue outer;
-                    }
+                
+                var result = findAndRemoveParentDirectory(context, i, size);
+                if (result != null) {
+                    size = result.newSize;
+                    i = result.newPosition - 1; // Will be incremented by loop
+                } else {
+                    // remove a/../ from a/../c
+                    System.arraycopy(context.array, i + 1, context.array, context.prefix, size - i);
+                    size -= i + 1 - context.prefix;
+                    i = context.prefix;
                 }
-                // remove a/../ from a/../c
-                System.arraycopy(context.array, i + 1, context.array, context.prefix, size - i);
-                size -= i + 1 - context.prefix;
-                i = context.prefix + 1;
             }
         }
         context.size = size;
+    }
+    
+    private static boolean isDoubleDotPattern(NormalizationContext context, int i) {
+        return context.array[i] == context.separator 
+                && context.array[i - 1] == '.' 
+                && context.array[i - 2] == '.'
+                && (i == context.prefix + 2 || context.array[i - 3] == context.separator);
+    }
+    
+    private static RemovalResult findAndRemoveParentDirectory(NormalizationContext context, int i, int size) {
+        for (var j = i - 4; j >= context.prefix; j--) {
+            if (context.array[j] == context.separator) {
+                // remove b/../ from a/b/../c
+                System.arraycopy(context.array, i + 1, context.array, j + 1, size - i);
+                return new RemovalResult(size - (i - j), j + 1);
+            }
+        }
+        return null;
+    }
+    
+    private static class RemovalResult {
+        final int newSize;
+        final int newPosition;
+        
+        RemovalResult(int newSize, int newPosition) {
+            this.newSize = newSize;
+            this.newPosition = newPosition;
+        }
     }
 
     private static String buildNormalizedPath(NormalizationContext context, boolean keepSeparator) {
