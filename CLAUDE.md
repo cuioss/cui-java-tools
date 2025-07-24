@@ -96,4 +96,4 @@ This is a Maven project with standard structure:
 - Follow CUI standards as outlined in `doc/ai-rules.md`
 - Always run pre-commit checks before making changes
 - Use appropriate test coverage for all new code
-- Document any new public APIs according to Javadoc standards
++ Document any new public APIs according to Javadoc standards
