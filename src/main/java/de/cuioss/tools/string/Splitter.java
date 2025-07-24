@@ -98,9 +98,6 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor(access = AccessLevel.MODULE)
 public final class Splitter {
 
-    private static final String REGEX_METACHARACTERS = ".*[\\[\\]{}()*.+?^$|\\\\].*";
-    private static final String REGEX_METACHARACTER_ERROR = "Separator contains regex metacharacters but doNotModifySeparatorString is true: ";
-
     private static final CuiLogger LOGGER = new CuiLogger(Splitter.class);
 
     @NonNull
@@ -294,10 +291,6 @@ public final class Splitter {
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
             return Collections.emptyList();
-        }
-        if (splitterConfig.isDoNotModifySeparatorString() &&
-                splitterConfig.getSeparator().matches(REGEX_METACHARACTERS)) {
-            throw new IllegalArgumentException(REGEX_METACHARACTER_ERROR + splitterConfig.getSeparator());
         }
         LOGGER.debug("Splitting '%s' with pattern '%s'", sequence, splitterConfig.getSeparator());
         if (isEmpty(sequence)) {

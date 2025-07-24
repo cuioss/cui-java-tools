@@ -233,23 +233,20 @@ class SplitterTest {
         }
 
         var splitter = Splitter.on("[").doNotModifySeparatorString();
-        assertThrows(IllegalArgumentException.class, () ->
-                splitter.splitToList("[boom]"));
+        var result = splitter.splitToList("[boom]");
+        assertEquals(immutableList("", "boom]"), result);
     }
 
     @Test
     void doNotModifySeparatorStringWithAllRegexMetacharacters() {
-        // Test all regex metacharacters that should be detected
+        // Test all regex metacharacters work as literal separators when using doNotModifySeparatorString
         String[] regexMetacharacters = {"[", "]", "{", "}", "(", ")", "*", "+", "?", "^", "$", "|", "\\", "."};
 
         for (String metachar : regexMetacharacters) {
             var splitter = Splitter.on(metachar).doNotModifySeparatorString();
-            var ex = assertThrows(IllegalArgumentException.class, () ->
-                            splitter.splitToList("test" + metachar + "data"),
-                    "Should throw for metacharacter: " + metachar
-            );
-            assertTrue(ex.getMessage().contains("regex metacharacters"),
-                    "Error message should mention regex metacharacters for: " + metachar);
+            var result = splitter.splitToList("test" + metachar + "data");
+            assertEquals(immutableList("test", "data"), result,
+                    "Regex metacharacter should work as literal separator: " + metachar);
         }
 
         // Test that normal characters work fine
