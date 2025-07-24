@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.io;
 
+import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
@@ -76,6 +77,8 @@ class StructuredFilenameTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        ObjectMethodsAsserts.assertNiceObject(new StructuredFilename("test.suffix"));
+        var name = Generators.randomString();
+        var suffix = Generators.randomString();
+        ObjectMethodsAsserts.assertNiceObject(new StructuredFilename(name + "." + suffix));
     }
 }
