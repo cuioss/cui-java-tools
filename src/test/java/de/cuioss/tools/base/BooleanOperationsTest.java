@@ -27,15 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static de.cuioss.tools.base.BooleanOperations.areAllFalse;
-import static de.cuioss.tools.base.BooleanOperations.areAllTrue;
-import static de.cuioss.tools.base.BooleanOperations.isAnyFalse;
-import static de.cuioss.tools.base.BooleanOperations.isAnyTrue;
-import static de.cuioss.tools.base.BooleanOperations.isValidBoolean;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.cuioss.tools.base.BooleanOperations.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("BooleanOperations should")
 class BooleanOperationsTest {

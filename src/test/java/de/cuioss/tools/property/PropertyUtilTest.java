@@ -27,20 +27,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static de.cuioss.tools.property.PropertyUtil.readProperty;
-import static de.cuioss.tools.property.PropertyUtil.resolvePropertyType;
-import static de.cuioss.tools.property.PropertyUtil.writeProperty;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_DEFAULT_VALUE;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_NOT_ACCESSIBLE;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_ONLY;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE_WITH_BUILDER;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_WRITE_ONLY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static de.cuioss.tools.property.PropertyUtil.*;
+import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("java:S5738")
 class PropertyUtilTest {

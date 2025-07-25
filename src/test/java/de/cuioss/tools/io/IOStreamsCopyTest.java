@@ -41,9 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static de.cuioss.tools.io.IOStreams.copyLarge;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="https://github.com/apache/commons-io/blob/master/src/test/java/org/apache/commons/io/IOUtilsCopyTestCase.java">...</a>

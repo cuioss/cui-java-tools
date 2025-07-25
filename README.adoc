@@ -1,4 +1,4 @@
-= cui-java-tools
+ch= cui-java-tools
 
 == Status
 

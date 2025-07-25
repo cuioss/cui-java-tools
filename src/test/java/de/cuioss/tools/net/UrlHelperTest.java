@@ -22,18 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.net.UrlHelper.addPrecedingSlashToPath;
-import static de.cuioss.tools.net.UrlHelper.addTrailingSlashToUrl;
-import static de.cuioss.tools.net.UrlHelper.isValidUri;
-import static de.cuioss.tools.net.UrlHelper.removePrecedingSlashFromPath;
-import static de.cuioss.tools.net.UrlHelper.removeTrailingSlashesFromUrl;
-import static de.cuioss.tools.net.UrlHelper.splitHost;
-import static de.cuioss.tools.net.UrlHelper.splitPath;
-import static de.cuioss.tools.net.UrlHelper.tryParseUri;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.cuioss.tools.net.UrlHelper.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UrlHelperTest {
 
