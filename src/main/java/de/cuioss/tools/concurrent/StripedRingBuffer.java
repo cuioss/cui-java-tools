@@ -52,8 +52,9 @@ public class StripedRingBuffer {
     /**
      * Number of independent ring buffer stripes.
      * Based on available processors to minimize contention.
+     * Rounded to next power of 2 for efficient bitwise operations.
      */
-    private static final int STRIPE_COUNT = Math.max(4, Runtime.getRuntime().availableProcessors());
+    private static final int STRIPE_COUNT = nextPowerOfTwo(Math.max(4, Runtime.getRuntime().availableProcessors()));
 
     /**
      * Array of independent ring buffers.
@@ -111,8 +112,8 @@ public class StripedRingBuffer {
         }
 
         // Select stripe based on current thread to minimize contention
-        // Use absolute value to avoid negative indices
-        int stripeIndex = (Thread.currentThread().hashCode() & Integer.MAX_VALUE) % stripeCount;
+        // Use bitwise AND for efficient stripe selection (stripeCount is power of 2)
+        int stripeIndex = (Thread.currentThread().hashCode() & Integer.MAX_VALUE) & (stripeCount - 1);
         stripes[stripeIndex].recordMeasurement(microseconds);
     }
 
@@ -165,6 +166,20 @@ public class StripedRingBuffer {
         for (RingBuffer stripe : stripes) {
             stripe.reset();
         }
+    }
+
+    /**
+     * Calculates the next power of 2 greater than or equal to the given value.
+     * <p>
+     * This is used to ensure the stripe count is a power of 2,
+     * enabling efficient bit masking operations instead of expensive modulo operations.
+     *
+     * @param value the input value (must be positive)
+     * @return the next power of 2
+     */
+    private static int nextPowerOfTwo(int value) {
+        if (value <= 1) return 1;
+        return Integer.highestOneBit(value - 1) << 1;
     }
 
 }
