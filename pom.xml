@@ -12,7 +12,7 @@
 
     <artifactId>cui-java-tools</artifactId>
     <name>cui java tools</name>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.5.0</version>
     <description>Utility Library acting as a replacement for google's guava,
         certain apache-commons libraries and logging facades/frameworks.
     </description>
@@ -24,7 +24,7 @@
         <url>https://github.com/cuioss/cui-java-tools/</url>
         <connection>scm:git:https://github.com/cuioss/cui-java-tools.git</connection>
         <developerConnection>scm:git:https://github.com/cuioss/cui-java-tools/</developerConnection>
-        <tag>HEAD</tag>
+        <tag>2.5.0</tag>
     </scm>
     <properties>
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
