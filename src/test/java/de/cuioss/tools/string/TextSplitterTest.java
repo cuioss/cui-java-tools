@@ -17,12 +17,8 @@ package de.cuioss.tools.string;
 
 import org.junit.jupiter.api.Test;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.valueOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TextSplitterTest {
 
@@ -43,7 +39,7 @@ class TextSplitterTest {
 
         assertEquals("", new TextSplitter("").getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
 
-        assertThat(new TextSplitter("").isAbridged(), is(FALSE));
+        assertFalse(new TextSplitter("").isAbridged());
 
         assertEquals("", new TextSplitter("").getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
     }
@@ -55,7 +51,7 @@ class TextSplitterTest {
         textSplitter.setAbridgedLength(valueOf(16));
 
         assertEquals("My extremly ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(textSplitter.isAbridged(), is(TRUE));
+        assertTrue(textSplitter.isAbridged());
     }
 
     @Test
@@ -64,7 +60,7 @@ class TextSplitterTest {
         textSplitter = new TextSplitter(text);
 
         assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(textSplitter.isAbridged(), is(FALSE));
+        assertFalse(textSplitter.isAbridged());
     }
 
     @Test
@@ -74,7 +70,7 @@ class TextSplitterTest {
         textSplitter.setAbridgedLength(valueOf(16));
 
         assertEquals("Myextremlylo ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(textSplitter.isAbridged(), is(TRUE));
+        assertTrue(textSplitter.isAbridged());
     }
 
     @Test
@@ -83,7 +79,7 @@ class TextSplitterTest {
         textSplitter = new TextSplitter(text);
 
         assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(textSplitter.isAbridged(), is(FALSE));
+        assertFalse(textSplitter.isAbridged());
     }
 
     @Test
