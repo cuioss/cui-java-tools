@@ -18,6 +18,7 @@ package de.cuioss.tools.concurrent;
 import de.cuioss.tools.logging.CuiLogger;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
  * High-performance lock-free ring buffer implementation.
@@ -52,8 +53,9 @@ public class RingBuffer {
 
     /**
      * Storage array for measurements in microseconds.
+     * Uses AtomicLongArray to ensure thread-safe access and visibility.
      */
-    private final long[] samples;
+    private final AtomicLongArray samples;
 
     /**
      * Bit mask for efficient index calculation (capacity - 1).
@@ -85,7 +87,7 @@ public class RingBuffer {
         }
 
         int actualCapacity = nextPowerOfTwo(capacity);
-        this.samples = new long[actualCapacity];
+        this.samples = new AtomicLongArray(actualCapacity);
         this.mask = actualCapacity - 1;
 
         if (actualCapacity != capacity) {
@@ -109,10 +111,10 @@ public class RingBuffer {
         }
 
         int index = writeIndex.getAndIncrement() & mask;
-        samples[index] = microseconds;
+        samples.set(index, microseconds);
 
         // Update sample count (capped at array length)
-        sampleCount.updateAndGet(current -> Math.min(current + 1, samples.length));
+        sampleCount.updateAndGet(current -> Math.min(current + 1, samples.length()));
     }
 
     /**
@@ -135,7 +137,7 @@ public class RingBuffer {
         // but this is acceptable for performance monitoring where perfect accuracy
         // is less important than minimal overhead)
         for (int i = 0; i < count; i++) {
-            sum += samples[i];
+            sum += samples.get(i);
         }
 
         return new RingBufferStatistics(sum, count);
