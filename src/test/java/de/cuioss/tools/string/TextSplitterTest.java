@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -44,7 +43,7 @@ class TextSplitterTest {
 
         assertEquals("", new TextSplitter("").getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
 
-        assertThat(valueOf(new TextSplitter("").isAbridged()), is(FALSE));
+        assertThat(new TextSplitter("").isAbridged(), is(FALSE));
 
         assertEquals("", new TextSplitter("").getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
     }
@@ -56,7 +55,7 @@ class TextSplitterTest {
         textSplitter.setAbridgedLength(valueOf(16));
 
         assertEquals("My extremly ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(valueOf(textSplitter.isAbridged()), is(TRUE));
+        assertThat(textSplitter.isAbridged(), is(TRUE));
     }
 
     @Test
@@ -65,7 +64,7 @@ class TextSplitterTest {
         textSplitter = new TextSplitter(text);
 
         assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(valueOf(textSplitter.isAbridged()), is(FALSE));
+        assertThat(textSplitter.isAbridged(), is(FALSE));
     }
 
     @Test
@@ -75,7 +74,7 @@ class TextSplitterTest {
         textSplitter.setAbridgedLength(valueOf(16));
 
         assertEquals("Myextremlylo ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(valueOf(textSplitter.isAbridged()), is(TRUE));
+        assertThat(textSplitter.isAbridged(), is(TRUE));
     }
 
     @Test
@@ -84,7 +83,7 @@ class TextSplitterTest {
         textSplitter = new TextSplitter(text);
 
         assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
-        assertThat(valueOf(textSplitter.isAbridged()), is(FALSE));
+        assertThat(textSplitter.isAbridged(), is(FALSE));
     }
 
     @Test

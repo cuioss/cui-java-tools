@@ -24,19 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
-import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static de.cuioss.tools.collect.CollectionLiterals.mutableMap;
-import static de.cuioss.tools.collect.MoreCollections.containsKey;
-import static de.cuioss.tools.collect.MoreCollections.difference;
-import static de.cuioss.tools.collect.MoreCollections.isEmpty;
-import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.cuioss.tools.collect.CollectionLiterals.*;
+import static de.cuioss.tools.collect.MoreCollections.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MoreCollectionsTest {
 

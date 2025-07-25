@@ -28,25 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static de.cuioss.tools.io.MorePaths.BACKUP_DIR_NAME;
-import static de.cuioss.tools.io.MorePaths.BACKUP_FILE_SUFFIX;
-import static de.cuioss.tools.io.MorePaths.backupFile;
-import static de.cuioss.tools.io.MorePaths.checkAccessiblePath;
-import static de.cuioss.tools.io.MorePaths.checkExecutablePath;
-import static de.cuioss.tools.io.MorePaths.copyToTempLocation;
-import static de.cuioss.tools.io.MorePaths.createNonExistingPath;
-import static de.cuioss.tools.io.MorePaths.deleteQuietly;
-import static de.cuioss.tools.io.MorePaths.getBackupDirectoryForPath;
-import static de.cuioss.tools.io.MorePaths.getRealPathSafely;
-import static de.cuioss.tools.io.MorePaths.saveAndBackup;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static de.cuioss.tools.io.MorePaths.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MorePathsTest {
 

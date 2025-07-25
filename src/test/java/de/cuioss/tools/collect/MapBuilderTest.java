@@ -20,9 +20,7 @@ import org.junit.jupiter.api.Test;
 import static de.cuioss.tools.collect.CollectionLiterals.immutableMap;
 import static de.cuioss.tools.collect.CollectionLiteralsTest.assertImmutable;
 import static de.cuioss.tools.collect.CollectionLiteralsTest.assertMutable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MapBuilderTest {
 

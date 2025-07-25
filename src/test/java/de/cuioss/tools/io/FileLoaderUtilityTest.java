@@ -22,11 +22,7 @@ import java.nio.file.Files;
 
 import static de.cuioss.tools.io.FileLoaderUtility.copyFileToTemp;
 import static de.cuioss.tools.io.FileLoaderUtility.getLoaderForPath;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("DataFlowIssue")
 class FileLoaderUtilityTest {

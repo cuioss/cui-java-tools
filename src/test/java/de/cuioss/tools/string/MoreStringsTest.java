@@ -20,15 +20,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
-import static de.cuioss.tools.string.MoreStrings.emptyToNull;
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
-import static de.cuioss.tools.string.MoreStrings.unquote;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.cuioss.tools.string.MoreStrings.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"ConstantValue", "DataFlowIssue"})
 class MoreStringsTest {

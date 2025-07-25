@@ -22,20 +22,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
-import static de.cuioss.tools.property.PropertyReadWrite.NONE;
-import static de.cuioss.tools.property.PropertyReadWrite.READ_ONLY;
-import static de.cuioss.tools.property.PropertyReadWrite.READ_WRITE;
-import static de.cuioss.tools.property.PropertyReadWrite.WRITE_ONLY;
-import static de.cuioss.tools.property.PropertyReadWrite.fromPropertyDescriptor;
-import static de.cuioss.tools.property.PropertyReadWrite.resolveForBean;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_NOT_ACCESSIBLE;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_ONLY;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_READ_WRITE_WITH_BUILDER;
-import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.ATTRIBUTE_WRITE_ONLY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.cuioss.tools.property.PropertyReadWrite.*;
+import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PropertyReadWriteTest {
 
