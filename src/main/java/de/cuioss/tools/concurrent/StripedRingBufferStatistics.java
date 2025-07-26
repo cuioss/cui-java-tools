@@ -45,9 +45,9 @@ Duration p99) {
     /**
      * Computes statistics from the given ring buffer stripes.
      * <p>
-     * This method aggregates statistics from all stripes. Since individual
-     * RingBufferStatistics already contain percentiles, we need to re-compute
-     * them from the aggregated samples for accuracy.
+     * This method aggregates raw samples from all stripes to compute
+     * accurate overall statistics. Percentiles are computed from the combined
+     * dataset to ensure correctness.
      *
      * @param stripes array of ring buffer stripes
      * @param timeUnit the time unit of the measurements

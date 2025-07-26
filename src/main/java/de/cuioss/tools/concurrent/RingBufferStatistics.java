@@ -101,7 +101,7 @@ Duration p99) {
         }
 
         // Special handling for median (P50) with even number of samples
-        if (percentile == 0.50 && sortedSamples.length % 2 == 0) {
+        if (Math.abs(percentile - 0.50) < 1e-9 && sortedSamples.length % 2 == 0) {
             int lowerIndex = sortedSamples.length / 2 - 1;
             int upperIndex = sortedSamples.length / 2;
             return (sortedSamples[lowerIndex] + sortedSamples[upperIndex]) / 2;
