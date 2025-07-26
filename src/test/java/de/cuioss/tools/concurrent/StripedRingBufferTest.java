@@ -68,11 +68,11 @@ class StripedRingBufferTest {
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
         // Median should be 250
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.p50());
+        assertEquals(Duration.of(250, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50());
         assertEquals(4, stats.sampleCount());
         // P95 and P99 should be at or near the max value
-        assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(300))) >= 0);
-        assertTrue(stats.p99().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(300))) >= 0);
+        assertTrue(stats.p95().compareTo(Duration.of(300, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0);
+        assertTrue(stats.p99().compareTo(Duration.of(300, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0);
     }
 
     @Test
@@ -191,10 +191,10 @@ class StripedRingBufferTest {
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
         // Median should be 500
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500)), stats.p50());
+        assertEquals(Duration.of(500, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50());
         // P95 and P99 should be close to or at the max
-        assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
-        assertTrue(stats.p99().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
+        assertTrue(stats.p95().compareTo(Duration.of(500, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0);
+        assertTrue(stats.p99().compareTo(Duration.of(500, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0);
     }
 
     @Test
@@ -207,9 +207,9 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(largeValue);
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p50());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p95());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p99());
+        assertEquals(Duration.of(largeValue, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50());
+        assertEquals(Duration.of(largeValue, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p95());
+        assertEquals(Duration.of(largeValue, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p99());
     }
 
     @Test
@@ -245,11 +245,11 @@ class StripedRingBufferTest {
         // Due to striping and limited buffer size, values should be within the range we inserted
         Duration p95 = stats.p95();
         Duration p99 = stats.p99();
-        assertTrue(p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
-                p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+        assertTrue(p95.compareTo(Duration.of(10, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0 &&
+                p95.compareTo(Duration.of(1000, TimeUnit.MICROSECONDS.toChronoUnit())) <= 0,
                 "P95 should be within range, got: " + p95);
-        assertTrue(p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
-                p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+        assertTrue(p99.compareTo(Duration.of(10, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0 &&
+                p99.compareTo(Duration.of(1000, TimeUnit.MICROSECONDS.toChronoUnit())) <= 0,
                 "P99 should be within range, got: " + p99);
     }
 
@@ -265,9 +265,9 @@ class StripedRingBufferTest {
         // Single value
         buffer.recordMeasurement(42);
         stats = buffer.getStatistics();
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p50());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p95());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p99());
+        assertEquals(Duration.of(42, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50());
+        assertEquals(Duration.of(42, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p95());
+        assertEquals(Duration.of(42, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p99());
     }
 
 
@@ -291,11 +291,11 @@ class StripedRingBufferTest {
         // Values should be within our input range
         Duration p95 = stats.p95();
         Duration p99 = stats.p99();
-        assertTrue(p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
-                p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+        assertTrue(p95.compareTo(Duration.of(10, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0 &&
+                p95.compareTo(Duration.of(1000, TimeUnit.MICROSECONDS.toChronoUnit())) <= 0,
                 "P95 should be within range");
-        assertTrue(p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
-                p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+        assertTrue(p99.compareTo(Duration.of(10, TimeUnit.MICROSECONDS.toChronoUnit())) >= 0 &&
+                p99.compareTo(Duration.of(1000, TimeUnit.MICROSECONDS.toChronoUnit())) <= 0,
                 "P99 should be within range");
     }
 }

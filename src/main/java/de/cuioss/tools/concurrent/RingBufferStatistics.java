@@ -81,9 +81,9 @@ Duration p99) {
         long p99Value = calculatePercentile(samples, 0.99);
 
         // Convert to Duration based on TimeUnit
-        Duration p50 = Duration.ofNanos(timeUnit.toNanos(medianValue));
-        Duration p95 = Duration.ofNanos(timeUnit.toNanos(p95Value));
-        Duration p99 = Duration.ofNanos(timeUnit.toNanos(p99Value));
+        Duration p50 = Duration.of(medianValue, timeUnit.toChronoUnit());
+        Duration p95 = Duration.of(p95Value, timeUnit.toChronoUnit());
+        Duration p99 = Duration.of(p99Value, timeUnit.toChronoUnit());
 
         return new RingBufferStatistics(samples.length, p50, p95, p99);
     }

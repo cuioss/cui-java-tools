@@ -106,7 +106,7 @@ class RingBufferTest {
 
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(3, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(200)), stats.p50()); // median of [100, 200, 300]
+        assertEquals(Duration.of(200, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50()); // median of [100, 200, 300]
     }
 
     @Test
@@ -120,7 +120,7 @@ class RingBufferTest {
 
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(4, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.p50()); // median of [100, 200, 300, 400]
+        assertEquals(Duration.of(250, TimeUnit.MICROSECONDS.toChronoUnit()), stats.p50()); // median of [100, 200, 300, 400]
 
         // Add one more - should overwrite oldest
         buffer.recordMeasurement(500);
