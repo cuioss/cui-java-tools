@@ -17,6 +17,9 @@ package de.cuioss.tools.concurrent;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -29,36 +32,41 @@ class RingBufferStatisticsTest {
 
     @Test
     void shouldCreateValidStatistics() {
-        RingBufferStatistics stats = new RingBufferStatistics(1000, 10);
-        assertEquals(1000, stats.sum());
-        assertEquals(10, stats.count());
+        Duration avg = Duration.ofMillis(100);
+        Duration p95 = Duration.ofMillis(180);
+        Duration p99 = Duration.ofMillis(190);
+        RingBufferStatistics stats = new RingBufferStatistics(10, avg, p95, p99);
+        assertEquals(10, stats.sampleCount());
+        assertEquals(avg, stats.average());
+        assertEquals(p95, stats.p95());
+        assertEquals(p99, stats.p99());
     }
 
     @Test
-    void shouldRejectNegativeSum() {
+    void shouldRejectNegativeSampleCount() {
         assertThrows(IllegalArgumentException.class,
-                () -> new RingBufferStatistics(-1, 10));
+                () -> new RingBufferStatistics(-1, Duration.ofMillis(100), Duration.ofMillis(180), Duration.ofMillis(190)));
     }
 
-    @Test
-    void shouldRejectNegativeCount() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new RingBufferStatistics(1000, -1));
-    }
 
     @Test
     void shouldAllowZeroValues() {
-        RingBufferStatistics stats = new RingBufferStatistics(0, 0);
-        assertEquals(0, stats.sum());
-        assertEquals(0, stats.count());
+        RingBufferStatistics stats = new RingBufferStatistics(0, Duration.ZERO, Duration.ZERO, Duration.ZERO);
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.average());
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
     }
 
     @Test
     void shouldImplementEqualsAndHashCode() {
-        RingBufferStatistics stats1 = new RingBufferStatistics(1000, 10);
-        RingBufferStatistics stats2 = new RingBufferStatistics(1000, 10);
-        RingBufferStatistics stats3 = new RingBufferStatistics(2000, 10);
-        RingBufferStatistics stats4 = new RingBufferStatistics(1000, 20);
+        Duration avg = Duration.ofMillis(100);
+        Duration p95 = Duration.ofMillis(180);
+        Duration p99 = Duration.ofMillis(190);
+        RingBufferStatistics stats1 = new RingBufferStatistics(10, avg, p95, p99);
+        RingBufferStatistics stats2 = new RingBufferStatistics(10, avg, p95, p99);
+        RingBufferStatistics stats3 = new RingBufferStatistics(10, Duration.ofMillis(200), p95, p99);
+        RingBufferStatistics stats4 = new RingBufferStatistics(20, avg, p95, p99);
 
         // Test equals
         assertEquals(stats1, stats2);
@@ -73,17 +81,50 @@ class RingBufferStatisticsTest {
 
     @Test
     void shouldProvideToString() {
-        RingBufferStatistics stats = new RingBufferStatistics(1000, 10);
+        Duration avg = Duration.ofMillis(100);
+        Duration p95 = Duration.ofMillis(180);
+        Duration p99 = Duration.ofMillis(190);
+        RingBufferStatistics stats = new RingBufferStatistics(10, avg, p95, p99);
         String toString = stats.toString();
         assertNotNull(toString);
-        assertTrue(toString.contains("1000"));
         assertTrue(toString.contains("10"));
+        // Duration toString format might vary, just check it's present
+        assertNotNull(toString);
     }
 
     @Test
     void shouldHandleLargeValues() {
-        RingBufferStatistics stats = new RingBufferStatistics(Long.MAX_VALUE - 1, Integer.MAX_VALUE);
-        assertEquals(Long.MAX_VALUE - 1, stats.sum());
-        assertEquals(Integer.MAX_VALUE, stats.count());
+        Duration large = Duration.ofNanos(Long.MAX_VALUE - 1);
+        RingBufferStatistics stats = new RingBufferStatistics(Integer.MAX_VALUE, large, large, large);
+        assertEquals(Integer.MAX_VALUE, stats.sampleCount());
+        assertEquals(large, stats.average());
+    }
+
+    @Test
+    void shouldComputeFromSamples() {
+        // Test with empty array
+        RingBufferStatistics stats = RingBufferStatistics.computeFrom(new long[0], TimeUnit.MICROSECONDS);
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.average());
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
+
+        // Test with single value
+        stats = RingBufferStatistics.computeFrom(new long[]{100}, TimeUnit.MICROSECONDS);
+        assertEquals(1, stats.sampleCount());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.average());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.p95());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.p99());
+
+        // Test with multiple values
+        long[] samples = new long[100];
+        for (int i = 0; i < 100; i++) {
+            samples[i] = i + 1; // 1 to 100
+        }
+        stats = RingBufferStatistics.computeFrom(samples, TimeUnit.MICROSECONDS);
+        assertEquals(100, stats.sampleCount());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(50)), stats.average()); // (1+100)*100/2 / 100 = 50.5, truncated to 50
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(95)), stats.p95());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(99)), stats.p99());
     }
 }

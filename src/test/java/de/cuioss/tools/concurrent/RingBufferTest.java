@@ -17,6 +17,7 @@ package de.cuioss.tools.concurrent;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +34,30 @@ import static org.junit.jupiter.api.Assertions.*;
 class RingBufferTest {
 
     @Test
+    void shouldDefaultToMicroseconds() {
+        RingBuffer buffer = new RingBuffer(10);
+        // This test just verifies the constructor works
+        assertNotNull(buffer);
+    }
+
+    @Test
+    void shouldAcceptCustomTimeUnit() {
+        RingBuffer buffer = new RingBuffer(10, TimeUnit.MILLISECONDS);
+        assertNotNull(buffer);
+
+        buffer = new RingBuffer(10, TimeUnit.NANOSECONDS);
+        assertNotNull(buffer);
+
+        buffer = new RingBuffer(10, TimeUnit.SECONDS);
+        assertNotNull(buffer);
+    }
+
+    @Test
+    void shouldRejectNullTimeUnit() {
+        assertThrows(NullPointerException.class, () -> new RingBuffer(10, null));
+    }
+
+    @Test
     void shouldRejectInvalidCapacity() {
         assertThrows(IllegalArgumentException.class, () -> new RingBuffer(0));
         assertThrows(IllegalArgumentException.class, () -> new RingBuffer(-1));
@@ -42,6 +67,10 @@ class RingBufferTest {
     void shouldRejectNegativeMeasurements() {
         RingBuffer buffer = new RingBuffer(10);
         assertThrows(IllegalArgumentException.class, () -> buffer.recordMeasurement(-1));
+
+        // Also test with custom time unit
+        RingBuffer bufferMs = new RingBuffer(10, TimeUnit.MILLISECONDS);
+        assertThrows(IllegalArgumentException.class, () -> bufferMs.recordMeasurement(-1));
     }
 
     @Test
@@ -53,15 +82,17 @@ class RingBufferTest {
             buffer.recordMeasurement(i);
         }
         RingBufferStatistics stats = buffer.getStatistics();
-        assertTrue(stats.count() <= 16); // Should be capped at actual capacity
+        assertTrue(stats.sampleCount() <= 16); // Should be capped at actual capacity
     }
 
     @Test
     void shouldHandleEmptyBuffer() {
         RingBuffer buffer = new RingBuffer(10);
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(0, stats.sum());
-        assertEquals(0, stats.count());
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.average());
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
     }
 
     @Test
@@ -74,8 +105,8 @@ class RingBufferTest {
         buffer.recordMeasurement(300);
 
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(600, stats.sum());
-        assertEquals(3, stats.count());
+        assertEquals(3, stats.sampleCount());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(200)), stats.average()); // (100 + 200 + 300) / 3
     }
 
     @Test
@@ -88,15 +119,15 @@ class RingBufferTest {
         }
 
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(1000, stats.sum()); // 100 + 200 + 300 + 400
-        assertEquals(4, stats.count());
+        assertEquals(4, stats.sampleCount());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.average()); // (100 + 200 + 300 + 400) / 4
 
         // Add one more - should overwrite oldest
         buffer.recordMeasurement(500);
 
         // Sample count should remain at 4
         stats = buffer.getStatistics();
-        assertEquals(4, stats.count());
+        assertEquals(4, stats.sampleCount());
     }
 
     @Test
@@ -110,15 +141,15 @@ class RingBufferTest {
 
         // Verify they're there
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(3, stats.count());
+        assertEquals(3, stats.sampleCount());
 
         // Reset
         buffer.reset();
 
         // Should be empty
         stats = buffer.getStatistics();
-        assertEquals(0, stats.sum());
-        assertEquals(0, stats.count());
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.average());
     }
 
     @Test
@@ -150,8 +181,8 @@ class RingBufferTest {
 
         // Verify we recorded something (exact count may vary due to overwrites)
         RingBufferStatistics stats = buffer.getStatistics();
-        assertTrue(stats.count() > 0);
-        assertTrue(stats.sum() > 0);
+        assertTrue(stats.sampleCount() > 0);
+        assertFalse(stats.average().isNegative());
     }
 
     @Test
@@ -163,8 +194,8 @@ class RingBufferTest {
         buffer.recordMeasurement(1000000000L);
 
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(2, stats.count());
-        assertTrue(stats.sum() > 0);
+        assertEquals(2, stats.sampleCount());
+        assertFalse(stats.average().isZero());
     }
 
     @Test
@@ -179,6 +210,66 @@ class RingBufferTest {
         testCapacityRounding(1000, 1024);
     }
 
+    @Test
+    void shouldReturnCorrectSamplesSnapshot() {
+        RingBuffer buffer = new RingBuffer(10);
+
+        // Empty buffer should return empty array
+        long[] snapshot = buffer.getSamplesSnapshot();
+        assertEquals(0, snapshot.length);
+
+        // Add some samples
+        buffer.recordMeasurement(100);
+        buffer.recordMeasurement(200);
+        buffer.recordMeasurement(300);
+
+        snapshot = buffer.getSamplesSnapshot();
+        assertEquals(3, snapshot.length);
+
+        // Verify values are correct (order may vary)
+        long sum = 0;
+        for (long value : snapshot) {
+            sum += value;
+        }
+        assertEquals(600, sum);
+    }
+
+    @Test
+    void shouldHandleSnapshotWithFullBuffer() {
+        RingBuffer buffer = new RingBuffer(4); // Capacity 4
+        
+        // Fill buffer completely
+        for (int i = 1; i <= 4; i++) {
+            buffer.recordMeasurement(i * 100);
+        }
+
+        long[] snapshot = buffer.getSamplesSnapshot();
+        assertEquals(4, snapshot.length);
+
+        // Add more to trigger overwrites
+        buffer.recordMeasurement(500);
+        buffer.recordMeasurement(600);
+
+        // Should still have 4 samples
+        snapshot = buffer.getSamplesSnapshot();
+        assertEquals(4, snapshot.length);
+    }
+
+    @Test
+    void shouldReturnSnapshotAfterReset() {
+        RingBuffer buffer = new RingBuffer(10);
+
+        buffer.recordMeasurement(100);
+        buffer.recordMeasurement(200);
+
+        // Reset
+        buffer.reset();
+
+        // Snapshot should be empty
+        long[] snapshot = buffer.getSamplesSnapshot();
+        assertEquals(0, snapshot.length);
+    }
+
     private void testCapacityRounding(int requested, int expectedPowerOfTwo) {
         RingBuffer buffer = new RingBuffer(requested);
 
@@ -189,6 +280,6 @@ class RingBufferTest {
 
         // Count should be capped at the power-of-2 capacity
         RingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(expectedPowerOfTwo, stats.count());
+        assertEquals(expectedPowerOfTwo, stats.sampleCount());
     }
 }

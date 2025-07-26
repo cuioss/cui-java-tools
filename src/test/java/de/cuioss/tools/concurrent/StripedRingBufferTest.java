@@ -17,6 +17,7 @@ package de.cuioss.tools.concurrent;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,12 +49,15 @@ class StripedRingBufferTest {
     @Test
     void shouldHandleEmptyBuffer() {
         StripedRingBuffer buffer = new StripedRingBuffer(100);
-        assertEquals(0, buffer.getAverage());
-        assertEquals(0, buffer.getSampleCount());
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.average());
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
     }
 
     @Test
-    void shouldRecordAndCalculateAverage() {
+    void shouldRecordAndCalculateStatistics() {
         StripedRingBuffer buffer = new StripedRingBuffer(100);
 
         // Record measurements
@@ -62,9 +66,13 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(300);
         buffer.recordMeasurement(400);
 
+        StripedRingBufferStatistics stats = buffer.getStatistics();
         // Average should be 250
-        assertEquals(250, buffer.getAverage());
-        assertEquals(4, buffer.getSampleCount());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.average());
+        assertEquals(4, stats.sampleCount());
+        // P95 and P99 should be at or near the max value
+        assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(300))) >= 0);
+        assertTrue(stats.p99().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(300))) >= 0);
     }
 
     @Test
@@ -77,15 +85,19 @@ class StripedRingBufferTest {
         }
 
         // Verify they're there
-        assertTrue(buffer.getSampleCount() > 0);
-        assertTrue(buffer.getAverage() > 0);
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertTrue(stats.sampleCount() > 0);
+        assertFalse(stats.average().isZero());
 
         // Reset
         buffer.reset();
 
         // Should be empty
-        assertEquals(0, buffer.getAverage());
-        assertEquals(0, buffer.getSampleCount());
+        stats = buffer.getStatistics();
+        assertEquals(Duration.ZERO, stats.average());
+        assertEquals(0, stats.sampleCount());
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
     }
 
     @Test
@@ -98,8 +110,9 @@ class StripedRingBufferTest {
         }
 
         // Should have recorded something
-        assertTrue(buffer.getSampleCount() > 0);
-        assertTrue(buffer.getAverage() >= 0);
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertTrue(stats.sampleCount() > 0);
+        assertFalse(stats.average().isNegative());
     }
 
     @Test
@@ -143,8 +156,9 @@ class StripedRingBufferTest {
         executor.shutdown();
 
         // Verify measurements were recorded
-        assertTrue(buffer.getSampleCount() > 0);
-        assertTrue(buffer.getAverage() > 0);
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertTrue(stats.sampleCount() > 0);
+        assertFalse(stats.average().isZero());
 
         // Note: We can't verify exact averages due to ring buffer overwrites,
         // but we can verify the buffer is functioning
@@ -160,12 +174,13 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(300);
 
         // Should still work, though capacity will be limited
-        assertTrue(buffer.getAverage() > 0);
-        assertTrue(buffer.getSampleCount() > 0);
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertFalse(stats.average().isZero());
+        assertTrue(stats.sampleCount() > 0);
     }
 
     @Test
-    void shouldCalculateAverageWithMixedValues() {
+    void shouldCalculateStatisticsWithMixedValues() {
         StripedRingBuffer buffer = new StripedRingBuffer(100);
 
         // Record a mix of small and large values
@@ -174,8 +189,12 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(500);
         buffer.recordMeasurement(500);
 
+        StripedRingBufferStatistics stats = buffer.getStatistics();
         // Average should be 500
-        assertEquals(500, buffer.getAverage());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500)), stats.average());
+        // P95 and P99 should be close to or at the max
+        assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
+        assertTrue(stats.p99().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
     }
 
     @Test
@@ -187,7 +206,10 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(largeValue);
         buffer.recordMeasurement(largeValue);
 
-        assertEquals(largeValue, buffer.getAverage());
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.average());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p95());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p99());
     }
 
     @Test
@@ -201,6 +223,79 @@ class StripedRingBufferTest {
 
         // The buffer should only maintain recent measurements
         // Due to striping, we can't predict exact values, but count should be limited
-        assertTrue(buffer.getSampleCount() <= 20); // Some reasonable upper bound
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertTrue(stats.sampleCount() <= 20); // Some reasonable upper bound
+    }
+
+    @Test
+    void shouldCalculatePercentilesCorrectly() {
+        StripedRingBuffer buffer = new StripedRingBuffer(1000); // Larger buffer to hold all values
+        
+        // Add known values for percentile calculation
+        for (int i = 1; i <= 100; i++) {
+            buffer.recordMeasurement(i * 10); // 10, 20, 30, ..., 1000
+        }
+
+        // Check statistics
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+
+        // P99 should be >= P95
+        assertTrue(stats.p99().compareTo(stats.p95()) >= 0, "P99 should be >= P95");
+
+        // Due to striping and limited buffer size, values should be within the range we inserted
+        Duration p95 = stats.p95();
+        Duration p99 = stats.p99();
+        assertTrue(p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
+                p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+                "P95 should be within range, got: " + p95);
+        assertTrue(p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
+                p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+                "P99 should be within range, got: " + p99);
+    }
+
+    @Test
+    void shouldHandlePercentileEdgeCases() {
+        StripedRingBuffer buffer = new StripedRingBuffer(100);
+
+        // Empty buffer should return 0
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+        assertEquals(Duration.ZERO, stats.p95());
+        assertEquals(Duration.ZERO, stats.p99());
+
+        // Single value
+        buffer.recordMeasurement(42);
+        stats = buffer.getStatistics();
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.average());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p95());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p99());
+    }
+
+
+    @Test
+    void shouldCalculatePercentilesWithSkewedDistribution() {
+        StripedRingBuffer buffer = new StripedRingBuffer(1000); // Larger buffer to ensure we capture the distribution
+        
+        // Add mostly small values with a few large outliers
+        for (int i = 0; i < 90; i++) {
+            buffer.recordMeasurement(10); // 90% are 10
+        }
+        for (int i = 0; i < 10; i++) {
+            buffer.recordMeasurement(1000); // 10% are 1000
+        }
+
+        StripedRingBufferStatistics stats = buffer.getStatistics();
+
+        // Basic sanity checks - percentiles should be ordered
+        assertTrue(stats.p99().compareTo(stats.p95()) >= 0, "P99 should be >= P95");
+
+        // Values should be within our input range
+        Duration p95 = stats.p95();
+        Duration p99 = stats.p99();
+        assertTrue(p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
+                p95.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+                "P95 should be within range");
+        assertTrue(p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(10))) >= 0 &&
+                p99.compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(1000))) <= 0,
+                "P99 should be within range");
     }
 }

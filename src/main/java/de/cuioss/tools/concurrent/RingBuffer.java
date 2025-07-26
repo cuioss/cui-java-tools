@@ -16,7 +16,9 @@
 package de.cuioss.tools.concurrent;
 
 import de.cuioss.tools.logging.CuiLogger;
+import lombok.NonNull;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLongArray;
 
@@ -43,16 +45,20 @@ import java.util.concurrent.atomic.AtomicLongArray;
  * <strong>Capacity:</strong>
  * The actual capacity will be rounded up to the next power of 2 for performance
  * optimization. For example, requesting capacity 100 will result in actual capacity 128.
+ * <p>
+ * <strong>Time Units:</strong>
+ * The ring buffer now supports configurable time units. By default, values are
+ * interpreted as microseconds for backward compatibility.
  *
  * @author Oliver Wolff
- * @since 1.0
+ * @since 2.5
  */
 public class RingBuffer {
 
     private static final CuiLogger LOGGER = new CuiLogger(RingBuffer.class);
 
     /**
-     * Storage array for measurements in microseconds.
+     * Storage array for measurements.
      * Uses AtomicLongArray to ensure thread-safe access and visibility.
      */
     private final AtomicLongArray samples;
@@ -73,7 +79,13 @@ public class RingBuffer {
     private final AtomicInteger sampleCount = new AtomicInteger(0);
 
     /**
-     * Creates a new ring buffer with the specified capacity.
+     * Time unit for interpreting measurement values.
+     */
+    @NonNull
+    private final TimeUnit timeUnit;
+
+    /**
+     * Creates a new ring buffer with the specified capacity, defaulting to microseconds.
      * <p>
      * The actual capacity will be rounded up to the next power of 2
      * for performance optimization.
@@ -82,6 +94,21 @@ public class RingBuffer {
      * @throws IllegalArgumentException if capacity is not positive
      */
     public RingBuffer(int capacity) {
+        this(capacity, TimeUnit.MICROSECONDS);
+    }
+
+    /**
+     * Creates a new ring buffer with the specified capacity and time unit.
+     * <p>
+     * The actual capacity will be rounded up to the next power of 2
+     * for performance optimization.
+     *
+     * @param capacity the desired capacity (must be positive)
+     * @param timeUnit the time unit for measurement values (must not be null)
+     * @throws IllegalArgumentException if capacity is not positive
+     * @throws NullPointerException if timeUnit is null
+     */
+    public RingBuffer(int capacity, @NonNull TimeUnit timeUnit) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be positive: " + capacity);
         }
@@ -89,6 +116,7 @@ public class RingBuffer {
         int actualCapacity = nextPowerOfTwo(capacity);
         this.samples = new AtomicLongArray(actualCapacity);
         this.mask = actualCapacity - 1;
+        this.timeUnit = timeUnit;
 
         if (actualCapacity != capacity) {
             LOGGER.debug("Ring buffer capacity adjusted from %s to %s (next power of 2)",
@@ -101,17 +129,18 @@ public class RingBuffer {
      * <p>
      * This operation is lock-free and designed for maximum performance.
      * The measurement will overwrite the oldest value when the buffer is full.
+     * The value is interpreted according to the configured time unit.
      *
-     * @param microseconds the measurement value in microseconds (must not be negative)
-     * @throws IllegalArgumentException if microseconds is negative
+     * @param amount the measurement value in the configured time unit (must not be negative)
+     * @throws IllegalArgumentException if amount is negative
      */
-    public void recordMeasurement(long microseconds) {
-        if (microseconds < 0) {
-            throw new IllegalArgumentException("Microseconds cannot be negative: " + microseconds);
+    public void recordMeasurement(long amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative: " + amount);
         }
 
         int index = writeIndex.getAndIncrement() & mask;
-        samples.set(index, microseconds);
+        samples.set(index, amount);
 
         // Update sample count (capped at array length)
         sampleCount.updateAndGet(current -> Math.min(current + 1, samples.length()));
@@ -120,27 +149,37 @@ public class RingBuffer {
     /**
      * Gets current statistics from this ring buffer.
      * <p>
-     * This method provides an eventually consistent snapshot of the buffer state.
-     * During concurrent writes, the statistics may include partial updates but
-     * will be consistent with the state at some point during the call.
+     * This method provides comprehensive statistics including sample count,
+     * average, P95, and P99. The result is eventually consistent and may
+     * include partial updates during concurrent write operations.
      *
-     * @return immutable statistics snapshot
+     * @return immutable statistics snapshot containing sampleCount, average, p95, and p99
      */
     public RingBufferStatistics getStatistics() {
+        long[] snapshot = getSamplesSnapshot();
+        return RingBufferStatistics.computeFrom(snapshot, timeUnit);
+    }
+
+    /**
+     * Gets a snapshot of all current samples for percentile calculations.
+     * <p>
+     * This method creates a copy of current samples to allow for sorting
+     * and percentile calculations without affecting the ring buffer state.
+     * The returned array will have size equal to the current sample count.
+     *
+     * @return array of samples in the configured time unit, or empty array if no samples
+     */
+    public long[] getSamplesSnapshot() {
         int count = sampleCount.get();
         if (count == 0) {
-            return new RingBufferStatistics(0, 0);
+            return new long[0];
         }
 
-        long sum = 0;
-        // Read current samples (may include some inconsistency during concurrent writes,
-        // but this is acceptable for performance monitoring where perfect accuracy
-        // is less important than minimal overhead)
+        long[] snapshot = new long[count];
         for (int i = 0; i < count; i++) {
-            sum += samples.get(i);
+            snapshot[i] = samples.get(i);
         }
-
-        return new RingBufferStatistics(sum, count);
+        return snapshot;
     }
 
     /**
