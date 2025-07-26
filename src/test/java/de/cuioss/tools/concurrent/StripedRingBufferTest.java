@@ -51,7 +51,7 @@ class StripedRingBufferTest {
         StripedRingBuffer buffer = new StripedRingBuffer(100);
         StripedRingBufferStatistics stats = buffer.getStatistics();
         assertEquals(0, stats.sampleCount());
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
         assertEquals(Duration.ZERO, stats.p95());
         assertEquals(Duration.ZERO, stats.p99());
     }
@@ -68,7 +68,7 @@ class StripedRingBufferTest {
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
         // Median should be 250
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.median());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.p50());
         assertEquals(4, stats.sampleCount());
         // P95 and P99 should be at or near the max value
         assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(300))) >= 0);
@@ -87,14 +87,14 @@ class StripedRingBufferTest {
         // Verify they're there
         StripedRingBufferStatistics stats = buffer.getStatistics();
         assertTrue(stats.sampleCount() > 0);
-        assertFalse(stats.median().isZero());
+        assertFalse(stats.p50().isZero());
 
         // Reset
         buffer.reset();
 
         // Should be empty
         stats = buffer.getStatistics();
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
         assertEquals(0, stats.sampleCount());
         assertEquals(Duration.ZERO, stats.p95());
         assertEquals(Duration.ZERO, stats.p99());
@@ -112,7 +112,7 @@ class StripedRingBufferTest {
         // Should have recorded something
         StripedRingBufferStatistics stats = buffer.getStatistics();
         assertTrue(stats.sampleCount() > 0);
-        assertFalse(stats.median().isNegative());
+        assertFalse(stats.p50().isNegative());
     }
 
     @Test
@@ -158,7 +158,7 @@ class StripedRingBufferTest {
         // Verify measurements were recorded
         StripedRingBufferStatistics stats = buffer.getStatistics();
         assertTrue(stats.sampleCount() > 0);
-        assertFalse(stats.median().isZero());
+        assertFalse(stats.p50().isZero());
 
         // Note: We can't verify exact averages due to ring buffer overwrites,
         // but we can verify the buffer is functioning
@@ -175,7 +175,7 @@ class StripedRingBufferTest {
 
         // Should still work, though capacity will be limited
         StripedRingBufferStatistics stats = buffer.getStatistics();
-        assertFalse(stats.median().isZero());
+        assertFalse(stats.p50().isZero());
         assertTrue(stats.sampleCount() > 0);
     }
 
@@ -191,7 +191,7 @@ class StripedRingBufferTest {
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
         // Median should be 500
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500)), stats.median());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500)), stats.p50());
         // P95 and P99 should be close to or at the max
         assertTrue(stats.p95().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
         assertTrue(stats.p99().compareTo(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(500))) >= 0);
@@ -207,7 +207,7 @@ class StripedRingBufferTest {
         buffer.recordMeasurement(largeValue);
 
         StripedRingBufferStatistics stats = buffer.getStatistics();
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.median());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p50());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p95());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(largeValue)), stats.p99());
     }
@@ -265,7 +265,7 @@ class StripedRingBufferTest {
         // Single value
         buffer.recordMeasurement(42);
         stats = buffer.getStatistics();
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.median());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p50());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p95());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(42)), stats.p99());
     }

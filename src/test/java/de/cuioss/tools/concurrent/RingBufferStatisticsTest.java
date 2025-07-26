@@ -37,7 +37,7 @@ class RingBufferStatisticsTest {
         Duration p99 = Duration.ofMillis(190);
         RingBufferStatistics stats = new RingBufferStatistics(10, avg, p95, p99);
         assertEquals(10, stats.sampleCount());
-        assertEquals(avg, stats.median());
+        assertEquals(avg, stats.p50());
         assertEquals(p95, stats.p95());
         assertEquals(p99, stats.p99());
     }
@@ -53,7 +53,7 @@ class RingBufferStatisticsTest {
     void shouldAllowZeroValues() {
         RingBufferStatistics stats = new RingBufferStatistics(0, Duration.ZERO, Duration.ZERO, Duration.ZERO);
         assertEquals(0, stats.sampleCount());
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
         assertEquals(Duration.ZERO, stats.p95());
         assertEquals(Duration.ZERO, stats.p99());
     }
@@ -97,7 +97,7 @@ class RingBufferStatisticsTest {
         Duration large = Duration.ofNanos(Long.MAX_VALUE - 1);
         RingBufferStatistics stats = new RingBufferStatistics(Integer.MAX_VALUE, large, large, large);
         assertEquals(Integer.MAX_VALUE, stats.sampleCount());
-        assertEquals(large, stats.median());
+        assertEquals(large, stats.p50());
     }
 
     @Test
@@ -105,14 +105,14 @@ class RingBufferStatisticsTest {
         // Test with empty array
         RingBufferStatistics stats = RingBufferStatistics.computeFrom(new long[0], TimeUnit.MICROSECONDS);
         assertEquals(0, stats.sampleCount());
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
         assertEquals(Duration.ZERO, stats.p95());
         assertEquals(Duration.ZERO, stats.p99());
 
         // Test with single value
         stats = RingBufferStatistics.computeFrom(new long[]{100}, TimeUnit.MICROSECONDS);
         assertEquals(1, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.median());
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.p50());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.p95());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(100)), stats.p99());
 
@@ -123,7 +123,7 @@ class RingBufferStatisticsTest {
         }
         stats = RingBufferStatistics.computeFrom(samples, TimeUnit.MICROSECONDS);
         assertEquals(100, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(50)), stats.median()); // median of 1-100 is 50
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(50)), stats.p50()); // median of 1-100 is 50
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(95)), stats.p95());
         assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(99)), stats.p99());
     }

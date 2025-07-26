@@ -90,7 +90,7 @@ class RingBufferTest {
         RingBuffer buffer = new RingBuffer(10);
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(0, stats.sampleCount());
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
         assertEquals(Duration.ZERO, stats.p95());
         assertEquals(Duration.ZERO, stats.p99());
     }
@@ -106,7 +106,7 @@ class RingBufferTest {
 
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(3, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(200)), stats.median()); // median of [100, 200, 300]
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(200)), stats.p50()); // median of [100, 200, 300]
     }
 
     @Test
@@ -120,7 +120,7 @@ class RingBufferTest {
 
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(4, stats.sampleCount());
-        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.median()); // median of [100, 200, 300, 400]
+        assertEquals(Duration.ofNanos(TimeUnit.MICROSECONDS.toNanos(250)), stats.p50()); // median of [100, 200, 300, 400]
 
         // Add one more - should overwrite oldest
         buffer.recordMeasurement(500);
@@ -149,7 +149,7 @@ class RingBufferTest {
         // Should be empty
         stats = buffer.getStatistics();
         assertEquals(0, stats.sampleCount());
-        assertEquals(Duration.ZERO, stats.median());
+        assertEquals(Duration.ZERO, stats.p50());
     }
 
     @Test
@@ -182,7 +182,7 @@ class RingBufferTest {
         // Verify we recorded something (exact count may vary due to overwrites)
         RingBufferStatistics stats = buffer.getStatistics();
         assertTrue(stats.sampleCount() > 0);
-        assertFalse(stats.median().isNegative());
+        assertFalse(stats.p50().isNegative());
     }
 
     @Test
@@ -195,7 +195,7 @@ class RingBufferTest {
 
         RingBufferStatistics stats = buffer.getStatistics();
         assertEquals(2, stats.sampleCount());
-        assertFalse(stats.median().isZero());
+        assertFalse(stats.p50().isZero());
     }
 
     @Test

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * </ul>
  *
  * @param sampleCount total number of samples
- * @param median median (P50) duration across all samples, or Duration.ZERO if no samples
+ * @param p50 50th percentile (median) duration across all samples, or Duration.ZERO if no samples
  * @param p95 95th percentile duration, or Duration.ZERO if no samples
  * @param p99 99th percentile duration, or Duration.ZERO if no samples
  *
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public record RingBufferStatistics(
 int sampleCount,
-Duration median,
+Duration p50,
 Duration p95,
 Duration p99) {
 
@@ -81,11 +81,11 @@ Duration p99) {
         long p99Value = calculatePercentile(samples, 0.99);
 
         // Convert to Duration based on TimeUnit
-        Duration median = Duration.ofNanos(timeUnit.toNanos(medianValue));
+        Duration p50 = Duration.ofNanos(timeUnit.toNanos(medianValue));
         Duration p95 = Duration.ofNanos(timeUnit.toNanos(p95Value));
         Duration p99 = Duration.ofNanos(timeUnit.toNanos(p99Value));
 
-        return new RingBufferStatistics(samples.length, median, p95, p99);
+        return new RingBufferStatistics(samples.length, p50, p95, p99);
     }
 
     /**

@@ -22,14 +22,14 @@ import java.util.concurrent.TimeUnit;
  * Immutable statistics snapshot from a {@link StripedRingBuffer}.
  * <p>
  * This record provides comprehensive statistics including sample count,
- * median, and key percentiles (P95, P99). All values are computed at
+ * P50 (median), and key percentiles (P95, P99). All values are computed at
  * the time of creation and remain constant for the lifetime of the instance.
  * <p>
  * The percentile calculation uses an optimized approach with pre-allocated
  * arrays and efficient sorting for better runtime performance.
  *
  * @param sampleCount total number of samples across all stripes
- * @param median median (P50) duration across all samples, or Duration.ZERO if no samples
+ * @param p50 50th percentile (median) duration across all samples, or Duration.ZERO if no samples
  * @param p95 95th percentile duration, or Duration.ZERO if no samples
  * @param p99 99th percentile duration, or Duration.ZERO if no samples
  *
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  */
 public record StripedRingBufferStatistics(
 int sampleCount,
-Duration median,
+Duration p50,
 Duration p95,
 Duration p99) {
 
@@ -84,7 +84,7 @@ Duration p99) {
 
         return new StripedRingBufferStatistics(
                 aggregatedStats.sampleCount(),
-                aggregatedStats.median(),
+                aggregatedStats.p50(),
                 aggregatedStats.p95(),
                 aggregatedStats.p99()
         );
