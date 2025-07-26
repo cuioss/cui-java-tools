@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * </ul>
  *
  * @param sampleCount total number of samples
- * @param average average duration across all samples, or Duration.ZERO if no samples
+ * @param median median (P50) duration across all samples, or Duration.ZERO if no samples
  * @param p95 95th percentile duration, or Duration.ZERO if no samples
  * @param p99 99th percentile duration, or Duration.ZERO if no samples
  *
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public record RingBufferStatistics(
 int sampleCount,
-Duration average,
+Duration median,
 Duration p95,
 Duration p99) {
 
@@ -72,26 +72,20 @@ Duration p99) {
             return new RingBufferStatistics(0, Duration.ZERO, Duration.ZERO, Duration.ZERO);
         }
 
-        // Calculate sum for average
-        long sum = 0;
-        for (long sample : samples) {
-            sum += sample;
-        }
-        long averageValue = sum / samples.length;
-
         // Sort for percentile calculation
         Arrays.sort(samples);
 
         // Calculate percentiles
+        long medianValue = calculatePercentile(samples, 0.50);
         long p95Value = calculatePercentile(samples, 0.95);
         long p99Value = calculatePercentile(samples, 0.99);
 
         // Convert to Duration based on TimeUnit
-        Duration average = Duration.ofNanos(timeUnit.toNanos(averageValue));
+        Duration median = Duration.ofNanos(timeUnit.toNanos(medianValue));
         Duration p95 = Duration.ofNanos(timeUnit.toNanos(p95Value));
         Duration p99 = Duration.ofNanos(timeUnit.toNanos(p99Value));
 
-        return new RingBufferStatistics(samples.length, average, p95, p99);
+        return new RingBufferStatistics(samples.length, median, p95, p99);
     }
 
     /**
@@ -104,6 +98,13 @@ Duration p99) {
     private static long calculatePercentile(long[] sortedSamples, double percentile) {
         if (sortedSamples.length == 0) {
             return 0;
+        }
+
+        // Special handling for median (P50) with even number of samples
+        if (percentile == 0.50 && sortedSamples.length % 2 == 0) {
+            int lowerIndex = sortedSamples.length / 2 - 1;
+            int upperIndex = sortedSamples.length / 2;
+            return (sortedSamples[lowerIndex] + sortedSamples[upperIndex]) / 2;
         }
 
         int index = (int) Math.ceil(percentile * sortedSamples.length) - 1;
