@@ -107,7 +107,7 @@ Duration p99) {
         }
 
         int index = (int) Math.ceil(percentile * sortedSamples.length) - 1;
-        index = Math.max(0, Math.min(index, sortedSamples.length - 1));
+        index = Math.clamp(index, 0, sortedSamples.length - 1);
 
         return sortedSamples[index];
     }
