@@ -16,6 +16,9 @@
 package de.cuioss.tools.concurrent;
 
 import de.cuioss.tools.logging.CuiLogger;
+import lombok.NonNull;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * High-performance striped ring buffer implementation for concurrent measurements.
@@ -41,9 +44,13 @@ import de.cuioss.tools.logging.CuiLogger;
  * <strong>Thread Safety:</strong>
  * All operations are thread-safe and lock-free. Multiple threads can simultaneously
  * record measurements and read statistics without blocking each other.
+ * <p>
+ * <strong>Time Units:</strong>
+ * The striped ring buffer now supports configurable time units. By default, values are
+ * interpreted as microseconds for backward compatibility.
  *
  * @author Oliver Wolff
- * @since 1.0
+ * @since 2.5
  */
 public class StripedRingBuffer {
 
@@ -67,7 +74,13 @@ public class StripedRingBuffer {
     private final int stripeCount;
 
     /**
-     * Creates a new striped ring buffer with the specified total window size.
+     * Time unit for interpreting measurement values.
+     */
+    @NonNull
+    private final TimeUnit timeUnit;
+
+    /**
+     * Creates a new striped ring buffer with the specified total window size, defaulting to microseconds.
      * <p>
      * The window size will be distributed across all stripes. For example,
      * with 8 stripes and window size 100, each stripe will have capacity ~12.
@@ -76,17 +89,33 @@ public class StripedRingBuffer {
      * @throws IllegalArgumentException if windowSize is not positive
      */
     public StripedRingBuffer(int windowSize) {
+        this(windowSize, TimeUnit.MICROSECONDS);
+    }
+
+    /**
+     * Creates a new striped ring buffer with the specified total window size and time unit.
+     * <p>
+     * The window size will be distributed across all stripes. For example,
+     * with 8 stripes and window size 100, each stripe will have capacity ~12.
+     *
+     * @param windowSize total number of samples to maintain across all stripes (must be positive)
+     * @param timeUnit the time unit for measurement values (must not be null)
+     * @throws IllegalArgumentException if windowSize is not positive
+     * @throws NullPointerException if timeUnit is null
+     */
+    public StripedRingBuffer(int windowSize, @NonNull TimeUnit timeUnit) {
         if (windowSize <= 0) {
             throw new IllegalArgumentException("Window size must be positive: " + windowSize);
         }
 
         this.stripeCount = STRIPE_COUNT;
         this.stripes = new RingBuffer[stripeCount];
+        this.timeUnit = timeUnit;
 
         // Distribute window size across stripes, ensuring at least 1 per stripe
         int sizePerStripe = Math.max(1, windowSize / stripeCount);
         for (int i = 0; i < stripeCount; i++) {
-            stripes[i] = new RingBuffer(sizePerStripe);
+            stripes[i] = new RingBuffer(sizePerStripe, timeUnit);
         }
 
         int actualTotalCapacity = sizePerStripe * stripeCount;
@@ -102,58 +131,41 @@ public class StripedRingBuffer {
      * This operation is lock-free and designed for maximum performance.
      * The stripe is selected based on the current thread's hash code to
      * distribute load and minimize contention.
+     * The value is interpreted according to the configured time unit.
      *
-     * @param microseconds the measurement value in microseconds (must not be negative)
-     * @throws IllegalArgumentException if microseconds is negative
+     * @param amount the measurement value in the configured time unit (must not be negative)
+     * @throws IllegalArgumentException if amount is negative
      */
-    public void recordMeasurement(long microseconds) {
-        if (microseconds < 0) {
-            throw new IllegalArgumentException("Microseconds cannot be negative: " + microseconds);
+    public void recordMeasurement(long amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount cannot be negative: " + amount);
         }
 
         // Select stripe based on current thread to minimize contention
         // Use bitwise AND for efficient stripe selection (stripeCount is power of 2)
         int stripeIndex = (Thread.currentThread().hashCode() & Integer.MAX_VALUE) & (stripeCount - 1);
-        stripes[stripeIndex].recordMeasurement(microseconds);
+        stripes[stripeIndex].recordMeasurement(amount);
     }
 
     /**
-     * Calculates the average from all measurements across all stripes.
+     * Gets comprehensive statistics from all measurements across all stripes.
      * <p>
-     * This method aggregates statistics from all stripes to provide a
-     * comprehensive average. The result is eventually consistent and may
-     * include partial updates during concurrent write operations.
-     *
-     * @return the average value in microseconds, or 0 if no measurements exist
-     */
-    public long getAverage() {
-        long totalSum = 0;
-        int totalCount = 0;
-
-        // Aggregate across all stripes
-        for (RingBuffer stripe : stripes) {
-            RingBufferStatistics stats = stripe.getStatistics();
-            totalSum += stats.sum();
-            totalCount += stats.count();
-        }
-
-        return totalCount > 0 ? totalSum / totalCount : 0;
-    }
-
-    /**
-     * Gets the total sample count across all stripes.
+     * This method computes a complete statistics snapshot including sample count,
+     * average, P95, and P99 in a single optimized pass. The result is eventually
+     * consistent and may include partial updates during concurrent write operations.
      * <p>
-     * This provides the sum of samples currently stored in all ring buffer stripes.
-     * The count may be less than the total window size if not all slots are filled.
+     * The implementation is optimized for runtime performance by:
+     * <ul>
+     *   <li>Pre-allocating arrays based on known sizes</li>
+     *   <li>Using System.arraycopy for bulk data transfer</li>
+     *   <li>Computing all statistics in a single pass</li>
+     *   <li>Avoiding boxing/unboxing overhead</li>
+     * </ul>
      *
-     * @return the total number of samples across all stripes
+     * @return immutable statistics snapshot containing sampleCount, average, p95, and p99
      */
-    public int getSampleCount() {
-        int totalCount = 0;
-        for (RingBuffer stripe : stripes) {
-            totalCount += stripe.getStatistics().count();
-        }
-        return totalCount;
+    public StripedRingBufferStatistics getStatistics() {
+        return StripedRingBufferStatistics.computeFrom(stripes, timeUnit);
     }
 
     /**
