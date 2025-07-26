@@ -44,8 +44,11 @@ class RingBufferStatisticsTest {
 
     @Test
     void shouldRejectNegativeSampleCount() {
+        Duration p50 = Duration.ofMillis(100);
+        Duration p95 = Duration.ofMillis(180);
+        Duration p99 = Duration.ofMillis(190);
         assertThrows(IllegalArgumentException.class,
-                () -> new RingBufferStatistics(-1, Duration.ofMillis(100), Duration.ofMillis(180), Duration.ofMillis(190)));
+                () -> new RingBufferStatistics(-1, p50, p95, p99));
     }
 
 
