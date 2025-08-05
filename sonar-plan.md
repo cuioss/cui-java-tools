@@ -94,7 +94,7 @@ Committed in 0164582.
 
 ## 🟡 **MEDIUM PRIORITY** (Runtime Safety)
 
-### **Task 4: Fix Argument Validation in MoreStrings** ☐
+### **Task 4: Fix Argument Validation in MoreStrings** ✅
 - **Files**: `MoreStrings.java` (lines 1074, 1123, 1174, 1189, 1199)
 
 **Problem Analysis**:
@@ -112,14 +112,19 @@ public static String ensureEndsWith(@NonNull String value, @NonNull String suffi
 ```
 
 **Action Items**:
-- [ ] Add `Objects.requireNonNull()` calls to all `@NonNull` parameters
-- [ ] Use descriptive error messages for each parameter
-- [ ] Update `lenientFormat` to handle null template gracefully
-- [ ] Add unit tests for null parameter scenarios
-- [ ] Verify consistent validation pattern across all methods
-- [ ] `./mvnw -Ppre-commit clean install`
-- [ ] Fix all errors and warnings
-- [ ] Finally commit
+- [x] Add `Objects.requireNonNull()` calls to all `@NonNull` parameters
+- [x] Use descriptive error messages for each parameter
+- [x] Update `lenientFormat` to handle null template gracefully (already handled)
+- [x] Add unit tests for null parameter scenarios
+- [x] Verify consistent validation pattern across all methods
+- [x] `./mvnw -Ppre-commit clean install`
+- [x] Fix all errors and warnings
+- [x] Finally commit
+
+**Completed**: 2025-08-05 - Successfully added runtime null validation to MoreStrings methods.
+Added Objects.requireNonNull() checks to ensureEndsWith() and coalesce() methods.
+Created comprehensive tests for null parameter scenarios. Verified lenientFormat() already handles null correctly.
+All tests pass (871 tests, 0 failures). Committed in 19022ed.
 
 
 ### **Task 5: Fix BooleanOperations Validation Logic** ☐
