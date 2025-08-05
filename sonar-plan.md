@@ -189,7 +189,7 @@ All tests pass (875 tests, 0 failures). Committed in 937bea5.
 
 ## 🔵 **LOW PRIORITY** (Code Quality)
 
-### **Task 7: Refactor Complex Methods** ☐
+### **Task 7: Refactor Complex Methods** ✅
 - **Issue ID**: Complexity Issue #6
 - **Rule**: `java:S3776`
 - **Files**: `MoreStrings.java:850` (`indexOf` method)
@@ -213,15 +213,20 @@ private static int searchFromPosition(String str, String searchStr, int startPos
 ```
 
 **Action Items**:
-- [ ] Analyze current `indexOf` method implementation
-- [ ] Extract validation logic to separate method
-- [ ] Extract core search algorithms to helper methods
-- [ ] Maintain existing behavior and performance
-- [ ] Add comprehensive unit tests
-- [ ] Remove `@SuppressWarnings` annotation once complexity is reduced
-- [ ] `./mvnw -Ppre-commit clean install`
-- [ ] Fix all errors and warnings
-- [ ] Finally commit
+- [x] Analyze current `indexOf` method implementation
+- [x] Extract validation logic to separate method
+- [x] Extract core search algorithms to helper methods
+- [x] Maintain existing behavior and performance
+- [x] Add comprehensive unit tests
+- [x] Remove `@SuppressWarnings` annotation once complexity is reduced
+- [x] `./mvnw -Ppre-commit clean install`
+- [x] Fix all errors and warnings
+- [x] Finally commit
+
+**Completed**: 2025-08-05 - Successfully refactored indexOf method to reduce cyclomatic complexity.
+Extracted helper methods: normalizeStartIndex(), indexOfBasicCharacter(), indexOfSupplementaryCharacter(),
+and indexOfInCharSequence(). Removed @SuppressWarnings annotation as complexity is now manageable.
+All tests pass (875 tests, 0 failures). Committed in 63809f8.
 
 
 ### **Task 8: Review and Address Suppressed Warnings** ☐
