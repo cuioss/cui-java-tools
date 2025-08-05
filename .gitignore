@@ -24,3 +24,6 @@
 # Maven
 target/
 .flattened-pom.xml
+
+# Claude Code configuration
+.claude/
