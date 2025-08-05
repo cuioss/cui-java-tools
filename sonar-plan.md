@@ -150,7 +150,7 @@ The existing implementation is mathematically correct with areAllTrue() returnin
 Added comprehensive documentation for special cases. All tests pass (871 tests, 0 failures).
 Committed in 21d9c89.
 
-### **Task 6: Standardize CuiLogger Validation** ☐
+### **Task 6: Standardize CuiLogger Validation** ✅
 - **Files**: `CuiLogger.java` (lines 162, 171)
 
 **Problem Analysis**:
@@ -171,13 +171,18 @@ public CuiLogger(String name) {
 ```
 
 **Action Items**:
-- [ ] Choose consistent validation strategy for both constructors
-- [ ] Update implementation accordingly
-- [ ] Add unit tests for null parameter scenarios
-- [ ] Document constructor behavior in JavaDoc
-- [ ] `./mvnw -Ppre-commit clean install`
-- [ ] Fix all errors and warnings
-- [ ] Finally commit
+- [x] Choose consistent validation strategy for both constructors
+- [x] Update implementation accordingly
+- [x] Add unit tests for null parameter scenarios
+- [x] Document constructor behavior in JavaDoc
+- [x] `./mvnw -Ppre-commit clean install`
+- [x] Fix all errors and warnings
+- [x] Finally commit
+
+**Completed**: 2025-08-05 - Fixed String constructor to properly reject null parameters.
+Removed incorrect nullToEmpty() wrapper, added descriptive error messages to both constructors.
+Created comprehensive constructor tests including null parameter validation.
+All tests pass (875 tests, 0 failures). Committed in 937bea5.
 
 
 ---
