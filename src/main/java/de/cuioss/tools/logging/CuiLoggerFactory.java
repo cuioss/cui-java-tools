@@ -18,10 +18,11 @@ package de.cuioss.tools.logging;
 import de.cuioss.tools.collect.CollectionLiterals;
 import lombok.experimental.UtilityClass;
 
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import static de.cuioss.tools.reflect.MoreReflection.findCaller;
 
 /**
  * Class provide factory method for CuiLogger instance
@@ -42,7 +43,7 @@ public class CuiLoggerFactory {
      * @throws IllegalStateException if caller couldn't be detected
      */
     public static CuiLogger getLogger() {
-        return getLogger(findCaller(MARKER_CLASS_NAMES).orElseThrow(ILLEGAL_STATE_EXCEPTION_SUPPLIER));
+        return getLogger(findCallerInternal(MARKER_CLASS_NAMES).orElseThrow(ILLEGAL_STATE_EXCEPTION_SUPPLIER));
     }
 
     /**
@@ -63,6 +64,35 @@ public class CuiLoggerFactory {
      */
     public static CuiLogger getLogger(final Class<?> clazz) {
         return new CuiLogger(clazz);
+    }
+
+    /**
+     * Internal method to find the caller class from the stack trace.
+     * This is a simplified version that avoids dependency on MoreReflection.
+     *
+     * @param markerClasses class names which could be used as marker before the
+     *                      real caller name. Collection must not be {@code null}.
+     * @return option of detected caller class name
+     */
+    private static Optional<String> findCallerInternal(final Collection<String> markerClasses) {
+        Objects.requireNonNull(markerClasses, "Marker class names are missing");
+
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+        if (null == stackTraceElements || stackTraceElements.length < 5) {
+            return Optional.empty();
+        }
+
+        for (var index = 2; index < stackTraceElements.length; index++) {
+            final var element = stackTraceElements[index];
+            if (markerClasses.contains(element.getClassName())) {
+                if (stackTraceElements.length > index + 1) {
+                    return Optional.of(stackTraceElements[index + 1].getClassName());
+                }
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 
 }

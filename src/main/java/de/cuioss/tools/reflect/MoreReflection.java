@@ -85,7 +85,18 @@ public final class MoreReflection {
 
     private static final String IGNORING_METHOD_ON_CLASS = "Ignoring method '{}' on class '{}'";
 
-    private static final CuiLogger LOGGER = new CuiLogger(MoreReflection.class);
+    private static volatile CuiLogger LOGGER = null;
+
+    private static CuiLogger getLogger() {
+        if (LOGGER == null) {
+            synchronized (MoreReflection.class) {
+                if (LOGGER == null) {
+                    LOGGER = new CuiLogger(MoreReflection.class);
+                }
+            }
+        }
+        return LOGGER;
+    }
 
     /**
      * We use {@link WeakHashMap} in order to allow the garbage collector to do its
@@ -130,7 +141,7 @@ public final class MoreReflection {
         try {
             return Optional.of(type.getDeclaredField(fieldName));
         } catch (final NoSuchFieldException | SecurityException e) {
-            LOGGER.debug("No field found for name '%s' on class '%s'", fieldName, type);
+            getLogger().debug("No field found for name '%s' on class '%s'", fieldName, type);
             if (Object.class.equals(type.getClass()) || null == type.getSuperclass()) {
                 return Optional.empty();
             }
@@ -178,11 +189,11 @@ public final class MoreReflection {
             if (0 == method.getParameterCount()) {
                 final var name = method.getName();
                 if (name.startsWith("get") || name.startsWith("is")) {
-                    LOGGER.debug("Adding found method '{}' on class '{}'", name, clazz);
+                    getLogger().debug("Adding found method '{}' on class '{}'", name, clazz);
                     found.add(method);
                 }
             } else {
-                LOGGER.trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
+                getLogger().trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
             }
         }
         return found;
@@ -229,7 +240,7 @@ public final class MoreReflection {
             if (checkWhetherParameterIsAssignable(method.getParameterTypes()[0], parameterType)) {
                 return Optional.of(method);
             }
-            LOGGER.trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
+            getLogger().trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
         }
         return Optional.empty();
     }
@@ -244,17 +255,17 @@ public final class MoreReflection {
         requireNonNull(assignableSource);
         requireNonNull(queryType);
         if (assignableSource.equals(queryType)) {
-            LOGGER.trace("Parameter-type matches exactly '%s'", assignableSource);
+            getLogger().trace("Parameter-type matches exactly '%s'", assignableSource);
             return true;
         }
         if (assignableSource.isAssignableFrom(queryType)) {
-            LOGGER.trace("Parameter '%s' is assignable from '%s'", assignableSource, queryType);
+            getLogger().trace("Parameter '%s' is assignable from '%s'", assignableSource, queryType);
             return true;
         }
         final Class<?> boxedSource = resolveWrapperTypeForPrimitive(assignableSource);
         final Class<?> boxedQuery = resolveWrapperTypeForPrimitive(queryType);
         if (boxedSource.equals(boxedQuery)) {
-            LOGGER.trace("Parameter-type matches exactly after autoboxing '%s'", assignableSource);
+            getLogger().trace("Parameter-type matches exactly after autoboxing '%s'", assignableSource);
             return true;
         }
         return boxedSource.isAssignableFrom(boxedQuery);
@@ -281,7 +292,7 @@ public final class MoreReflection {
             case "double" -> Double.class;
             case "float" -> Float.class;
             default -> {
-                LOGGER.warn("Unable to determine wrapper type for '{}', ", check);
+                getLogger().warn("Unable to determine wrapper type for '{}', ", check);
                 yield check;
             }
         };
@@ -308,15 +319,15 @@ public final class MoreReflection {
             if (1 == method.getParameterCount()) {
                 final var name = method.getName();
                 if (propertyName.equals(name)) {
-                    LOGGER.debug("Returning found method '{}' on class '{}'", name, clazz);
+                    getLogger().debug("Returning found method '{}' on class '{}'", name, clazz);
                     builder.add(method);
                 }
                 if (name.startsWith("set") && computePropertyNameFromMethodName(name).equalsIgnoreCase(propertyName)) {
-                    LOGGER.debug("Returning found method '{}' on class '{}'", name, clazz);
+                    getLogger().debug("Returning found method '{}' on class '{}'", name, clazz);
                     builder.add(method);
                 }
             } else {
-                LOGGER.trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
+                getLogger().trace(IGNORING_METHOD_ON_CLASS, method.getName(), clazz);
             }
         }
         return builder.toImmutableList();
@@ -357,13 +368,13 @@ public final class MoreReflection {
             if (methodName.length() > 3) {
                 return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
             }
-            LOGGER.debug("Name to short for extracting attributeName '{}'", methodName);
+            getLogger().debug("Name to short for extracting attributeName '{}'", methodName);
         }
         if (methodName.startsWith("is")) {
             if (methodName.length() > 2) {
                 return methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
             }
-            LOGGER.debug("Name to short for extracting attributeName '{}'", methodName);
+            getLogger().debug("Name to short for extracting attributeName '{}'", methodName);
         }
         return methodName;
     }
@@ -451,18 +462,18 @@ public final class MoreReflection {
      */
     public static Optional<Class<?>> extractGenericTypeCovariantly(final Type type) {
         if (null == type) {
-            LOGGER.trace("No KeyStoreType given, returning empty");
+            getLogger().trace("No KeyStoreType given, returning empty");
             return Optional.empty();
         }
         if (type instanceof Class<?> class1) {
-            LOGGER.debug("Found actual class returning as result {}", type);
+            getLogger().debug("Found actual class returning as result {}", type);
             return Optional.of(class1);
         }
         if (type instanceof ParameterizedType parameterizedType) {
-            LOGGER.debug("found Parameterized type, for {}, calling recursively", type);
+            getLogger().debug("found Parameterized type, for {}, calling recursively", type);
             return extractGenericTypeCovariantly(parameterizedType.getRawType());
         }
-        LOGGER.warn("Unable to determines generic-type for {}", type);
+        getLogger().warn("Unable to determines generic-type for {}", type);
         return Optional.empty();
     }
 
@@ -474,12 +485,12 @@ public final class MoreReflection {
      * given class.
      */
     public static Optional<ParameterizedType> extractParameterizedType(final Class<?> typeToBeExtractedFrom) {
-        LOGGER.debug("Extracting ParameterizedType from {}", typeToBeExtractedFrom);
+        getLogger().debug("Extracting ParameterizedType from {}", typeToBeExtractedFrom);
         if (null == typeToBeExtractedFrom) {
             return Optional.empty();
         }
         if (Object.class.equals(typeToBeExtractedFrom)) {
-            LOGGER.debug("java.lang.Object is not a ParameterizedType");
+            getLogger().debug("java.lang.Object is not a ParameterizedType");
             return Optional.empty();
         }
         final var genericSuperclass = typeToBeExtractedFrom.getGenericSuperclass();
