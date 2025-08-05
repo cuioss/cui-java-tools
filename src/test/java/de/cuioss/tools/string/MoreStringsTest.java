@@ -446,6 +446,21 @@ class MoreStringsTest {
         assertEquals("b", MoreStrings.firstNonBlank(null, "", " ", "b", "a").orElseThrow());
     }
 
+    @Test
+    void coalesceNullChecks() {
+        // Test that coalesce requires non-null checker
+        assertThrows(NullPointerException.class,
+                () -> MoreStrings.coalesce(null, "a", "b"),
+                "Should reject null checker predicate");
+
+        // Test that coalesce handles null values array correctly
+        assertTrue(MoreStrings.coalesce(MoreStrings::isEmpty, (String[]) null).isEmpty());
+
+        // Test normal behavior with valid checker
+        assertEquals("test",
+                MoreStrings.coalesce(MoreStrings::isEmpty, "", null, "test", "other").orElseThrow());
+    }
+
     private static class ThrowsOnToString {
 
         @Override

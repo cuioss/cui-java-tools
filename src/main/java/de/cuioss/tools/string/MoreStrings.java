@@ -21,6 +21,7 @@ import lombok.experimental.UtilityClass;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -1128,6 +1129,8 @@ public final class MoreStrings {
      * @return value with suffix
      */
     public static String ensureEndsWith(@NonNull final String value, @NonNull final String suffix) {
+        Objects.requireNonNull(value, "value must not be null");
+        Objects.requireNonNull(suffix, "suffix must not be null");
         if (!value.endsWith(suffix)) {
             return value + suffix;
         }
@@ -1179,6 +1182,7 @@ public final class MoreStrings {
      */
     @NonNull
     public static Optional<String> coalesce(Predicate<String> checker, String... values) {
+        Objects.requireNonNull(checker, "checker must not be null");
         if (null != values) {
             for (String value : values) {
                 if (!checker.test(value)) {
