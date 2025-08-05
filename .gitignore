@@ -3,7 +3,6 @@
 **/.idea
 **/.vscode
 **/src/main/gen
-*.iml
 *.classpath
 *.project
 .DS_Store
