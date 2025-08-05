@@ -124,8 +124,13 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if one of parameters is {@code true}, {@code false}
-     * otherwise.
-     * If no parameter is given or parameter is null, returns {@code false}.
+     *         otherwise.
+     *         <p>
+     *         <b>Special cases:</b>
+     *         <ul>
+     *         <li>Returns {@code false} if parameter is {@code null}</li>
+     *         <li>Returns {@code false} if no parameters are provided (empty array)</li>
+     *         </ul>
      */
     public static boolean isAnyTrue(final boolean... parameter) {
         return containsTrue(parameter);
@@ -136,7 +141,13 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if one of parameters is {@code false}, {@code false}
-     * otherwise. If no parameter is given or parameter is null, returns {@code false}.
+     *         otherwise.
+     *         <p>
+     *         <b>Special cases:</b>
+     *         <ul>
+     *         <li>Returns {@code false} if parameter is {@code null}</li>
+     *         <li>Returns {@code false} if no parameters are provided (empty array)</li>
+     *         </ul>
      */
     public static boolean isAnyFalse(final boolean... parameter) {
         return containsFalse(parameter);
@@ -146,8 +157,18 @@ public final class BooleanOperations {
      * Shorthand for checking if all the given booleans are {@code true}
      *
      * @param parameter ellipsis of boolean values
-     * @return {@code true} if all parameters are {@code true} or if no parameter is
-     * given (including null case). Returns {@code false} if any parameter is {@code false}.
+     * @return {@code true} if all parameters are {@code true}, {@code false} if any
+     *         parameter is {@code false}.
+     *         <p>
+     *         <b>Special cases:</b>
+     *         <ul>
+     *         <li>Returns {@code true} if parameter is {@code null} (vacuous truth)</li>
+     *         <li>Returns {@code true} if no parameters are provided (empty array - vacuous truth)</li>
+     *         </ul>
+     *         <p>
+     *         The empty case returns {@code true} following the mathematical convention
+     *         of vacuous truth: "all elements satisfy the condition" is true when there
+     *         are no elements to check.
      */
     public static boolean areAllTrue(final boolean... parameter) {
         if (isEmpty(parameter)) {
@@ -161,7 +182,16 @@ public final class BooleanOperations {
      *
      * @param parameter ellipsis of boolean values
      * @return {@code true} if all parameters are {@code false}, {@code false}
-     * otherwise. If no parameter is given or parameter is null, returns {@code false}.
+     *         otherwise.
+     *         <p>
+     *         <b>Special cases:</b>
+     *         <ul>
+     *         <li>Returns {@code false} if parameter is {@code null}</li>
+     *         <li>Returns {@code false} if no parameters are provided (empty array)</li>
+     *         </ul>
+     *         <p>
+     *         Unlike {@link #areAllTrue(boolean...)}, this method returns {@code false}
+     *         for empty arrays as there are no false values to verify.
      */
     public static boolean areAllFalse(final boolean... parameter) {
         if (isEmpty(parameter)) {
