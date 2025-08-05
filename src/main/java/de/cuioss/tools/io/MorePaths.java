@@ -258,19 +258,42 @@ public final class MorePaths {
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
      * security issue. Never ever use this location for sensitive information that
      * might be of interest for an attacker
+     * <p>
+     * <h2>Security Note</h2> This method validates and normalizes the input path to prevent
+     * path traversal attacks. The path is canonicalized to its real path before processing.
      *
      * @param path must not be null and denote an existing read and writable file
      * @return Path on the newly created file
      * @throws IOException if an I/O error occurs
+     * @throws IllegalArgumentException if the path contains invalid traversal sequences
      */
-    @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyToTempLocation(final Path path) throws IOException {
         assertAccessibleFile(path);
-        var filename = new StructuredFilename(path.getFileName());
-        var tempFile = Files.createTempFile(filename.getNamePart(), filename.getSuffix());
 
-        Files.copy(path, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        LOGGER.debug("Created temp-file from '%s' at '%s'", path.toFile().getAbsolutePath(),
+        // Normalize and validate the path to prevent traversal attacks
+        var normalizedPath = path.normalize();
+        var realPath = normalizedPath.toRealPath();
+
+        // Get the filename from the real path to ensure no path traversal
+        var fileName = realPath.getFileName();
+        if (fileName == null) {
+            throw new IllegalArgumentException("Invalid path: no filename found");
+        }
+
+        var filename = new StructuredFilename(fileName);
+        var namePart = filename.getNamePart();
+        var suffix = filename.getSuffix();
+
+        // Additional validation to ensure no path separators in filename parts
+        if (namePart.contains("..") || namePart.contains("/") || namePart.contains("\\") ||
+                (suffix != null && (suffix.contains("..") || suffix.contains("/") || suffix.contains("\\")))) {
+            throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
+        }
+
+        var tempFile = Files.createTempFile(namePart, suffix);
+
+        Files.copy(realPath, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+        LOGGER.debug("Created temp-file from '%s' at '%s'", realPath.toFile().getAbsolutePath(),
                 tempFile.toFile().getAbsolutePath());
         return tempFile;
     }

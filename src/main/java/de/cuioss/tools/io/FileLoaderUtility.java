@@ -68,6 +68,10 @@ public final class FileLoaderUtility {
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
      * security issue. Never ever use this location for sensitive information that
      * might be of interest for an attacker
+     * <p>
+     * <h2>Security Note</h2> This method validates that the source file name does not
+     * contain path traversal sequences to prevent unauthorized access to files outside
+     * the intended directory structure.
      *
      * @param source           must not be null and represent an accessible file,
      *                         saying {@link FileLoader#isReadable()}
@@ -76,12 +80,22 @@ public final class FileLoaderUtility {
      * @return a reference on a file copied in the temp folder
      * @throws IOException
      */
-    @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyFileToTemp(final FileLoader source, final boolean markDeleteOnExit) throws IOException {
         checkArgument(null != source, "Attribute with name source must not be null");
         checkArgument(source.isReadable(), "Source must be readable");
 
-        final var target = Files.createTempFile(source.getFileName().getNamePart(), source.getFileName().getSuffix());
+        // Validate filename to prevent path traversal
+        var fileName = source.getFileName();
+        var namePart = fileName.getNamePart();
+        var suffix = fileName.getSuffix();
+
+        // Ensure the filename parts don't contain path separators or traversal sequences
+        if (namePart.contains("..") || namePart.contains("/") || namePart.contains("\\") ||
+                (suffix != null && (suffix.contains("..") || suffix.contains("/") || suffix.contains("\\")))) {
+            throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
+        }
+
+        final var target = Files.createTempFile(namePart, suffix);
 
         try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
