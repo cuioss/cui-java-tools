@@ -26,7 +26,6 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * Provides enhanced String handling utilities focusing on null-safety, performance,
@@ -938,7 +937,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmpty(final String underCheck) {
-        checkArgument(!isEmpty(underCheck), "Given String is Empty");
+        if (isEmpty(underCheck)) {
+            throw new IllegalArgumentException("Given String is Empty");
+        }
         return underCheck;
     }
 
@@ -951,7 +952,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmpty(final String underCheck, final String attributeName) {
-        checkArgument(!isEmpty(underCheck), "Attribute with name '" + attributeName + "' must not be empty");
+        if (isEmpty(underCheck)) {
+            throw new IllegalArgumentException("Attribute with name '" + attributeName + "' must not be empty");
+        }
         return underCheck;
     }
 
@@ -963,7 +966,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck) {
-        checkArgument(!isBlank(underCheck), "Attribute must not be blank");
+        if (isBlank(underCheck)) {
+            throw new IllegalArgumentException("Attribute must not be blank");
+        }
         return underCheck;
     }
 
@@ -976,7 +981,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck, final String attributeName) {
-        checkArgument(!isBlank(underCheck), "Attribute with name '" + attributeName + "' must not be blank");
+        if (isBlank(underCheck)) {
+            throw new IllegalArgumentException("Attribute with name '" + attributeName + "' must not be blank");
+        }
         return underCheck;
     }
 
