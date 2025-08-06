@@ -228,6 +228,74 @@ class MoreStringsTest {
     }
 
     @Test
+    void indexOfCharCodeWithNonStringCharSequence() {
+        // Test indexOf(CharSequence, int, int) with StringBuilder (non-String CharSequence)
+        StringBuilder sb = new StringBuilder("Hello World");
+        
+        // Basic ASCII character search
+        assertEquals(0, MoreStrings.indexOf(sb, 'H', 0));
+        assertEquals(6, MoreStrings.indexOf(sb, 'W', 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, 'W', 7));
+        assertEquals(4, MoreStrings.indexOf(sb, 'o', 0));
+        assertEquals(7, MoreStrings.indexOf(sb, 'o', 5)); // Find second 'o'
+        
+        // Test with negative start index (should normalize to 0)
+        assertEquals(0, MoreStrings.indexOf(sb, 'H', -5));
+        
+        // Test character not in string
+        assertEquals(-1, MoreStrings.indexOf(sb, 'z', 0));
+        
+        // Test with CharBuffer
+        CharSequence charBuffer = java.nio.CharBuffer.wrap("Testing");
+        assertEquals(0, MoreStrings.indexOf(charBuffer, 'T', 0));
+        assertEquals(3, MoreStrings.indexOf(charBuffer, 't', 0));
+        assertEquals(-1, MoreStrings.indexOf(charBuffer, 't', 4));
+    }
+    
+    @Test
+    void indexOfSupplementaryCharacters() {
+        // Test with Unicode supplementary characters (code points > 0xFFFF)
+        // Using emoji as supplementary characters
+        StringBuilder sb = new StringBuilder("Hello 😀 World"); // 😀 is U+1F600
+        
+        // Search for the emoji (supplementary character)
+        int emojiCodePoint = 0x1F600; // 😀
+        assertEquals(6, MoreStrings.indexOf(sb, emojiCodePoint, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, emojiCodePoint, 8));
+        
+        // Test with another supplementary character
+        StringBuilder sb2 = new StringBuilder("Test 𝕏 String"); // 𝕏 is U+1D54F (Mathematical Double-Struck Capital X)
+        int mathX = 0x1D54F;
+        assertEquals(5, MoreStrings.indexOf(sb2, mathX, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb2, mathX, 7));
+        
+        // Test with invalid code point (> MAX_CODE_POINT)
+        assertEquals(-1, MoreStrings.indexOf(sb, Character.MAX_CODE_POINT + 1, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, Integer.MAX_VALUE, 0));
+    }
+    
+    @Test
+    void indexOfEdgeCases() {
+        // Test with empty CharSequence
+        assertEquals(-1, MoreStrings.indexOf(new StringBuilder(), 'a', 0));
+        assertEquals(-1, MoreStrings.indexOf(null, 'a', 0));
+        
+        // Test with String (should use optimized String.indexOf)
+        String str = "optimize";
+        assertEquals(0, MoreStrings.indexOf(str, 'o', 0));
+        
+        // Test boundary conditions for supplementary characters
+        StringBuilder sb = new StringBuilder("x𝕏y"); // 𝕏 at position 1
+        assertEquals(0, MoreStrings.indexOf(sb, 'x', 0));
+        assertEquals(3, MoreStrings.indexOf(sb, 'y', 0)); // 'y' is at index 3 because 𝕏 takes 2 chars
+        
+        // Test searching at the very end
+        StringBuilder sb2 = new StringBuilder("abc");
+        assertEquals(-1, MoreStrings.indexOf(sb2, 'a', 3));
+        assertEquals(-1, MoreStrings.indexOf(sb2, 'a', 100));
+    }
+
+    @Test
     void lang666() {
         assertEquals("12", MoreStrings.stripEnd("120.00", ".0"));
         assertEquals("121", MoreStrings.stripEnd("121.00", ".0"));

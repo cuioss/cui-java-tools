@@ -117,4 +117,5 @@ class CuiLoggerFactoryTest {
             assertEquals(CuiLoggerFactoryTest.class.getName(), logger.getName());
         }
     }
+
 }
