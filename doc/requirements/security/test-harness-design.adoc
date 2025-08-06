@@ -1,0 +1,785 @@
+= Path Traversal Security Test Harness Design
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+
+link:README.adoc[← Back to Documentation Index]
+
+== Executive Summary
+
+This document defines a comprehensive test harness design for validating path traversal security implementations. The harness incorporates test cases derived from real CVEs, OWASP testing guidelines, and security research to ensure robust validation of path security mechanisms. The design emphasizes both positive and negative testing, cross-platform compatibility, and automated security verification.
+
+== Test Harness Architecture
+
+=== Core Components
+
+[cols="2,3,2"]
+|===
+|Component |Purpose |Key Features
+
+|Test Data Generator
+|Creates malicious path patterns
+|CVE-based patterns, encoding variants, platform-specific
+
+|Validation Engine
+|Executes security validations
+|Multiple validation strategies, performance metrics
+
+|Attack Simulator
+|Simulates real attack scenarios
+|Archive extraction, file upload, URL manipulation
+
+|Result Analyzer
+|Evaluates test outcomes
+|Security scoring, vulnerability detection, reporting
+
+|Platform Adapter
+|Handles OS-specific testing
+|Windows, Linux, macOS path conventions
+
+|===
+
+=== Test Framework Structure
+
+```
+test-harness/
+├── core/
+│   ├── generators/
+│   │   ├── PathPatternGenerator.java
+│   │   ├── EncodingGenerator.java
+│   │   └── ArchiveGenerator.java
+│   ├── validators/
+│   │   ├── PathValidator.java
+│   │   ├── URLValidator.java
+│   │   └── ArchiveValidator.java
+│   └── analyzers/
+│       ├── SecurityAnalyzer.java
+│       └── PerformanceAnalyzer.java
+├── attacks/
+│   ├── cve-based/
+│   ├── encoding/
+│   ├── platform-specific/
+│   └── advanced/
+├── reports/
+│   └── templates/
+└── config/
+    └── test-profiles/
+```
+
+== Test Data Categories
+
+=== CVE-Based Test Vectors
+
+==== Critical CVE Patterns
+
+```java
+public class CVETestVectors {
+    
+    // HTTP URL Path Traversal Patterns
+    public static final String[] HTTP_TRAVERSAL_PATTERNS = {
+        "GET /images/../../../etc/passwd HTTP/1.1",
+        "GET /static/%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd HTTP/1.1",
+        "GET /files/..%252f..%252f..%252fetc%252fpasswd HTTP/1.1",
+        "GET /%2e%2e%2f%2e%2e%2f%2e%2e%2f HTTP/1.1"
+    };
+    
+    // CVE-2023-32235 - Ghost CMS (URL Encoding)
+    public static final String[] GHOST_URL_PATTERNS = {
+        "/assets/built%2F..%2F..%2F/package.json",
+        "/assets/built%2F..%2F..%2F..%2F/etc/passwd",
+        "/themes/casper%2F..%2F..%2F/config.production.json"
+    };
+    
+    // CVE-2023-50164 - Apache Struts
+    public static final String[] STRUTS_PATTERNS = {
+        "../../WEB-INF/web.xml",
+        "../../../webapps/ROOT/shell.jsp",
+        "..\\..\\..\\windows\\win.ini"
+    };
+    
+    // CVE-2024-38819 - Spring Framework
+    public static final String[] SPRING_PATTERNS = {
+        "%252e%252e%252f%252e%252e%252f",
+        "%252E%252E%252F%252E%252E%252F",
+        "%%32%65%%32%65%%32%66"
+    };
+    
+    // Zip Slip Patterns
+    public static final String[] ZIP_SLIP_PATTERNS = {
+        "../../../../../../../../tmp/evil.sh",
+        "..\\..\\..\\..\\..\\..\\..\\..\\windows\\system32\\calc.exe",
+        "../../../.ssh/authorized_keys"
+    };
+}
+```
+
+=== HTTP/URL Encoding Test Matrices
+
+==== HTTP-Specific Encoding Tests
+
+```java
+public class HTTPEncodingTestMatrix {
+    
+    public enum HTTPEncodingType {
+        // RFC 3986 Percent-Encoding
+        URL_SINGLE("%2e%2e%2f"),
+        URL_DOUBLE("%252e%252e%252f"),
+        URL_TRIPLE("%25252e%25252e%25252f"),
+        
+        // Mixed Case Encoding (RFC 3986 Section 2.1)
+        MIXED_CASE_HEX("%2E%2e%2F"),
+        
+        // Unicode in URLs (RFC 3987 - IRI)
+        UNICODE_URL("%u002e%u002e%u002f"),
+        
+        // HTML Entity Encoding (for parameters)
+        HTML_ENTITY("&#46;&#46;&#47;"),
+        HTML_HEX("&#x2e;&#x2e;&#x2f;"),
+        
+        // Null Byte Injection
+        NULL_BYTE("..%00/"),
+        
+        // Non-standard but seen in attacks
+        PLUS_FOR_SPACE("..+/"),
+        
+        // RFC 3986 Reserved Character Encoding
+        ENCODED_SLASH("%2F"),
+        ENCODED_QUESTION("%3F"),
+        ENCODED_HASH("%23")
+    }
+    
+    public static String generateEncodedPath(String basePath, EncodingType encoding) {
+        // Implementation for each encoding type
+        switch(encoding) {
+            case URL_SINGLE:
+                return URLEncoder.encode(basePath, StandardCharsets.UTF_8);
+            case URL_DOUBLE:
+                return URLEncoder.encode(
+                    URLEncoder.encode(basePath, StandardCharsets.UTF_8),
+                    StandardCharsets.UTF_8
+                );
+            // ... other encoding implementations
+        }
+    }
+}
+```
+
+=== Platform-Specific Test Cases
+
+==== Operating System Variants
+
+```java
+public class PlatformSpecificTests {
+    
+    // Windows-specific patterns
+    public static final String[] WINDOWS_PATTERNS = {
+        "..\\..\\windows\\system32\\config\\sam",
+        "C:\\..\\..\\windows\\win.ini",
+        "\\\\?\\C:\\Windows\\System32\\config\\sam",
+        "file:///C:/windows/win.ini",
+        "C:../../../windows/system32/drivers/etc/hosts",
+        "\\\\server\\share\\..\\..\\sensitive"
+    };
+    
+    // Linux-specific patterns
+    public static final String[] LINUX_PATTERNS = {
+        "../../../etc/passwd",
+        "/proc/self/environ",
+        "/dev/null/../../etc/shadow",
+        "~/../../../root/.ssh/id_rsa",
+        "/var/www/../../etc/apache2/apache2.conf"
+    };
+    
+    // macOS-specific patterns
+    public static final String[] MACOS_PATTERNS = {
+        "../../../../../System/Library/CoreServices/SystemVersion.plist",
+        "~/../../../../etc/passwd",
+        "/Applications/../../../etc/passwd",
+        "/Volumes/../../etc/master.passwd"
+    };
+    
+    // Container-specific patterns
+    public static final String[] CONTAINER_PATTERNS = {
+        "/proc/1/root/etc/passwd",
+        "/host_proc/1/root/etc/shadow",
+        "/../../../../../../../proc/self/cgroup"
+    };
+}
+```
+
+== Test Implementation Framework
+
+=== Base Test Class
+
+```java
+public abstract class PathTraversalSecurityTest {
+    
+    protected PathValidator validator;
+    protected SecurityAnalyzer analyzer;
+    protected TestReport report;
+    
+    @BeforeEach
+    public void setup() {
+        validator = createValidator();
+        analyzer = new SecurityAnalyzer();
+        report = new TestReport();
+    }
+    
+    protected abstract PathValidator createValidator();
+    
+    @Test
+    public void testAllCVEPatterns() {
+        for (String pattern : CVETestVectors.getAllPatterns()) {
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validatePath(pattern),
+                "Failed to block CVE pattern: " + pattern
+            );
+            report.addTestResult("CVE", pattern, true);
+        }
+    }
+    
+    @Test
+    public void testEncodingVariants() {
+        String basePath = "../../../etc/passwd";
+        for (EncodingType encoding : EncodingType.values()) {
+            String encoded = EncodingTestMatrix.generateEncodedPath(basePath, encoding);
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validatePath(encoded),
+                "Failed to block encoding: " + encoding
+            );
+            report.addTestResult("Encoding", encoded, true);
+        }
+    }
+    
+    @Test
+    public void testLegitimateAccess() {
+        String[] legitimatePaths = {
+            "documents/report.pdf",
+            "images/logo.png",
+            "data/2024/january/sales.csv"
+        };
+        
+        for (String path : legitimatePaths) {
+            assertDoesNotThrow(
+                () -> validator.validatePath(path),
+                "Incorrectly blocked legitimate path: " + path
+            );
+            report.addTestResult("Legitimate", path, true);
+        }
+    }
+    
+    @AfterEach
+    public void generateReport() {
+        report.generateSummary();
+        analyzer.analyzeResults(report);
+    }
+}
+```
+
+=== Archive Extraction Test Suite
+
+```java
+public class ZipSlipTestSuite {
+    
+    @Test
+    public void testMaliciousZipExtraction() throws IOException {
+        // Create malicious zip
+        Path maliciousZip = createMaliciousZip();
+        Path targetDir = Files.createTempDirectory("extract-test");
+        
+        // Test extraction
+        ArchiveExtractor extractor = new SecureArchiveExtractor();
+        
+        assertThrows(
+            SecurityException.class,
+            () -> extractor.extract(maliciousZip, targetDir),
+            "Failed to detect Zip Slip attack"
+        );
+        
+        // Verify no files escaped
+        assertTrue(containsOnlyInDirectory(targetDir));
+    }
+    
+    private Path createMaliciousZip() throws IOException {
+        Path zipFile = Files.createTempFile("malicious", ".zip");
+        try (ZipOutputStream zos = new ZipOutputStream(
+                Files.newOutputStream(zipFile))) {
+            
+            // Add malicious entries
+            String[] maliciousNames = {
+                "../../../../tmp/evil.sh",
+                "../../passwords.txt",
+                "../../../.ssh/authorized_keys"
+            };
+            
+            for (String name : maliciousNames) {
+                ZipEntry entry = new ZipEntry(name);
+                zos.putNextEntry(entry);
+                zos.write("malicious content".getBytes());
+                zos.closeEntry();
+            }
+        }
+        return zipFile;
+    }
+}
+```
+
+=== Performance Benchmark Suite
+
+```java
+public class PathValidationBenchmark {
+    
+    private static final int ITERATIONS = 100000;
+    
+    @Test
+    public void benchmarkValidationMethods() {
+        Map<String, Long> results = new HashMap<>();
+        
+        // Test string-based validation
+        long stringTime = measureTime(() -> {
+            for (int i = 0; i < ITERATIONS; i++) {
+                stringBasedValidation("../../../etc/passwd");
+            }
+        });
+        results.put("String-based", stringTime);
+        
+        // Test canonical path validation
+        long canonicalTime = measureTime(() -> {
+            for (int i = 0; i < ITERATIONS; i++) {
+                canonicalPathValidation("../../../etc/passwd");
+            }
+        });
+        results.put("Canonical", canonicalTime);
+        
+        // Test NIO-based validation
+        long nioTime = measureTime(() -> {
+            for (int i = 0; i < ITERATIONS; i++) {
+                nioBasedValidation("../../../etc/passwd");
+            }
+        });
+        results.put("NIO-based", nioTime);
+        
+        // Generate performance report
+        generatePerformanceReport(results);
+    }
+    
+    private long measureTime(Runnable task) {
+        long start = System.nanoTime();
+        task.run();
+        return System.nanoTime() - start;
+    }
+}
+```
+
+== Attack Simulation Framework
+
+=== Web Application Attack Simulator
+
+```java
+public class WebAttackSimulator {
+    
+    private MockHttpServletRequest request;
+    private PathTraversalFilter filter;
+    
+    @Test
+    public void simulateHttpParameterAttack() {
+        // Simulate various HTTP parameter attacks
+        String[] attackParams = {
+            "?file=../../../etc/passwd",
+            "?page=%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd",
+            "?doc=..\\..\\..\\windows\\win.ini",
+            "?image=../../../../../../../../dev/null"
+        };
+        
+        for (String param : attackParams) {
+            request = new MockHttpServletRequest();
+            request.setQueryString(param);
+            
+            assertThrows(
+                SecurityException.class,
+                () -> filter.doFilter(request),
+                "Failed to block parameter attack: " + param
+            );
+        }
+    }
+    
+    @Test
+    public void simulateFileUploadAttack() {
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "../../webapps/ROOT/shell.jsp",
+            "application/octet-stream",
+            "<%@ page import=\"java.io.*\" %>".getBytes()
+        );
+        
+        FileUploadValidator validator = new FileUploadValidator();
+        assertThrows(
+            SecurityException.class,
+            () -> validator.validateUpload(file),
+            "Failed to block malicious file upload"
+        );
+    }
+    
+    @Test
+    public void simulateCookieAttack() {
+        Cookie maliciousCookie = new Cookie(
+            "path", 
+            Base64.encode("../../../etc/passwd")
+        );
+        
+        CookieValidator validator = new CookieValidator();
+        assertThrows(
+            SecurityException.class,
+            () -> validator.validate(maliciousCookie),
+            "Failed to detect path traversal in cookie"
+        );
+    }
+}
+```
+
+=== Container Escape Simulator
+
+```java
+public class ContainerEscapeSimulator {
+    
+    @Test
+    public void testDockerEscapePatterns() {
+        String[] escapePatterns = {
+            "/proc/1/root/etc/shadow",
+            "/proc/self/root/etc/passwd",
+            "/sys/kernel/vmcoreinfo",
+            "/../../../../../../../host/etc/passwd"
+        };
+        
+        ContainerPathValidator validator = new ContainerPathValidator();
+        
+        for (String pattern : escapePatterns) {
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validateContainerPath(pattern),
+                "Failed to prevent container escape: " + pattern
+            );
+        }
+    }
+    
+    @Test
+    public void testKubernetesVolumeTraversal() {
+        String[] k8sPatterns = {
+            "/var/run/secrets/kubernetes.io/../../../etc/passwd",
+            "/mnt/../../host/etc/shadow",
+            "/opt/../../proc/1/environ"
+        };
+        
+        KubernetesPathValidator validator = new KubernetesPathValidator();
+        
+        for (String pattern : k8sPatterns) {
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validatePath(pattern),
+                "Failed to block Kubernetes traversal: " + pattern
+            );
+        }
+    }
+}
+```
+
+== Security Validation Metrics
+
+=== Test Coverage Requirements
+
+[cols="2,1,3"]
+|===
+|Category |Minimum Coverage |Test Cases
+
+|CVE Patterns
+|100%
+|All known CVE patterns from 2019-2024
+
+|Encoding Variants
+|95%
+|URL, Unicode, UTF-8, Base64, HTML entities
+
+|Platform Specific
+|100%
+|Windows, Linux, macOS, containers
+
+|Archive Formats
+|90%
+|ZIP, TAR, JAR, WAR, 7Z, RAR
+
+|HTTP Methods
+|100%
+|GET, POST, PUT, DELETE, PATCH
+
+|Performance
+|N/A
+|< 1ms per validation for 95th percentile
+
+|===
+
+=== Security Score Calculation
+
+```java
+public class SecurityScoreCalculator {
+    
+    public SecurityScore calculateScore(TestReport report) {
+        SecurityScore score = new SecurityScore();
+        
+        // CVE protection (40% weight)
+        double cveScore = report.getCVEBlockRate() * 40;
+        score.addComponent("CVE Protection", cveScore);
+        
+        // Encoding resistance (25% weight)
+        double encodingScore = report.getEncodingBlockRate() * 25;
+        score.addComponent("Encoding Resistance", encodingScore);
+        
+        // Platform coverage (15% weight)
+        double platformScore = report.getPlatformCoverage() * 15;
+        score.addComponent("Platform Coverage", platformScore);
+        
+        // False positive rate (10% weight)
+        double fpScore = (1 - report.getFalsePositiveRate()) * 10;
+        score.addComponent("False Positive Rate", fpScore);
+        
+        // Performance (10% weight)
+        double perfScore = report.getPerformanceScore() * 10;
+        score.addComponent("Performance", perfScore);
+        
+        return score;
+    }
+}
+```
+
+== Automated Test Execution
+
+=== CI/CD Integration
+
+```yaml
+# GitHub Actions workflow
+name: Path Traversal Security Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [11, 17, 21]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ matrix.java }}
+    
+    - name: Run Path Traversal Tests
+      run: |
+        mvn test -Dtest=PathTraversalTestSuite
+        mvn test -Dtest=CVEValidationTests
+        mvn test -Dtest=EncodingResistanceTests
+    
+    - name: Run Performance Benchmarks
+      run: mvn test -Dtest=PathValidationBenchmark
+    
+    - name: Generate Security Report
+      run: mvn security:report
+    
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-test-results-${{ matrix.os }}-java${{ matrix.java }}
+        path: target/security-reports/
+```
+
+=== Test Execution Framework
+
+```java
+@TestConfiguration
+public class PathTraversalTestConfiguration {
+    
+    @Bean
+    public TestExecutor testExecutor() {
+        return TestExecutor.builder()
+            .parallel(true)
+            .timeout(Duration.ofMinutes(5))
+            .retryCount(3)
+            .reportFormat(ReportFormat.HTML)
+            .includePerformanceMetrics(true)
+            .build();
+    }
+    
+    @Bean
+    public TestDataProvider testDataProvider() {
+        return new CompositeTestDataProvider(
+            new CVETestDataProvider(),
+            new EncodingTestDataProvider(),
+            new PlatformTestDataProvider(),
+            new FuzzingTestDataProvider()
+        );
+    }
+}
+```
+
+== Fuzzing and Edge Case Testing
+
+=== Intelligent Fuzzing Engine
+
+```java
+public class PathTraversalFuzzer {
+    
+    private static final int FUZZ_ITERATIONS = 10000;
+    private final Random random = new SecureRandom();
+    
+    @Test
+    public void fuzzPathValidation() {
+        PathValidator validator = new SecurePathValidator();
+        List<String> findings = new ArrayList<>();
+        
+        for (int i = 0; i < FUZZ_ITERATIONS; i++) {
+            String fuzzInput = generateFuzzInput();
+            
+            try {
+                validator.validatePath(fuzzInput);
+                // If no exception, check if it should have been blocked
+                if (containsTraversalPattern(fuzzInput)) {
+                    findings.add("Missed traversal: " + fuzzInput);
+                }
+            } catch (SecurityException e) {
+                // Expected for malicious input
+                if (!containsTraversalPattern(fuzzInput)) {
+                    findings.add("False positive: " + fuzzInput);
+                }
+            } catch (Exception e) {
+                findings.add("Unexpected error: " + e.getMessage() + 
+                           " for input: " + fuzzInput);
+            }
+        }
+        
+        assertTrue(findings.isEmpty(), 
+                  "Fuzzing found issues: " + findings);
+    }
+    
+    private String generateFuzzInput() {
+        StringBuilder input = new StringBuilder();
+        int length = random.nextInt(100) + 1;
+        
+        for (int i = 0; i < length; i++) {
+            input.append(getRandomPathComponent());
+        }
+        
+        return input.toString();
+    }
+    
+    private String getRandomPathComponent() {
+        String[] components = {
+            "..", ".", "/", "\\", "%2e", "%2f", 
+            "normal", "file.txt", "%00", "\0",
+            ":", "*", "?", "<", ">", "|",
+            "\\u002e", "\\u002f", "../", "..\\",
+            "....//", "..;/", "%c0%ae"
+        };
+        return components[random.nextInt(components.length)];
+    }
+}
+```
+
+== Test Report Generation
+
+=== Comprehensive Report Template
+
+```java
+public class SecurityTestReport {
+    
+    public void generateHTMLReport(TestResults results) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html><html><head>");
+        html.append("<title>Path Traversal Security Test Report</title>");
+        html.append("<style>/* CSS styles */</style>");
+        html.append("</head><body>");
+        
+        // Executive Summary
+        html.append("<h1>Executive Summary</h1>");
+        html.append("<div class='summary'>");
+        html.append("Security Score: ").append(results.getSecurityScore());
+        html.append("</div>");
+        
+        // CVE Coverage
+        html.append("<h2>CVE Pattern Coverage</h2>");
+        html.append("<table>");
+        for (CVETest test : results.getCVETests()) {
+            html.append("<tr>");
+            html.append("<td>").append(test.getCVE()).append("</td>");
+            html.append("<td>").append(test.isPassed() ? "✓" : "✗").append("</td>");
+            html.append("</tr>");
+        }
+        html.append("</table>");
+        
+        // Encoding Resistance
+        html.append("<h2>Encoding Resistance</h2>");
+        appendEncodingResults(html, results);
+        
+        // Performance Metrics
+        html.append("<h2>Performance Metrics</h2>");
+        appendPerformanceMetrics(html, results);
+        
+        // Recommendations
+        html.append("<h2>Recommendations</h2>");
+        appendRecommendations(html, results);
+        
+        html.append("</body></html>");
+        
+        saveReport(html.toString());
+    }
+}
+```
+
+== Continuous Improvement
+
+=== CVE Database Integration
+
+```java
+@Component
+public class CVEDatabaseUpdater {
+    
+    @Scheduled(cron = "0 0 * * * *") // Hourly
+    public void updateCVEPatterns() {
+        List<CVE> newCVEs = fetchLatestCVEs();
+        
+        for (CVE cve : newCVEs) {
+            if (isPathTraversalCVE(cve)) {
+                addTestPattern(cve);
+                notifySecurityTeam(cve);
+            }
+        }
+    }
+    
+    private List<CVE> fetchLatestCVEs() {
+        // Fetch from NVD API
+        return nvdClient.getRecentCVEs(24); // Last 24 hours
+    }
+}
+```
+
+== References
+
+* OWASP Testing Guide v4.2
+* NIST Special Publication 800-53
+* Common Weakness Enumeration (CWE-22)
+* ISO/IEC 27034 Application Security
+* SANS Top 25 Software Errors
+* CVE Database Testing Patterns
+
+_Document generated: 2025-01-06_
+_Comprehensive test harness design for path traversal security_

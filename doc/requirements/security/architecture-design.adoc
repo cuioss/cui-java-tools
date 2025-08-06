@@ -1,0 +1,931 @@
+= Path Traversal Security Architecture and Design Document
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+
+link:README.adoc[← Back to Documentation Index]
+
+== Executive Summary
+
+This document presents a comprehensive architecture and design for a unified path traversal security utility that serves as a single point of entry for validating paths across all contexts (file systems, URLs, archives, containers). The design incorporates lessons learned from CVE analysis, industry best practices, and comparative analysis of existing security libraries to create a robust, performant, and extensible security framework.
+
+== Design Goals and Principles
+
+=== Primary Goals
+
+1. **Unified Security Interface**: Single API for all path validation needs
+2. **Zero False Negatives**: Block all known attack patterns
+3. **Minimal False Positives**: Allow legitimate use cases
+4. **Performance**: Sub-millisecond validation for 95th percentile
+5. **Extensibility**: Support for new attack patterns and contexts
+6. **Cross-Platform**: Consistent behavior across OS platforms
+7. **Security by Default**: Safe defaults, explicit unsafe operations
+
+=== Design Principles
+
+[cols="2,3"]
+|===
+|Principle |Implementation
+
+|Defense in Depth
+|Multiple validation layers, each catching different attack classes
+
+|Fail Secure
+|Reject ambiguous or unparseable input rather than attempting correction
+
+|Least Privilege
+|Minimal permissions required for validation operations
+
+|Separation of Concerns
+|Distinct components for different validation aspects
+
+|Zero Trust
+|Assume all input is malicious until proven otherwise
+
+|Transparency
+|Clear logging and audit trail for security decisions
+
+|===
+
+== System Architecture
+
+=== High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Public API Layer                      │
+│  PathSecurityValidator (Main Entry Point)                │
+└─────────────┬───────────────────────────────────────────┘
+              │
+┌─────────────▼───────────────────────────────────────────┐
+│              Validation Orchestrator                     │
+│  Coordinates multiple validation strategies              │
+└─────────────┬───────────────────────────────────────────┘
+              │
+┌─────────────▼───────────────────────────────────────────┐
+│           Validation Pipeline                            │
+├──────────────┬────────────┬────────────┬───────────────┤
+│   Decoder    │ Normalizer │ Validator  │   Verifier    │
+│   Engine     │   Engine   │   Engine   │    Engine     │
+└──────────────┴────────────┴────────────┴───────────────┘
+              │
+┌─────────────▼───────────────────────────────────────────┐
+│           Platform Abstraction Layer                     │
+├──────────────┬────────────┬────────────┬───────────────┤
+│   Windows    │   Linux    │   macOS    │  Container    │
+│   Handler    │  Handler   │  Handler   │   Handler     │
+└──────────────┴────────────┴────────────┴───────────────┘
+```
+
+=== Component Architecture
+
+==== Core Components
+
+```java
+package de.cuioss.tools.security.path;
+
+/**
+ * Main entry point for path security validation
+ */
+public final class PathSecurityValidator {
+    
+    private final ValidationOrchestrator orchestrator;
+    private final SecurityConfiguration config;
+    private final AuditLogger auditLogger;
+    
+    private PathSecurityValidator(Builder builder) {
+        this.config = builder.config;
+        this.orchestrator = new ValidationOrchestrator(config);
+        this.auditLogger = new AuditLogger(config);
+    }
+    
+    /**
+     * Validates a file system path
+     */
+    public ValidationResult validateFilePath(String path, Path baseDirectory) {
+        return orchestrator.validate(
+            ValidationContext.forFilePath(path, baseDirectory)
+        );
+    }
+    
+    /**
+     * Validates a URL path component
+     */
+    public ValidationResult validateURLPath(String urlPath) {
+        return orchestrator.validate(
+            ValidationContext.forURL(urlPath)
+        );
+    }
+    
+    /**
+     * Validates an archive entry
+     */
+    public ValidationResult validateArchiveEntry(String entryName, Path targetDir) {
+        return orchestrator.validate(
+            ValidationContext.forArchive(entryName, targetDir)
+        );
+    }
+    
+    public static Builder builder() {
+        return new Builder();
+    }
+    
+    public static class Builder {
+        // Builder implementation
+    }
+}
+```
+
+=== Validation Pipeline Architecture
+
+==== Pipeline Design
+
+```java
+/**
+ * Validation pipeline processing stages
+ */
+public class ValidationPipeline {
+    
+    private final List<ValidationStage> stages;
+    
+    public ValidationPipeline() {
+        this.stages = Arrays.asList(
+            new DecodingStage(),      // Handle all encoding schemes
+            new NormalizationStage(),  // Normalize paths
+            new ValidationStage(),     // Core validation logic
+            new VerificationStage()    // Final verification
+        );
+    }
+    
+    public ValidationResult process(ValidationContext context) {
+        ValidationData data = new ValidationData(context);
+        
+        for (ValidationStage stage : stages) {
+            StageResult result = stage.process(data);
+            
+            if (result.isBlocked()) {
+                return ValidationResult.blocked(
+                    result.getReason(),
+                    stage.getName()
+                );
+            }
+            
+            data = result.getTransformedData();
+        }
+        
+        return ValidationResult.allowed();
+    }
+}
+```
+
+==== Stage Implementations
+
+```java
+/**
+ * Decoding stage - handles all encoding schemes
+ */
+public class DecodingStage implements ValidationStage {
+    
+    private final List<Decoder> decoders = Arrays.asList(
+        new URLDecoder(),
+        new UnicodeDecoder(),
+        new HTMLEntityDecoder(),
+        new Base64Decoder(),
+        new DoubleEncodingDecoder()
+    );
+    
+    @Override
+    public StageResult process(ValidationData data) {
+        String path = data.getPath();
+        
+        for (Decoder decoder : decoders) {
+            if (decoder.canDecode(path)) {
+                path = decoder.decode(path);
+                data.addDecodingStep(decoder.getName());
+            }
+        }
+        
+        // Check for remaining encoding
+        if (hasRemainingEncoding(path)) {
+            return StageResult.blocked("Undecodeable content detected");
+        }
+        
+        return StageResult.proceed(data.withPath(path));
+    }
+}
+
+/**
+ * Normalization stage - platform-aware path normalization
+ */
+public class NormalizationStage implements ValidationStage {
+    
+    @Override
+    public StageResult process(ValidationData data) {
+        String normalized = normalizePath(data.getPath(), data.getPlatform());
+        
+        // Detect normalization bypass attempts
+        if (isNormalizationBypass(data.getPath(), normalized)) {
+            return StageResult.blocked("Normalization bypass detected");
+        }
+        
+        return StageResult.proceed(data.withPath(normalized));
+    }
+    
+    private String normalizePath(String path, Platform platform) {
+        // Platform-specific normalization
+        return platform.getNormalizer().normalize(path);
+    }
+}
+```
+
+== Security Validation Strategies
+
+=== Multi-Layer Validation Approach
+
+```java
+public class ValidationEngine {
+    
+    private final List<Validator> validators = Arrays.asList(
+        new BlacklistValidator(),      // Known attack patterns
+        new WhitelistValidator(),      // Allowed patterns only
+        new ContainmentValidator(),    // Path containment checks
+        new CanonicalValidator(),      // Canonical path validation
+        new SemanticValidator()        // Context-aware validation
+    );
+    
+    public ValidationResult validate(ValidationContext context) {
+        for (Validator validator : validators) {
+            if (validator.appliesTo(context)) {
+                ValidationResult result = validator.validate(context);
+                if (result.isBlocked()) {
+                    return result;
+                }
+            }
+        }
+        return ValidationResult.allowed();
+    }
+}
+```
+
+=== Attack Pattern Detection
+
+```java
+public class AttackPatternDetector {
+    
+    private final PatternMatcher patterns;
+    
+    public AttackPatternDetector() {
+        this.patterns = new PatternMatcher();
+        loadCVEPatterns();
+        loadOWASPPatterns();
+        loadCustomPatterns();
+    }
+    
+    public boolean detectAttack(String path) {
+        // Direct pattern matching
+        if (patterns.matches(path)) {
+            return true;
+        }
+        
+        // Semantic analysis
+        if (hasTraversalSemantics(path)) {
+            return true;
+        }
+        
+        // Anomaly detection
+        if (isAnomalous(path)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private void loadCVEPatterns() {
+        // Load patterns from CVE database
+        patterns.addPattern("CVE-2021-29425", "//../*");
+        patterns.addPattern("CVE-2023-32235", "*%2F..%2F..%2F*");
+        patterns.addPattern("CVE-2023-50164", "../../WEB-INF/*");
+        // ... more CVE patterns
+    }
+}
+```
+
+== Platform-Specific Implementations
+
+=== Platform Abstraction
+
+```java
+public interface PlatformHandler {
+    
+    /**
+     * Normalize path for specific platform
+     */
+    String normalizePath(String path);
+    
+    /**
+     * Validate path against platform-specific rules
+     */
+    boolean isValidPath(String path);
+    
+    /**
+     * Get canonical representation
+     */
+    String getCanonicalPath(String path) throws IOException;
+    
+    /**
+     * Check if path is absolute
+     */
+    boolean isAbsolutePath(String path);
+    
+    /**
+     * Get platform-specific separators
+     */
+    String[] getSeparators();
+}
+
+public class WindowsPlatformHandler implements PlatformHandler {
+    
+    @Override
+    public String normalizePath(String path) {
+        // Handle both / and \ separators
+        path = path.replace('/', '\\');
+        
+        // Handle UNC paths
+        if (path.startsWith("\\\\")) {
+            return normalizeUNCPath(path);
+        }
+        
+        // Handle drive letters
+        if (isDrivePath(path)) {
+            return normalizeDrivePath(path);
+        }
+        
+        return path;
+    }
+    
+    @Override
+    public boolean isValidPath(String path) {
+        // Check for invalid Windows characters
+        if (containsInvalidChars(path)) {
+            return false;
+        }
+        
+        // Check for reserved names (CON, PRN, AUX, etc.)
+        if (isReservedName(path)) {
+            return false;
+        }
+        
+        return true;
+    }
+}
+```
+
+=== HTTP Parameter Validation
+
+```java
+public class HTTPParameterValidator {
+    
+    // RFC 3986 query component validation
+    public ValidationResult validateQueryParameters(Map<String, String> params) {
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            // Validate parameter name (RFC 7230 token)
+            if (!isValidParameterName(param.getKey())) {
+                return ValidationResult.blocked("Invalid parameter name: " + param.getKey());
+            }
+            
+            // Validate parameter value for path traversal
+            String decoded = fullyDecode(param.getValue());
+            if (containsPathTraversal(decoded)) {
+                return ValidationResult.blocked("Path traversal in parameter: " + param.getKey());
+            }
+        }
+        return ValidationResult.allowed();
+    }
+    
+    private boolean isValidParameterName(String name) {
+        // RFC 7230 token characters
+        return name.matches("^[a-zA-Z0-9!#$%&'*+\\-.^_`|~]+$");
+    }
+}
+```
+
+=== Cookie Path Validation
+
+```java
+public class CookiePathValidator {
+    
+    // RFC 6265 - HTTP State Management
+    public ValidationResult validateCookiePath(String path) {
+        // RFC 6265 Section 5.1.4 - Paths
+        if (!path.startsWith("/")) {
+            return ValidationResult.blocked("Cookie path must start with /");
+        }
+        
+        // Check for path traversal in cookie paths
+        if (containsPathTraversal(path)) {
+            return ValidationResult.blocked("Path traversal in cookie path");
+        }
+        
+        return ValidationResult.allowed();
+    }
+}
+```
+
+== URL Path Validation (Primary Focus)
+
+=== HTTP Standards Compliance
+
+==== RFC 3986 - URI Generic Syntax Implementation
+
+```java
+public class RFC3986Validator {
+    
+    // RFC 3986 Section 2.2 - Reserved Characters
+    private static final String RESERVED = ":/?#[]@!$&'()*+,;=";
+    private static final String UNRESERVED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    
+    public boolean isValidURIPath(String path) {
+        // RFC 3986 Section 3.3 - Path validation
+        for (char c : path.toCharArray()) {
+            if (!isUnreserved(c) && !isReserved(c) && !isPercentEncoded(path, c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean isPercentEncoded(String path, char c) {
+        // RFC 3986 Section 2.1 - Percent-Encoding
+        return c == '%' && isHexDigit(path.charAt(path.indexOf(c) + 1)) 
+                        && isHexDigit(path.charAt(path.indexOf(c) + 2));
+    }
+}
+```
+
+==== RFC 7230 - HTTP/1.1 Message Syntax
+
+```java
+public class RFC7230Validator {
+    
+    // RFC 7230 Section 3.2 - Header Field Structure
+    private static final Pattern TOKEN = Pattern.compile("^[!#$%&'*+\\-.0-9A-Z^_`a-z|~]+$");
+    
+    // RFC 7230 Section 5.3 - Request Target
+    public ValidationResult validateRequestTarget(String target) {
+        // origin-form = absolute-path [ "?" query ]
+        if (target.startsWith("/")) {
+            return validateOriginForm(target);
+        }
+        // absolute-form = absolute-URI
+        else if (target.matches("^https?://.*")) {
+            return validateAbsoluteForm(target);
+        }
+        return ValidationResult.blocked("Invalid request target format");
+    }
+    
+    public boolean isValidHeaderName(String name) {
+        return TOKEN.matcher(name).matches();
+    }
+}
+```
+
+=== URL-Specific Security
+
+```java
+public class URLPathSecurityValidator {
+    
+    public ValidationResult validateURLPath(String urlPath) {
+        // Decode URL encoding
+        String decoded = fullyDecode(urlPath);
+        
+        // Check for double encoding
+        if (hasDoubleEncoding(urlPath)) {
+            return ValidationResult.blocked("Double encoding detected");
+        }
+        
+        // Validate URL path components
+        String[] segments = decoded.split("/");
+        for (String segment : segments) {
+            if (isTraversalSegment(segment)) {
+                return ValidationResult.blocked("Path traversal in URL");
+            }
+        }
+        
+        // Check for URL-specific attacks
+        if (hasURLAttackPattern(decoded)) {
+            return ValidationResult.blocked("URL attack pattern detected");
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    private String fullyDecode(String url) {
+        String decoded = url;
+        String previous;
+        
+        do {
+            previous = decoded;
+            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+        } while (!decoded.equals(previous));
+        
+        return decoded;
+    }
+}
+```
+
+== Performance Optimization
+
+=== Caching Strategy
+
+```java
+public class ValidationCache {
+    
+    private final Cache<String, ValidationResult> cache;
+    private final BloomFilter<String> knownMalicious;
+    
+    public ValidationCache() {
+        this.cache = CacheBuilder.newBuilder()
+            .maximumSize(10000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
+            
+        this.knownMalicious = BloomFilter.create(
+            Funnels.stringFunnel(StandardCharsets.UTF_8),
+            100000,
+            0.01
+        );
+    }
+    
+    public Optional<ValidationResult> get(String path) {
+        // Quick check for known malicious
+        if (knownMalicious.mightContain(path)) {
+            return Optional.of(ValidationResult.blocked("Known attack pattern"));
+        }
+        
+        return Optional.ofNullable(cache.getIfPresent(path));
+    }
+    
+    public void put(String path, ValidationResult result) {
+        cache.put(path, result);
+        
+        if (result.isBlocked()) {
+            knownMalicious.put(path);
+        }
+    }
+}
+```
+
+=== Performance Metrics
+
+```java
+public class PerformanceMonitor {
+    
+    private final MeterRegistry registry;
+    
+    public PerformanceMonitor(MeterRegistry registry) {
+        this.registry = registry;
+    }
+    
+    public <T> T measure(String operation, Supplier<T> task) {
+        return Timer.Sample
+            .start(registry)
+            .stop(registry.timer("path.validation", "operation", operation))
+            .recordCallable(task);
+    }
+    
+    public void recordValidation(ValidationContext context, long duration) {
+        registry.timer("path.validation.duration",
+            "type", context.getType().name(),
+            "result", context.getResult().name()
+        ).record(duration, TimeUnit.NANOSECONDS);
+        
+        registry.counter("path.validation.count",
+            "type", context.getType().name()
+        ).increment();
+    }
+}
+```
+
+== Security Configuration
+
+=== Configuration Model
+
+```java
+@ConfigurationProperties(prefix = "security.path")
+public class PathSecurityConfiguration {
+    
+    /**
+     * Validation strictness level
+     */
+    private StrictnessLevel strictness = StrictnessLevel.HIGH;
+    
+    /**
+     * Allowed file extensions
+     */
+    private Set<String> allowedExtensions = Set.of(
+        ".pdf", ".txt", ".doc", ".docx", ".jpg", ".png"
+    );
+    
+    /**
+     * Maximum path length
+     */
+    private int maxPathLength = 4096;
+    
+    /**
+     * Enable caching
+     */
+    private boolean cachingEnabled = true;
+    
+    /**
+     * Custom validation rules
+     */
+    private List<CustomRule> customRules = new ArrayList<>();
+    
+    /**
+     * Platform-specific settings
+     */
+    private PlatformSettings platformSettings = new PlatformSettings();
+    
+    public enum StrictnessLevel {
+        LOW,      // Basic validation only
+        MEDIUM,   // Standard validation
+        HIGH,     // Strict validation (default)
+        PARANOID  // Maximum security, may block legitimate paths
+    }
+}
+```
+
+== Error Handling and Logging
+
+=== Security-Aware Error Handling
+
+```java
+public class SecurityErrorHandler {
+    
+    /**
+     * Handle validation errors without information disclosure
+     */
+    public ErrorResponse handleError(ValidationException e) {
+        // Log detailed error internally
+        securityLogger.error("Validation failed", e);
+        
+        // Return generic error to client
+        return ErrorResponse.builder()
+            .code("INVALID_PATH")
+            .message("The requested path is invalid")
+            .build();
+    }
+    
+    /**
+     * Audit logging for security events
+     */
+    public void auditValidation(ValidationContext context, ValidationResult result) {
+        AuditEvent event = AuditEvent.builder()
+            .timestamp(Instant.now())
+            .principal(context.getPrincipal())
+            .action("PATH_VALIDATION")
+            .resource(sanitizePath(context.getPath()))
+            .result(result.isAllowed() ? "ALLOWED" : "BLOCKED")
+            .reason(result.getReason())
+            .build();
+            
+        auditLogger.log(event);
+    }
+}
+```
+
+== Integration Patterns
+
+=== Spring Integration
+
+```java
+@Configuration
+@EnableConfigurationProperties(PathSecurityConfiguration.class)
+public class PathSecurityAutoConfiguration {
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public PathSecurityValidator pathSecurityValidator(
+            PathSecurityConfiguration config) {
+        return PathSecurityValidator.builder()
+            .configuration(config)
+            .build();
+    }
+    
+    @Bean
+    public PathSecurityFilter pathSecurityFilter(
+            PathSecurityValidator validator) {
+        return new PathSecurityFilter(validator);
+    }
+}
+
+@Component
+public class PathSecurityFilter extends OncePerRequestFilter {
+    
+    private final PathSecurityValidator validator;
+    
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain) throws ServletException, IOException {
+        
+        String path = extractPath(request);
+        ValidationResult result = validator.validateURLPath(path);
+        
+        if (result.isBlocked()) {
+            response.sendError(
+                HttpServletResponse.SC_BAD_REQUEST,
+                "Invalid path"
+            );
+            return;
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+```
+
+=== Jakarta EE Integration
+
+```java
+@WebFilter("/*")
+public class JakartaPathSecurityFilter implements Filter {
+    
+    @Inject
+    private PathSecurityValidator validator;
+    
+    @Override
+    public void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
+        
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String path = httpRequest.getRequestURI();
+        
+        ValidationResult result = validator.validateURLPath(path);
+        
+        if (result.isBlocked()) {
+            ((HttpServletResponse) response).sendError(
+                HttpServletResponse.SC_BAD_REQUEST
+            );
+            return;
+        }
+        
+        chain.doFilter(request, response);
+    }
+}
+```
+
+== Migration Strategy
+
+=== From Existing Libraries
+
+```java
+/**
+ * Migration adapter for Apache Commons IO
+ */
+public class CommonsIOMigrationAdapter {
+    
+    private final PathSecurityValidator validator;
+    
+    /**
+     * Drop-in replacement for FileNameUtils.normalize()
+     */
+    public String normalize(String filename) {
+        ValidationResult result = validator.validateFilePath(
+            filename, 
+            Paths.get(".")
+        );
+        
+        if (result.isBlocked()) {
+            return null; // Commons IO behavior
+        }
+        
+        return result.getNormalizedPath();
+    }
+}
+
+/**
+ * Migration adapter for OWASP ESAPI
+ */
+public class ESAPIMigrationAdapter {
+    
+    private final PathSecurityValidator validator;
+    
+    /**
+     * Drop-in replacement for Validator.getValidDirectoryPath()
+     */
+    public String getValidDirectoryPath(
+            String context,
+            String input,
+            File parent,
+            boolean allowNull) throws ValidationException {
+        
+        if (input == null && allowNull) {
+            return null;
+        }
+        
+        ValidationResult result = validator.validateFilePath(
+            input,
+            parent.toPath()
+        );
+        
+        if (result.isBlocked()) {
+            throw new ValidationException(
+                context,
+                "Invalid directory path"
+            );
+        }
+        
+        return result.getNormalizedPath();
+    }
+}
+```
+
+== Monitoring and Observability
+
+=== Metrics Collection
+
+```java
+@Component
+public class PathSecurityMetrics {
+    
+    private final MeterRegistry registry;
+    
+    public void recordValidation(ValidationMetrics metrics) {
+        // Record validation counts
+        registry.counter("path.validation.total",
+            "type", metrics.getType(),
+            "result", metrics.getResult()
+        ).increment();
+        
+        // Record performance metrics
+        registry.timer("path.validation.duration",
+            "type", metrics.getType()
+        ).record(metrics.getDuration());
+        
+        // Record attack detection
+        if (metrics.isAttackDetected()) {
+            registry.counter("path.validation.attacks",
+                "pattern", metrics.getAttackPattern()
+            ).increment();
+        }
+    }
+    
+    public void exportMetrics() {
+        // Prometheus format
+        String metrics = registry.scrape();
+        
+        // Custom format for security dashboard
+        SecurityMetrics securityMetrics = SecurityMetrics.builder()
+            .totalValidations(getTotalValidations())
+            .blockedAttempts(getBlockedAttempts())
+            .averageLatency(getAverageLatency())
+            .topAttackPatterns(getTopAttackPatterns())
+            .build();
+    }
+}
+```
+
+== Future Enhancements
+
+=== Planned Features
+
+1. **Machine Learning Integration**
+   - Anomaly detection for zero-day patterns
+   - Adaptive threat modeling
+   - Behavioral analysis
+
+2. **Cloud-Native Support**
+   - S3/Azure Blob/GCS path validation
+   - Serverless function path security
+   - Container registry path validation
+
+3. **Advanced Threat Intelligence**
+   - Real-time CVE feed integration
+   - Threat intelligence platform integration
+   - Automated pattern updates
+
+4. **Formal Verification**
+   - Mathematical proof of security properties
+   - Model checking for validation logic
+   - Automated security proof generation
+
+== Conclusion
+
+This architecture provides a comprehensive, extensible, and performant solution for path traversal security that addresses the limitations found in existing libraries while incorporating lessons learned from real-world vulnerabilities. The design's modular nature allows for easy extension and adaptation to new threats while maintaining backward compatibility through migration adapters.
+
+== References
+
+* OWASP Application Security Architecture Guide
+* NIST Cybersecurity Framework
+* ISO/IEC 27034 - Application Security
+* Common Criteria for Information Technology Security Evaluation
+* MITRE ATT&CK Framework
+* Zero Trust Architecture (NIST SP 800-207)
+
+_Document generated: 2025-01-06_
+_Comprehensive architecture for unified path traversal security_
