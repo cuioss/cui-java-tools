@@ -72,6 +72,17 @@ class PathTraversalSecurityTest {
             // The result should be in the temp directory, not accessing parent directories
             assertTrue(normalizedResult.startsWith(normalizedTemp),
                     "Result path should be within temp directory boundaries");
+
+            // IMPORTANT: Verify that sensitive content was NOT copied
+            // This is the key security validation - we should not have access to sensitive content
+            String copiedContent = Files.readString(result);
+            assertNotEquals("Sensitive content", copiedContent,
+                    "Sensitive file content should not be accessible through path traversal");
+
+            // If we reach here, the content should be from the safe file, not the sensitive one
+            // Or it should be an error/empty content
+            assertTrue("Safe content".equals(copiedContent) || copiedContent.isEmpty(),
+                    "Content should be either from safe file or empty, not from sensitive file");
         }
     }
 
@@ -175,6 +186,49 @@ class PathTraversalSecurityTest {
     }
 
     @Test
+    void fileLoaderUtilityValidatesPathTraversalInFilename() {
+        // Test that FileLoaderUtility.copyFileToTemp properly validates filenames
+        // This test specifically addresses the Gemini comment about validating 
+        // that sensitive content is not accessible
+        
+        // Create a mock FileLoader with path traversal in different parts
+        FileLoader traversalInName = new FileLoader() {
+            @Override
+            public boolean isReadable() {
+                return true;
+            }
+
+            @Override
+            public StructuredFilename getFileName() {
+                // Filename with traversal in the name part
+                return new StructuredFilename("../../../etc/passwd");
+            }
+
+            @Override
+            public InputStream inputStream() throws IOException {
+                return new ByteArrayInputStream("should not be copied".getBytes());
+            }
+
+            @Override
+            public URL getURL() {
+                return null;
+            }
+
+            @Override
+            public boolean isFilesystemLoader() {
+                return false;
+            }
+        };
+
+        // Should throw IllegalArgumentException for path traversal
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.copyFileToTemp(traversalInName, false));
+
+        assertTrue(exception.getMessage().contains("potential path traversal"),
+                "Exception message should indicate path traversal detection");
+    }
+
+    @Test
     void pathNormalization() throws IOException {
         // Test that path normalization works correctly
         Path pathWithDots = subDir.resolve("../safe.txt");
@@ -219,37 +273,50 @@ class PathTraversalSecurityTest {
         assertNotNull(result);
         assertTrue(Files.exists(result));
 
-        // Now test with a mock FileLoader that returns malicious filename
-        FileLoader maliciousLoader = new FileLoader() {
-            @Override
-            public boolean isReadable() {
-                return true;
-            }
-
-            @Override
-            public StructuredFilename getFileName() {
-                return new StructuredFilename("../../etc/passwd");
-            }
-
-            @Override
-            public InputStream inputStream() throws IOException {
-                return new ByteArrayInputStream("test".getBytes());
-            }
-
-            @Override
-            public URL getURL() {
-                return null;
-            }
-
-            @Override
-            public boolean isFilesystemLoader() {
-                return true;
-            }
+        // Test various malicious filename patterns
+        String[] maliciousFilenames = {
+                "../../etc/passwd",
+                "../../../sensitive.txt",
+                "..\\..\\windows\\system32",
+                "/etc/shadow",
+                "C:\\Windows\\System32\\config\\SAM",
+                "normal/../../../etc/passwd",
+                "safe.txt/../../sensitive"
         };
 
-        // This should be rejected due to path traversal in filename
-        assertThrows(IllegalArgumentException.class,
-                () -> FileLoaderUtility.copyFileToTemp(maliciousLoader, false),
-                "Should reject malicious filename");
+        for (String maliciousName : maliciousFilenames) {
+            // Create a mock FileLoader that returns malicious filename
+            FileLoader maliciousLoader = new FileLoader() {
+                @Override
+                public boolean isReadable() {
+                    return true;
+                }
+
+                @Override
+                public StructuredFilename getFileName() {
+                    return new StructuredFilename(maliciousName);
+                }
+
+                @Override
+                public InputStream inputStream() throws IOException {
+                    return new ByteArrayInputStream("malicious content".getBytes());
+                }
+
+                @Override
+                public URL getURL() {
+                    return null;
+                }
+
+                @Override
+                public boolean isFilesystemLoader() {
+                    return true;
+                }
+            };
+
+            // This should be rejected due to path traversal in filename
+            assertThrows(IllegalArgumentException.class,
+                    () -> FileLoaderUtility.copyFileToTemp(maliciousLoader, false),
+                    "Should reject malicious filename: " + maliciousName);
+        }
     }
 }
