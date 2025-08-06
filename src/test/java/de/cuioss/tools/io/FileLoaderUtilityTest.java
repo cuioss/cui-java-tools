@@ -78,4 +78,51 @@ class FileLoaderUtilityTest {
                 FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
     }
 
+    @Test
+    void validatePathSegmentShouldAcceptValidSegments() {
+        // Should not throw for valid segments
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment(null));
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment(""));
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment("normal.txt"));
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment("file-name_123.pdf"));
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment(".hidden"));
+        assertDoesNotThrow(() -> FileLoaderUtility.validatePathSegment("file with spaces.doc"));
+    }
+
+    @Test
+    void validatePathSegmentShouldRejectPathTraversal() {
+        // Should throw for path traversal attempts
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment(".."),
+                "Should reject double dots");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("../etc/passwd"),
+                "Should reject path traversal with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("..\\windows\\system32"),
+                "Should reject path traversal with backslash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("normal/../../../etc/passwd"),
+                "Should reject embedded path traversal");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("/etc/passwd"),
+                "Should reject absolute paths with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("C:\\Windows\\System32"),
+                "Should reject Windows absolute paths");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("some/nested/path"),
+                "Should reject nested paths with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FileLoaderUtility.validatePathSegment("some\\nested\\path"),
+                "Should reject nested paths with backslash");
+    }
+
 }

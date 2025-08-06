@@ -66,6 +66,20 @@ public final class FileLoaderUtility {
     }
 
     /**
+     * Validates a path segment (filename part or suffix) to ensure it doesn't contain
+     * path traversal sequences or separators that could be used to escape the intended directory.
+     *
+     * @param pathSegment the path segment to validate (can be null)
+     * @throws IllegalArgumentException if the path segment contains invalid characters or sequences
+     */
+    static void validatePathSegment(String pathSegment) {
+        if (pathSegment != null &&
+                (pathSegment.contains("..") || pathSegment.contains("/") || pathSegment.contains("\\"))) {
+            throw new IllegalArgumentException("Invalid path segment: potential path traversal detected in '" + pathSegment + "'");
+        }
+    }
+
+    /**
      * Helper class that copies the content of a {@link FileLoader} to the
      * temp-folder and references it
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
@@ -93,10 +107,8 @@ public final class FileLoaderUtility {
         var suffix = fileName.getSuffix();
 
         // Ensure the filename parts don't contain path separators or traversal sequences
-        if (namePart.contains("..") || namePart.contains("/") || namePart.contains("\\") ||
-                (suffix != null && (suffix.contains("..") || suffix.contains("/") || suffix.contains("\\")))) {
-            throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
-        }
+        validatePathSegment(namePart);
+        validatePathSegment(suffix);
 
         // Create temp file with secure permissions (owner read/write only)
         // This addresses SonarQube security warning about publicly writable directories

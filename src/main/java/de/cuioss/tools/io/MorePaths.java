@@ -284,10 +284,8 @@ public final class MorePaths {
         var suffix = filename.getSuffix();
 
         // Additional validation to ensure no path separators in filename parts
-        if (namePart.contains("..") || namePart.contains("/") || namePart.contains("\\") ||
-                (suffix != null && (suffix.contains("..") || suffix.contains("/") || suffix.contains("\\")))) {
-            throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
-        }
+        FileLoaderUtility.validatePathSegment(namePart);
+        FileLoaderUtility.validatePathSegment(suffix);
 
         // Use secure temp file creation from FileLoaderUtility to ensure proper permissions
         var tempFile = FileLoaderUtility.createSecureTempFile(namePart, suffix);
