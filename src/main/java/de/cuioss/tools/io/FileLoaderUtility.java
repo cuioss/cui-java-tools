@@ -177,7 +177,7 @@ public final class FileLoaderUtility {
     // We explicitly set restrictive permissions (rw-------) on POSIX systems.
     // On Windows, temp files are created in user-specific directories with appropriate ACLs.
     // Additionally, the filename parameters are validated against path traversal attacks before this method is called.
-    private static Path createSecureTempFile(String prefix, String suffix) throws IOException {
+    static Path createSecureTempFile(String prefix, String suffix) throws IOException {
         try {
             // Try to set POSIX permissions (works on Unix/Linux/Mac)
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");

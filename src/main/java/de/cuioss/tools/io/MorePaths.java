@@ -289,7 +289,8 @@ public final class MorePaths {
             throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
         }
 
-        var tempFile = Files.createTempFile(namePart, suffix);
+        // Use secure temp file creation from FileLoaderUtility to ensure proper permissions
+        var tempFile = FileLoaderUtility.createSecureTempFile(namePart, suffix);
 
         Files.copy(realPath, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         LOGGER.debug("Created temp-file from '%s' at '%s'", realPath.toFile().getAbsolutePath(),
