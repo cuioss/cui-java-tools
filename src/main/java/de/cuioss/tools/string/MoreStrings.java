@@ -1191,25 +1191,18 @@ public final class MoreStrings {
     static String lenientToString(Object o) {
         try {
             if (o != null && o.getClass().isArray()) {
-                if (o instanceof Object[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof int[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof long[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof double[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof float[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof boolean[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof byte[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof short[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof char[] arr) {
-                    return Arrays.toString(arr);
-                }
+                return switch (o) {
+                    case Object[] arr -> Arrays.toString(arr);
+                    case int[] arr -> Arrays.toString(arr);
+                    case long[] arr -> Arrays.toString(arr);
+                    case double[] arr -> Arrays.toString(arr);
+                    case float[] arr -> Arrays.toString(arr);
+                    case boolean[] arr -> Arrays.toString(arr);
+                    case byte[] arr -> Arrays.toString(arr);
+                    case short[] arr -> Arrays.toString(arr);
+                    case char[] arr -> Arrays.toString(arr);
+                    default -> String.valueOf(o);
+                };
             }
             return String.valueOf(o);
         } catch (Exception e) {
