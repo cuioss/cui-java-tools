@@ -85,16 +85,9 @@ public final class MoreReflection {
 
     private static final String IGNORING_METHOD_ON_CLASS = "Ignoring method '{}' on class '{}'";
 
-    private static volatile CuiLogger LOGGER = null;
+    private static final CuiLogger LOGGER = new CuiLogger(MoreReflection.class);
 
     private static CuiLogger getLogger() {
-        if (LOGGER == null) {
-            synchronized (MoreReflection.class) {
-                if (LOGGER == null) {
-                    LOGGER = new CuiLogger(MoreReflection.class);
-                }
-            }
-        }
         return LOGGER;
     }
 
