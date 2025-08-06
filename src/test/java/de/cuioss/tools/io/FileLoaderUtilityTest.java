@@ -18,10 +18,10 @@ package de.cuioss.tools.io;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import static de.cuioss.tools.io.FileLoaderUtility.copyFileToTemp;
-import static de.cuioss.tools.io.FileLoaderUtility.getLoaderForPath;
+import static de.cuioss.tools.io.FileLoaderUtility.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("DataFlowIssue")
@@ -60,11 +60,21 @@ class FileLoaderUtilityTest {
     }
 
     @Test
+    void shouldFailToProvideLoaderOnEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> getLoaderForPath(""));
+    }
+
+    @Test
     void shouldReturnLoaderForPaths() {
         assertEquals(ClassPathLoader.class, getLoaderForPath(FileTypePrefix.CLASSPATH + EXISTING_FILE_NAME).getClass());
         assertEquals(FileSystemLoader.class, getLoaderForPath(FileTypePrefix.FILE + EXISTING_FILE_NAME).getClass());
         assertEquals(FileSystemLoader.class, getLoaderForPath(EXISTING_FILE_NAME).getClass());
         assertEquals(FileSystemLoader.class, getLoaderForPath(NOT_EXISTING_FILE).getClass());
+    }
+
+    @Test
+    void shouldReturnUrlLoaderForUrlPrefix() {
+        assertEquals(UrlLoader.class, getLoaderForPath("url:http://example.com/file.txt").getClass());
     }
 
     @Test
@@ -76,6 +86,21 @@ class FileLoaderUtilityTest {
 
         assertThrows(IllegalArgumentException.class, () ->
                 FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
+    }
+
+    @Test
+    void shouldReturnContentAsStringWithCharset() throws IOException {
+        var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH, StandardCharsets.UTF_8);
+        assertNotNull(loaded);
+        assertFalse(loaded.isEmpty());
+        assertTrue(loaded.contains("Hello"));
+    }
+
+    @Test
+    void shouldThrowOnNullFileLoader() {
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toString(null));
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toString(null, StandardCharsets.UTF_8));
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toStringUnchecked(null));
     }
 
     @Test
