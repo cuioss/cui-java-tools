@@ -111,7 +111,10 @@ public class PropertyUtil {
      * @throws IllegalArgumentException if the property cannot be read or does not exist
      * @since 2.0
      */
-    @SuppressWarnings("java:S3655") // owolff: False Positive, isPresent is checked
+    @SuppressWarnings("java:S3655")
+    // Sonar false positive: "Optional.get() should not be called without checking isPresent()"
+    // We DO check isPresent() via findProperty().isPresent() before calling get().
+    // The check is in the return statement condition, which Sonar doesn't recognize.
     public static Object readProperty(Object bean, String propertyName) {
         LOGGER.debug("Reading property '%s' from %s", propertyName, bean);
         requireNonNull(bean);

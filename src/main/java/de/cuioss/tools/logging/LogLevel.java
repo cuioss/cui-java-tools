@@ -134,7 +134,9 @@ public enum LogLevel {
     }
 
     @SuppressWarnings("squid:S2629")
-    // False positive, logger state explicitly checked
+    // Sonar false positive: "Logging arguments should be lazy" - but we DO check isEnabled()
+    // before any string formatting, making this effectively lazy. The formatting only happens
+    // if the log level is enabled, which is the intent of the rule.
     void log(final Logger logger, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
             final var replacedTemplate = CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
@@ -144,7 +146,7 @@ public enum LogLevel {
     }
 
     @SuppressWarnings("squid:S2629")
-    // False positive, logger state explicitly checked
+    // Sonar false positive: The supplier IS lazy - we only call get() after checking isEnabled()
     void log(final Logger logger, Supplier<String> message, final Throwable throwable) {
         if (isEnabled(logger)) {
             doLog(logger, message.get(), throwable);
@@ -152,7 +154,9 @@ public enum LogLevel {
     }
 
     @SuppressWarnings("squid:S2629")
-    // False positive, logger state explicitly checked
+    // Sonar false positive: "Logging arguments should be lazy" - but we DO check isEnabled()
+    // before any string formatting, making this effectively lazy. The formatting only happens
+    // if the log level is enabled, which is the intent of the rule.
     void log(final Logger logger, final Throwable throwable, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
             final var replacedTemplate = CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))

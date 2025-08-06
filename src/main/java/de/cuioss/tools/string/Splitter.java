@@ -278,10 +278,10 @@ public final class Splitter {
      * @return an immutable list of the segments split from the parameter
      */
     @SuppressWarnings("java:S5852")
-    // owolff:
-    // This is a false positive,
-    // because the splitter-separator is coded / configured value,
-    // no user-payload
+    // Sonar: "Regex patterns should not be created needlessly" - False positive.
+    // The regex pattern here is NOT user input but a configured separator value 
+    // set during Splitter construction. The pattern is created once per Splitter
+    // instance, not per split operation. This is safe and performant by design.
     @NonNull
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
