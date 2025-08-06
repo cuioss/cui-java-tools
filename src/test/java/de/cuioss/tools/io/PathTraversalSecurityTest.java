@@ -188,9 +188,9 @@ class PathTraversalSecurityTest {
     @Test
     void fileLoaderUtilityValidatesPathTraversalInFilename() {
         // Test that FileLoaderUtility.copyFileToTemp properly validates filenames
-        // This test specifically addresses the Gemini comment about validating 
+        // This test specifically addresses the Gemini comment about validating
         // that sensitive content is not accessible
-        
+
         // Create a mock FileLoader with path traversal in different parts
         FileLoader traversalInName = new FileLoader() {
             @Override
@@ -229,7 +229,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void pathNormalization() throws IOException {
+    void pathNormalization() {
         // Test that path normalization works correctly
         Path pathWithDots = subDir.resolve("../safe.txt");
         Path normalized = pathWithDots.normalize();

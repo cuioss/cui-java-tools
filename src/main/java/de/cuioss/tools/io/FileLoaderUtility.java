@@ -26,9 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Set;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
@@ -65,19 +62,6 @@ public final class FileLoaderUtility {
         return new FileSystemLoader(pathName);
     }
 
-    /**
-     * Validates a path segment (filename part or suffix) to ensure it doesn't contain
-     * path traversal sequences or separators that could be used to escape the intended directory.
-     *
-     * @param pathSegment the path segment to validate (can be null)
-     * @throws IllegalArgumentException if the path segment contains invalid characters or sequences
-     */
-    static void validatePathSegment(String pathSegment) {
-        if (pathSegment != null &&
-                (pathSegment.contains("..") || pathSegment.contains("/") || pathSegment.contains("\\"))) {
-            throw new IllegalArgumentException("Invalid path segment: potential path traversal detected in '" + pathSegment + "'");
-        }
-    }
 
     /**
      * Helper class that copies the content of a {@link FileLoader} to the
@@ -107,12 +91,12 @@ public final class FileLoaderUtility {
         var suffix = fileName.getSuffix();
 
         // Ensure the filename parts don't contain path separators or traversal sequences
-        validatePathSegment(namePart);
-        validatePathSegment(suffix);
+        PathTraversalSecurity.validatePathSegment(namePart);
+        PathTraversalSecurity.validatePathSegment(suffix);
 
         // Create temp file with secure permissions (owner read/write only)
         // This addresses SonarQube security warning about publicly writable directories
-        final Path target = createSecureTempFile(namePart, suffix);
+        final Path target = PathTraversalSecurity.createSecureTempFile(namePart, suffix);
 
         try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
@@ -174,34 +158,4 @@ public final class FileLoaderUtility {
         }
     }
 
-    /**
-     * Creates a temporary file with secure permissions.
-     * On POSIX systems (Unix/Linux/Mac), sets permissions to owner-only (rw-------).
-     * On Windows, relies on default temp file security.
-     *
-     * @param prefix the prefix string to be used in generating the file name
-     * @param suffix the suffix string to be used in generating the file name
-     * @return Path to the created temporary file
-     * @throws IOException if an I/O error occurs
-     */
-    @SuppressWarnings("java:S5443")
-    // Sonar: "Make sure publicly writable directories are used safely" - False positive.
-    // We explicitly set restrictive permissions (rw-------) on POSIX systems.
-    // On Windows, temp files are created in user-specific directories with appropriate ACLs.
-    // Additionally, the filename parameters are validated against path traversal attacks before this method is called.
-    static Path createSecureTempFile(String prefix, String suffix) throws IOException {
-        try {
-            // Try to set POSIX permissions (works on Unix/Linux/Mac)
-            Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
-            var attrs = PosixFilePermissions.asFileAttribute(perms);
-            return Files.createTempFile(prefix, suffix, attrs);
-        } catch (UnsupportedOperationException e) {
-            // Fallback for Windows and other non-POSIX systems
-            // Windows handles file permissions differently, temp files are created with user-only access by default
-            // This is considered safe as Windows temp files are created in user-specific temp directories
-            @SuppressWarnings("java:S5443") // Already addressed - see method-level documentation
-            Path tempFile = Files.createTempFile(prefix, suffix);
-            return tempFile;
-        }
-    }
 }

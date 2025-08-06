@@ -284,11 +284,11 @@ public final class MorePaths {
         var suffix = filename.getSuffix();
 
         // Additional validation to ensure no path separators in filename parts
-        FileLoaderUtility.validatePathSegment(namePart);
-        FileLoaderUtility.validatePathSegment(suffix);
+        PathTraversalSecurity.validatePathSegment(namePart);
+        PathTraversalSecurity.validatePathSegment(suffix);
 
-        // Use secure temp file creation from FileLoaderUtility to ensure proper permissions
-        var tempFile = FileLoaderUtility.createSecureTempFile(namePart, suffix);
+        // Use secure temp file creation from PathTraversalSecurity to ensure proper permissions
+        var tempFile = PathTraversalSecurity.createSecureTempFile(namePart, suffix);
 
         Files.copy(realPath, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         LOGGER.debug("Created temp-file from '%s' at '%s'", realPath.toFile().getAbsolutePath(),
