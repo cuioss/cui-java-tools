@@ -32,6 +32,80 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Collection Literals Test Suite")
 class CollectionLiteralsTest {
 
+    @Test
+    @DisplayName("Should handle edge cases for mutable list with collections")
+    void shouldHandleMutableListEdgeCases() {
+        // Test with empty collection
+        var emptyList = mutableList(new ArrayList<String>());
+        assertTrue(emptyList.isEmpty());
+        emptyList.add("test");
+        assertEquals(1, emptyList.size());
+
+        // Test with null elements in collection
+        var listWithNulls = mutableList(Arrays.asList(null, "value", null));
+        assertEquals(3, listWithNulls.size());
+        assertNull(listWithNulls.getFirst());
+        assertEquals("value", listWithNulls.get(1));
+    }
+
+    @Test
+    @DisplayName("Should maintain order in mutable lists")
+    void shouldMaintainOrderInLists() {
+        var list = mutableList("first", "second", "third");
+        assertEquals("first", list.getFirst());
+        assertEquals("second", list.get(1));
+        assertEquals("third", list.get(2));
+
+        // Verify it's truly mutable
+        list.set(1, "modified");
+        assertEquals("modified", list.get(1));
+    }
+
+    @Test
+    @DisplayName("Should handle duplicate elements in sets")
+    void shouldHandleDuplicatesInSets() {
+        var set = mutableSet("a", "b", "a", "c", "b");
+        assertEquals(3, set.size()); // Duplicates removed
+        assertTrue(set.contains("a"));
+        assertTrue(set.contains("b"));
+        assertTrue(set.contains("c"));
+    }
+
+    @Test
+    @DisplayName("Should properly sort elements in sorted sets")
+    void shouldSortElementsInSortedSet() {
+        var sortedSet = mutableSortedSet("zebra", "apple", "mango", "banana");
+        var iterator = sortedSet.iterator();
+        assertEquals("apple", iterator.next());
+        assertEquals("banana", iterator.next());
+        assertEquals("mango", iterator.next());
+        assertEquals("zebra", iterator.next());
+    }
+
+    @Test
+    @DisplayName("Should create map with maximum 4 key-value pairs")
+    void shouldCreateMapWithMultiplePairs() {
+        var map = mutableMap("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4");
+        assertEquals(4, map.size());
+        assertEquals("v1", map.get("k1"));
+        assertEquals("v2", map.get("k2"));
+        assertEquals("v3", map.get("k3"));
+        assertEquals("v4", map.get("k4"));
+
+        // Verify it's mutable
+        map.put("k5", "v5");
+        assertEquals(5, map.size());
+    }
+
+    @Test
+    @DisplayName("Should preserve null values in maps")
+    void shouldPreserveNullValuesInMaps() {
+        var map = mutableMap("key1", null, "key2", "value2");
+        assertTrue(map.containsKey("key1"));
+        assertNull(map.get("key1"));
+        assertEquals("value2", map.get("key2"));
+    }
+
     @Nested
     @DisplayName("List Operations")
     class ListTests {

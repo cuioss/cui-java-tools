@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import static de.cuioss.tools.string.MoreStrings.nullToEmpty;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -156,20 +155,26 @@ public class CuiLogger {
     static final Pattern SLF4J_PATTERN = Pattern.compile(Pattern.quote("{}"));
 
     /**
+     * Creates a new CuiLogger instance for the given class.
+     *
      * @param clazz to be used for acquiring a concrete {@link Logger} instance.
      *              Must not be null
+     * @throws NullPointerException if clazz is null
      */
     public CuiLogger(Class<?> clazz) {
-        requireNonNull(clazz);
+        requireNonNull(clazz, "clazz must not be null");
         delegate = Logger.getLogger(clazz.getName());
     }
 
     /**
+     * Creates a new CuiLogger instance with the given name.
+     *
      * @param name to be used for acquiring a concrete {@link Logger} instance. Must
      *             not be null
+     * @throws NullPointerException if name is null
      */
     public CuiLogger(String name) {
-        requireNonNull(nullToEmpty(name));
+        requireNonNull(name, "name must not be null");
         delegate = Logger.getLogger(name);
     }
 

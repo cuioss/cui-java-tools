@@ -65,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  * <pre>{@code
  * // Access field with caching
  * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
- * 
+ *
  * // Handle field access safely
  * field.ifPresent(f -> {Object value = f.get(bean);});
  * }</pre>
@@ -131,7 +131,7 @@ public final class MoreReflection {
             return Optional.of(type.getDeclaredField(fieldName));
         } catch (final NoSuchFieldException | SecurityException e) {
             LOGGER.debug("No field found for name '%s' on class '%s'", fieldName, type);
-            if (Object.class.equals(type.getClass()) || null == type.getSuperclass()) {
+            if (Object.class.equals(type) || null == type.getSuperclass()) {
                 return Optional.empty();
             }
             return resolveField(type.getSuperclass(), fieldName);
@@ -141,6 +141,7 @@ public final class MoreReflection {
     /**
      * Determines the public not static methods of a given {@link Class}.
      * {@link Object#getClass()} will implicitly ignore
+     *
      *
      * @param clazz to be checked
      * @return the found public-methods.
@@ -381,7 +382,7 @@ public final class MoreReflection {
      */
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
             final Class<A> annotation) {
-        if (null == annotatedType || Object.class.equals(annotatedType.getClass())) {
+        if (null == annotatedType || Object.class.equals(annotatedType)) {
             return Collections.emptyList();
         }
 
@@ -450,20 +451,24 @@ public final class MoreReflection {
      * Otherwise, the super-type will be checked by calling the superclass
      */
     public static Optional<Class<?>> extractGenericTypeCovariantly(final Type type) {
-        if (null == type) {
-            LOGGER.trace("No KeyStoreType given, returning empty");
-            return Optional.empty();
-        }
-        if (type instanceof Class<?> class1) {
-            LOGGER.debug("Found actual class returning as result {}", type);
-            return Optional.of(class1);
-        }
-        if (type instanceof ParameterizedType parameterizedType) {
-            LOGGER.debug("found Parameterized type, for {}, calling recursively", type);
-            return extractGenericTypeCovariantly(parameterizedType.getRawType());
-        }
-        LOGGER.warn("Unable to determines generic-type for {}", type);
-        return Optional.empty();
+        return switch (type) {
+            case null -> {
+                LOGGER.trace("No type given, returning empty");
+                yield Optional.empty();
+            }
+            case Class<?> class1 -> {
+                LOGGER.debug("Found actual class returning as result {}", type);
+                yield Optional.of(class1);
+            }
+            case ParameterizedType parameterizedType -> {
+                LOGGER.debug("found Parameterized type, for {}, calling recursively", type);
+                yield extractGenericTypeCovariantly(parameterizedType.getRawType());
+            }
+            default -> {
+                LOGGER.warn("Unable to determines generic-type for {}", type);
+                yield Optional.empty();
+            }
+        };
     }
 
     /**

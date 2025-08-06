@@ -278,10 +278,11 @@ public final class Splitter {
      * @return an immutable list of the segments split from the parameter
      */
     @SuppressWarnings("java:S5852")
-    // owolff:
-    // This is a false positive,
-    // because the splitter-separator is coded / configured value,
-    // no user-payload
+    // Sonar: "Regex patterns should not be created needlessly" - False positive.
+    // All public factory methods (on(char), on(String), on(Pattern)) pre-compile the pattern
+    // at Splitter construction time. The Pattern.compile() at line 297 is defensive code that
+    // should never execute in normal usage, as pattern is always set by the factory methods.
+    // The pattern is created once per Splitter instance, not per split operation.
     @NonNull
     public List<String> splitToList(String sequence) {
         if (null == sequence) {

@@ -21,12 +21,12 @@ import lombok.experimental.UtilityClass;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.cuioss.tools.base.Preconditions.checkArgument;
 
 /**
  * Provides enhanced String handling utilities focusing on null-safety, performance,
@@ -847,7 +847,6 @@ public final class MoreStrings {
      * @return the index where the search char was found, -1 if not found
      * @see <a href="https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/StringUtils.java">Apache Commons Lang</a>
      */
-    @SuppressWarnings("squid:S3776") // owolff: original code
     public static int indexOf(final CharSequence cs, final int searchChar, int start) {
         if (isEmpty(cs)) {
             return INDEX_NOT_FOUND;
@@ -856,26 +855,75 @@ public final class MoreStrings {
         if (cs instanceof String string) {
             return string.indexOf(searchChar, start);
         }
-        final var sz = cs.length();
-        if (start < 0) {
-            start = 0;
-        }
+
+        return indexOfInCharSequence(cs, searchChar, normalizeStartIndex(start));
+    }
+
+    /**
+     * Normalizes the start index to ensure it's within valid bounds.
+     *
+     * @param start the start index
+     * @return normalized start index (minimum 0)
+     */
+    private static int normalizeStartIndex(int start) {
+        return Math.max(0, start);
+    }
+
+    /**
+     * Searches for a character in a CharSequence that is not a String.
+     *
+     * @param cs the CharSequence to search in
+     * @param searchChar the character to search for
+     * @param start the normalized start index
+     * @return the index of the character, or INDEX_NOT_FOUND
+     */
+    private static int indexOfInCharSequence(final CharSequence cs, final int searchChar, final int start) {
         if (searchChar < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
-            for (var i = start; i < sz; i++) {
-                if (cs.charAt(i) == searchChar) {
-                    return i;
-                }
+            return indexOfBasicCharacter(cs, searchChar, start);
+        }
+
+        if (searchChar <= Character.MAX_CODE_POINT) {
+            return indexOfSupplementaryCharacter(cs, searchChar, start);
+        }
+
+        return INDEX_NOT_FOUND;
+    }
+
+    /**
+     * Searches for a basic (non-supplementary) character.
+     *
+     * @param cs the CharSequence to search in
+     * @param searchChar the character to search for
+     * @param start the start index
+     * @return the index of the character, or INDEX_NOT_FOUND
+     */
+    private static int indexOfBasicCharacter(final CharSequence cs, final int searchChar, final int start) {
+        final var sz = cs.length();
+        for (var i = start; i < sz; i++) {
+            if (cs.charAt(i) == searchChar) {
+                return i;
             }
         }
-        // supplementary characters (LANG1300)
-        if (searchChar <= Character.MAX_CODE_POINT) {
-            final var chars = Character.toChars(searchChar);
-            for (var i = start; i < sz - 1; i++) {
-                final var high = cs.charAt(i);
-                final var low = cs.charAt(i + 1);
-                if (high == chars[0] && low == chars[1]) {
-                    return i;
-                }
+        return INDEX_NOT_FOUND;
+    }
+
+    /**
+     * Searches for a supplementary Unicode character (LANG1300).
+     *
+     * @param cs the CharSequence to search in
+     * @param searchChar the supplementary character to search for
+     * @param start the start index
+     * @return the index of the character, or INDEX_NOT_FOUND
+     */
+    private static int indexOfSupplementaryCharacter(final CharSequence cs, final int searchChar, final int start) {
+        final var chars = Character.toChars(searchChar);
+        final var sz = cs.length();
+
+        for (var i = start; i < sz - 1; i++) {
+            final var high = cs.charAt(i);
+            final var low = cs.charAt(i + 1);
+            if (high == chars[0] && low == chars[1]) {
+                return i;
             }
         }
         return INDEX_NOT_FOUND;
@@ -938,7 +986,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmpty(final String underCheck) {
-        checkArgument(!isEmpty(underCheck), "Given String is Empty");
+        if (isEmpty(underCheck)) {
+            throw new IllegalArgumentException("Given String is Empty");
+        }
         return underCheck;
     }
 
@@ -951,7 +1001,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmpty(final String underCheck, final String attributeName) {
-        checkArgument(!isEmpty(underCheck), "Attribute with name '" + attributeName + "' must not be empty");
+        if (isEmpty(underCheck)) {
+            throw new IllegalArgumentException("Attribute with name '" + attributeName + "' must not be empty");
+        }
         return underCheck;
     }
 
@@ -963,7 +1015,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck) {
-        checkArgument(!isBlank(underCheck), "Attribute must not be blank");
+        if (isBlank(underCheck)) {
+            throw new IllegalArgumentException("Attribute must not be blank");
+        }
         return underCheck;
     }
 
@@ -976,7 +1030,9 @@ public final class MoreStrings {
      * @return the given String
      */
     public static String requireNotEmptyTrimmed(final String underCheck, final String attributeName) {
-        checkArgument(!isBlank(underCheck), "Attribute with name '" + attributeName + "' must not be blank");
+        if (isBlank(underCheck)) {
+            throw new IllegalArgumentException("Attribute with name '" + attributeName + "' must not be blank");
+        }
         return underCheck;
     }
 
@@ -1121,6 +1177,8 @@ public final class MoreStrings {
      * @return value with suffix
      */
     public static String ensureEndsWith(@NonNull final String value, @NonNull final String suffix) {
+        Objects.requireNonNull(value, "value must not be null");
+        Objects.requireNonNull(suffix, "suffix must not be null");
         if (!value.endsWith(suffix)) {
             return value + suffix;
         }
@@ -1133,25 +1191,18 @@ public final class MoreStrings {
     static String lenientToString(Object o) {
         try {
             if (o != null && o.getClass().isArray()) {
-                if (o instanceof Object[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof int[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof long[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof double[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof float[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof boolean[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof byte[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof short[] arr) {
-                    return Arrays.toString(arr);
-                } else if (o instanceof char[] arr) {
-                    return Arrays.toString(arr);
-                }
+                return switch (o) {
+                    case Object[] arr -> Arrays.toString(arr);
+                    case int[] arr -> Arrays.toString(arr);
+                    case long[] arr -> Arrays.toString(arr);
+                    case double[] arr -> Arrays.toString(arr);
+                    case float[] arr -> Arrays.toString(arr);
+                    case boolean[] arr -> Arrays.toString(arr);
+                    case byte[] arr -> Arrays.toString(arr);
+                    case short[] arr -> Arrays.toString(arr);
+                    case char[] arr -> Arrays.toString(arr);
+                    default -> String.valueOf(o);
+                };
             }
             return String.valueOf(o);
         } catch (Exception e) {
@@ -1172,6 +1223,7 @@ public final class MoreStrings {
      */
     @NonNull
     public static Optional<String> coalesce(Predicate<String> checker, String... values) {
+        Objects.requireNonNull(checker, "checker must not be null");
         if (null != values) {
             for (String value : values) {
                 if (!checker.test(value)) {

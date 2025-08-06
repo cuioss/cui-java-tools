@@ -85,14 +85,15 @@ import static de.cuioss.tools.collect.MoreCollections.isEmpty;
  * @author Oliver Wolff
  */
 @SuppressWarnings("javaarchitecture:S7027")
-// Intended circular dependency within collection utilities
+// Sonar: "Cyclic dependency between packages" - False positive.
+// This is an INTRA-package dependency (within de.cuioss.tools.collect), not cross-package.
+// CollectionLiterals and MoreCollections are designed to work together as complementary
+// utility classes within the same package. This is intentional and acceptable.
 @UtilityClass
 public class CollectionLiterals {
 
     /**
-     * <p>
-     * mutableList.
-     * </p>
+     * Creates an empty mutable list.
      *
      * @return a newly created empty {@link java.util.ArrayList}
      * @param <E> a E class
@@ -303,9 +304,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSet.
-     * </p>
+     * Creates an empty mutable set.
      *
      * @return a newly created empty {@link java.util.HashSet}
      * @param <E> a E class
@@ -315,9 +314,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSet.
-     * </p>
+     * Creates a mutable set with a single element.
      *
      * @param element to be added. If it is {@code null} it will not be added
      * @return a newly created empty {@link java.util.HashSet} with the given
@@ -334,9 +331,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSet.
-     * </p>
+     * Creates a mutable set with the given elements.
      *
      * @param elements to be added
      * @return a newly created empty {@link java.util.HashSet} with the given
@@ -422,9 +417,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * immutableSet.
-     * </p>
+     * Creates an empty immutable set.
      *
      * @return a newly created empty {@link java.util.HashSet} Convenience method
      *         for {@link java.util.Collections#emptySet()}
@@ -511,9 +504,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSortedSet.
-     * </p>
+     * Creates an empty mutable sorted set.
      *
      * @return a newly created empty {@link java.util.TreeSet}
      * @param <E> a E class
@@ -523,9 +514,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSortedSet.
-     * </p>
+     * Creates a mutable sorted set with a single element.
      *
      * @param element to be added. If it is {@code null} an empty
      *                {@link java.util.SortedSet} will be returned
@@ -543,9 +532,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableSortedSet.
-     * </p>
+     * Creates a mutable sorted set with the given elements.
      *
      * @param elements to be added
      * @return a newly created empty {@link java.util.TreeSet} with the given
@@ -619,9 +606,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * immutableSortedSet.
-     * </p>
+     * Creates an empty immutable sorted set.
      *
      * @return a newly created empty {@link java.util.SortedSet} Convenience method
      *         for {@link java.util.Collections#emptySortedSet()}
@@ -696,9 +681,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * mutableMap.
-     * </p>
+     * Creates an empty mutable map.
      *
      * @return an empty <i>mutable</i> Map
      * @param <K> a K class
@@ -788,9 +771,7 @@ public class CollectionLiterals {
     }
 
     /**
-     * <p>
-     * immutableMap.
-     * </p>
+     * Creates an empty immutable map.
      *
      * @return an empty <i>mutable</i> Map
      * @param <K> a K class

@@ -18,10 +18,11 @@ package de.cuioss.tools.io;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import static de.cuioss.tools.io.FileLoaderUtility.copyFileToTemp;
-import static de.cuioss.tools.io.FileLoaderUtility.getLoaderForPath;
+import static de.cuioss.tools.io.FileLoaderUtility.*;
+import static de.cuioss.tools.io.PathTraversalSecurity.validatePathSegment;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("DataFlowIssue")
@@ -60,6 +61,11 @@ class FileLoaderUtilityTest {
     }
 
     @Test
+    void shouldFailToProvideLoaderOnEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> getLoaderForPath(""));
+    }
+
+    @Test
     void shouldReturnLoaderForPaths() {
         assertEquals(ClassPathLoader.class, getLoaderForPath(FileTypePrefix.CLASSPATH + EXISTING_FILE_NAME).getClass());
         assertEquals(FileSystemLoader.class, getLoaderForPath(FileTypePrefix.FILE + EXISTING_FILE_NAME).getClass());
@@ -68,14 +74,91 @@ class FileLoaderUtilityTest {
     }
 
     @Test
+    void shouldReturnUrlLoaderForUrlPrefix() {
+        assertEquals(UrlLoader.class, getLoaderForPath("url:http://example.com/file.txt").getClass());
+    }
+
+    @Test
     void shouldReturnContentAsString() throws IOException {
         var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH);
         assertNotNull(loaded);
         assertFalse(loaded.isEmpty());
         assertTrue(loaded.contains("Hello"));
+    }
 
+    @Test
+    void shouldReturnContentAsStringUnchecked() {
+        // Test successful case - should return content without throwing
+        var loaded = FileLoaderUtility.toStringUnchecked(LOADER_EXISTING_FILE_CLASSPATH);
+        assertNotNull(loaded);
+        assertFalse(loaded.isEmpty());
+        assertTrue(loaded.contains("Hello"));
+
+        // Test error case - should throw IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () ->
                 FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
+    }
+
+    @Test
+    void shouldReturnContentAsStringWithCharset() throws IOException {
+        var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH, StandardCharsets.UTF_8);
+        assertNotNull(loaded);
+        assertFalse(loaded.isEmpty());
+        assertTrue(loaded.contains("Hello"));
+    }
+
+    @Test
+    void shouldThrowOnNullFileLoader() {
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toString(null));
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toString(null, StandardCharsets.UTF_8));
+        assertThrows(NullPointerException.class, () -> FileLoaderUtility.toStringUnchecked(null));
+    }
+
+    @Test
+    void validatePathSegmentShouldAcceptValidSegments() {
+        // Should not throw for valid segments
+        assertDoesNotThrow(() -> validatePathSegment(null));
+        assertDoesNotThrow(() -> validatePathSegment(""));
+        assertDoesNotThrow(() -> validatePathSegment("normal.txt"));
+        assertDoesNotThrow(() -> validatePathSegment("file-name_123.pdf"));
+        assertDoesNotThrow(() -> validatePathSegment(".hidden"));
+        assertDoesNotThrow(() -> validatePathSegment("file with spaces.doc"));
+    }
+
+    @Test
+    void validatePathSegmentShouldRejectPathTraversal() {
+        // Should throw for path traversal attempts
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment(".."),
+                "Should reject double dots");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("../etc/passwd"),
+                "Should reject path traversal with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("..\\windows\\system32"),
+                "Should reject path traversal with backslash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("normal/../../../etc/passwd"),
+                "Should reject embedded path traversal");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("/etc/passwd"),
+                "Should reject absolute paths with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("C:\\Windows\\System32"),
+                "Should reject Windows absolute paths");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("some/nested/path"),
+                "Should reject nested paths with forward slash");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> validatePathSegment("some\\nested\\path"),
+                "Should reject nested paths with backslash");
     }
 
 }

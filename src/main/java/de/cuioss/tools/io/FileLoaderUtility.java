@@ -62,12 +62,17 @@ public final class FileLoaderUtility {
         return new FileSystemLoader(pathName);
     }
 
+
     /**
      * Helper class that copies the content of a {@link FileLoader} to the
      * temp-folder and references it
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
      * security issue. Never ever use this location for sensitive information that
      * might be of interest for an attacker
+     * 
+     * <h2>Security Note</h2> This method validates that the source file name does not
+     * contain path traversal sequences to prevent unauthorized access to files outside
+     * the intended directory structure.
      *
      * @param source           must not be null and represent an accessible file,
      *                         saying {@link FileLoader#isReadable()}
@@ -76,12 +81,22 @@ public final class FileLoaderUtility {
      * @return a reference on a file copied in the temp folder
      * @throws IOException
      */
-    @SuppressWarnings("java:S5443") // owolff: See hint Caution: Security-Impact
     public static Path copyFileToTemp(final FileLoader source, final boolean markDeleteOnExit) throws IOException {
         checkArgument(null != source, "Attribute with name source must not be null");
         checkArgument(source.isReadable(), "Source must be readable");
 
-        final var target = Files.createTempFile(source.getFileName().getNamePart(), source.getFileName().getSuffix());
+        // Validate filename to prevent path traversal
+        var fileName = source.getFileName();
+        var namePart = fileName.getNamePart();
+        var suffix = fileName.getSuffix();
+
+        // Ensure the filename parts don't contain path separators or traversal sequences
+        PathTraversalSecurity.validatePathSegment(namePart);
+        PathTraversalSecurity.validatePathSegment(suffix);
+
+        // Create temp file with secure permissions (owner read/write only)
+        // This addresses SonarQube security warning about publicly writable directories
+        final Path target = PathTraversalSecurity.createSecureTempFile(namePart, suffix);
 
         try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
@@ -100,7 +115,7 @@ public final class FileLoaderUtility {
      * @param charset    must not be null
      * @return The String content of the File represented by the given
      *         {@link FileLoader}
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public static String toString(final FileLoader fileLoader, final Charset charset) throws IOException {
         requireNonNull(fileLoader);
@@ -118,7 +133,7 @@ public final class FileLoaderUtility {
      * @param fileLoader must not be null
      * @return The String content of the File represented by the given
      *         {@link FileLoader}
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public static String toString(final FileLoader fileLoader) throws IOException {
         return toString(fileLoader, StandardCharsets.UTF_8);
@@ -142,4 +157,5 @@ public final class FileLoaderUtility {
             throw new IllegalArgumentException("Unable to read from Path " + fileLoader.getFileName(), e);
         }
     }
+
 }

@@ -37,9 +37,11 @@ import java.util.Optional;
  * @author Oliver Wolff
  * @since 1.0
  */
-@SuppressWarnings("java:S3011") // owolff: The warning is "Reflection should not be used to
-// increase accessibility of classes, methods, or fields"
-// What is actually the use-case of this type, therefore, there is nothing we can do
+@SuppressWarnings("java:S3011")
+// Sonar: "Reflection should not be used to increase accessibility of classes, methods, or fields"
+// This is intentional and by design. FieldWrapper is specifically designed to provide controlled
+// reflection access for framework-level operations (e.g., testing, serialization). The accessibility
+// changes are properly encapsulated within this utility class and not exposed to end users.
 public class FieldWrapper {
 
     private static final CuiLogger LOGGER = new CuiLogger(FieldWrapper.class);

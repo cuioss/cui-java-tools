@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 @Resource
 @Deprecated
+@SuppressWarnings({"java:S4276"})
 public class ChildAnnotatedClass extends BaseAnnotatedClass implements Function<String, String> {
 
     @Override

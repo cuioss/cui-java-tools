@@ -146,6 +146,29 @@ class SplitterTest {
     }
 
     @Test
+    void shouldHandleNullPatternByQuoting() {
+        // This ensures line 298 is covered - when pattern is null, it compiles a quoted separator
+        var config = new SplitterConfig.Builder().separator(".").build(); // No pattern set, only separator
+        var splitter = new Splitter(config);
+        var result = splitter.splitToList("a.b.c");
+        assertEquals(3, result.size());
+        assertEquals("a", result.getFirst());
+        assertEquals("b", result.get(1));
+        assertEquals("c", result.get(2));
+    }
+
+    @Test
+    void shouldHandleNullElementsInResults() {
+        // This tests the null element handling in addIfApplicable (line 316)
+        var splitter = Splitter.on(",").omitEmptyStrings();
+        var result = splitter.splitToList("a,,b"); // Empty string becomes null in some cases
+        // The empty element should be omitted, so we get 2 elements
+        assertEquals(2, result.size());
+        assertEquals("a", result.getFirst());
+        assertEquals("b", result.get(1));
+    }
+
+    @Test
     void stringSplitWithLongDelimiter() {
         final var longDelimiter = "a, b, c";
         final Iterable<String> letters = Splitter.on(", ").splitToList(longDelimiter);

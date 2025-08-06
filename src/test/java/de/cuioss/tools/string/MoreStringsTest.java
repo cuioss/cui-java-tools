@@ -17,6 +17,7 @@ package de.cuioss.tools.string;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.CharBuffer;
 import java.util.List;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
@@ -225,6 +226,74 @@ class MoreStringsTest {
         assertEquals(-1, MoreStrings.indexOf("12345678", "8", 8));
 
         assertEquals(5, MoreStrings.indexOf(new StringBuilder("aabaabaa"), "b", 3));
+    }
+
+    @Test
+    void indexOfCharCodeWithNonStringCharSequence() {
+        // Test indexOf(CharSequence, int, int) with StringBuilder (non-String CharSequence)
+        StringBuilder sb = new StringBuilder("Hello World");
+
+        // Basic ASCII character search
+        assertEquals(0, MoreStrings.indexOf(sb, 'H', 0));
+        assertEquals(6, MoreStrings.indexOf(sb, 'W', 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, 'W', 7));
+        assertEquals(4, MoreStrings.indexOf(sb, 'o', 0));
+        assertEquals(7, MoreStrings.indexOf(sb, 'o', 5)); // Find second 'o'
+        
+        // Test with negative start index (should normalize to 0)
+        assertEquals(0, MoreStrings.indexOf(sb, 'H', -5));
+
+        // Test character not in string
+        assertEquals(-1, MoreStrings.indexOf(sb, 'z', 0));
+
+        // Test with CharBuffer
+        CharSequence charBuffer = CharBuffer.wrap("Testing");
+        assertEquals(0, MoreStrings.indexOf(charBuffer, 'T', 0));
+        assertEquals(3, MoreStrings.indexOf(charBuffer, 't', 0));
+        assertEquals(-1, MoreStrings.indexOf(charBuffer, 't', 4));
+    }
+
+    @Test
+    void indexOfSupplementaryCharacters() {
+        // Test with Unicode supplementary characters (code points > 0xFFFF)
+        // Using emoji as supplementary characters
+        StringBuilder sb = new StringBuilder("Hello 😀 World"); // 😀 is U+1F600
+        
+        // Search for the emoji (supplementary character)
+        int emojiCodePoint = 0x1F600; // 😀
+        assertEquals(6, MoreStrings.indexOf(sb, emojiCodePoint, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, emojiCodePoint, 8));
+
+        // Test with another supplementary character
+        StringBuilder sb2 = new StringBuilder("Test 𝕏 String"); // 𝕏 is U+1D54F (Mathematical Double-Struck Capital X)
+        int mathX = 0x1D54F;
+        assertEquals(5, MoreStrings.indexOf(sb2, mathX, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb2, mathX, 7));
+
+        // Test with invalid code point (> MAX_CODE_POINT)
+        assertEquals(-1, MoreStrings.indexOf(sb, Character.MAX_CODE_POINT + 1, 0));
+        assertEquals(-1, MoreStrings.indexOf(sb, Integer.MAX_VALUE, 0));
+    }
+
+    @Test
+    void indexOfEdgeCases() {
+        // Test with empty CharSequence
+        assertEquals(-1, MoreStrings.indexOf(new StringBuilder(), 'a', 0));
+        assertEquals(-1, MoreStrings.indexOf(null, 'a', 0));
+
+        // Test with String (should use optimized String.indexOf)
+        String str = "optimize";
+        assertEquals(0, MoreStrings.indexOf(str, 'o', 0));
+
+        // Test boundary conditions for supplementary characters
+        StringBuilder sb = new StringBuilder("x𝕏y"); // 𝕏 at position 1
+        assertEquals(0, MoreStrings.indexOf(sb, 'x', 0));
+        assertEquals(3, MoreStrings.indexOf(sb, 'y', 0)); // 'y' is at index 3 because 𝕏 takes 2 chars
+        
+        // Test searching at the very end
+        StringBuilder sb2 = new StringBuilder("abc");
+        assertEquals(-1, MoreStrings.indexOf(sb2, 'a', 3));
+        assertEquals(-1, MoreStrings.indexOf(sb2, 'a', 100));
     }
 
     @Test
@@ -437,6 +506,35 @@ class MoreStringsTest {
     }
 
     @Test
+    void lenientFormatArrayTypes() {
+        // Test Object[] array - needs to be cast to Object to avoid varargs expansion
+        Object[] objArray = {"a", "b", "c"};
+        assertEquals("Array: [a, b, c]", MoreStrings.lenientFormat("Array: %s", (Object) objArray));
+
+        // Test primitive arrays - these should be handled as single objects
+        long[] longArray = {1L, 2L, 3L};
+        assertEquals("Longs: [1, 2, 3]", MoreStrings.lenientFormat("Longs: %s", longArray));
+
+        double[] doubleArray = {1.5, 2.5};
+        assertEquals("Doubles: [1.5, 2.5]", MoreStrings.lenientFormat("Doubles: %s", doubleArray));
+
+        float[] floatArray = {1.5f, 2.5f};
+        assertEquals("Floats: [1.5, 2.5]", MoreStrings.lenientFormat("Floats: %s", floatArray));
+
+        boolean[] boolArray = {true, false, true};
+        assertEquals("Booleans: [true, false, true]", MoreStrings.lenientFormat("Booleans: %s", boolArray));
+
+        byte[] byteArray = {1, 2, 3};
+        assertEquals("Bytes: [1, 2, 3]", MoreStrings.lenientFormat("Bytes: %s", byteArray));
+
+        short[] shortArray = {10, 20, 30};
+        assertEquals("Shorts: [10, 20, 30]", MoreStrings.lenientFormat("Shorts: %s", shortArray));
+
+        char[] charArray = {'a', 'b', 'c'};
+        assertEquals("Chars: [a, b, c]", MoreStrings.lenientFormat("Chars: %s", charArray));
+    }
+
+    @Test
     void returnsFirstNonEmpty() {
         assertEquals(" ", MoreStrings.firstNonEmpty(null, "", " ", "b", "a").orElseThrow());
     }
@@ -444,6 +542,21 @@ class MoreStringsTest {
     @Test
     void returnsFirstNonBlank() {
         assertEquals("b", MoreStrings.firstNonBlank(null, "", " ", "b", "a").orElseThrow());
+    }
+
+    @Test
+    void coalesceNullChecks() {
+        // Test that coalesce requires non-null checker
+        assertThrows(NullPointerException.class,
+                () -> MoreStrings.coalesce(null, "a", "b"),
+                "Should reject null checker predicate");
+
+        // Test that coalesce handles null values array correctly
+        assertTrue(MoreStrings.coalesce(MoreStrings::isEmpty, (String[]) null).isEmpty());
+
+        // Test normal behavior with valid checker
+        assertEquals("test",
+                MoreStrings.coalesce(MoreStrings::isEmpty, "", null, "test", "other").orElseThrow());
     }
 
     private static class ThrowsOnToString {

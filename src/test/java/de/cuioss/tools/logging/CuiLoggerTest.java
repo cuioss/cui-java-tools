@@ -67,6 +67,52 @@ class CuiLoggerTest {
     }
 
     @Nested
+    @DisplayName("Constructor Tests")
+    class ConstructorTests {
+        @Test
+        @DisplayName("Should create logger with Class parameter")
+        void shouldCreateLoggerWithClass() {
+            var logger = new CuiLogger(String.class);
+            assertNotNull(logger);
+            assertEquals("java.lang.String", logger.getWrapped().getName());
+        }
+
+        @Test
+        @DisplayName("Should create logger with String parameter")
+        void shouldCreateLoggerWithString() {
+            var logger = new CuiLogger("test.logger.name");
+            assertNotNull(logger);
+            assertEquals("test.logger.name", logger.getWrapped().getName());
+        }
+
+        @Test
+        @DisplayName("Should reject null Class parameter")
+        void shouldRejectNullClass() {
+            assertThrows(NullPointerException.class,
+                    () -> new CuiLogger((Class<?>) null),
+                    "Should throw NullPointerException for null class");
+        }
+
+        @Test
+        @DisplayName("Should reject null String parameter")
+        void shouldRejectNullString() {
+            assertThrows(NullPointerException.class,
+                    () -> new CuiLogger((String) null),
+                    "Should throw NullPointerException for null name");
+        }
+
+        @Test
+        @DisplayName("Should return log level from wrapped logger")
+        void shouldReturnLogLevel() {
+            underTest.getWrapped().setLevel(Level.WARNING);
+            assertEquals(LogLevel.WARN, underTest.getLogLevel());
+
+            underTest.getWrapped().setLevel(Level.INFO);
+            assertEquals(LogLevel.INFO, underTest.getLogLevel());
+        }
+    }
+
+    @Nested
     @DisplayName("Log Level Tests")
     class LogLevelTests {
         @Test
