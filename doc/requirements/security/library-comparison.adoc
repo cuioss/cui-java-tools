@@ -48,7 +48,7 @@ This document provides a comprehensive comparison of path traversal security imp
 * Assumes applications will perform additional validation
 * No built-in containment validation
 
-**Source**: https://nvd.nist.gov/vuln/detail/CVE-2021-29425
+**Source**: link:https://nvd.nist.gov/vuln/detail/CVE-2021-29425[NVD - CVE-2021-29425]
 
 === OWASP ESAPI
 
@@ -96,7 +96,7 @@ This document provides a comprehensive comparison of path traversal security imp
 * Performance overhead from multiple checks
 * Vulnerability to implementation errors
 
-**Source**: https://nvd.nist.gov/vuln/detail/CVE-2022-23457
+**Source**: link:https://nvd.nist.gov/vuln/detail/CVE-2022-23457[NVD - CVE-2022-23457]
 
 === Spring Security
 
@@ -135,7 +135,7 @@ This document provides a comprehensive comparison of path traversal security imp
 * Configurable strictness levels
 * Coordinates with servlet path mapping
 
-**Source**: Spring Security documentation and CVE database
+**Source**: link:https://spring.io/security[Spring Security Documentation] | link:https://tanzu.vmware.com/security[VMware Tanzu Security Advisories]
 
 === Google Guava
 
@@ -172,7 +172,7 @@ This document provides a comprehensive comparison of path traversal security imp
 * Recommends migration to java.nio.file
 * Limited security-focused features
 
-**Source**: https://github.com/google/guava/wiki/CVE-2020-8908
+**Source**: link:https://github.com/google/guava/wiki/CVE-2020-8908[Google Guava CVE-2020-8908 Advisory]
 
 == Comparative Analysis
 
@@ -365,13 +365,16 @@ path = path.replace("../", "");
 
 == References
 
-* Apache Commons IO Security Advisories
-* OWASP ESAPI Documentation and CVE Reports
-* Spring Security Reference Documentation
-* Google Guava Security Advisories
-* National Vulnerability Database (NVD)
-* Snyk Vulnerability Database
-* OWASP Web Security Testing Guide v4.2
+* link:https://commons.apache.org/proper/commons-io/security.html[Apache Commons IO Security Advisories]
+* link:https://github.com/ESAPI/esapi-java-legacy/security/advisories[OWASP ESAPI Security Advisories]
+* link:https://docs.spring.io/spring-security/reference/[Spring Security Reference Documentation]
+* link:https://github.com/google/guava/wiki/SecurityAdvisories[Google Guava Security Advisories]
+* link:https://nvd.nist.gov/[National Vulnerability Database (NVD)]
+* link:https://snyk.io/vuln/[Snyk Vulnerability Database]
+* link:https://owasp.org/www-project-web-security-testing-guide/[OWASP Web Security Testing Guide v4.2]
+* link:https://cwe.mitre.org/data/definitions/22.html[CWE-22: Path Traversal]
+* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - URI Generic Syntax]
+* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - HTTP/1.1 Message Syntax]
 
 _Document generated: 2025-01-06_
 _Based on comprehensive security research and CVE analysis_

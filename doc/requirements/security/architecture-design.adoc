@@ -381,31 +381,201 @@ public class WindowsPlatformHandler implements PlatformHandler {
 }
 ```
 
-=== HTTP Parameter Validation
+=== Comprehensive HTTP Parameter Validation
+
+==== URL Query Parameter Value Validation
 
 ```java
-public class HTTPParameterValidator {
+public class URLParameterValueValidator {
     
-    // RFC 3986 query component validation
-    public ValidationResult validateQueryParameters(Map<String, String> params) {
-        for (Map.Entry<String, String> param : params.entrySet()) {
-            // Validate parameter name (RFC 7230 token)
-            if (!isValidParameterName(param.getKey())) {
-                return ValidationResult.blocked("Invalid parameter name: " + param.getKey());
-            }
-            
-            // Validate parameter value for path traversal
-            String decoded = fullyDecode(param.getValue());
-            if (containsPathTraversal(decoded)) {
-                return ValidationResult.blocked("Path traversal in parameter: " + param.getKey());
-            }
+    // RFC 3986 query component validation with comprehensive checks
+    public ValidationResult validateQueryParameter(String name, String value) {
+        // 1. Validate parameter name (RFC 7230 token)
+        if (!isValidParameterName(name)) {
+            return ValidationResult.blocked("Invalid parameter name: " + name);
         }
+        
+        // 2. Check raw value for suspicious patterns before decoding
+        if (hasDoubleEncoding(value)) {
+            return ValidationResult.blocked("Double encoding detected in: " + name);
+        }
+        
+        // 3. Fully decode the parameter value
+        String decoded = fullyDecode(value);
+        
+        // 4. Validate based on parameter type/context
+        if (isFilePathParameter(name)) {
+            return validateFilePathValue(name, decoded);
+        } else if (isURLParameter(name)) {
+            return validateURLValue(name, decoded);
+        } else if (isNumericParameter(name)) {
+            return validateNumericValue(name, decoded);
+        }
+        
+        // 5. Generic validation for all parameters
+        return validateGenericValue(name, decoded);
+    }
+    
+    private ValidationResult validateFilePathValue(String name, String value) {
+        // Path traversal patterns
+        if (containsPathTraversal(value)) {
+            return ValidationResult.blocked("Path traversal in: " + name);
+        }
+        
+        // Absolute path check
+        if (isAbsolutePath(value)) {
+            return ValidationResult.blocked("Absolute path not allowed: " + name);
+        }
+        
+        // Null byte injection
+        if (value.contains("\0")) {
+            return ValidationResult.blocked("Null byte in: " + name);
+        }
+        
+        // Special file references
+        if (isSpecialFile(value)) {
+            return ValidationResult.blocked("Special file reference: " + name);
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    private ValidationResult validateURLValue(String name, String value) {
+        // Check for javascript: protocol
+        if (value.toLowerCase().startsWith("javascript:")) {
+            return ValidationResult.blocked("JavaScript protocol in: " + name);
+        }
+        
+        // Check for data: protocol (potential XSS)
+        if (value.toLowerCase().startsWith("data:")) {
+            return ValidationResult.blocked("Data protocol in: " + name);
+        }
+        
+        // Validate URL format
+        try {
+            URL url = new URL(value);
+            // Check for local file access
+            if ("file".equalsIgnoreCase(url.getProtocol())) {
+                return ValidationResult.blocked("File protocol not allowed: " + name);
+            }
+        } catch (MalformedURLException e) {
+            return ValidationResult.blocked("Invalid URL format: " + name);
+        }
+        
         return ValidationResult.allowed();
     }
     
     private boolean isValidParameterName(String name) {
         // RFC 7230 token characters
         return name.matches("^[a-zA-Z0-9!#$%&'*+\\-.^_`|~]+$");
+    }
+    
+    private String fullyDecode(String value) {
+        String decoded = value;
+        String previous;
+        int iterations = 0;
+        
+        do {
+            previous = decoded;
+            try {
+                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException e) {
+                break;
+            }
+            iterations++;
+        } while (!decoded.equals(previous) && iterations < 10);
+        
+        return decoded;
+    }
+}
+```
+
+==== HTTP POST Body Parameter Value Validation
+
+```java
+public class BodyParameterValueValidator {
+    
+    // Content-Type specific validation
+    public ValidationResult validateBodyParameter(String contentType, String name, String value) {
+        switch (contentType.toLowerCase()) {
+            case "application/x-www-form-urlencoded":
+                return validateFormEncodedValue(name, value);
+            case "application/json":
+                return validateJsonValue(name, value);
+            case "multipart/form-data":
+                return validateMultipartValue(name, value);
+            case "application/xml":
+            case "text/xml":
+                return validateXmlValue(name, value);
+            default:
+                return validateGenericValue(name, value);
+        }
+    }
+    
+    private ValidationResult validateFormEncodedValue(String name, String value) {
+        // URL decode the value
+        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
+        
+        // Check for path traversal
+        if (containsPathTraversal(decoded)) {
+            return ValidationResult.blocked("Path traversal in form field: " + name);
+        }
+        
+        // Check length limits
+        if (decoded.length() > MAX_FORM_FIELD_LENGTH) {
+            return ValidationResult.blocked("Form field too long: " + name);
+        }
+        
+        // Check for SQL injection patterns
+        if (containsSQLInjection(decoded)) {
+            return ValidationResult.blocked("SQL injection pattern in: " + name);
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    private ValidationResult validateJsonValue(String name, String value) {
+        // Check for JSON injection attacks
+        if (value.contains("$where") || value.contains("$regex")) {
+            return ValidationResult.blocked("NoSQL injection pattern in: " + name);
+        }
+        
+        // Validate string values for path traversal
+        if (containsPathTraversal(value)) {
+            return ValidationResult.blocked("Path traversal in JSON: " + name);
+        }
+        
+        // Check for prototype pollution
+        if (name.equals("__proto__") || name.equals("constructor") || name.equals("prototype")) {
+            return ValidationResult.blocked("Prototype pollution attempt: " + name);
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    private ValidationResult validateMultipartValue(String name, String value) {
+        // For file uploads, validate the filename
+        if (name.equals("filename")) {
+            // Remove path components from filename
+            String filename = Paths.get(value).getFileName().toString();
+            
+            // Check for path traversal in filename
+            if (containsPathTraversal(filename)) {
+                return ValidationResult.blocked("Path traversal in filename");
+            }
+            
+            // Check for double extensions
+            if (hasDoubleExtension(filename)) {
+                return ValidationResult.blocked("Double extension in filename");
+            }
+            
+            // Validate extension
+            if (!isAllowedExtension(filename)) {
+                return ValidationResult.blocked("Disallowed file extension");
+            }
+        }
+        
+        return ValidationResult.allowed();
     }
 }
 ```
@@ -920,12 +1090,28 @@ This architecture provides a comprehensive, extensible, and performant solution 
 
 == References
 
-* OWASP Application Security Architecture Guide
-* NIST Cybersecurity Framework
-* ISO/IEC 27034 - Application Security
-* Common Criteria for Information Technology Security Evaluation
-* MITRE ATT&CK Framework
-* Zero Trust Architecture (NIST SP 800-207)
+=== Security Standards and Frameworks
+
+* link:https://owasp.org/www-project-application-security-verification-standard/[OWASP Application Security Architecture Guide]
+* link:https://www.nist.gov/cyberframework[NIST Cybersecurity Framework]
+* link:https://www.iso.org/standard/44378.html[ISO/IEC 27034 - Application Security]
+* link:https://www.commoncriteriaportal.org/[Common Criteria for Information Technology Security Evaluation]
+* link:https://attack.mitre.org/[MITRE ATT&CK Framework]
+* link:https://csrc.nist.gov/publications/detail/sp/800-207/final[Zero Trust Architecture (NIST SP 800-207)]
+
+=== HTTP and URL Standards
+
+* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax]
+* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing]
+* link:https://www.rfc-editor.org/rfc/rfc6265[RFC 6265 - HTTP State Management Mechanism]
+* link:https://www.rfc-editor.org/rfc/rfc8941[RFC 8941 - Structured Field Values for HTTP]
+* link:https://www.rfc-editor.org/rfc/rfc3987[RFC 3987 - Internationalized Resource Identifiers (IRIs)]
+
+=== Vulnerability Resources
+
+* link:https://cwe.mitre.org/data/definitions/22.html[CWE-22: Improper Limitation of a Pathname to a Restricted Directory]
+* link:https://nvd.nist.gov/[National Vulnerability Database]
+* link:https://www.first.org/cvss/[Common Vulnerability Scoring System (CVSS)]
 
 _Document generated: 2025-01-06_
 _Comprehensive architecture for unified path traversal security_

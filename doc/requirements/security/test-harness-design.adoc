@@ -774,12 +774,15 @@ public class CVEDatabaseUpdater {
 
 == References
 
-* OWASP Testing Guide v4.2
-* NIST Special Publication 800-53
-* Common Weakness Enumeration (CWE-22)
-* ISO/IEC 27034 Application Security
-* SANS Top 25 Software Errors
-* CVE Database Testing Patterns
+* link:https://owasp.org/www-project-web-security-testing-guide/[OWASP Testing Guide v4.2]
+* link:https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final[NIST Special Publication 800-53]
+* link:https://cwe.mitre.org/data/definitions/22.html[Common Weakness Enumeration (CWE-22)]
+* link:https://www.iso.org/standard/44378.html[ISO/IEC 27034 Application Security]
+* link:https://www.sans.org/top25-software-errors/[SANS Top 25 Software Errors]
+* link:https://nvd.nist.gov/[CVE Database Testing Patterns]
+* link:https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal[PayloadsAllTheThings - Directory Traversal]
+* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - URI Generic Syntax]
+* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - HTTP/1.1 Message Syntax]
 
 _Document generated: 2025-01-06_
 _Comprehensive test harness design for path traversal security_

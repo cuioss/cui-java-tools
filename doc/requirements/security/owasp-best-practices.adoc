@@ -456,42 +456,207 @@ Monitor for these indicators:
 
 === HTTP Parameter Validation
 
+==== URL Query Parameter Validation
+
+URL query parameters require special attention as they are often used in path construction:
+
 ```java
-public class HTTPParameterValidator {
-    // RFC 7230 token characters
+public class URLParameterValidator {
+    // RFC 7230 token characters for parameter names
     private static final Pattern VALID_PARAM_NAME = 
         Pattern.compile("^[a-zA-Z0-9!#$%&'*+\\-.^_`|~]+$");
     
-    // RFC 3986 query string validation
-    private static final Pattern VALID_PARAM_VALUE = 
-        Pattern.compile("^[\\x21-\\x7E\\x80-\\xFF]*$");
+    // RFC 3986 Section 3.4 - Query component allowed characters
+    private static final String QUERY_ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
     
-    public boolean isValidParameterName(String name) {
-        return VALID_PARAM_NAME.matcher(name).matches();
+    public ValidationResult validateQueryParameter(String name, String value) {
+        // Validate parameter name
+        if (!isValidParameterName(name)) {
+            return ValidationResult.blocked("Invalid parameter name: " + name);
+        }
+        
+        // Decode parameter value (handle multiple encoding layers)
+        String decoded = fullyDecode(value);
+        
+        // Check for path traversal patterns
+        if (containsPathTraversal(decoded)) {
+            return ValidationResult.blocked("Path traversal in parameter: " + name);
+        }
+        
+        // Check for null byte injection
+        if (decoded.contains("\0") || decoded.contains("%00")) {
+            return ValidationResult.blocked("Null byte in parameter: " + name);
+        }
+        
+        // Validate against maximum length (prevent buffer overflow)
+        if (decoded.length() > MAX_PARAM_LENGTH) {
+            return ValidationResult.blocked("Parameter too long: " + name);
+        }
+        
+        return ValidationResult.allowed();
     }
     
-    public boolean isValidParameterValue(String value) {
-        // Decode first, then validate
-        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
-        return !containsPathTraversal(decoded);
+    private String fullyDecode(String value) {
+        String decoded = value;
+        String previous;
+        int iterations = 0;
+        
+        do {
+            previous = decoded;
+            try {
+                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException e) {
+                // Invalid encoding, return as-is for validation
+                break;
+            }
+            iterations++;
+        } while (!decoded.equals(previous) && iterations < 10);
+        
+        return decoded;
     }
 }
 ```
 
+==== HTTP Body Parameter Validation
+
+HTTP POST body parameters (form-data, JSON, XML) require different validation approaches:
+
+```java
+public class BodyParameterValidator {
+    
+    // Form-encoded body validation (application/x-www-form-urlencoded)
+    public ValidationResult validateFormParameter(String name, String value) {
+        // Similar to URL parameters but may contain more data
+        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
+        
+        // Check for path traversal
+        if (containsPathTraversal(decoded)) {
+            return ValidationResult.blocked("Path traversal in form parameter: " + name);
+        }
+        
+        // Validate against content-type specific rules
+        if (isFilePathParameter(name)) {
+            return validateFilePath(decoded);
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    // JSON body validation
+    public ValidationResult validateJsonParameter(JsonNode node, String path) {
+        if (node.isTextual()) {
+            String value = node.asText();
+            
+            // Check for encoded path traversal
+            if (containsEncodedTraversal(value)) {
+                return ValidationResult.blocked("Encoded traversal in JSON: " + path);
+            }
+            
+            // Check for path traversal patterns
+            if (containsPathTraversal(value)) {
+                return ValidationResult.blocked("Path traversal in JSON: " + path);
+            }
+        }
+        
+        // Recursively validate nested objects
+        if (node.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
+            while (fields.hasNext()) {
+                Map.Entry<String, JsonNode> field = fields.next();
+                ValidationResult result = validateJsonParameter(
+                    field.getValue(), 
+                    path + "." + field.getKey()
+                );
+                if (result.isBlocked()) {
+                    return result;
+                }
+            }
+        }
+        
+        return ValidationResult.allowed();
+    }
+    
+    // Multipart form data validation (file uploads)
+    public ValidationResult validateMultipartParameter(Part part) {
+        String filename = extractFilename(part);
+        
+        if (filename != null) {
+            // Validate filename for path traversal
+            if (containsPathTraversal(filename)) {
+                return ValidationResult.blocked("Path traversal in filename: " + filename);
+            }
+            
+            // Check for double extensions (bypass attempts)
+            if (hasDoubleExtension(filename)) {
+                return ValidationResult.blocked("Double extension detected: " + filename);
+            }
+        }
+        
+        // Validate content if it's text-based
+        if (isTextContent(part.getContentType())) {
+            String content = new String(part.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            if (containsPathTraversal(content)) {
+                return ValidationResult.blocked("Path traversal in file content");
+            }
+        }
+        
+        return ValidationResult.allowed();
+    }
+}
+```
+
+==== Common Parameter Attack Patterns
+
+[cols="2,3,2"]
+|===
+|Attack Type |Example |Detection Method
+
+|Direct Traversal
+|`file=../../../etc/passwd`
+|Pattern matching
+
+|Encoded Traversal
+|`file=%2e%2e%2f%2e%2e%2f`
+|Decode then validate
+
+|Double Encoding
+|`file=%252e%252e%252f`
+|Recursive decoding
+
+|Unicode Encoding
+|`file=%u002e%u002e%u002f`
+|Unicode normalization
+
+|Null Byte Injection
+|`file=image.jpg%00.pdf`
+|Null byte detection
+
+|Parameter Pollution
+|`file=safe.txt&file=../etc/passwd`
+|Validate all occurrences
+
+|Case Variation
+|`file=..%2F..%2f`
+|Case-insensitive matching
+
+|===
+
 == References
 
-* OWASP Web Security Testing Guide v4.2
-* OWASP Path Traversal Prevention Cheat Sheet
-* OWASP Top 10 2021 - A01:2021 Broken Access Control
-* CISA/FBI Security by Design Alert (2024)
-* CVE Database and National Vulnerability Database
-* Snyk Security Research on Zip Slip
-* PortSwigger Web Security Academy
+* link:https://owasp.org/www-project-web-security-testing-guide/[OWASP Web Security Testing Guide v4.2]
+* link:https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Defense_Cheat_Sheet.html[OWASP Path Traversal Prevention Cheat Sheet]
+* link:https://owasp.org/www-project-top-ten/[OWASP Top 10 2021 - A01:2021 Broken Access Control]
+* link:https://nvd.nist.gov/[CVE Database and National Vulnerability Database]
+* link:https://snyk.io/research/zip-slip-vulnerability[Snyk Security Research on Zip Slip]
+* link:https://portswigger.net/web-security/file-path-traversal[PortSwigger Web Security Academy]
 
-**Source URLs:**
-* https://owasp.org/www-project-web-security-testing-guide/
-* https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Defense_Cheat_Sheet.html
-* https://portswigger.net/web-security/file-path-traversal
+=== RFC Standards
+
+* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax]
+* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing]
+* link:https://www.rfc-editor.org/rfc/rfc3987[RFC 3987 - Internationalized Resource Identifiers (IRIs)]
+* link:https://www.rfc-editor.org/rfc/rfc6265[RFC 6265 - HTTP State Management Mechanism]
+* link:https://www.rfc-editor.org/rfc/rfc8941[RFC 8941 - Structured Field Values for HTTP]
 
 _Document generated: 2025-01-06_
 _Based on OWASP guidelines and real-world vulnerability research_
