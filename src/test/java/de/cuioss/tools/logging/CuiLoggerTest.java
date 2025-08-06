@@ -100,6 +100,16 @@ class CuiLoggerTest {
                     () -> new CuiLogger((String) null),
                     "Should throw NullPointerException for null name");
         }
+
+        @Test
+        @DisplayName("Should return log level from wrapped logger")
+        void shouldReturnLogLevel() {
+            underTest.getWrapped().setLevel(Level.WARNING);
+            assertEquals(LogLevel.WARN, underTest.getLogLevel());
+            
+            underTest.getWrapped().setLevel(Level.INFO);
+            assertEquals(LogLevel.INFO, underTest.getLogLevel());
+        }
     }
 
     @Nested

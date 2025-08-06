@@ -65,7 +65,7 @@ import static java.util.Objects.requireNonNull;
  * <pre>{@code
  * // Access field with caching
  * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
- * 
+ *
  * // Handle field access safely
  * field.ifPresent(f -> {Object value = f.get(bean);});
  * }</pre>
@@ -141,6 +141,7 @@ public final class MoreReflection {
     /**
      * Determines the public not static methods of a given {@link Class}.
      * {@link Object#getClass()} will implicitly ignore
+     *
      *
      * @param clazz to be checked
      * @return the found public-methods.
