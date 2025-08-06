@@ -257,8 +257,7 @@ public final class MorePaths {
      * {@link StandardCopyOption#COPY_ATTRIBUTES}.
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
      * security issue. Never ever use this location for sensitive information that
-     * might be of interest for an attacker
-     * <p>
+     * might be of interest for an attacker.
      * <h2>Security Note</h2> This method validates and normalizes the input path to prevent
      * path traversal attacks. The path is canonicalized to its real path before processing.
      *

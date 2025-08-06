@@ -26,6 +26,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
@@ -68,7 +71,7 @@ public final class FileLoaderUtility {
      * <h2>Caution: Security-Impact</h2> Creating a temp-file might introduce a
      * security issue. Never ever use this location for sensitive information that
      * might be of interest for an attacker
-     * <p>
+     * 
      * <h2>Security Note</h2> This method validates that the source file name does not
      * contain path traversal sequences to prevent unauthorized access to files outside
      * the intended directory structure.
@@ -95,7 +98,9 @@ public final class FileLoaderUtility {
             throw new IllegalArgumentException("Invalid filename: potential path traversal detected");
         }
 
-        final var target = Files.createTempFile(namePart, suffix);
+        // Create temp file with secure permissions (owner read/write only)
+        // This addresses SonarQube security warning about publicly writable directories
+        final Path target = createSecureTempFile(namePart, suffix);
 
         try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
@@ -114,7 +119,7 @@ public final class FileLoaderUtility {
      * @param charset    must not be null
      * @return The String content of the File represented by the given
      *         {@link FileLoader}
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public static String toString(final FileLoader fileLoader, final Charset charset) throws IOException {
         requireNonNull(fileLoader);
@@ -132,7 +137,7 @@ public final class FileLoaderUtility {
      * @param fileLoader must not be null
      * @return The String content of the File represented by the given
      *         {@link FileLoader}
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public static String toString(final FileLoader fileLoader) throws IOException {
         return toString(fileLoader, StandardCharsets.UTF_8);
@@ -154,6 +159,37 @@ public final class FileLoaderUtility {
             return toString(fileLoader);
         } catch (final IOException | IllegalStateException e) {
             throw new IllegalArgumentException("Unable to read from Path " + fileLoader.getFileName(), e);
+        }
+    }
+
+    /**
+     * Creates a temporary file with secure permissions.
+     * On POSIX systems (Unix/Linux/Mac), sets permissions to owner-only (rw-------).
+     * On Windows, relies on default temp file security.
+     *
+     * @param prefix the prefix string to be used in generating the file name
+     * @param suffix the suffix string to be used in generating the file name
+     * @return Path to the created temporary file
+     * @throws IOException if an I/O error occurs
+     */
+    @SuppressWarnings("java:S5443")
+    // Sonar: "Make sure publicly writable directories are used safely" - False positive.
+    // We explicitly set restrictive permissions (rw-------) on POSIX systems.
+    // On Windows, temp files are created in user-specific directories with appropriate ACLs.
+    // Additionally, the filename parameters are validated against path traversal attacks before this method is called.
+    private static Path createSecureTempFile(String prefix, String suffix) throws IOException {
+        try {
+            // Try to set POSIX permissions (works on Unix/Linux/Mac)
+            Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
+            var attrs = PosixFilePermissions.asFileAttribute(perms);
+            return Files.createTempFile(prefix, suffix, attrs);
+        } catch (UnsupportedOperationException e) {
+            // Fallback for Windows and other non-POSIX systems
+            // Windows handles file permissions differently, temp files are created with user-only access by default
+            // This is considered safe as Windows temp files are created in user-specific temp directories
+            @SuppressWarnings("java:S5443") // Already addressed - see method-level documentation
+            Path tempFile = Files.createTempFile(prefix, suffix);
+            return tempFile;
         }
     }
 }
