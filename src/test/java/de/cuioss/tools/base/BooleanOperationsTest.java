@@ -23,6 +23,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -244,9 +245,7 @@ class BooleanOperationsTest {
 
             // Test finding single false at end
             var singleFalseAtEnd = new boolean[size];
-            for (int i = 0; i < size; i++) {
-                singleFalseAtEnd[i] = true;
-            }
+            Arrays.fill(singleFalseAtEnd, true);
             singleFalseAtEnd[size - 1] = false;
 
             assertDoesNotThrow(() -> {
@@ -270,10 +269,9 @@ class BooleanOperationsTest {
             }
 
             var threadCount = 10;
-            var executor = Executors.newFixedThreadPool(threadCount);
             var futures = new ArrayList<Future<?>>();
 
-            try {
+            try (var executor = Executors.newFixedThreadPool(threadCount)) {
                 // Submit multiple concurrent read tasks
                 for (int i = 0; i < threadCount; i++) {
                     futures.add(executor.submit(() -> {
@@ -291,8 +289,6 @@ class BooleanOperationsTest {
                 for (var future : futures) {
                     assertDoesNotThrow(() -> future.get(5, TimeUnit.SECONDS));
                 }
-            } finally {
-                executor.shutdownNow();
             }
         }
     }
