@@ -85,7 +85,7 @@ class FileLoaderUtilityTest {
         assertFalse(loaded.isEmpty());
         assertTrue(loaded.contains("Hello"));
     }
-    
+
     @Test
     void shouldReturnContentAsStringUnchecked() {
         // Test successful case - should return content without throwing
@@ -93,7 +93,7 @@ class FileLoaderUtilityTest {
         assertNotNull(loaded);
         assertFalse(loaded.isEmpty());
         assertTrue(loaded.contains("Hello"));
-        
+
         // Test error case - should throw IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () ->
                 FileLoaderUtility.toStringUnchecked(LOADER_NOT_EXISTING_FILE));
