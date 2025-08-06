@@ -40,11 +40,11 @@ class CollectionLiteralsTest {
         assertTrue(emptyList.isEmpty());
         emptyList.add("test");
         assertEquals(1, emptyList.size());
-        
+
         // Test with null elements in collection
         var listWithNulls = mutableList(Arrays.asList(null, "value", null));
         assertEquals(3, listWithNulls.size());
-        assertNull(listWithNulls.get(0));
+        assertNull(listWithNulls.getFirst());
         assertEquals("value", listWithNulls.get(1));
     }
 
@@ -52,10 +52,10 @@ class CollectionLiteralsTest {
     @DisplayName("Should maintain order in mutable lists")
     void shouldMaintainOrderInLists() {
         var list = mutableList("first", "second", "third");
-        assertEquals("first", list.get(0));
+        assertEquals("first", list.getFirst());
         assertEquals("second", list.get(1));
         assertEquals("third", list.get(2));
-        
+
         // Verify it's truly mutable
         list.set(1, "modified");
         assertEquals("modified", list.get(1));
@@ -91,7 +91,7 @@ class CollectionLiteralsTest {
         assertEquals("v2", map.get("k2"));
         assertEquals("v3", map.get("k3"));
         assertEquals("v4", map.get("k4"));
-        
+
         // Verify it's mutable
         map.put("k5", "v5");
         assertEquals(5, map.size());

@@ -106,7 +106,7 @@ class CuiLoggerTest {
         void shouldReturnLogLevel() {
             underTest.getWrapped().setLevel(Level.WARNING);
             assertEquals(LogLevel.WARN, underTest.getLogLevel());
-            
+
             underTest.getWrapped().setLevel(Level.INFO);
             assertEquals(LogLevel.INFO, underTest.getLogLevel());
         }

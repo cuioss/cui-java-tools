@@ -131,7 +131,7 @@ public final class MoreReflection {
             return Optional.of(type.getDeclaredField(fieldName));
         } catch (final NoSuchFieldException | SecurityException e) {
             LOGGER.debug("No field found for name '%s' on class '%s'", fieldName, type);
-            if (Object.class.equals(type.getClass()) || null == type.getSuperclass()) {
+            if (Object.class.equals(type) || null == type.getSuperclass()) {
                 return Optional.empty();
             }
             return resolveField(type.getSuperclass(), fieldName);
@@ -382,7 +382,7 @@ public final class MoreReflection {
      */
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
             final Class<A> annotation) {
-        if (null == annotatedType || Object.class.equals(annotatedType.getClass())) {
+        if (null == annotatedType || Object.class.equals(annotatedType)) {
             return Collections.emptyList();
         }
 
