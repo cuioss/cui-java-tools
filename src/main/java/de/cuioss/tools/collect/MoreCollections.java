@@ -328,7 +328,10 @@ public final class MoreCollections {
      * @return the difference between the maps
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Maps.java#L504"></a>
      */
-    @SuppressWarnings("javaarchitecture:S7027") // owolff: No issue, because it delegates to MapDifferenceImpl
+    @SuppressWarnings("javaarchitecture:S7027")
+    // Sonar: "Cyclic dependency between packages" - False positive.
+    // MapDifferenceImpl is in the SAME package (de.cuioss.tools.collect), not a different one.
+    // This is proper encapsulation with a package-private implementation class.
     public static <K, V> MapDifference<K, V> difference(Map<? extends K, ? extends V> left,
             Map<? extends K, ? extends V> right) {
         return MapDiffenceImpl.from(left, right);

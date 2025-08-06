@@ -86,6 +86,9 @@ import java.util.Deque;
  *
  */
 @SuppressWarnings("javaarchitecture:S7027")
+// Sonar: "Cyclic dependency between packages" - False positive.
+// FilenameUtils has no cyclic dependencies. This is a standalone utility class
+// copied from Apache Commons IO with minimal external dependencies.
 // Intended circular dependency with IOCase
 @UtilityClass
 public class FilenameUtils {

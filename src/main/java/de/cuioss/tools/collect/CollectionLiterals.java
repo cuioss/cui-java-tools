@@ -85,7 +85,10 @@ import static de.cuioss.tools.collect.MoreCollections.isEmpty;
  * @author Oliver Wolff
  */
 @SuppressWarnings("javaarchitecture:S7027")
-// Intended circular dependency within collection utilities
+// Sonar: "Cyclic dependency between packages" - False positive.
+// This is an INTRA-package dependency (within de.cuioss.tools.collect), not cross-package.
+// CollectionLiterals and MoreCollections are designed to work together as complementary
+// utility classes within the same package. This is intentional and acceptable.
 @UtilityClass
 public class CollectionLiterals {
 

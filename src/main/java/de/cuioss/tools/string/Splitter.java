@@ -279,9 +279,10 @@ public final class Splitter {
      */
     @SuppressWarnings("java:S5852")
     // Sonar: "Regex patterns should not be created needlessly" - False positive.
-    // The regex pattern here is NOT user input but a configured separator value 
-    // set during Splitter construction. The pattern is created once per Splitter
-    // instance, not per split operation. This is safe and performant by design.
+    // All public factory methods (on(char), on(String), on(Pattern)) pre-compile the pattern
+    // at Splitter construction time. The Pattern.compile() at line 297 is defensive code that
+    // should never execute in normal usage, as pattern is always set by the factory methods.
+    // The pattern is created once per Splitter instance, not per split operation.
     @NonNull
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
