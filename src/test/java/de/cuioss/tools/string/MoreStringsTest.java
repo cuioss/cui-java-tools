@@ -437,6 +437,35 @@ class MoreStringsTest {
     }
 
     @Test
+    void lenientFormatArrayTypes() {
+        // Test Object[] array - needs to be cast to Object to avoid varargs expansion
+        Object[] objArray = {"a", "b", "c"};
+        assertEquals("Array: [a, b, c]", MoreStrings.lenientFormat("Array: %s", (Object) objArray));
+
+        // Test primitive arrays - these should be handled as single objects
+        long[] longArray = {1L, 2L, 3L};
+        assertEquals("Longs: [1, 2, 3]", MoreStrings.lenientFormat("Longs: %s", longArray));
+
+        double[] doubleArray = {1.5, 2.5};
+        assertEquals("Doubles: [1.5, 2.5]", MoreStrings.lenientFormat("Doubles: %s", doubleArray));
+
+        float[] floatArray = {1.5f, 2.5f};
+        assertEquals("Floats: [1.5, 2.5]", MoreStrings.lenientFormat("Floats: %s", floatArray));
+
+        boolean[] boolArray = {true, false, true};
+        assertEquals("Booleans: [true, false, true]", MoreStrings.lenientFormat("Booleans: %s", boolArray));
+
+        byte[] byteArray = {1, 2, 3};
+        assertEquals("Bytes: [1, 2, 3]", MoreStrings.lenientFormat("Bytes: %s", byteArray));
+
+        short[] shortArray = {10, 20, 30};
+        assertEquals("Shorts: [10, 20, 30]", MoreStrings.lenientFormat("Shorts: %s", shortArray));
+
+        char[] charArray = {'a', 'b', 'c'};
+        assertEquals("Chars: [a, b, c]", MoreStrings.lenientFormat("Chars: %s", charArray));
+    }
+
+    @Test
     void returnsFirstNonEmpty() {
         assertEquals(" ", MoreStrings.firstNonEmpty(null, "", " ", "b", "a").orElseThrow());
     }
