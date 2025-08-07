@@ -59,7 +59,7 @@ class CollectionLiteralsTest {
         var first = Generators.nonEmptyStrings().next();
         var second = Generators.nonEmptyStrings().next();
         var third = Generators.nonEmptyStrings().next();
-        
+
         var list = mutableList(first, second, third);
         assertEquals(first, list.getFirst());
         assertEquals(second, list.get(1));
@@ -77,7 +77,7 @@ class CollectionLiteralsTest {
         var a = Generators.letterStrings(1, 5).next();
         var b = Generators.letterStrings(1, 5).next();
         var c = Generators.letterStrings(1, 5).next();
-        
+
         var set = mutableSet(a, b, a, c, b);
         // Size depends on whether generated strings are equal
         assertTrue(set.size() <= 3); // Duplicates removed

@@ -19,6 +19,9 @@ import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,29 +44,19 @@ class UrlParameterTest {
         var value = Generators.nonEmptyStrings().next();
         parameter = new UrlParameter(name, value);
         assertNotNull(parameter);
-        
+
         parameter = new UrlParameter("na/me", "va/lue");
         assertNotNull(parameter);
         assertEquals("na%2Fme", parameter.getName());
         assertEquals("va%2Flue", parameter.getValue());
     }
 
-    @Test
-    void urlParameterConstructorInvalidNameNull() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void urlParameterConstructorInvalidName(String invalidName) {
         var value = Generators.nonEmptyStrings().next();
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter(null, value));
-    }
-
-    @Test
-    void urlParameterConstructorInvalidNameEmpty() {
-        var value = Generators.nonEmptyStrings().next();
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("", value));
-    }
-
-    @Test
-    void urlParameterConstructorInvalidNameTrimEmpty() {
-        var value = Generators.nonEmptyStrings().next();
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("   ", value));
+        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter(invalidName, value));
     }
 
     @Test
@@ -71,7 +64,7 @@ class UrlParameterTest {
         var name = Generators.letterStrings(3, 10).next();
         parameter = new UrlParameter(name, null);
         assertTrue(parameter.isEmpty());
-        
+
         var value = Generators.nonEmptyStrings().next();
         parameter = new UrlParameter(name, value);
         assertFalse(parameter.isEmpty());
