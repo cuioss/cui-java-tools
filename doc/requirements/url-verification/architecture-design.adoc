@@ -193,58 +193,27 @@ public enum UrlSecurityFailureType {
  * Main exception for security violations.
  * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
  */
+@Value
+@Builder
 public class UrlSecurityException extends RuntimeException {
-    private final UrlSecurityFailureType failureType;
-    private final ValidationType validationType;
-    private final String originalInput;
-    private final String sanitizedInput;
+    UrlSecurityFailureType failureType;
+    ValidationType validationType;
+    String originalInput;
+    String sanitizedInput;
+    String detail;
     
-    // Builder pattern for complex scenarios
-    public static Builder builder() {
-        return new Builder();
-    }
-    
-    public static class Builder {
-        private UrlSecurityFailureType failureType;
-        private ValidationType validationType;
-        private String originalInput;
-        private String sanitizedInput;
-        private String detail;
-        private Throwable cause;
-        
-        public Builder failureType(UrlSecurityFailureType failureType) {
-            this.failureType = failureType;
-            return this;
-        }
-        
-        public Builder validationType(ValidationType validationType) {
-            this.validationType = validationType;
-            return this;
-        }
-        
-        public Builder originalInput(String originalInput) {
-            this.originalInput = originalInput;
-            return this;
-        }
-        
-        public Builder sanitizedInput(String sanitizedInput) {
-            this.sanitizedInput = sanitizedInput;
-            return this;
-        }
-        
-        public Builder detail(String detail) {
-            this.detail = detail;
-            return this;
-        }
-        
-        public Builder cause(Throwable cause) {
-            this.cause = cause;
-            return this;
-        }
-        
-        public UrlSecurityException build() {
-            return new UrlSecurityException(this);
-        }
+    public UrlSecurityException(UrlSecurityFailureType failureType, 
+                               ValidationType validationType,
+                               String originalInput, 
+                               String sanitizedInput, 
+                               String detail,
+                               Throwable cause) {
+        super(detail, cause);
+        this.failureType = failureType;
+        this.validationType = validationType;
+        this.originalInput = originalInput;
+        this.sanitizedInput = sanitizedInput;
+        this.detail = detail;
     }
 }
 ----
