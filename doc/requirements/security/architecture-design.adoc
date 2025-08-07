@@ -108,18 +108,20 @@ public final class HttpUrlValidator {
                 }
             }
             
-            // Step 5: Use Java 21 pattern matching for additional checks
-            return switch (decoded) {
-                case String s when (s.contains("..")) -> 
-                    ValidationResult.blocked("Direct traversal pattern");
-                case String s when (s.contains("./")) -> 
-                    ValidationResult.blocked("Current directory reference");
-                case String s when (s.contains("//")) -> 
-                    ValidationResult.blocked("Double slash pattern");
-                case String s when (s.matches(".*[\\x00-\\x1f].*")) -> 
-                    ValidationResult.blocked("Control characters detected");
-                default -> ValidationResult.allowed();
-            };
+            // Step 5: Use conditional checks (pattern matching with guards requires preview features)
+            if (decoded.contains("..")) {
+                return ValidationResult.blocked("Direct traversal pattern");
+            }
+            if (decoded.contains("./")) {
+                return ValidationResult.blocked("Current directory reference");
+            }
+            if (decoded.contains("//")) {
+                return ValidationResult.blocked("Double slash pattern");
+            }
+            if (decoded.matches(".*[\\x00-\\x1f].*")) {
+                return ValidationResult.blocked("Control characters detected");
+            }
+            return ValidationResult.allowed();
             
         } catch (URISyntaxException e) {
             return ValidationResult.blocked("Invalid URI syntax: " + e.getMessage());
@@ -246,16 +248,17 @@ public class HttpValidationPipeline {
     }
     
     private ValidationResult validateSemantics(String path) {
-        // Java 21 pattern matching switch with guard conditions
-        return switch (path) {
-            case String s when (s.startsWith("/admin")) -> 
-                new ValidationResult.Blocked("Admin path access denied");
-            case String s when (s.contains("WEB-INF")) -> 
-                new ValidationResult.Blocked("Protected directory access");
-            case String s when (s.contains("META-INF")) -> 
-                new ValidationResult.Blocked("Protected directory access");
-            default -> new ValidationResult.Allowed();
-        };
+        // Semantic validation using simple conditionals
+        if (path.startsWith("/admin")) {
+            return new ValidationResult.Blocked("Admin path access denied");
+        }
+        if (path.contains("WEB-INF")) {
+            return new ValidationResult.Blocked("Protected directory access");
+        }
+        if (path.contains("META-INF")) {
+            return new ValidationResult.Blocked("Protected directory access");
+        }
+        return new ValidationResult.Allowed();
     }
     
     // Java 21 sealed classes for type-safe results
