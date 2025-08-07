@@ -42,13 +42,11 @@ This document defines a comprehensive test harness design for HTTP URL path trav
 test-harness/
 ├── core/
 │   ├── generators/
-│   │   ├── PathPatternGenerator.java
-│   │   ├── EncodingGenerator.java
-│   │   └── ArchiveGenerator.java
+│   │   ├── HttpPatternGenerator.java
+│   │   └── EncodingGenerator.java
 │   ├── validators/
-│   │   ├── PathValidator.java
-│   │   ├── URLValidator.java
-│   │   └── ArchiveValidator.java
+│   │   ├── HttpPathValidator.java
+│   │   └── URLValidator.java
 │   └── analyzers/
 │       ├── SecurityAnalyzer.java
 │       └── PerformanceAnalyzer.java

@@ -7,11 +7,6 @@
 
 This documentation suite provides comprehensive analysis and design specifications for HTTP/URL path traversal security validation in cui-java-tools.
 
-[IMPORTANT]
-====
-This documentation describes planned HTTP/URL validation functionality that is not yet implemented in the codebase. The current `PathTraversalSecurity` class only provides file system path validation with methods `validatePathSegment()` and `createSecureTempFile()`. This documentation serves as a design specification for future HTTP/URL validation features.
-====
-
 
 == Document Index
 

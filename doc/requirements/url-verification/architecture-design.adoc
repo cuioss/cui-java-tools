@@ -8,12 +8,7 @@ link:README.adoc[← Back to Documentation Index]
 
 == Executive Summary
 
-This document presents a comprehensive architecture and design specification for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
-
-[NOTE]
-====
-This document describes a design specification for planned functionality. The HTTP/URL validation classes and methods described herein are not yet implemented in the cui-java-tools codebase.
-====
+This document presents a comprehensive architecture and design for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
 
 == Design Goals and Principles
 

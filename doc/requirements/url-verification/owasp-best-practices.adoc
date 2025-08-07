@@ -397,13 +397,13 @@ Monitor for these indicators:
 - [ ] Validate path containment after resolution
 - [ ] Handle all encoding schemes (URL, Unicode, double)
 - [ ] Implement proper error handling without information disclosure
-- [ ] Set restrictive file permissions
-- [ ] Use chroot/container isolation where appropriate
+- [ ] Validate HTTP request methods
+- [ ] Implement proper HTTP header validation
 - [ ] Log and monitor suspicious access patterns
 - [ ] Regular security testing with OWASP methodology
 - [ ] Keep libraries updated for security patches
-- [ ] Implement rate limiting for file access
-- [ ] Validate file extensions and content types
+- [ ] Implement rate limiting for HTTP requests
+- [ ] Validate HTTP parameter values
 - [ ] Use secure defaults in frameworks
 - [ ] Document security assumptions and boundaries
 
@@ -622,7 +622,7 @@ public class BodyParameterValidator {
 * link:https://cheatsheetseries.owasp.org/cheatsheets/Path_Traversal_Defense_Cheat_Sheet.html[OWASP Path Traversal Prevention Cheat Sheet]
 * link:https://owasp.org/www-project-top-ten/[OWASP Top 10 2021 - A01:2021 Broken Access Control]
 * link:https://nvd.nist.gov/[CVE Database and National Vulnerability Database]
-* link:https://snyk.io/research/zip-slip-vulnerability[Snyk Security Research on Zip Slip]
+* link:https://snyk.io/research/[Snyk Security Research]
 * link:https://portswigger.net/web-security/file-path-traversal[PortSwigger Web Security Academy]
 
 === RFC Standards
