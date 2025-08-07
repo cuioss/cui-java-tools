@@ -17,6 +17,7 @@ This document consolidates OWASP's comprehensive guidelines for preventing path 
 The most effective defense against path traversal is to completely avoid passing user-supplied input to filesystem APIs.
 
 **Implementation Strategies:**
+
 * Use indirect reference maps (user selects from numbered options)
 * Generate internal identifiers mapped to actual resources
 * Store files with system-generated names, maintaining original names separately
