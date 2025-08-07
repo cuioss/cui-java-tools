@@ -447,8 +447,8 @@ public class URLParameterValidator {
             return ValidationResult.blocked("Invalid parameter name: " + name);
         }
         
-        // Decode parameter value (handle multiple encoding layers)
-        String decoded = fullyDecode(value);
+        // Decode parameter value
+        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
         
         // Check for path traversal patterns
         if (containsPathTraversal(decoded)) {
@@ -468,24 +468,6 @@ public class URLParameterValidator {
         return ValidationResult.allowed();
     }
     
-    private String fullyDecode(String value) {
-        String decoded = value;
-        String previous;
-        int iterations = 0;
-        
-        do {
-            previous = decoded;
-            try {
-                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            } catch (IllegalArgumentException e) {
-                // Invalid encoding, return as-is for validation
-                break;
-            }
-            iterations++;
-        } while (!decoded.equals(previous) && iterations < 10);
-        
-        return decoded;
-    }
 }
 ----
 

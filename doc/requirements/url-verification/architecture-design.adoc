@@ -90,7 +90,7 @@ public final class HttpUrlValidator {
      */
     public ValidationResult validateUrlPath(String urlPath) {
         // Step 1: Decode using Java's URLDecoder
-        String decoded = fullyDecode(urlPath);
+        String decoded = URLDecoder.decode(urlPath, StandardCharsets.UTF_8);
         
         // Step 2: Check for double encoding (security issue)
         if (hasDoubleEncoding(urlPath, decoded)) {
@@ -130,24 +130,6 @@ public final class HttpUrlValidator {
         }
     }
     
-    private String fullyDecode(String input) {
-        String decoded = input;
-        String previous;
-        int iterations = 0;
-        
-        do {
-            previous = decoded;
-            try {
-                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            } catch (IllegalArgumentException e) {
-                // Invalid encoding, return current state
-                break;
-            }
-            iterations++;
-        } while (!decoded.equals(previous) && iterations < 10);
-        
-        return decoded;
-    }
     
     private boolean hasDoubleEncoding(String original, String decoded) {
         try {
@@ -442,8 +424,8 @@ public class URLParameterValueValidator {
             return ValidationResult.blocked("Double encoding detected in: " + name);
         }
         
-        // 3. Fully decode the parameter value
-        String decoded = fullyDecode(value);
+        // 3. Decode the parameter value
+        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
         
         // 4. Validate based on parameter context
         if (isURLParameter(name)) {
@@ -501,23 +483,6 @@ public class URLParameterValueValidator {
         return name.matches("^[a-zA-Z0-9!#$%&'*+\\-.^_`|~]+$");
     }
     
-    private String fullyDecode(String value) {
-        String decoded = value;
-        String previous;
-        int iterations = 0;
-        
-        do {
-            previous = decoded;
-            try {
-                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            } catch (IllegalArgumentException e) {
-                break;
-            }
-            iterations++;
-        } while (!decoded.equals(previous) && iterations < 10);
-        
-        return decoded;
-    }
 }
 ----
 
@@ -697,7 +662,7 @@ public class URLPathSecurityValidator {
     
     public ValidationResult validateURLPath(String urlPath) {
         // Decode URL encoding
-        String decoded = fullyDecode(urlPath);
+        String decoded = URLDecoder.decode(urlPath, StandardCharsets.UTF_8);
         
         // Check for double encoding
         if (hasDoubleEncoding(urlPath)) {
@@ -720,17 +685,6 @@ public class URLPathSecurityValidator {
         return ValidationResult.allowed();
     }
     
-    private String fullyDecode(String url) {
-        String decoded = url;
-        String previous;
-        
-        do {
-            previous = decoded;
-            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-        } while (!decoded.equals(previous));
-        
-        return decoded;
-    }
 }
 ----
 
