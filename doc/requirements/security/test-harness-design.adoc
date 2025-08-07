@@ -42,7 +42,7 @@ This document defines a comprehensive test harness design for HTTP URL path trav
 
 === Test Framework Structure
 
-```
+----
 test-harness/
 ├── core/
 │   ├── generators/
@@ -65,7 +65,7 @@ test-harness/
 │   └── templates/
 └── config/
     └── test-profiles/
-```
+----
 
 == Test Data Categories
 
@@ -73,7 +73,8 @@ test-harness/
 
 ==== Critical CVE Patterns
 
-```java
+[source,java]
+----
 public class CVETestVectors {
     
     // HTTP URL Path Traversal Patterns
@@ -112,13 +113,14 @@ public class CVETestVectors {
         "X-Forwarded-Path: /../../protected/"
     };
 }
-```
+----
 
 === HTTP/URL Encoding Test Matrices
 
 ==== HTTP-Specific Encoding Tests
 
-```java
+[source,java]
+----
 public class HTTPEncodingTestMatrix {
     
     public enum HTTPEncodingType {
@@ -163,13 +165,14 @@ public class HTTPEncodingTestMatrix {
         }
     }
 }
-```
+----
 
 === HTTP Protocol-Specific Test Cases
 
 ==== HTTP Method and Protocol Variants
 
-```java
+[source,java]
+----
 public class HttpProtocolTests {
     
     // HTTP method-specific patterns
@@ -206,13 +209,14 @@ public class HttpProtocolTests {
         "Path=//evil.com/"
     };
 }
-```
+----
 
 == Test Implementation Framework
 
 === Base Test Class
 
-```java
+[source,java]
+----
 public abstract class PathTraversalSecurityTest {
     
     protected PathValidator validator;
@@ -277,11 +281,12 @@ public abstract class PathTraversalSecurityTest {
         analyzer.analyzeResults(report);
     }
 }
-```
+----
 
 === HTTP Parameter Attack Test Suite
 
-```java
+[source,java]
+----
 public class HttpParameterAttackTestSuite {
     
     @Test
@@ -325,11 +330,12 @@ public class HttpParameterAttackTestSuite {
         });
     }
 }
-```
+----
 
 === Performance Benchmark Suite
 
-```java
+[source,java]
+----
 public class PathValidationBenchmark {
     
     private static final int ITERATIONS = 100000;
@@ -372,13 +378,14 @@ public class PathValidationBenchmark {
         return System.nanoTime() - start;
     }
 }
-```
+----
 
 == Attack Simulation Framework
 
 === Web Application Attack Simulator
 
-```java
+[source,java]
+----
 public class WebAttackSimulator {
     
     // Simulated HTTP request for testing
@@ -438,11 +445,12 @@ public class WebAttackSimulator {
         );
     }
 }
-```
+----
 
 === HTTP API Endpoint Security Tests
 
-```java
+[source,java]
+----
 public class HttpApiSecurityTests {
     
     @Test
@@ -484,7 +492,7 @@ public class HttpApiSecurityTests {
         }
     }
 }
-```
+----
 
 == Security Validation Metrics
 
@@ -522,7 +530,8 @@ public class HttpApiSecurityTests {
 
 === Security Score Calculation
 
-```java
+[source,java]
+----
 public class SecurityScoreCalculator {
     
     public SecurityScore calculateScore(TestReport report) {
@@ -551,13 +560,14 @@ public class SecurityScoreCalculator {
         return score;
     }
 }
-```
+----
 
 == Automated Test Execution
 
 === CI/CD Integration
 
-```yaml
+[source,yaml]
+----
 # GitHub Actions workflow
 name: Path Traversal Security Tests
 
@@ -601,11 +611,12 @@ jobs:
       with:
         name: security-test-results-${{ matrix.os }}-java${{ matrix.java }}
         path: target/security-reports/
-```
+----
 
 === Test Execution Framework
 
-```java
+[source,java]
+----
 @TestConfiguration
 public class PathTraversalTestConfiguration {
     
@@ -630,13 +641,14 @@ public class PathTraversalTestConfiguration {
         );
     }
 }
-```
+----
 
 == Fuzzing and Edge Case Testing
 
 === Intelligent Fuzzing Engine
 
-```java
+[source,java]
+----
 public class PathTraversalFuzzer {
     
     private static final int FUZZ_ITERATIONS = 10000;
@@ -693,13 +705,14 @@ public class PathTraversalFuzzer {
         return components[random.nextInt(components.length)];
     }
 }
-```
+----
 
 == Test Report Generation
 
 === Comprehensive Report Template
 
-```java
+[source,java]
+----
 public class SecurityTestReport {
     
     public void generateHTMLReport(TestResults results) {
@@ -743,13 +756,14 @@ public class SecurityTestReport {
         saveReport(html.toString());
     }
 }
-```
+----
 
 == Continuous Improvement
 
 === CVE Database Integration
 
-```java
+[source,java]
+----
 @Component
 public class CVEDatabaseUpdater {
     
@@ -770,7 +784,7 @@ public class CVEDatabaseUpdater {
         return nvdClient.getRecentCVEs(24); // Last 24 hours
     }
 }
-```
+----
 
 == References
 

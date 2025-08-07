@@ -56,7 +56,8 @@ When user input cannot be avoided, implement multiple layers of defense:
 === Input Validation Techniques
 
 ==== Whitelist Validation (Preferred)
-```java
+[source,java]
+----
 // Define allowed files
 Set<String> allowedFiles = Set.of("report.pdf", "summary.doc", "data.csv");
 
@@ -64,22 +65,24 @@ Set<String> allowedFiles = Set.of("report.pdf", "summary.doc", "data.csv");
 if (!allowedFiles.contains(userInput)) {
     throw new SecurityException("Invalid file requested");
 }
-```
+----
 
 ==== Character Validation
-```java
+[source,java]
+----
 // Allow only alphanumeric and specific characters
 Pattern VALID_FILE_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]+$");
 
 if (!VALID_FILE_PATTERN.matcher(userInput).matches()) {
     throw new SecurityException("Invalid characters in filename");
 }
-```
+----
 
 === Path Canonicalization and Validation
 
 ==== Java Implementation Pattern
-```java
+[source,java]
+----
 public Path validatePath(String userInput, Path baseDirectory) 
         throws SecurityException {
     // Step 1: Resolve the path
@@ -95,7 +98,7 @@ public Path validatePath(String userInput, Path baseDirectory)
     
     return canonicalPath;
 }
-```
+----
 
 ==== Platform-Specific Considerations
 * **Windows**: Handle both forward and backward slashes
@@ -133,7 +136,8 @@ public Path validatePath(String userInput, Path baseDirectory)
 |===
 
 ==== Comprehensive Decoding Implementation
-```java
+[source,java]
+----
 public String normalizeInput(String input) {
     // Decode URL encoding
     String decoded = URLDecoder.decode(input, StandardCharsets.UTF_8);
@@ -149,7 +153,7 @@ public String normalizeInput(String input) {
     
     return decoded;
 }
-```
+----
 
 == OWASP Testing Methodology
 
@@ -157,59 +161,60 @@ public String normalizeInput(String input) {
 
 Identify all potential entry points for path traversal:
 
-1. **HTTP Parameters**
-   - GET parameters: `?file=`, `?page=`, `?doc=`
-   - POST body parameters
-   - Multipart form data
+. **HTTP Parameters**
+  * GET parameters: `?file=`, `?page=`, `?doc=`
+  * POST body parameters
+  * Multipart form data
 
-2. **HTTP Headers**
-   - Custom headers
-   - Cookie values
-   - Referer headers
+. **HTTP Headers**
+  * Custom headers
+  * Cookie values
+  * Referer headers
 
-3. **File Upload**
-   - Filename parameters
-   - Content-Type headers
-   - Archive contents (Zip Slip)
+. **File Upload**
+  * Filename parameters
+  * Content-Type headers
+  * Archive contents (Zip Slip)
 
 === Test Cases from OWASP Guide
 
 ==== Basic Traversal Patterns
-```
+----
 ../../../etc/passwd
 ..\..\..\..\windows\win.ini
 ....//....//....//etc/passwd
 ..;/..;/..;/etc/passwd
-```
+----
 
 ==== Encoded Traversal Patterns
-```
+----
 %2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
 %252e%252e%252f
 ..%c0%af..%c0%af..%c0%afetc%c0%afpasswd
-```
+----
 
 ==== Advanced Bypass Techniques
-```
+----
 /var/www/../../etc/passwd
 C:\inetpub\wwwroot\..\..\Windows\win.ini
 /../../../../../../../../etc/passwd%00.jpg
 ....\/....\/....\/etc/passwd
-```
+----
 
 === Validation Testing Approach
 
-1. **Positive Testing**: Verify legitimate file access works
-2. **Negative Testing**: Confirm malicious patterns are blocked
-3. **Boundary Testing**: Test edge cases and limits
-4. **Encoding Testing**: Verify all encoding schemes handled
-5. **Platform Testing**: Test OS-specific patterns
+. **Positive Testing**: Verify legitimate file access works
+. **Negative Testing**: Confirm malicious patterns are blocked
+. **Boundary Testing**: Test edge cases and limits
+. **Encoding Testing**: Verify all encoding schemes handled
+. **Platform Testing**: Test OS-specific patterns
 
 == Security Patterns and Architecture
 
 === Secure File Access Pattern
 
-```java
+[source,java]
+----
 public class SecureFileAccess {
     private final Path baseDirectory;
     private final Set<String> allowedExtensions;
@@ -252,12 +257,13 @@ public class SecureFileAccess {
         return Files.readAllBytes(realPath);
     }
 }
-```
+----
 
 === Web Application Security Headers
 
 ==== Security Headers for Path Traversal Prevention
-```java
+[source,java]
+----
 public class SecurityHeaderFilter implements Filter {
     
     @Override
@@ -282,7 +288,7 @@ public class SecurityHeaderFilter implements Filter {
         chain.doFilter(request, response);
     }
 }
-```
+----
 
 == Real-World Attack Patterns and Prevention
 
@@ -290,7 +296,8 @@ public class SecurityHeaderFilter implements Filter {
 
 For web applications handling URL paths:
 
-```java
+[source,java]
+----
 public class URLPathValidator {
     
     public boolean isValidURLPath(String urlPath) {
@@ -321,13 +328,14 @@ public class URLPathValidator {
         return true;
     }
 }
-```
+----
 
 == Monitoring and Detection
 
 === Logging Strategy
 
-```java
+[source,java]
+----
 public class PathTraversalMonitor {
     private static final Logger logger = LoggerFactory.getLogger(PathTraversalMonitor.class);
     private static final Logger securityLogger = LoggerFactory.getLogger("SECURITY");
@@ -344,7 +352,7 @@ public class PathTraversalMonitor {
         }
     }
 }
-```
+----
 
 === Detection Patterns
 
@@ -360,9 +368,9 @@ Monitor for these indicators:
 === CVE-2023-32235 (Ghost CMS)
 
 **Attack Vector**: URL-encoded path traversal
-```
+----
 /assets/built%2F..%2F..%2F/package.json
-```
+----
 
 **Lesson**: Always decode before validation
 
@@ -422,7 +430,8 @@ Monitor for these indicators:
 
 URL query parameters require special attention as they are often used in path construction:
 
-```java
+[source,java]
+----
 public class URLParameterValidator {
     // RFC 7230 token characters for parameter names
     private static final Pattern VALID_PARAM_NAME = 
@@ -477,13 +486,14 @@ public class URLParameterValidator {
         return decoded;
     }
 }
-```
+----
 
 ==== HTTP Body Parameter Validation
 
 HTTP POST body parameters (form-data, JSON, XML) require different validation approaches:
 
-```java
+[source,java]
+----
 public class BodyParameterValidator {
     
     // Form-encoded body validation (application/x-www-form-urlencoded)
@@ -567,7 +577,7 @@ public class BodyParameterValidator {
         return ValidationResult.allowed();
     }
 }
-```
+----
 
 ==== Common Parameter Attack Patterns
 

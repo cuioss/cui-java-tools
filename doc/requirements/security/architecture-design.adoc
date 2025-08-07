@@ -14,13 +14,13 @@ This document presents a comprehensive architecture and design for HTTP URL path
 
 === Primary Goals
 
-1. **HTTP/URL Focus**: Specialized validation for HTTP request paths and parameters
-2. **Java Built-in Types**: Leverage Java 21+ native URL/URI validation capabilities
-3. **Zero False Negatives**: Block all known HTTP path traversal patterns
-4. **RFC Compliance**: Full RFC 3986 and RFC 7230 compliance using Java's URI class
-5. **Performance**: Sub-millisecond validation using native Java types
-6. **Simplicity**: Minimal custom code by leveraging Java standard library
-7. **Security by Default**: Combine Java's syntactic validation with semantic security
+. **HTTP/URL Focus**: Specialized validation for HTTP request paths and parameters
+. **Java Built-in Types**: Leverage Java 21+ native URL/URI validation capabilities
+. **Zero False Negatives**: Block all known HTTP path traversal patterns
+. **RFC Compliance**: Full RFC 3986 and RFC 7230 compliance using Java's URI class
+. **Performance**: Sub-millisecond validation using native Java types
+. **Simplicity**: Minimal custom code by leveraging Java standard library
+. **Security by Default**: Combine Java's syntactic validation with semantic security
 
 === Design Principles
 
@@ -52,7 +52,7 @@ This document presents a comprehensive architecture and design for HTTP URL path
 
 === High-Level Architecture Using Java 21+ Built-in Types
 
-```
+----
 ┌─────────────────────────────────────────────────────────┐
 │                 HTTP URL Validator                       │
 │         (Leveraging Java 21 Built-in Types)             │
@@ -65,13 +65,14 @@ This document presents a comprehensive architecture and design for HTTP URL path
 │ URLDecoder   │    URI     │  Pattern   │   Custom      │
 │ (Built-in)   │ (Built-in) │ (Built-in) │  Security     │
 └──────────────┴────────────┴────────────┴───────────────┘
-```
+----
 
 === Component Architecture
 
 ==== Core Components
 
-```java
+[source,java]
+----
 package de.cuioss.tools.security.http;
 
 import java.net.URI;
@@ -157,13 +158,14 @@ public final class HttpUrlValidator {
         }
     }
 }
-```
+----
 
 === Validation Pipeline Using Java 21 Built-in Types
 
 ==== Pipeline Design with Native Java Components
 
-```java
+[source,java]
+----
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -282,11 +284,12 @@ public class HttpValidationPipeline {
         record Failed(String reason) implements NormalizationResult {}
     }
 }
-```
+----
 
 ==== Stage Implementations
 
-```java
+[source,java]
+----
 /**
  * Decoding stage - handles all encoding schemes
  */
@@ -342,13 +345,14 @@ public class NormalizationStage implements ValidationStage {
         return platform.getNormalizer().normalize(path);
     }
 }
-```
+----
 
 == Security Validation Strategies
 
 === Multi-Layer Validation Approach
 
-```java
+[source,java]
+----
 public class ValidationEngine {
     
     private final List<Validator> validators = Arrays.asList(
@@ -371,11 +375,12 @@ public class ValidationEngine {
         return ValidationResult.allowed();
     }
 }
-```
+----
 
 === Attack Pattern Detection
 
-```java
+[source,java]
+----
 public class AttackPatternDetector {
     
     private final PatternMatcher patterns;
@@ -414,14 +419,15 @@ public class AttackPatternDetector {
         // ... more CVE patterns
     }
 }
-```
+----
 
 
 === Comprehensive HTTP Parameter Validation
 
 ==== URL Query Parameter Value Validation
 
-```java
+[source,java]
+----
 public class URLParameterValueValidator {
     
     // RFC 3986 query component validation with comprehensive checks
@@ -513,11 +519,12 @@ public class URLParameterValueValidator {
         return decoded;
     }
 }
-```
+----
 
 ==== HTTP POST Body Parameter Value Validation
 
-```java
+[source,java]
+----
 public class BodyParameterValueValidator {
     
     private static final int MAX_FORM_FIELD_LENGTH = 8192;
@@ -597,11 +604,12 @@ public class BodyParameterValueValidator {
         return ValidationResult.allowed();
     }
 }
-```
+----
 
 === Cookie Path Validation
 
-```java
+[source,java]
+----
 public class CookiePathValidator {
     
     // RFC 6265 - HTTP State Management
@@ -619,7 +627,7 @@ public class CookiePathValidator {
         return ValidationResult.allowed();
     }
 }
-```
+----
 
 == URL Path Validation (Primary Focus)
 
@@ -627,7 +635,8 @@ public class CookiePathValidator {
 
 ==== RFC 3986 - URI Generic Syntax Implementation
 
-```java
+[source,java]
+----
 public class RFC3986Validator {
     
     // RFC 3986 Section 2.2 - Reserved Characters
@@ -650,11 +659,12 @@ public class RFC3986Validator {
                         && isHexDigit(path.charAt(path.indexOf(c) + 2));
     }
 }
-```
+----
 
 ==== RFC 7230 - HTTP/1.1 Message Syntax
 
-```java
+[source,java]
+----
 public class RFC7230Validator {
     
     // RFC 7230 Section 3.2 - Header Field Structure
@@ -677,11 +687,12 @@ public class RFC7230Validator {
         return TOKEN.matcher(name).matches();
     }
 }
-```
+----
 
 === URL-Specific Security
 
-```java
+[source,java]
+----
 public class URLPathSecurityValidator {
     
     public ValidationResult validateURLPath(String urlPath) {
@@ -721,13 +732,14 @@ public class URLPathSecurityValidator {
         return decoded;
     }
 }
-```
+----
 
 == Performance Optimization
 
 === Caching Strategy
 
-```java
+[source,java]
+----
 public class ValidationCache {
     
     private final Map<String, ValidationResult> cache = new ConcurrentHashMap<>();
@@ -756,11 +768,12 @@ public class ValidationCache {
         }
     }
 }
-```
+----
 
 === Performance Metrics
 
-```java
+[source,java]
+----
 public class PerformanceMonitor {
     
     private final MeterRegistry registry;
@@ -787,13 +800,14 @@ public class PerformanceMonitor {
         ).increment();
     }
 }
-```
+----
 
 == Security Configuration
 
 === Configuration Model
 
-```java
+[source,java]
+----
 @ConfigurationProperties(prefix = "security.path")
 public class PathSecurityConfiguration {
     
@@ -836,13 +850,14 @@ public class PathSecurityConfiguration {
         PARANOID  // Maximum security, may block legitimate paths
     }
 }
-```
+----
 
 == Error Handling and Logging
 
 === Security-Aware Error Handling
 
-```java
+[source,java]
+----
 public class SecurityErrorHandler {
     
     /**
@@ -875,7 +890,7 @@ public class SecurityErrorHandler {
         auditLogger.log(event);
     }
 }
-```
+----
 
 == Integration Patterns
 
@@ -884,7 +899,8 @@ public class SecurityErrorHandler {
 
 === Metrics Collection
 
-```java
+[source,java]
+----
 @Component
 public class PathSecurityMetrics {
     
@@ -923,31 +939,31 @@ public class PathSecurityMetrics {
             .build();
     }
 }
-```
+----
 
 == Future Enhancements
 
 === Planned Features
 
-1. **Machine Learning Integration**
-   - Anomaly detection for zero-day patterns
-   - Adaptive threat modeling
-   - Behavioral analysis
+. **Machine Learning Integration**
+  * Anomaly detection for zero-day patterns
+  * Adaptive threat modeling
+  * Behavioral analysis
 
-2. **Cloud-Native Support**
-   - S3/Azure Blob/GCS path validation
-   - Serverless function path security
-   - Container registry path validation
+. **Cloud-Native Support**
+  * S3/Azure Blob/GCS path validation
+  * Serverless function path security
+  * Container registry path validation
 
-3. **Advanced Threat Intelligence**
-   - Real-time CVE feed integration
-   - Threat intelligence platform integration
-   - Automated pattern updates
+. **Advanced Threat Intelligence**
+  * Real-time CVE feed integration
+  * Threat intelligence platform integration
+  * Automated pattern updates
 
-4. **Formal Verification**
-   - Mathematical proof of security properties
-   - Model checking for validation logic
-   - Automated security proof generation
+. **Formal Verification**
+  * Mathematical proof of security properties
+  * Model checking for validation logic
+  * Automated security proof generation
 
 == Conclusion
 
