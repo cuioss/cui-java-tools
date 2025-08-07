@@ -524,51 +524,6 @@ public class AttackPatternDatabase {
 
 == Test Execution Strategy
 
-=== Test Suite Orchestration
-
-[source,java]
-----
-package de.cuioss.tools.security.http.harness;
-
-import org.junit.platform.suite.api.Suite;
-import org.junit.platform.suite.api.SelectPackages;
-
-/**
- * Main security test suite orchestrator.
- * Implements: link:../../../plan.adoc#_phase_712_integration_tasks[Task I1]
- */
-@Suite
-@SelectPackages({
-    "de.cuioss.tools.security.http.attacks",
-    "de.cuioss.tools.security.http.generators"
-})
-public class SecurityTestSuite {
-    
-    @BeforeAll
-    static void setupTestEnvironment() {
-        // Initialize attack pattern database
-        AttackPatternDatabase database = new AttackPatternDatabase();
-        
-        // Configure test reporting
-        TestReporter reporter = new TestReporter();
-        
-        // Set performance baselines
-        PerformanceBaseline.set(1.0); // 1ms threshold
-    }
-    
-    @AfterAll
-    static void generateTestReport() {
-        // Generate comprehensive test report
-        TestReport report = reporter.generateReport();
-        
-        // Export results in multiple formats
-        reporter.generateHTMLReport(report);
-        reporter.generateJSONReport(report);
-        reporter.generateJUnitXML(report);
-    }
-}
-----
-
 === Performance Benchmarking
 
 [source,java]
@@ -593,8 +548,10 @@ public class PerformanceValidationBenchmark {
     
     @Setup
     public void setup() {
-        validator = new URLPathValidationPipeline(
-            UrlSecurityConfig.builder().build(),
+        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
+        ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
+        validator = new UnifiedValidationPipeline(
+            pathConfig,
             new SecurityEventCounter()
         );
         attackGen = new PathTraversalGenerator();
@@ -643,63 +600,21 @@ public class PerformanceValidationBenchmark {
 - International domain names must be supported
 - Valid relative paths must work correctly
 
-== Test Reporting
+== Test Quality Requirements
 
-=== Report Structure
+=== Test Coverage Requirements
 
-[source,java]
-----
-package de.cuioss.tools.security.http.harness;
-
-/**
- * Comprehensive test report generator.
- */
-public class TestReporter {
-    
-    public record TestReport(
-        Instant timestamp,
-        int totalTests,
-        int passed,
-        int failed,
-        Map<AttackCategory, CategoryResult> categoryResults,
-        List<PerformanceMetric> performanceMetrics,
-        List<FalsePositive> falsePositives,
-        double securityScore
-    ) {}
-    
-    public void generateHTMLReport(TestReport report) {
-        // Generate visual HTML report with charts
-        // Include attack coverage heatmap
-        // Show performance distribution graphs
-    }
-    
-    public void generateJSONReport(TestReport report) {
-        // Generate machine-readable JSON report
-        // Include all metrics for CI/CD integration
-    }
-    
-    public void generateJUnitXML(TestReport report) {
-        // Generate JUnit XML for CI/CD tools
-        // Compatible with Jenkins, GitLab CI, etc.
-    }
-}
-----
-
-== Continuous Testing Strategy
-
-=== CI/CD Integration
-
-1. **Pre-commit**: Run quick smoke tests (T1, T5, T11, T34)
-2. **Pull Request**: Run full test suite (T1-T36)
-3. **Nightly**: Run extended fuzzing with all generators
-4. **Release**: Full security audit with performance benchmarks
+* **ALL tests MUST pass** - No exceptions, no degradation threshold
+* **100% attack detection** - Every known attack pattern must be blocked
+* **Zero false positives** - Valid URLs must not be rejected
+* **Performance requirements** - All validations must complete in <1ms
 
 === Regression Testing
 
-- Maintain test case for every security issue found
-- Add new CVE patterns as they are discovered
-- Update OWASP patterns with each OWASP update
-- Performance regression detection (<5% degradation threshold)
+* Maintain test case for every security issue found
+* Add new CVE patterns as they are discovered  
+* Update OWASP patterns with each OWASP update
+* All existing tests must continue to pass
 
 == Generator Usage Guidelines
 
@@ -790,6 +705,77 @@ public class GeneratorsArgumentsProvider implements ArgumentsProvider {
 
 === Comprehensive Test Example
 
+== ValidationType Integration Testing
+
+=== Testing Different Validation Types
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+/**
+ * Tests to ensure ValidationType is properly propagated through the system.
+ */
+public class ValidationTypeTest {
+    
+    @Test
+    void testValidationTypeInException() {
+        // Create validators for different types
+        UrlSecurityConfig config = UrlSecurityConfig.builder().build();
+        
+        // Test URL_PATH type
+        ConfigStageProvider pathConfig = new URLPathConfig(config);
+        HttpSecurityValidator pathValidator = new UnifiedValidationPipeline(
+            pathConfig, new SecurityEventCounter());
+        
+        UrlSecurityException pathException = assertThrows(
+            UrlSecurityException.class,
+            () -> pathValidator.execute("../../../etc/passwd")
+        );
+        assertEquals(ValidationType.URL_PATH, pathException.getValidationType());
+        
+        // Test URL_PARAMETER type
+        ConfigStageProvider paramConfig = new URLParameterConfig(config);
+        HttpSecurityValidator paramValidator = new UnifiedValidationPipeline(
+            paramConfig, new SecurityEventCounter());
+        
+        UrlSecurityException paramException = assertThrows(
+            UrlSecurityException.class,
+            () -> paramValidator.execute("search=<script>alert(1)</script>")
+        );
+        assertEquals(ValidationType.URL_PARAMETER, paramException.getValidationType());
+        
+        // Test HTTP_HEADER type
+        ConfigStageProvider headerConfig = new HTTPHeaderConfig(config);
+        HttpSecurityValidator headerValidator = new UnifiedValidationPipeline(
+            headerConfig, new SecurityEventCounter());
+        
+        UrlSecurityException headerException = assertThrows(
+            UrlSecurityException.class,
+            () -> headerValidator.execute("Bearer\\r\\nX-Injected: true")
+        );
+        assertEquals(ValidationType.HTTP_HEADER, headerException.getValidationType());
+    }
+    
+    @Test
+    void testValidationTypeConsistency() {
+        // Ensure ValidationType is consistent across all stages in a pipeline
+        UrlSecurityConfig config = UrlSecurityConfig.builder().build();
+        ConfigStageProvider pathConfig = new URLPathConfig(config);
+        
+        // All stages should report the same ValidationType
+        assertEquals(ValidationType.URL_PATH, pathConfig.getValidationType());
+        for (HttpSecurityValidator stage : pathConfig.getStages()) {
+            if (stage != null) {
+                assertEquals(ValidationType.URL_PATH, stage.getType());
+            }
+        }
+    }
+}
+----
+
+== Comprehensive Security Testing
+
 [source,java]
 ----
 package de.cuioss.tools.security.http.attacks;
@@ -802,6 +788,24 @@ public class ComprehensiveSecurityTest {
     private final HttpSecurityValidator pathValidator = createPathValidator();
     private final HttpSecurityValidator paramValidator = createParameterValidator();
     private final HttpSecurityValidator headerValidator = createHeaderValidator();
+    
+    private HttpSecurityValidator createPathValidator() {
+        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
+        ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
+        return new UnifiedValidationPipeline(pathConfig, new SecurityEventCounter());
+    }
+    
+    private HttpSecurityValidator createParameterValidator() {
+        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
+        ConfigStageProvider paramConfig = new URLParameterConfig(baseConfig);
+        return new UnifiedValidationPipeline(paramConfig, new SecurityEventCounter());
+    }
+    
+    private HttpSecurityValidator createHeaderValidator() {
+        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
+        ConfigStageProvider headerConfig = new HTTPHeaderConfig(baseConfig);
+        return new UnifiedValidationPipeline(headerConfig, new SecurityEventCounter());
+    }
     
     @ParameterizedTest(name = "Attack detection [{index}]: {1}")
     @GeneratorsSource(value = {
@@ -818,9 +822,14 @@ public class ComprehensiveSecurityTest {
             "Failed to detect attack from " + generatorType + ": " + attack
         );
         
+        // Verify ValidationType is properly set
+        assertEquals(ValidationType.URL_PATH, exception.getValidationType(),
+            "Exception should include ValidationType");
+        
         // Log failure type for analysis
-        logger.debug("Detected {} for {} attack: {}", 
-            exception.getFailureType(), generatorType, attack);
+        logger.debug("Detected {} for {} attack (type: {}): {}", 
+            exception.getFailureType(), generatorType, 
+            exception.getValidationType(), attack);
     }
     
     @ParameterizedTest(name = "Valid URL [{index}]")
@@ -1061,12 +1070,13 @@ public class CombinedAttackTest {
 
 The test harness achieves success when:
 
-1. ✅ All 10 generators (G1-G10) implemented and tested
-2. ✅ All 36 test cases (T1-T36) passing
-3. ✅ 100% of known CVE patterns blocked
-4. ✅ OWASP Top 10 compliance achieved
-5. ✅ <1ms performance for 95% of validations
-6. ✅ <0.1% false positive rate
-7. ✅ Zero false negatives for known attacks
+1. ✅ **ALL tests pass** - No failures accepted
+2. ✅ All 10 generators (G1-G10) implemented and tested
+3. ✅ All 36 test cases (T1-T36) passing
+4. ✅ 100% of known CVE patterns blocked
+5. ✅ OWASP Top 10 compliance achieved
+6. ✅ <1ms performance for ALL validations
+7. ✅ Zero false positives - valid URLs must pass
+8. ✅ Zero false negatives - all attacks must be detected
 8. ✅ CI/CD integration complete
 9. ✅ Comprehensive reporting available

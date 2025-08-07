@@ -78,16 +78,18 @@ The URL Security Validation system provides comprehensive protection against pat
 ----
 de.cuioss.tools.security.http/
 ├── HttpSecurityValidator.java         # Core validation interface
-├── UrlSecurityException.java          # Main exception with failure types
-├── UrlSecurityFailureType.java        # Comprehensive failure enum
+├── UrlSecurityException.java          # Main exception with ValidationType
+├── UrlSecurityFailureType.java        # Comprehensive failure enum  
 ├── ValidationType.java                # Input type classification
 │
 ├── config/
+│   ├── ConfigStageProvider.java      # Stage provider interface
 │   ├── UrlSecurityConfig.java        # Base configuration with defaults
-│   ├── URLConfig.java                # URL path specific config
-│   ├── ParameterConfig.java          # Parameter validation config
-│   ├── HeaderConfig.java             # HTTP header config
-│   └── BodyConfig.java               # HTTP body validation config
+│   ├── URLPathConfig.java            # URL path specific config
+│   ├── URLParameterConfig.java       # Parameter validation config
+│   ├── HTTPHeaderConfig.java         # HTTP header config
+│   ├── HTTPBodyConfig.java           # HTTP body validation config
+│   └── CookieConfig.java              # Cookie validation config
 │
 ├── security/
 │   ├── SecurityEventCounter.java     # Thread-safe event counting
@@ -101,11 +103,8 @@ de.cuioss.tools.security.http/
 │   └── PatternMatchingStage.java     # Attack pattern detection
 │
 └── pipeline/
-    ├── URLPathValidationPipeline.java      # URL path pipeline
-    ├── URLParameterValidationPipeline.java # Parameter pipeline
-    ├── HTTPHeaderValidationPipeline.java   # Header pipeline
-    ├── HTTPBodyValidationPipeline.java     # Body pipeline
-    └── PipelineFactory.java                # Pipeline creation
+    ├── UnifiedValidationPipeline.java # Single pipeline for all types
+    └── ValidationFactory.java         # Factory for creating validators
 ----
 
 == Core Components
@@ -196,12 +195,56 @@ public enum UrlSecurityFailureType {
  */
 public class UrlSecurityException extends RuntimeException {
     private final UrlSecurityFailureType failureType;
+    private final ValidationType validationType;
     private final String originalInput;
     private final String sanitizedInput;
     
     // Builder pattern for complex scenarios
     public static Builder builder() {
         return new Builder();
+    }
+    
+    public static class Builder {
+        private UrlSecurityFailureType failureType;
+        private ValidationType validationType;
+        private String originalInput;
+        private String sanitizedInput;
+        private String detail;
+        private Throwable cause;
+        
+        public Builder failureType(UrlSecurityFailureType failureType) {
+            this.failureType = failureType;
+            return this;
+        }
+        
+        public Builder validationType(ValidationType validationType) {
+            this.validationType = validationType;
+            return this;
+        }
+        
+        public Builder originalInput(String originalInput) {
+            this.originalInput = originalInput;
+            return this;
+        }
+        
+        public Builder sanitizedInput(String sanitizedInput) {
+            this.sanitizedInput = sanitizedInput;
+            return this;
+        }
+        
+        public Builder detail(String detail) {
+            this.detail = detail;
+            return this;
+        }
+        
+        public Builder cause(Throwable cause) {
+            this.cause = cause;
+            return this;
+        }
+        
+        public UrlSecurityException build() {
+            return new UrlSecurityException(this);
+        }
     }
 }
 ----
@@ -248,24 +291,19 @@ package de.cuioss.tools.security.http.config;
 public interface ConfigStageProvider {
     
     /**
+     * @return The type of validation this configuration is for
+     */
+    ValidationType getValidationType();
+    
+    /**
      * @return Pre-configured length validation stage
      */
     HttpSecurityValidator getLengthValidationStage();
     
     /**
-     * @return Pre-configured character validation stage for URL paths
+     * @return Pre-configured character validation stage appropriate for the ValidationType
      */
-    HttpSecurityValidator getPathCharacterValidationStage();
-    
-    /**
-     * @return Pre-configured character validation stage for URL parameters
-     */
-    HttpSecurityValidator getParameterCharacterValidationStage();
-    
-    /**
-     * @return Pre-configured character validation stage for HTTP headers
-     */
-    HttpSecurityValidator getHeaderCharacterValidationStage();
+    HttpSecurityValidator getCharacterValidationStage();
     
     /**
      * @return Pre-configured decoding stage with security checks
@@ -281,10 +319,15 @@ public interface ConfigStageProvider {
      * @return Pre-configured pattern matching stage
      */
     HttpSecurityValidator getPatternMatchingStage();
+    
+    /**
+     * @return List of stages to use in the pipeline, in the correct order
+     */
+    List<HttpSecurityValidator> getStages();
 }
 ----
 
-=== UrlSecurityConfig Implementation
+=== Configuration Implementations
 
 [source,java]
 ----
@@ -294,14 +337,13 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
- * Base configuration for URL security validation.
+ * Base configuration with security defaults.
  * All defaults are based on OWASP guidelines and RFC specifications.
- * Implements ConfigStageProvider to provide factory methods for validation stages.
  * Implemented by: link:../../../plan.adoc#_phase_3_configuration_system[Tasks C1-C2]
  */
 @Builder
 @Value
-public class UrlSecurityConfig implements ConfigStageProvider {
+public class UrlSecurityConfig {
     
     /**
      * Maximum URL path length in characters.
@@ -363,55 +405,56 @@ public class UrlSecurityConfig implements ConfigStageProvider {
     
     @Builder.Default
     boolean rejectNullBytes = DEFAULT_REJECT_NULL_BYTES;
+}
+
+/**
+ * Configuration for URL path validation.
+ * Implements ConfigStageProvider with URL_PATH specific stages.
+ */
+@Value
+public class URLPathConfig implements ConfigStageProvider {
+    
+    UrlSecurityConfig baseConfig;
+    ValidationType validationType = ValidationType.URL_PATH;
     
     // Cached stage instances - created once, reused everywhere
     @Getter(lazy = true)
-    private final LengthValidationStage lengthValidationStage = 
-        new LengthValidationStage(this);
+    LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(baseConfig, ValidationType.URL_PATH);
     
     @Getter(lazy = true)
-    private final CharacterValidationStage pathCharacterValidationStage = 
-        new CharacterValidationStage(this, ValidationType.URL_PATH);
+    CharacterValidationStage characterValidationStage = 
+        new CharacterValidationStage(baseConfig, ValidationType.URL_PATH);
     
     @Getter(lazy = true)
-    private final CharacterValidationStage parameterCharacterValidationStage = 
-        new CharacterValidationStage(this, ValidationType.URL_PARAMETER);
+    DecodingStage decodingStage = 
+        new DecodingStage(baseConfig, ValidationType.URL_PATH);
     
     @Getter(lazy = true)
-    private final CharacterValidationStage headerCharacterValidationStage = 
-        new CharacterValidationStage(this, ValidationType.HTTP_HEADER);
+    NormalizationStage normalizationStage = 
+        new NormalizationStage(baseConfig, ValidationType.URL_PATH);
     
     @Getter(lazy = true)
-    private final DecodingStage decodingStage = 
-        new DecodingStage(this);
+    PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(baseConfig, ValidationType.URL_PATH);
     
-    @Getter(lazy = true)
-    private final NormalizationStage normalizationStage = 
-        new NormalizationStage(this);
+    public URLPathConfig(UrlSecurityConfig baseConfig) {
+        this.baseConfig = baseConfig;
+    }
     
-    @Getter(lazy = true)
-    private final PatternMatchingStage patternMatchingStage = 
-        new PatternMatchingStage(this);
+    @Override
+    public ValidationType getValidationType() {
+        return ValidationType.URL_PATH;
+    }
     
-    // ConfigStageProvider implementation methods
     @Override
     public HttpSecurityValidator getLengthValidationStage() {
         return lengthValidationStage;
     }
     
     @Override
-    public HttpSecurityValidator getPathCharacterValidationStage() {
-        return pathCharacterValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getParameterCharacterValidationStage() {
-        return parameterCharacterValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getHeaderCharacterValidationStage() {
-        return headerCharacterValidationStage;
+    public HttpSecurityValidator getCharacterValidationStage() {
+        return characterValidationStage;
     }
     
     @Override
@@ -427,6 +470,154 @@ public class UrlSecurityConfig implements ConfigStageProvider {
     @Override
     public HttpSecurityValidator getPatternMatchingStage() {
         return patternMatchingStage;
+    }
+    
+    @Override
+    public List<HttpSecurityValidator> getStages() {
+        return List.of(
+            getLengthValidationStage(),
+            getCharacterValidationStage(),
+            getDecodingStage(),
+            getNormalizationStage(),
+            getPatternMatchingStage()
+        );
+    }
+}
+
+/**
+ * Configuration for URL parameter validation.
+ * Implements ConfigStageProvider with URL_PARAMETER specific stages.
+ */
+@Value
+public class URLParameterConfig implements ConfigStageProvider {
+    
+    UrlSecurityConfig baseConfig;
+    ValidationType validationType = ValidationType.URL_PARAMETER;
+    
+    @Getter(lazy = true)
+    LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(baseConfig, ValidationType.URL_PARAMETER);
+    
+    @Getter(lazy = true)
+    CharacterValidationStage characterValidationStage = 
+        new CharacterValidationStage(baseConfig, ValidationType.URL_PARAMETER);
+    
+    @Getter(lazy = true)
+    DecodingStage decodingStage = 
+        new DecodingStage(baseConfig, ValidationType.URL_PARAMETER);
+    
+    @Getter(lazy = true)
+    PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(baseConfig, ValidationType.URL_PARAMETER);
+    
+    public URLParameterConfig(UrlSecurityConfig baseConfig) {
+        this.baseConfig = baseConfig;
+    }
+    
+    @Override
+    public ValidationType getValidationType() {
+        return ValidationType.URL_PARAMETER;
+    }
+    
+    @Override
+    public HttpSecurityValidator getLengthValidationStage() {
+        return lengthValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getCharacterValidationStage() {
+        return characterValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getDecodingStage() {
+        return decodingStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getNormalizationStage() {
+        return null; // Not used for parameters
+    }
+    
+    @Override
+    public HttpSecurityValidator getPatternMatchingStage() {
+        return patternMatchingStage;
+    }
+    
+    @Override
+    public List<HttpSecurityValidator> getStages() {
+        return List.of(
+            getLengthValidationStage(),
+            getCharacterValidationStage(),
+            getDecodingStage(),
+            getPatternMatchingStage()
+        );
+    }
+}
+
+/**
+ * Configuration for HTTP header validation.
+ * Implements ConfigStageProvider with HTTP_HEADER specific stages.
+ */
+@Value
+public class HTTPHeaderConfig implements ConfigStageProvider {
+    
+    UrlSecurityConfig baseConfig;
+    ValidationType validationType = ValidationType.HTTP_HEADER;
+    
+    @Getter(lazy = true)
+    LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(baseConfig, ValidationType.HTTP_HEADER);
+    
+    @Getter(lazy = true)
+    CharacterValidationStage characterValidationStage = 
+        new CharacterValidationStage(baseConfig, ValidationType.HTTP_HEADER);
+    
+    @Getter(lazy = true)
+    PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(baseConfig, ValidationType.HTTP_HEADER);
+    
+    public HTTPHeaderConfig(UrlSecurityConfig baseConfig) {
+        this.baseConfig = baseConfig;
+    }
+    
+    @Override
+    public ValidationType getValidationType() {
+        return ValidationType.HTTP_HEADER;
+    }
+    
+    @Override
+    public HttpSecurityValidator getLengthValidationStage() {
+        return lengthValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getCharacterValidationStage() {
+        return characterValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getDecodingStage() {
+        return null; // Not used for headers
+    }
+    
+    @Override
+    public HttpSecurityValidator getNormalizationStage() {
+        return null; // Not used for headers
+    }
+    
+    @Override
+    public HttpSecurityValidator getPatternMatchingStage() {
+        return patternMatchingStage;
+    }
+    
+    @Override
+    public List<HttpSecurityValidator> getStages() {
+        return List.of(
+            getLengthValidationStage(),
+            getCharacterValidationStage(),
+            getPatternMatchingStage()
+        );
     }
 }
 ----
@@ -456,10 +647,12 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     
     private final int maxLength;
     private final int maxDepth;
+    private final ValidationType validationType;
     
-    public LengthValidationStage(UrlSecurityConfig config) {
+    public LengthValidationStage(UrlSecurityConfig config, ValidationType validationType) {
         this.maxLength = config.getMaxPathLength();
         this.maxDepth = config.getMaxDirectoryDepth();
+        this.validationType = validationType;
     }
     
     @Override
@@ -468,6 +661,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
         if (value.length() > maxLength) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.PATH_TOO_LONG)
+                .validationType(validationType)
                 .originalInput(value)
                 .build();
         }
@@ -477,6 +671,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
         if (depth > maxDepth) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
+                .validationType(validationType)
                 .originalInput(value)
                 .build();
         }
@@ -486,7 +681,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     
     @Override
     public ValidationType getType() {
-        return ValidationType.URL_PATH;
+        return validationType;
     }
 }
 ----
@@ -500,6 +695,7 @@ package de.cuioss.tools.security.http.validation;
 import java.text.Normalizer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 /**
  * Multi-layer decoding with security checks.
@@ -508,21 +704,24 @@ import java.nio.charset.StandardCharsets;
  */
 public final class DecodingStage implements HttpSecurityValidator {
     
-    private final UrlSecurityConfig config;
-    private final Pattern doubleEncodingPattern;
+    // Static pattern shared across all instances
+    private static final Pattern DOUBLE_ENCODING_PATTERN = Pattern.compile("%25[0-9a-fA-F]{2}");
     
-    public DecodingStage(UrlSecurityConfig config) {
+    private final UrlSecurityConfig config;
+    private final ValidationType validationType;
+    
+    public DecodingStage(UrlSecurityConfig config, ValidationType validationType) {
         this.config = config;
-        // Pre-compile patterns for performance
-        this.doubleEncodingPattern = Pattern.compile("%25[0-9a-fA-F]{2}");
+        this.validationType = validationType;
     }
     
     @Override
     public String execute(String value) throws UrlSecurityException {
         // Detect double encoding before decoding
-        if (doubleEncodingPattern.matcher(value).find()) {
+        if (DOUBLE_ENCODING_PATTERN.matcher(value).find()) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.DOUBLE_ENCODING)
+                .validationType(validationType)
                 .originalInput(value)
                 .build();
         }
@@ -534,6 +733,7 @@ public final class DecodingStage implements HttpSecurityValidator {
         } catch (IllegalArgumentException e) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                .validationType(validationType)
                 .originalInput(value)
                 .cause(e)
                 .build();
@@ -546,6 +746,7 @@ public final class DecodingStage implements HttpSecurityValidator {
                 // Normalization changed the string - potential attack
                 throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED)
+                    .validationType(validationType)
                     .originalInput(value)
                     .sanitizedInput(normalized)
                     .build();
@@ -560,7 +761,7 @@ public final class DecodingStage implements HttpSecurityValidator {
     
     @Override
     public ValidationType getType() {
-        return ValidationType.URL_PATH;
+        return validationType;
     }
 }
 ----
@@ -680,6 +881,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
             if (ch == '\0') {
                 throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
+                    .validationType(validationType)
                     .originalInput(value)
                     .detail("Null byte detected at position " + i)
                     .build();
@@ -691,6 +893,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
                 if (i + 2 >= value.length()) {
                     throw UrlSecurityException.builder()
                         .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                        .validationType(validationType)
                         .originalInput(value)
                         .detail("Incomplete percent encoding at position " + i)
                         .build();
@@ -710,6 +913,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
                 if (hex1 == '0' && hex2 == '0') {
                     throw UrlSecurityException.builder()
                         .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
+                        .validationType(validationType)
                         .originalInput(value)
                         .detail("Encoded null byte (%00) detected at position " + i)
                         .build();
@@ -723,6 +927,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
             if (ch > 255 || !allowedChars.get(ch)) {
                 throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.INVALID_CHARACTER)
+                    .validationType(validationType)
                     .originalInput(value)
                     .detail(String.format("Invalid character '%c' (0x%02X) at position %d", 
                                         ch, (int)ch, i))
@@ -752,6 +957,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import lombok.Value;
 import java.nio.file.Paths;
 
 /**
@@ -760,13 +966,11 @@ import java.nio.file.Paths;
  * Immutable and thread-safe.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V2]
  */
-public final class NormalizationStage implements HttpSecurityValidator {
+@Value
+public class NormalizationStage implements HttpSecurityValidator {
     
-    private final UrlSecurityConfig config;
-    
-    public NormalizationStage(UrlSecurityConfig config) {
-        this.config = config;
-    }
+    UrlSecurityConfig config;
+    ValidationType validationType;
     
     @Override
     public String execute(String value) throws UrlSecurityException {
@@ -784,6 +988,7 @@ public final class NormalizationStage implements HttpSecurityValidator {
         if (containsPathTraversal(normalized)) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                .validationType(validationType)
                 .originalInput(original)
                 .sanitizedInput(normalized)
                 .detail("Path normalization revealed traversal attempt")
@@ -794,6 +999,7 @@ public final class NormalizationStage implements HttpSecurityValidator {
         if (escapesRoot(normalized)) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT)
+                .validationType(validationType)
                 .originalInput(original)
                 .sanitizedInput(normalized)
                 .detail("Path attempts to escape root directory")
@@ -840,6 +1046,7 @@ public final class NormalizationStage implements HttpSecurityValidator {
         if (depth > config.getMaxDirectoryDepth()) {
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
+                .validationType(validationType)
                 .originalInput(path)
                 .detail("Path depth " + depth + " exceeds maximum " + config.getMaxDirectoryDepth())
                 .build();
@@ -865,7 +1072,7 @@ public final class NormalizationStage implements HttpSecurityValidator {
     
     @Override
     public ValidationType getType() {
-        return ValidationType.URL_PATH;
+        return validationType;
     }
 }
 ----
@@ -876,6 +1083,8 @@ public final class NormalizationStage implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import java.util.regex.Pattern;
+
 /**
  * Pattern-based attack detection using pre-compiled patterns.
  * Immutable and optimized for performance.
@@ -883,76 +1092,84 @@ package de.cuioss.tools.security.http.validation;
  */
 public final class PatternMatchingStage implements HttpSecurityValidator {
     
-    // Pre-compiled patterns stored in final fields
-    private final Pattern pathTraversalPattern;
-    private final Pattern windowsTraversalPattern;
-    private final Pattern encodedTraversalPattern;
+    // Static patterns shared across all instances
+    private static final Pattern PATH_TRAVERSAL_PATTERN = Pattern.compile(
+        "(?:^|/)\\.\\.(?:/|$)"
+    );
+    private static final Pattern WINDOWS_TRAVERSAL_PATTERN = Pattern.compile(
+        "(?:^|\\\\)\\.\\.(?:\\\\|$)"
+    );
+    private static final Pattern ENCODED_TRAVERSAL_PATTERN = Pattern.compile(
+        "%(?:2e|2E)%(?:2e|2E)"
+    );
     
-    public PatternMatchingStage(UrlSecurityConfig config) {
-        // Compile all patterns during construction
-        this.pathTraversalPattern = Pattern.compile(
-            "(?:^|/)\\.\\.(?:/|$)"
-        );
-        this.windowsTraversalPattern = Pattern.compile(
-            "(?:^|\\\\)\\.\\.(?:\\\\|$)"
-        );
-        this.encodedTraversalPattern = Pattern.compile(
-            "%(?:2e|2E)%(?:2e|2E)"
-        );
+    private final ValidationType validationType;
+    
+    public PatternMatchingStage(UrlSecurityConfig config, ValidationType validationType) {
+        this.validationType = validationType;
     }
     
     @Override
     public String execute(String value) throws UrlSecurityException {
         // Check all patterns efficiently
-        if (pathTraversalPattern.matcher(value).find() ||
-            windowsTraversalPattern.matcher(value).find() ||
-            encodedTraversalPattern.matcher(value).find()) {
+        if (PATH_TRAVERSAL_PATTERN.matcher(value).find() ||
+            WINDOWS_TRAVERSAL_PATTERN.matcher(value).find() ||
+            ENCODED_TRAVERSAL_PATTERN.matcher(value).find()) {
             
             throw UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                .validationType(validationType)
                 .originalInput(value)
                 .build();
         }
         
         return value;
     }
+    
+    @Override
+    public ValidationType getType() {
+        return validationType;
+    }
 }
 ----
 
 == Pipeline Architecture
 
-=== Sequential Execution Model
+=== Unified Validation Pipeline
 
-Pipelines execute validation stages sequentially with early termination:
+A single pipeline implementation handles all validation types through configuration:
 
 [source,java]
 ----
 package de.cuioss.tools.security.http.pipeline;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
- * URL path validation pipeline.
- * Uses ConfigStageProvider interface for dependency injection.
- * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P1]
+ * Unified validation pipeline that works with any ConfigStageProvider.
+ * The validation type and stage selection is determined by the configuration.
+ * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Tasks P1-P5]
  */
-public final class URLPathValidationPipeline implements HttpSecurityValidator {
+public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     
+    private final ConfigStageProvider config;
     private final List<HttpSecurityValidator> stages;
     private final SecurityEventCounter eventCounter;
+    private final ValidationType validationType;
     
-    public URLPathValidationPipeline(ConfigStageProvider stageProvider, 
+    public UnifiedValidationPipeline(ConfigStageProvider config, 
                                     SecurityEventCounter eventCounter) {
-        // Get individual stages from provider in correct order
-        // Order is critical: Length first, then Character validation BEFORE processing
-        this.stages = List.of(
-            stageProvider.getLengthValidationStage(),          // First: prevent DoS
-            stageProvider.getPathCharacterValidationStage(),   // Second: RFC path validation
-            stageProvider.getDecodingStage(),                  // Third: decode input
-            stageProvider.getNormalizationStage(),             // Fourth: normalize paths
-            stageProvider.getPatternMatchingStage()            // Fifth: detect attacks
-        );
-        this.eventCounter = eventCounter;
+        this.config = Objects.requireNonNull(config, "Config must not be null");
+        this.eventCounter = Objects.requireNonNull(eventCounter, "EventCounter must not be null");
+        this.validationType = config.getValidationType();
+        
+        // Get stages from config - it knows which stages to use
+        this.stages = config.getStages();
+        
+        if (stages.isEmpty()) {
+            throw new IllegalArgumentException("Configuration must provide at least one stage");
+        }
     }
     
     @Override
@@ -961,15 +1178,31 @@ public final class URLPathValidationPipeline implements HttpSecurityValidator {
         
         // Sequential execution with early termination
         for (HttpSecurityValidator stage : stages) {
-            try {
-                result = stage.execute(result);
-            } catch (UrlSecurityException e) {
-                // Track security event
-                eventCounter.increment(e.getFailureType());
-                // Log via URLSecurityLogMessages
-                logSecurityEvent(e);
-                // Re-throw for caller
-                throw e;
+            if (stage != null) { // Skip null stages (not all configs use all stages)
+                try {
+                    result = stage.execute(result);
+                } catch (UrlSecurityException e) {
+                    // Add validation type to exception if not already set
+                    if (e.getValidationType() == null) {
+                        throw UrlSecurityException.builder()
+                            .failureType(e.getFailureType())
+                            .validationType(this.validationType)
+                            .originalInput(e.getOriginalInput())
+                            .sanitizedInput(e.getSanitizedInput())
+                            .detail(e.getMessage())
+                            .cause(e.getCause())
+                            .build();
+                    }
+                    
+                    // Track security event
+                    eventCounter.increment(e.getFailureType());
+                    
+                    // Log via URLSecurityLogMessages
+                    logSecurityEvent(e);
+                    
+                    // Re-throw
+                    throw e;
+                }
             }
         }
         
@@ -978,90 +1211,26 @@ public final class URLPathValidationPipeline implements HttpSecurityValidator {
     
     @Override
     public ValidationType getType() {
-        return ValidationType.URL_PATH;
-    }
-}
-
-/**
- * URL parameter validation pipeline.
- * Uses ConfigStageProvider but skips normalization stage.
- * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P2]
- */
-public final class URLParameterValidationPipeline implements HttpSecurityValidator {
-    
-    private final List<HttpSecurityValidator> stages;
-    private final SecurityEventCounter eventCounter;
-    
-    public URLParameterValidationPipeline(ConfigStageProvider stageProvider,
-                                         SecurityEventCounter eventCounter) {
-        // Parameters: validate chars before decoding, skip normalization
-        this.stages = List.of(
-            stageProvider.getLengthValidationStage(),
-            stageProvider.getParameterCharacterValidationStage(),
-            stageProvider.getDecodingStage(),
-            stageProvider.getPatternMatchingStage()
-        );
-        this.eventCounter = eventCounter;
+        return validationType;
     }
     
-    @Override
-    public String execute(String value) throws UrlSecurityException {
-        String result = value;
-        for (HttpSecurityValidator stage : stages) {
-            try {
-                result = stage.execute(result);
-            } catch (UrlSecurityException e) {
-                eventCounter.increment(e.getFailureType());
-                throw e;
-            }
+    private void logSecurityEvent(UrlSecurityException e) {
+        // Log security events based on failure type
+        CuiLogger logger = new CuiLogger(UnifiedValidationPipeline.class);
+        
+        switch (e.getFailureType()) {
+            case PATH_TRAVERSAL_DETECTED ->
+                logger.warn(URLSecurityLogMessages.WARN.PATH_TRAVERSAL_DETECTED, 
+                    e.getOriginalInput());
+            case DOUBLE_ENCODING ->
+                logger.warn(URLSecurityLogMessages.WARN.DOUBLE_ENCODING_DETECTED, 
+                    e.getOriginalInput());
+            case UNICODE_NORMALIZATION_CHANGED ->
+                logger.warn(URLSecurityLogMessages.WARN.UNICODE_ATTACK_DETECTED);
+            default ->
+                logger.error(URLSecurityLogMessages.ERROR.VALIDATION_FAILED, 
+                    e.getFailureType(), e.getMessage());
         }
-        return result;
-    }
-    
-    @Override
-    public ValidationType getType() {
-        return ValidationType.URL_PARAMETER;
-    }
-}
-
-/**
- * HTTP header validation pipeline.
- * Uses ConfigStageProvider but only needs subset of stages.
- * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P3]
- */
-public final class HTTPHeaderValidationPipeline implements HttpSecurityValidator {
-    
-    private final List<HttpSecurityValidator> stages;
-    private final SecurityEventCounter eventCounter;
-    
-    public HTTPHeaderValidationPipeline(ConfigStageProvider stageProvider,
-                                       SecurityEventCounter eventCounter) {
-        // Headers: validate RFC 7230 chars first, no decoding/normalization needed
-        this.stages = List.of(
-            stageProvider.getLengthValidationStage(),
-            stageProvider.getHeaderCharacterValidationStage(),
-            stageProvider.getPatternMatchingStage()
-        );
-        this.eventCounter = eventCounter;
-    }
-    
-    @Override
-    public String execute(String value) throws UrlSecurityException {
-        String result = value;
-        for (HttpSecurityValidator stage : stages) {
-            try {
-                result = stage.execute(result);
-            } catch (UrlSecurityException e) {
-                eventCounter.increment(e.getFailureType());
-                throw e;
-            }
-        }
-        return result;
-    }
-    
-    @Override
-    public ValidationType getType() {
-        return ValidationType.HTTP_HEADER;
     }
 }
 ----
@@ -1182,37 +1351,65 @@ public final class URLSecurityLogMessages {
 
 [source,java]
 ----
-// Create configuration with secure defaults
-UrlSecurityConfig config = UrlSecurityConfig.builder()
+// Create base configuration with secure defaults
+UrlSecurityConfig baseConfig = UrlSecurityConfig.builder()
     .maxPathLength(2048)  // Uses DEFAULT_MAX_PATH_LENGTH
     .build();
 
-// Create pipeline using ConfigStageProvider interface
-HttpSecurityValidator validator = new URLPathValidationPipeline(
-    config,  // UrlSecurityConfig implements ConfigStageProvider
-    new SecurityEventCounter()
+// Create specific configurations for different validation types
+ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
+ConfigStageProvider paramConfig = new URLParameterConfig(baseConfig);
+ConfigStageProvider headerConfig = new HTTPHeaderConfig(baseConfig);
+
+// Create unified pipelines with different configurations
+SecurityEventCounter eventCounter = new SecurityEventCounter();
+
+HttpSecurityValidator pathValidator = new UnifiedValidationPipeline(
+    pathConfig,    // URL_PATH configuration
+    eventCounter
 );
 
-// Validate input
+HttpSecurityValidator paramValidator = new UnifiedValidationPipeline(
+    paramConfig,   // URL_PARAMETER configuration  
+    eventCounter
+);
+
+HttpSecurityValidator headerValidator = new UnifiedValidationPipeline(
+    headerConfig,  // HTTP_HEADER configuration
+    eventCounter
+);
+
+// Use validators - they all share the same pipeline implementation
 try {
-    String safe = validator.execute(userInput);
-    // Use validated input
+    String safePath = pathValidator.execute("/api/users/123");
+    String safeParam = paramValidator.execute("search=test%20query");
+    String safeHeader = headerValidator.execute("Bearer abc123");
 } catch (UrlSecurityException e) {
-    // Handle security violation
-    log.warn(URLSecurityLogMessages.WARN.PATH_TRAVERSAL_DETECTED, 
-             e.getOriginalInput());
+    // Exception now includes ValidationType
+    log.warn("Security violation in {}: {} - {}", 
+        e.getValidationType(), 
+        e.getFailureType(), 
+        e.getOriginalInput());
 }
 
-// Different pipelines can use the same config provider
-HttpSecurityValidator paramValidator = new URLParameterValidationPipeline(
-    config,  // Same config, different stage selection
-    new SecurityEventCounter()
-);
-
-HttpSecurityValidator headerValidator = new HTTPHeaderValidationPipeline(
-    config,  // Same config, minimal stages
-    new SecurityEventCounter()
-);
+// Alternative: Factory pattern for cleaner creation
+public class ValidationFactory {
+    
+    private final UrlSecurityConfig baseConfig;
+    private final SecurityEventCounter eventCounter;
+    
+    public HttpSecurityValidator createValidator(ValidationType type) {
+        ConfigStageProvider config = switch (type) {
+            case URL_PATH -> new URLPathConfig(baseConfig);
+            case URL_PARAMETER -> new URLParameterConfig(baseConfig);
+            case HTTP_HEADER -> new HTTPHeaderConfig(baseConfig);
+            case HTTP_BODY -> new HTTPBodyConfig(baseConfig);
+            case COOKIE -> new CookieConfig(baseConfig);
+        };
+        
+        return new UnifiedValidationPipeline(config, eventCounter);
+    }
+}
 ----
 
 == Security Considerations
