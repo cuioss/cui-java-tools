@@ -194,55 +194,132 @@ class BooleanOperationsTest {
     }
 
     @Nested
-    @DisplayName("handle performance")
-    class PerformanceTest {
-
-        @Test
-        @DisplayName("handle large arrays efficiently")
-        void shouldHandleLargeArrays() {
-            // Create large array with random values
-            var size = Generators.integers(5000, 15000).next();
-            var largeArray = new boolean[size];
-            for (int i = 0; i < size; i++) {
-                largeArray[i] = Generators.booleans().next();
+    @DisplayName("handle random arrays with correctness verification")
+    class RandomArrayTest {
+        
+        // Helper methods to calculate expected results
+        private boolean calculateIsAnyTrue(boolean[] array) {
+            if (array == null || array.length == 0) {
+                return false;
             }
-
-            // Test isAnyTrue performance
-            assertDoesNotThrow(() -> isAnyTrue(largeArray));
-
-            // Test isAnyFalse performance
-            assertDoesNotThrow(() -> isAnyFalse(largeArray));
-
-            // Test areAllTrue performance
-            assertDoesNotThrow(() -> areAllTrue(largeArray));
-
-            // Test areAllFalse performance
-            assertDoesNotThrow(() -> areAllFalse(largeArray));
+            for (boolean value : array) {
+                if (value) return true;
+            }
+            return false;
+        }
+        
+        private boolean calculateIsAnyFalse(boolean[] array) {
+            if (array == null || array.length == 0) {
+                return false;
+            }
+            for (boolean value : array) {
+                if (!value) return true;
+            }
+            return false;
+        }
+        
+        private boolean calculateAreAllTrue(boolean[] array) {
+            if (array == null || array.length == 0) {
+                return true; // Empty arrays return true for areAllTrue
+            }
+            for (boolean value : array) {
+                if (!value) return false;
+            }
+            return true;
+        }
+        
+        private boolean calculateAreAllFalse(boolean[] array) {
+            if (array == null || array.length == 0) {
+                return false; // Empty arrays return false for areAllFalse
+            }
+            for (boolean value : array) {
+                if (value) return false;
+            }
+            return true;
         }
 
         @Test
-        @DisplayName("handle worst-case scenarios efficiently")
-        void shouldHandleWorstCaseScenarios() {
-            var size = Generators.integers(5000, 15000).next();
+        @DisplayName("verify correctness with typical varargs sizes (1-5 elements)")
+        void shouldHandleTypicalVarargsArrays() {
+            // Test multiple times with different random arrays
+            for (int iteration = 0; iteration < 20; iteration++) {
+                // Generate realistic size (1-5 elements, typical for varargs)
+                var size = Generators.integers(1, 6).next();
+                var testArray = new boolean[size];
+                
+                // Fill with random values
+                for (int i = 0; i < size; i++) {
+                    testArray[i] = Generators.booleans().next();
+                }
+                
+                // Verify isAnyTrue
+                var expectedAnyTrue = calculateIsAnyTrue(testArray);
+                var actualAnyTrue = isAnyTrue(testArray);
+                assertEquals(expectedAnyTrue, actualAnyTrue, 
+                    "isAnyTrue failed for array: " + Arrays.toString(testArray));
+                
+                // Verify isAnyFalse
+                var expectedAnyFalse = calculateIsAnyFalse(testArray);
+                var actualAnyFalse = isAnyFalse(testArray);
+                assertEquals(expectedAnyFalse, actualAnyFalse,
+                    "isAnyFalse failed for array: " + Arrays.toString(testArray));
+                
+                // Verify areAllTrue
+                var expectedAllTrue = calculateAreAllTrue(testArray);
+                var actualAllTrue = areAllTrue(testArray);
+                assertEquals(expectedAllTrue, actualAllTrue,
+                    "areAllTrue failed for array: " + Arrays.toString(testArray));
+                
+                // Verify areAllFalse
+                var expectedAllFalse = calculateAreAllFalse(testArray);
+                var actualAllFalse = areAllFalse(testArray);
+                assertEquals(expectedAllFalse, actualAllFalse,
+                    "areAllFalse failed for array: " + Arrays.toString(testArray));
+            }
+        }
 
-            // Test finding single true at end
+        @Test
+        @DisplayName("handle edge cases correctly")
+        void shouldHandleEdgeCases() {
+            // Test with typical varargs size but worst-case element positioning
+            var size = 5; // Typical varargs size
+            
+            // Test finding single true at end (worst case for isAnyTrue)
             var singleTrueAtEnd = new boolean[size];
             singleTrueAtEnd[size - 1] = true;
+            
+            assertTrue(isAnyTrue(singleTrueAtEnd), "Should find single true at end");
+            assertTrue(isAnyFalse(singleTrueAtEnd), "Should find falses before the true");
+            assertFalse(areAllTrue(singleTrueAtEnd), "Not all values are true");
+            assertFalse(areAllFalse(singleTrueAtEnd), "Not all values are false");
 
-            assertDoesNotThrow(() -> {
-                var result = isAnyTrue(singleTrueAtEnd);
-                assertTrue(result, "Should find single true at end");
-            });
-
-            // Test finding single false at end
+            // Test finding single false at end (worst case for isAnyFalse)
             var singleFalseAtEnd = new boolean[size];
             Arrays.fill(singleFalseAtEnd, true);
             singleFalseAtEnd[size - 1] = false;
-
-            assertDoesNotThrow(() -> {
-                var result = isAnyFalse(singleFalseAtEnd);
-                assertTrue(result, "Should find single false at end");
-            });
+            
+            assertTrue(isAnyTrue(singleFalseAtEnd), "Should find trues before the false");
+            assertTrue(isAnyFalse(singleFalseAtEnd), "Should find single false at end");
+            assertFalse(areAllTrue(singleFalseAtEnd), "Not all values are true");
+            assertFalse(areAllFalse(singleFalseAtEnd), "Not all values are false");
+            
+            // Test with all true
+            var allTrue = new boolean[size];
+            Arrays.fill(allTrue, true);
+            
+            assertTrue(isAnyTrue(allTrue), "Should find true values");
+            assertFalse(isAnyFalse(allTrue), "Should not find any false");
+            assertTrue(areAllTrue(allTrue), "All values are true");
+            assertFalse(areAllFalse(allTrue), "Not all values are false");
+            
+            // Test with all false
+            var allFalse = new boolean[size];
+            // Arrays are false by default
+            
+            assertFalse(isAnyTrue(allFalse), "Should not find any true");
+            assertTrue(isAnyFalse(allFalse), "Should find false values");
+            assertFalse(areAllTrue(allFalse), "Not all values are true");
+            assertTrue(areAllFalse(allFalse), "All values are false");
         }
     }
 
@@ -253,7 +330,8 @@ class BooleanOperationsTest {
         @Test
         @DisplayName("handle concurrent reads safely")
         void shouldHandleConcurrentReads() {
-            var size = Generators.integers(500, 1500).next();
+            // Use realistic varargs size
+            var size = Generators.integers(3, 6).next();
             var sharedArray = new boolean[size];
             for (int i = 0; i < size; i++) {
                 sharedArray[i] = Generators.booleans().next();

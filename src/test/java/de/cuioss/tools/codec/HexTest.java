@@ -331,11 +331,12 @@ class HexTest {
         @DisplayName("correctly encode and decode random data")
         void roundTripRandom() throws DecoderException {
             final var hex = new Hex();
+            final var random = new Random();
 
             for (int i = 0; i < 100; i++) {
                 final var size = Generators.integers(0, 256).next();
                 final var bytes = new byte[size];
-                new Random().nextBytes(bytes);
+                random.nextBytes(bytes);
 
                 final var encoded = hex.encode(bytes);
                 final var decoded = hex.decode(encoded);
