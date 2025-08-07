@@ -34,10 +34,6 @@ This document defines a comprehensive test harness design for HTTP URL path trav
 |Evaluates test outcomes
 |Security scoring, vulnerability detection, reporting
 
-|Platform Adapter
-|Handles OS-specific testing
-|Windows, Linux, macOS path conventions
-
 |===
 
 === Test Framework Structure
@@ -59,7 +55,6 @@ test-harness/
 ├── attacks/
 │   ├── cve-based/
 │   ├── encoding/
-│   ├── platform-specific/
 │   └── advanced/
 ├── reports/
 │   └── templates/
@@ -510,10 +505,6 @@ public class HttpApiSecurityTests {
 |95%
 |URL, Unicode, UTF-8, Base64, HTML entities
 
-|Platform Specific
-|100%
-|Windows, Linux, macOS, containers
-
 |HTTP Headers
 |95%
 |X-Original-URL, X-Rewrite-URL, X-Forwarded-Path
@@ -541,13 +532,13 @@ public class SecurityScoreCalculator {
         double cveScore = report.getCVEBlockRate() * 40;
         score.addComponent("CVE Protection", cveScore);
         
-        // Encoding resistance (25% weight)
-        double encodingScore = report.getEncodingBlockRate() * 25;
+        // Encoding resistance (30% weight)
+        double encodingScore = report.getEncodingBlockRate() * 30;
         score.addComponent("Encoding Resistance", encodingScore);
         
-        // Platform coverage (15% weight)
-        double platformScore = report.getPlatformCoverage() * 15;
-        score.addComponent("Platform Coverage", platformScore);
+        // HTTP method coverage (15% weight)
+        double methodScore = report.getHttpMethodCoverage() * 15;
+        score.addComponent("HTTP Method Coverage", methodScore);
         
         // False positive rate (10% weight)
         double fpScore = (1 - report.getFalsePositiveRate()) * 10;
@@ -636,7 +627,7 @@ public class PathTraversalTestConfiguration {
         return new CompositeTestDataProvider(
             new CVETestDataProvider(),
             new EncodingTestDataProvider(),
-            new PlatformTestDataProvider(),
+            new HttpMethodTestDataProvider(),
             new FuzzingTestDataProvider()
         );
     }
