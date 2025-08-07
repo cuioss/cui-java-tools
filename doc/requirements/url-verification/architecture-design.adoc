@@ -505,7 +505,7 @@ public class URLParameterConfig implements ConfigStageProvider {
     
     @Override
     public HttpSecurityValidator getNormalizationStage() {
-        return null; // Not used for parameters
+        return IdentityValidator.URL_PARAMETER; // Not used for parameters
     }
     
     @Override
@@ -567,12 +567,12 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     
     @Override
     public HttpSecurityValidator getDecodingStage() {
-        return null; // Not used for headers
+        return IdentityValidator.HTTP_HEADER; // Not used for headers
     }
     
     @Override
     public HttpSecurityValidator getNormalizationStage() {
-        return null; // Not used for headers
+        return IdentityValidator.HTTP_HEADER; // Not used for headers
     }
     
     @Override
@@ -599,6 +599,50 @@ All validation stages follow these principles:
 2. **Performance**: Pre-compiled patterns, optimized algorithms, <1ms per stage
 3. **Thread Safety**: No mutable state, safe for concurrent use
 4. **Clear Contracts**: String input/output with UrlSecurityException on violations
+
+=== IdentityValidator
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+import lombok.Getter;
+
+/**
+ * Identity validator that performs no validation - just returns the input unchanged.
+ * Used as a placeholder for stages that are not applicable to certain validation types.
+ * Thread-safe and immutable.
+ */
+public final class IdentityValidator implements HttpSecurityValidator {
+    
+    @Getter
+    private final ValidationType validationType;
+    
+    /**
+     * Singleton instances for each validation type to avoid unnecessary object creation.
+     */
+    public static final IdentityValidator URL_PATH = new IdentityValidator(ValidationType.URL_PATH);
+    public static final IdentityValidator URL_PARAMETER = new IdentityValidator(ValidationType.URL_PARAMETER);
+    public static final IdentityValidator HTTP_HEADER = new IdentityValidator(ValidationType.HTTP_HEADER);
+    public static final IdentityValidator HTTP_BODY = new IdentityValidator(ValidationType.HTTP_BODY);
+    public static final IdentityValidator COOKIE = new IdentityValidator(ValidationType.COOKIE);
+    
+    private IdentityValidator(ValidationType validationType) {
+        this.validationType = validationType;
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        // Identity function - return input unchanged
+        return value;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return validationType;
+    }
+}
+----
 
 === LengthValidationStage
 
@@ -1143,7 +1187,8 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
         
         // Sequential execution with early termination
         for (HttpSecurityValidator stage : stages) {
-            if (stage != null) { // Skip null stages (not all configs use all stages)
+            // Skip null stages and identity validators
+            if (stage != null && !(stage instanceof IdentityValidator)) {
                 try {
                     result = stage.execute(result);
                 } catch (UrlSecurityException e) {
