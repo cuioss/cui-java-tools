@@ -15,20 +15,31 @@
  */
 package de.cuioss.tools.collect;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static de.cuioss.tools.collect.PartialArrayList.emptyList;
 import static de.cuioss.tools.collect.PartialArrayList.of;
-import static de.cuioss.tools.support.Generators.randomInt;
-import static de.cuioss.tools.support.Generators.randomStrings;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class PartialArrayListTest {
 
     private static final int DEFAULT_SIZE = 10;
+
+    private static List<String> randomStrings(int count) {
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            result.add(Generators.nonEmptyStrings().next());
+        }
+        return result;
+    }
 
     @Test
     void shouldHandleEmptyList() {
@@ -50,7 +61,7 @@ class PartialArrayListTest {
     @Test
     void shouldHandleLargeLists() {
         // Larger List
-        var count = randomInt(1, 256);
+        var count = Generators.integers(1, 256).next();
         var bigger = count + 1;
 
         assertFalse(of(randomStrings(bigger), count).isEmpty());

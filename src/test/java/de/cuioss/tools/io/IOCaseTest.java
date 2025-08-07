@@ -15,7 +15,8 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link IOCase} class focusing on case sensitivity handling in file operations.
  * Based on Apache Commons IO test cases.
  */
+@EnableGeneratorController
 class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';
@@ -81,7 +83,7 @@ class IOCaseTest {
 
     @Test
     void shouldHandleCompareToEdgeCases() {
-        var testString = Generators.randomString();
+        var testString = Generators.nonEmptyStrings().next();
         assertTrue(IOCase.SENSITIVE.checkCompareTo(testString, "") > 0);
         assertTrue(IOCase.SENSITIVE.checkCompareTo("", testString) < 0);
         assertEquals(0, IOCase.SENSITIVE.checkCompareTo("", ""));
@@ -108,7 +110,7 @@ class IOCaseTest {
 
     @Test
     void shouldHandleEqualsEdgeCases() {
-        var testString = Generators.randomString();
+        var testString = Generators.nonEmptyStrings().next();
         assertFalse(IOCase.SENSITIVE.checkEquals(testString, ""));
         assertTrue(IOCase.SENSITIVE.checkEquals("", ""));
 
@@ -131,7 +133,7 @@ class IOCaseTest {
 
     @Test
     void shouldHandleStartsWithEdgeCases() {
-        var testString = Generators.randomString();
+        var testString = Generators.nonEmptyStrings().next();
         assertTrue(IOCase.SENSITIVE.checkStartsWith(testString, ""));
         assertFalse(IOCase.SENSITIVE.checkStartsWith("", testString));
         assertTrue(IOCase.SENSITIVE.checkStartsWith("", ""));

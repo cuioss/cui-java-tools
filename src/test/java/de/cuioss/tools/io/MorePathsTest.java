@@ -15,7 +15,8 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.util.List;
 import static de.cuioss.tools.io.MorePaths.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class MorePathsTest {
 
     private static final String NOT_THERE = "not.there";
@@ -59,7 +61,7 @@ class MorePathsTest {
         if (!Files.exists(playGround)) {
             Files.createDirectories(playGround);
         }
-        var stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.randomString();
+        var stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.nonEmptyStrings().next();
         playGroundBase = playGround.resolve(stamp);
         Files.createDirectories(playGroundBase);
         playGroundBackup = playGroundBase.resolve(BACKUP_DIR_NAME);

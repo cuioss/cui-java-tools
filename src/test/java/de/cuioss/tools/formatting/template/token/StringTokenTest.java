@@ -15,15 +15,17 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
+@EnableGeneratorController
 class StringTokenTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        ObjectMethodsAsserts.assertNiceObject(new StringToken(Generators.randomString()));
+        ObjectMethodsAsserts.assertNiceObject(new StringToken(Generators.nonEmptyStrings().next()));
     }
 
 }

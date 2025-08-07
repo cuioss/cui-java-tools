@@ -15,7 +15,9 @@
  */
 package de.cuioss.tools.net.ssl;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.tools.support.TestDataGenerator;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v1CertificateBuilder;
@@ -38,6 +40,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class KeyStoreProviderTest {
 
     /**
@@ -243,7 +246,7 @@ class KeyStoreProviderTest {
     @Test
     void shouldHandleKeyPasswordAsCharArray() {
 
-        var generatedKeyPassword = Generators.randomString();
+        var generatedKeyPassword = Generators.nonEmptyStrings().next();
         var provider = KeyStoreProvider.builder().keyPassword(generatedKeyPassword).keyStoreType(KeyStoreType.KEY_STORE)
                 .build();
 
@@ -260,7 +263,7 @@ class KeyStoreProviderTest {
     @Test
     void shouldHandleStorePasswordAsCharArray() {
 
-        var generatedStorePassword = Generators.randomString();
+        var generatedStorePassword = Generators.nonEmptyStrings().next();
         var provider = KeyStoreProvider.builder().storePassword(generatedStorePassword)
                 .keyStoreType(KeyStoreType.KEY_STORE).build();
 
@@ -281,7 +284,7 @@ class KeyStoreProviderTest {
         assertTrue(provider.getKeys().isEmpty());
 
         provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE)
-                .key(KeyMaterialHolder.builder().keyMaterial(Generators.generateTestData(100)).build()).build();
+                .key(KeyMaterialHolder.builder().keyMaterial(TestDataGenerator.generateTestData(100)).build()).build();
         assertEquals(1, provider.getKeys().size());
     }
 

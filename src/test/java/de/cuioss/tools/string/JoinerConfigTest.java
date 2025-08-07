@@ -15,7 +15,8 @@
  */
 package de.cuioss.tools.string;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("JoinerConfig")
+@EnableGeneratorController
 class JoinerConfigTest {
 
     @Nested
@@ -33,7 +35,7 @@ class JoinerConfigTest {
         @Test
         @DisplayName("Should build with default values")
         void shouldBuildWithDefaults() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
             var config = JoinerConfig.builder()
                     .separator(separator)
                     .build();
@@ -48,8 +50,8 @@ class JoinerConfigTest {
         @Test
         @DisplayName("Should build with custom values")
         void shouldBuildWithCustomValues() {
-            var separator = Generators.randomString();
-            var useForNull = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
+            var useForNull = Generators.nonEmptyStrings().next();
 
             var config = JoinerConfig.builder()
                     .separator(separator)
@@ -69,8 +71,8 @@ class JoinerConfigTest {
         @Test
         @DisplayName("Should support fluent API")
         void shouldSupportFluentApi() {
-            var separator = Generators.randomString();
-            var useForNull = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
+            var useForNull = Generators.nonEmptyStrings().next();
 
             var config = JoinerConfig.builder()
                     .separator(separator)
@@ -92,7 +94,7 @@ class JoinerConfigTest {
         @Test
         @DisplayName("Should handle all boolean combinations")
         void shouldHandleAllBooleanCombinations() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
 
             // Test all 8 combinations of the three boolean flags
             boolean[] values = {false, true};
@@ -119,7 +121,7 @@ class JoinerConfigTest {
         @DisplayName("Should handle null useForNull value")
         void shouldHandleNullUseForNull() {
             var config = JoinerConfig.builder()
-                    .separator(Generators.randomString())
+                    .separator(Generators.nonEmptyStrings().next())
                     .useForNull(null)
                     .build();
 
@@ -174,11 +176,11 @@ class JoinerConfigTest {
     @DisplayName("Should implement object contracts correctly")
     void shouldImplementObjectContracts() {
         var config = JoinerConfig.builder()
-                .separator(Generators.randomString())
-                .skipNulls(Generators.randomBoolean())
-                .skipEmpty(Generators.randomBoolean())
-                .skipBlank(Generators.randomBoolean())
-                .useForNull(Generators.randomString())
+                .separator(Generators.nonEmptyStrings().next())
+                .skipNulls(Generators.booleans().next())
+                .skipEmpty(Generators.booleans().next())
+                .skipBlank(Generators.booleans().next())
+                .useForNull(Generators.nonEmptyStrings().next())
                 .build();
 
         // Test equals and hashCode contracts (skip serialization as class doesn't implement Serializable)
