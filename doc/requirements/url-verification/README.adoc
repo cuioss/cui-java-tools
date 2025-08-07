@@ -5,7 +5,13 @@
 
 == Overview
 
-This documentation suite provides comprehensive analysis and design specifications for enhanced path traversal security in cui-java-tools, with a primary focus on URL/HTTP validation while maintaining support for file system operations.
+This documentation suite provides comprehensive analysis and design specifications for HTTP/URL path traversal security validation in cui-java-tools.
+
+[IMPORTANT]
+====
+This documentation describes planned HTTP/URL validation functionality that is not yet implemented in the codebase. The current `PathTraversalSecurity` class only provides file system path validation with methods `validatePathSegment()` and `createSecureTempFile()`. This documentation serves as a design specification for future HTTP/URL validation features.
+====
+
 
 == Document Index
 
@@ -24,7 +30,7 @@ link:test-harness-design.adoc[Test Harness Design]::
 Complete testing framework specification including CVE-based test vectors, encoding matrices, and automated security validation.
 
 link:architecture-design.adoc[Architecture and Design]::
-Unified security architecture for path traversal prevention across multiple contexts (URLs, files, archives) with performance optimization strategies.
+HTTP/URL path traversal security architecture leveraging Java 21+ built-in types with performance optimization strategies.
 
 == Quick Start
 
@@ -87,39 +93,16 @@ Each stage must handle:
 * Context-aware validation
 * Performance optimization
 
-== Implementation Status
-
-[cols="2,1,3"]
-|===
-|Component |Status |Notes
-
-|HTTP/URL Validation
-|In Progress
-|Core framework defined, implementation pending
-
-|File System Validation
-|Existing
-|Current PathTraversalSecurity class
-
-|Archive Validation
-|Planned
-|Zip Slip prevention patterns documented
-
-|Container Security
-|Planned
-|Docker/Kubernetes path validation
-
-|===
 
 == Contributing
 
-When updating documentation:
+When updating this documentation suite:
 
 1. Maintain cross-references between documents
-2. Update this README index when adding new documents
+2. Update this README index when adding new documents  
 3. Follow AsciiDoc formatting standards
-4. Include RFC references for standards compliance
-5. Focus on practical, implementable solutions
+4. Include RFC references for HTTP/URL standards compliance
+5. Focus on HTTP/URL-specific security patterns
 
 == References
 
@@ -135,4 +118,3 @@ When updating documentation:
 * link:https://cwe.mitre.org/data/definitions/22.html[CWE-22: Path Traversal]
 * link:https://portswigger.net/web-security/file-path-traversal[PortSwigger Web Security]
 
-_Last updated: 2025-01-06_

@@ -352,23 +352,8 @@ if (!userPath.startsWith(basePath)) {
 . **Complexity Creates Risk**: Simpler, well-understood approaches often safer
 . **Testing is Critical**: Must test with actual attack patterns
 . **Regular Updates Essential**: Libraries continuously patch vulnerabilities
-. **Context Matters**: Web vs. file system vs. cloud storage require different approaches
+. **Context Matters**: HTTP/URL validation requires specialized approaches
 
-== Future Directions
-
-=== Emerging Trends
-
-* **Formal Verification**: Mathematical proof of security properties
-* **AI-Enhanced Detection**: Machine learning for anomaly detection
-* **Container-Aware Security**: Protection in containerized environments
-* **Cloud-Native Approaches**: Object storage and serverless considerations
-
-=== Recommended Evolution
-
-1. Standardized security interfaces across libraries
-2. Built-in security by default in frameworks
-3. Automated vulnerability detection in CI/CD
-4. Improved developer education and tooling
 
 == References
 
@@ -383,5 +368,3 @@ if (!userPath.startsWith(basePath)) {
 * link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - URI Generic Syntax]
 * link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - HTTP/1.1 Message Syntax]
 
-_Document generated: 2025-01-06_
-_Based on comprehensive security research and CVE analysis_

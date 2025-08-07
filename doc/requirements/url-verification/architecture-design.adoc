@@ -8,7 +8,12 @@ link:README.adoc[← Back to Documentation Index]
 
 == Executive Summary
 
-This document presents a comprehensive architecture and design for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
+This document presents a comprehensive architecture and design specification for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
+
+[NOTE]
+====
+This document describes a design specification for planned functionality. The HTTP/URL validation classes and methods described herein are not yet implemented in the cui-java-tools codebase.
+====
 
 == Design Goals and Principles
 
@@ -941,33 +946,10 @@ public class PathSecurityMetrics {
 }
 ----
 
-== Future Enhancements
-
-=== Planned Features
-
-. **Machine Learning Integration**
-  * Anomaly detection for zero-day patterns
-  * Adaptive threat modeling
-  * Behavioral analysis
-
-. **Cloud-Native Support**
-  * S3/Azure Blob/GCS path validation
-  * Serverless function path security
-  * Container registry path validation
-
-. **Advanced Threat Intelligence**
-  * Real-time CVE feed integration
-  * Threat intelligence platform integration
-  * Automated pattern updates
-
-. **Formal Verification**
-  * Mathematical proof of security properties
-  * Model checking for validation logic
-  * Automated security proof generation
 
 == Conclusion
 
-This architecture provides a comprehensive, extensible, and performant solution for path traversal security that addresses the limitations found in existing libraries while incorporating lessons learned from real-world vulnerabilities. The design's modular nature allows for easy extension and adaptation to new threats while maintaining backward compatibility through migration adapters.
+This architecture provides a comprehensive, extensible, and performant solution for HTTP/URL path traversal security that addresses the limitations found in existing libraries while incorporating lessons learned from real-world vulnerabilities.
 
 == References
 
@@ -994,5 +976,3 @@ This architecture provides a comprehensive, extensible, and performant solution 
 * link:https://nvd.nist.gov/[National Vulnerability Database]
 * link:https://www.first.org/cvss/[Common Vulnerability Scoring System (CVSS)]
 
-_Document generated: 2025-01-06_
-_Comprehensive architecture for unified path traversal security_

@@ -176,7 +176,6 @@ Identify all potential entry points for path traversal:
 . **File Upload**
   * Filename parameters
   * Content-Type headers
-  * Archive contents (Zip Slip)
 
 === Test Cases from OWASP Guide
 
@@ -634,5 +633,3 @@ public class BodyParameterValidator {
 * link:https://www.rfc-editor.org/rfc/rfc6265[RFC 6265 - HTTP State Management Mechanism]
 * link:https://www.rfc-editor.org/rfc/rfc8941[RFC 8941 - Structured Field Values for HTTP]
 
-_Document generated: 2025-01-06_
-_Based on OWASP guidelines and real-world vulnerability research_

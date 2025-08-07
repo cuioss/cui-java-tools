@@ -798,5 +798,3 @@ public class CVEDatabaseUpdater {
 * link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - URI Generic Syntax]
 * link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - HTTP/1.1 Message Syntax]
 
-_Document generated: 2025-01-06_
-_Comprehensive test harness design for path traversal security_
