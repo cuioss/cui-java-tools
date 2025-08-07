@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.support;
 
+import de.cuioss.test.generator.Generators;
 import lombok.experimental.UtilityClass;
 
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
@@ -50,7 +51,7 @@ public class StringCaseShuffler {
         if (!Character.isAlphabetic(c)) {
             return c;
         }
-        if (Generators.randomBoolean()) {
+        if (Generators.booleans().next()) {
             return Character.toUpperCase(c);
         }
         return Character.toLowerCase(c);

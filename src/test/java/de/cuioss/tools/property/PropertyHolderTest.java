@@ -15,13 +15,13 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
 import de.cuioss.tools.property.support.ExplodingBean;
 import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
 import de.cuioss.tools.property.support.StringTypedGenericType;
-import de.cuioss.tools.support.Generators;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
@@ -66,7 +66,7 @@ class PropertyHolderTest {
         assertNotNull(underTest.getWriteMethod());
         var bean = new BeanWithReadWriteProperties();
         assertNull(underTest.readFrom(bean));
-        Integer number = Generators.randomInt(0, 1024);
+        Integer number = Generators.integers(0, 1024).next();
         assertNotNull(underTest.writeTo(bean, number));
         assertEquals(BeanWithReadWriteProperties.class, underTest.writeTo(bean, number).getClass(),
                 "Should return initial bean");
@@ -84,7 +84,7 @@ class PropertyHolderTest {
         assertNotNull(underTest.getWriteMethod());
         var bean = new BeanWithReadWriteProperties();
         assertNull(underTest.readFrom(bean));
-        Integer number = Generators.randomInt(0, 1024);
+        Integer number = Generators.integers(0, 1024).next();
         assertNotNull(underTest.writeTo(bean, number));
         assertEquals(BeanWithReadWriteProperties.class, underTest.writeTo(bean, number).getClass(),
                 "Should return initial bean");
@@ -115,7 +115,7 @@ class PropertyHolderTest {
         assertEquals(PROPERTY_NAME, underTest.getName());
         assertEquals(Integer.class, underTest.getType());
         assertNull(underTest.getWriteMethod());
-        Integer number = Generators.randomInt(0, 1024);
+        Integer number = Generators.integers(0, 1024).next();
         assertNotNull(underTest.writeTo(bean, number));
         assertEquals(BeanWithBuilderStyleAccessor.class, underTest.writeTo(bean, number).getClass(),
                 "Should return initial bean");

@@ -15,7 +15,7 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ class MorePathsTest {
         if (!Files.exists(playGround)) {
             Files.createDirectories(playGround);
         }
-        var stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.randomString();
+        var stamp = FILE_SUFFIX_DATEFORMAT.format(new Date()) + Generators.nonEmptyStrings().next();
         playGroundBase = playGround.resolve(stamp);
         Files.createDirectories(playGroundBase);
         playGroundBackup = playGroundBase.resolve(BACKUP_DIR_NAME);

@@ -15,7 +15,7 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.tools.support.TestDataGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -38,7 +38,7 @@ class IOStreamsTest {
 
     private static final int FILE_SIZE = 1024 * 4 + 1;
 
-    private final byte[] inData = Generators.generateTestData(FILE_SIZE);
+    private final byte[] inData = TestDataGenerator.generateTestData(FILE_SIZE);
 
     @Test
     void contentEqualsInputStreamInputStream() throws Exception {

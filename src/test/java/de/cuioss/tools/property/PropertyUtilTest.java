@@ -15,13 +15,13 @@
  */
 package de.cuioss.tools.property;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.tools.property.support.BeanForTestingTypeResolving;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithPrimitives;
 import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
 import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
 import de.cuioss.tools.property.support.ExplodingBean;
-import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.StringCaseShuffler;
 import org.junit.jupiter.api.Test;
 
@@ -119,7 +119,7 @@ class PropertyUtilTest {
         var name = StringCaseShuffler.shuffleCase("url");
         assertNull(readProperty(underTest, name));
 
-        var value = Generators.randomString();
+        var value = Generators.nonEmptyStrings().next();
         writeProperty(underTest, name, value);
         assertEquals(value, readProperty(underTest, name));
     }

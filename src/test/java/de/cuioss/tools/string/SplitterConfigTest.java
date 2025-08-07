@@ -15,7 +15,7 @@
  */
 package de.cuioss.tools.string;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,7 +35,7 @@ class SplitterConfigTest {
         @Test
         @DisplayName("Should build with default values")
         void shouldBuildWithDefaults() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
             var config = SplitterConfig.builder()
                     .separator(separator)
                     .build();
@@ -51,8 +51,8 @@ class SplitterConfigTest {
         @Test
         @DisplayName("Should build with custom values")
         void shouldBuildWithCustomValues() {
-            var separator = Generators.randomString();
-            var maxItems = Generators.randomInt(1, 100);
+            var separator = Generators.nonEmptyStrings().next();
+            var maxItems = Generators.integers(1, 100).next();
             var pattern = Pattern.compile("[,;]");
 
             var config = SplitterConfig.builder()
@@ -75,7 +75,7 @@ class SplitterConfigTest {
         @Test
         @DisplayName("Should support fluent API")
         void shouldSupportFluentApi() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
 
             var config = SplitterConfig.builder()
                     .separator(separator)
@@ -95,7 +95,7 @@ class SplitterConfigTest {
         @Test
         @DisplayName("Should handle all boolean combinations")
         void shouldHandleAllBooleanCombinations() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
 
             // Test all combinations of boolean flags
             boolean[] values = {false, true};
@@ -121,7 +121,7 @@ class SplitterConfigTest {
         @Test
         @DisplayName("Should handle maxItems variations")
         void shouldHandleMaxItemsVariations() {
-            var separator = Generators.randomString();
+            var separator = Generators.nonEmptyStrings().next();
             int[] maxItemsValues = {-1, 0, 1, 5, 100, Integer.MAX_VALUE};
 
             for (int maxItems : maxItemsValues) {
@@ -138,7 +138,7 @@ class SplitterConfigTest {
         @DisplayName("Should handle null pattern")
         void shouldHandleNullPattern() {
             var config = SplitterConfig.builder()
-                    .separator(Generators.randomString())
+                    .separator(Generators.nonEmptyStrings().next())
                     .pattern(null)
                     .build();
 
@@ -175,7 +175,7 @@ class SplitterConfigTest {
             for (String regex : regexPatterns) {
                 var pattern = Pattern.compile(regex);
                 var config = SplitterConfig.builder()
-                        .separator(Generators.randomString())
+                        .separator(Generators.nonEmptyStrings().next())
                         .pattern(pattern)
                         .build();
 
@@ -188,7 +188,7 @@ class SplitterConfigTest {
         void shouldHandlePatternFlags() {
             var pattern = Pattern.compile("[a-z]+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
             var config = SplitterConfig.builder()
-                    .separator(Generators.randomString())
+                    .separator(Generators.nonEmptyStrings().next())
                     .pattern(pattern)
                     .build();
 
@@ -205,7 +205,7 @@ class SplitterConfigTest {
         @DisplayName("Should create identical copy")
         void shouldCreateIdenticalCopy() {
             var original = SplitterConfig.builder()
-                    .separator(Generators.randomString())
+                    .separator(Generators.nonEmptyStrings().next())
                     .omitEmptyStrings(true)
                     .trimResults(true)
                     .maxItems(10)
@@ -284,11 +284,11 @@ class SplitterConfigTest {
     @DisplayName("Should implement object contracts correctly")
     void shouldImplementObjectContracts() {
         var config = SplitterConfig.builder()
-                .separator(Generators.randomString())
-                .omitEmptyStrings(Generators.randomBoolean())
-                .trimResults(Generators.randomBoolean())
-                .maxItems(Generators.randomInt(1, 100))
-                .doNotModifySeparatorString(Generators.randomBoolean())
+                .separator(Generators.nonEmptyStrings().next())
+                .omitEmptyStrings(Generators.booleans().next())
+                .trimResults(Generators.booleans().next())
+                .maxItems(Generators.integers(1, 100).next())
+                .doNotModifySeparatorString(Generators.booleans().next())
                 .pattern(Pattern.compile("[,;]"))
                 .build();
 
