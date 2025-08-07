@@ -81,62 +81,194 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * Enumeration of URL security validation failure types
+ */
+public enum UrlSecurityFailureType {
+    INVALID_ENCODING("Invalid URL encoding detected"),
+    DOUBLE_ENCODING("Double URL encoding detected"),
+    PATH_TRAVERSAL("Path traversal pattern detected"),
+    MALFORMED_URI("Malformed URI syntax"),
+    CONTROL_CHARACTERS("Control characters detected"),
+    NULL_BYTE_INJECTION("Null byte injection detected");
+    
+    private final String description;
+    
+    UrlSecurityFailureType(String description) {
+        this.description = description;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+}
+
+/**
+ * Runtime exception for URL security violations
+ */
+public class UrlSecurityException extends RuntimeException {
+    private final UrlSecurityFailureType failureType;
+    private final String originalValue;
+    private final String decodedValue;
+    
+    public UrlSecurityException(UrlSecurityFailureType failureType, String originalValue, String decodedValue) {
+        super(failureType.getDescription() + ": " + originalValue);
+        this.failureType = failureType;
+        this.originalValue = originalValue;
+        this.decodedValue = decodedValue;
+    }
+    
+    public UrlSecurityException(UrlSecurityFailureType failureType, String originalValue, String decodedValue, Throwable cause) {
+        super(failureType.getDescription() + ": " + originalValue, cause);
+        this.failureType = failureType;
+        this.originalValue = originalValue;
+        this.decodedValue = decodedValue;
+    }
+    
+    public UrlSecurityFailureType getFailureType() {
+        return failureType;
+    }
+    
+    public String getOriginalValue() {
+        return originalValue;
+    }
+    
+    public String getDecodedValue() {
+        return decodedValue;
+    }
+}
+
+/**
+ * Utility class for secure URL decoding operations
+ */
+public final class UrlDecodingTools {
+    
+    private UrlDecodingTools() {
+        // Utility class
+    }
+    
+    /**
+     * Safely decodes a URL-encoded string with security validation
+     * 
+     * @param encodedValue the URL-encoded string to decode
+     * @return the decoded string
+     * @throws UrlSecurityException if security violations are detected
+     */
+    public static String getDecodedValue(String encodedValue) {
+        if (encodedValue == null) {
+            return null;
+        }
+        
+        String decoded;
+        try {
+            // First decode
+            decoded = URLDecoder.decode(encodedValue, StandardCharsets.UTF_8);
+            
+            // Check for double encoding by attempting second decode
+            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            if (!decoded.equals(doubleDecoded)) {
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.DOUBLE_ENCODING,
+                    encodedValue,
+                    decoded
+                );
+            }
+            
+            // Check for null bytes
+            if (decoded.contains("\0")) {
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.NULL_BYTE_INJECTION,
+                    encodedValue,
+                    decoded
+                );
+            }
+            
+            // Check for control characters
+            if (decoded.matches(".*[\\x00-\\x1f].*")) {
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.CONTROL_CHARACTERS,
+                    encodedValue,
+                    decoded
+                );
+            }
+            
+        } catch (IllegalArgumentException e) {
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.INVALID_ENCODING,
+                encodedValue,
+                null,
+                e
+            );
+        }
+        
+        return decoded;
+    }
+}
+
+/**
  * HTTP URL path validator using Java 21 built-in types
  */
 public final class HttpUrlValidator {
     
     /**
      * Validates an HTTP URL path using Java's built-in validation
+     * 
+     * @param urlPath the URL path to validate
+     * @return the validated and normalized path
+     * @throws UrlSecurityException if validation fails
      */
-    public ValidationResult validateUrlPath(String urlPath) {
-        // Step 1: Decode using Java's URLDecoder
-        String decoded = URLDecoder.decode(urlPath, StandardCharsets.UTF_8);
+    public String validateUrlPath(String urlPath) {
+        // Step 1: Decode using secure utility
+        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
         
-        // Step 2: Check for double encoding (security issue)
-        if (hasDoubleEncoding(urlPath, decoded)) {
-            return ValidationResult.blocked("Double encoding detected");
-        }
-        
-        // Step 3: Use Java's URI for RFC 3986 validation and normalization
+        // Step 2: Use Java's URI for RFC 3986 validation and normalization
         try {
             // Create URI with just the path component for validation
             URI uri = new URI(null, null, null, -1, decoded, null, null);
             String normalized = uri.normalize().getPath();
             
-            // Step 4: Check if normalization revealed traversal
+            // Step 3: Check if normalization revealed traversal
             if (normalized != null && !normalized.equals(decoded)) {
                 if (normalized.contains("..")) {
-                    return ValidationResult.blocked("Path traversal detected after normalization");
+                    throw new UrlSecurityException(
+                        UrlSecurityFailureType.PATH_TRAVERSAL,
+                        urlPath,
+                        decoded
+                    );
                 }
             }
             
-            // Step 5: Use conditional checks (pattern matching with guards requires preview features)
+            // Step 4: Check for direct path traversal patterns
             if (decoded.contains("..")) {
-                return ValidationResult.blocked("Direct traversal pattern");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    urlPath,
+                    decoded
+                );
             }
             if (decoded.contains("./")) {
-                return ValidationResult.blocked("Current directory reference");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    urlPath,
+                    decoded
+                );
             }
             if (decoded.contains("//")) {
-                return ValidationResult.blocked("Double slash pattern");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    urlPath,
+                    decoded
+                );
             }
-            if (decoded.matches(".*[\\x00-\\x1f].*")) {
-                return ValidationResult.blocked("Control characters detected");
-            }
-            return ValidationResult.allowed();
+            
+            return normalized != null ? normalized : decoded;
             
         } catch (URISyntaxException e) {
-            return ValidationResult.blocked("Invalid URI syntax: " + e.getMessage());
-        }
-    }
-    
-    
-    private boolean hasDoubleEncoding(String original, String decoded) {
-        try {
-            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            return !decoded.equals(doubleDecoded);
-        } catch (IllegalArgumentException e) {
-            return false;
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.MALFORMED_URI,
+                urlPath,
+                decoded,
+                e
+            );
         }
     }
 }
@@ -165,105 +297,96 @@ public class HttpValidationPipeline {
         Pattern.CASE_INSENSITIVE
     );
     
-    public sealed interface ValidationResult 
-        permits Allowed, Blocked {
-        
-        record Allowed() implements ValidationResult {}
-        record Blocked(String reason) implements ValidationResult {}
-    }
-    
-    public ValidationResult validate(String urlPath) {
+    /**
+     * Validates a URL path through the complete pipeline
+     * 
+     * @param urlPath the URL path to validate
+     * @return the validated and normalized path
+     * @throws UrlSecurityException if validation fails at any stage
+     */
+    public String validate(String urlPath) {
         // Stage 1: URL Decoding with Java's URLDecoder
-        var decoded = decodeUrl(urlPath);
-        if (decoded instanceof DecodingResult.Failed failed) {
-            return new Blocked(failed.reason());
-        }
+        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
         
         // Stage 2: URI Normalization with Java's URI class
-        var normalized = normalizeUri(((DecodingResult.Success) decoded).value());
-        if (normalized instanceof NormalizationResult.Failed failed) {
-            return new Blocked(failed.reason());
-        }
+        String normalized = normalizeUri(decoded, urlPath);
         
         // Stage 3: Pattern-based validation using Java regex
-        var validated = validatePatterns(((NormalizationResult.Success) normalized).value());
-        if (validated instanceof Blocked) {
-            return validated;
-        }
+        validatePatterns(normalized, urlPath);
         
         // Stage 4: Semantic validation
-        return validateSemantics(((NormalizationResult.Success) normalized).value());
+        validateSemantics(normalized, urlPath);
+        
+        return normalized;
     }
     
-    private DecodingResult decodeUrl(String input) {
-        try {
-            String decoded = URLDecoder.decode(input, StandardCharsets.UTF_8);
-            
-            // Check for double encoding
-            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            if (!decoded.equals(doubleDecoded)) {
-                return new DecodingResult.Failed("Double encoding detected");
-            }
-            
-            return new DecodingResult.Success(decoded);
-        } catch (IllegalArgumentException e) {
-            return new DecodingResult.Failed("Invalid URL encoding");
-        }
-    }
-    
-    private NormalizationResult normalizeUri(String path) {
+    private String normalizeUri(String path, String originalPath) {
         try {
             // Create URI with path component only
             URI uri = new URI(null, null, null, -1, path, null, null);
             String normalized = uri.normalize().getPath();
             
             if (normalized == null) {
-                return new NormalizationResult.Failed("Invalid path");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.MALFORMED_URI,
+                    originalPath,
+                    path
+                );
             }
             
             // Check if normalization changed the path (potential traversal)
             if (!normalized.equals(path) && normalized.contains("..")) {
-                return new NormalizationResult.Failed("Path traversal via normalization");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    originalPath,
+                    path
+                );
             }
             
-            return new NormalizationResult.Success(normalized);
+            return normalized;
         } catch (URISyntaxException e) {
-            return new NormalizationResult.Failed("Invalid URI syntax");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.MALFORMED_URI,
+                originalPath,
+                path,
+                e
+            );
         }
     }
     
-    private ValidationResult validatePatterns(String path) {
+    private void validatePatterns(String path, String originalPath) {
         if (TRAVERSAL_PATTERN.matcher(path).find()) {
-            return new Blocked("Traversal pattern detected");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalPath,
+                path
+            );
         }
-        return new Allowed();
     }
     
-    private ValidationResult validateSemantics(String path) {
+    private void validateSemantics(String path, String originalPath) {
         // Semantic validation using simple conditionals
         if (path.startsWith("/admin")) {
-            return new Blocked("Admin path access denied");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalPath,
+                path
+            );
         }
         if (path.contains("WEB-INF")) {
-            return new Blocked("Protected directory access");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalPath,
+                path
+            );
         }
         if (path.contains("META-INF")) {
-            return new Blocked("Protected directory access");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalPath,
+                path
+            );
         }
-        return new Allowed();
-    }
-    
-    // Java 21 sealed classes for type-safe results
-    private sealed interface DecodingResult 
-        permits DecodingResult.Success, DecodingResult.Failed {
-        record Success(String value) implements DecodingResult {}
-        record Failed(String reason) implements DecodingResult {}
-    }
-    
-    private sealed interface NormalizationResult 
-        permits NormalizationResult.Success, NormalizationResult.Failed {
-        record Success(String value) implements NormalizationResult {}
-        record Failed(String reason) implements NormalizationResult {}
     }
 }
 ----
@@ -412,55 +535,69 @@ public class AttackPatternDetector {
 ----
 public class URLParameterValueValidator {
     
-    // RFC 3986 query component validation with comprehensive checks
-    public ValidationResult validateQueryParameter(String name, String value) {
+    /**
+     * Validates and decodes an HTTP query parameter
+     * 
+     * @param name the parameter name
+     * @param value the parameter value
+     * @return the validated and decoded parameter value
+     * @throws UrlSecurityException if validation fails
+     */
+    public String validateQueryParameter(String name, String value) {
         // 1. Validate parameter name (RFC 7230 token)
         if (!isValidParameterName(name)) {
-            return ValidationResult.blocked("Invalid parameter name: " + name);
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.INVALID_ENCODING,
+                value,
+                null
+            );
         }
         
-        // 2. Check raw value for suspicious patterns before decoding
-        if (hasDoubleEncoding(value)) {
-            return ValidationResult.blocked("Double encoding detected in: " + name);
-        }
+        // 2. Decode the parameter value using secure utility
+        String decoded = UrlDecodingTools.getDecodedValue(value);
         
-        // 3. Decode the parameter value
-        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
-        
-        // 4. Validate based on parameter context
+        // 3. Validate based on parameter context
         if (isURLParameter(name)) {
-            return validateURLValue(name, decoded);
+            return validateURLValue(name, decoded, value);
         } else if (isNumericParameter(name)) {
-            return validateNumericValue(name, decoded);
+            return validateNumericValue(name, decoded, value);
         }
         
-        // 5. Generic validation for all parameters
-        return validateGenericValue(name, decoded);
+        // 4. Generic validation for all parameters
+        return validateGenericValue(name, decoded, value);
     }
     
-    private ValidationResult validateGenericValue(String name, String value) {
+    private String validateGenericValue(String name, String value, String originalValue) {
         // Path traversal patterns
         if (containsPathTraversal(value)) {
-            return ValidationResult.blocked("Path traversal in: " + name);
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalValue,
+                value
+            );
         }
         
-        // Null byte injection
-        if (value.contains("\0")) {
-            return ValidationResult.blocked("Null byte in: " + name);
-        }
-        
-        return ValidationResult.allowed();
+        // Null byte injection already checked in UrlDecodingTools
+        return value;
     }
     
-    private ValidationResult validateURLValue(String name, String value) {
+    private String validateURLValue(String name, String value, String originalValue) {
         // Check for javascript: protocol
         if (value.toLowerCase().startsWith("javascript:")) {
-            return ValidationResult.blocked("JavaScript protocol in: " + name);
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalValue,
+                value
+            );
         }
         
         // Check for data: protocol (potential XSS)
         if (value.toLowerCase().startsWith("data:")) {
-            return ValidationResult.blocked("Data protocol in: " + name);
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                originalValue,
+                value
+            );
         }
         
         // Validate URL format
@@ -469,13 +606,27 @@ public class URLParameterValueValidator {
             // Check for non-HTTP protocols
             String protocol = url.getProtocol();
             if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
-                return ValidationResult.blocked("Only HTTP/HTTPS protocols allowed: " + name);
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    originalValue,
+                    value
+                );
             }
         } catch (MalformedURLException e) {
-            return ValidationResult.blocked("Invalid URL format: " + name);
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.MALFORMED_URI,
+                originalValue,
+                value,
+                e
+            );
         }
         
-        return ValidationResult.allowed();
+        return value;
+    }
+    
+    private String validateNumericValue(String name, String value, String originalValue) {
+        // Implementation for numeric parameter validation
+        return value;
     }
     
     private boolean isValidParameterName(String name) {
@@ -660,29 +811,39 @@ public class RFC7230Validator {
 ----
 public class URLPathSecurityValidator {
     
-    public ValidationResult validateURLPath(String urlPath) {
-        // Decode URL encoding
-        String decoded = URLDecoder.decode(urlPath, StandardCharsets.UTF_8);
-        
-        // Check for double encoding
-        if (hasDoubleEncoding(urlPath)) {
-            return ValidationResult.blocked("Double encoding detected");
-        }
+    /**
+     * Validates a URL path for security issues
+     * 
+     * @param urlPath the URL path to validate
+     * @return the validated and decoded URL path
+     * @throws UrlSecurityException if validation fails
+     */
+    public String validateURLPath(String urlPath) {
+        // Decode URL encoding using secure utility
+        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
         
         // Validate URL path components
         String[] segments = decoded.split("/");
         for (String segment : segments) {
             if (isTraversalSegment(segment)) {
-                return ValidationResult.blocked("Path traversal in URL");
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.PATH_TRAVERSAL,
+                    urlPath,
+                    decoded
+                );
             }
         }
         
         // Check for URL-specific attacks
         if (hasURLAttackPattern(decoded)) {
-            return ValidationResult.blocked("URL attack pattern detected");
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL,
+                urlPath,
+                decoded
+            );
         }
         
-        return ValidationResult.allowed();
+        return decoded;
     }
     
 }
