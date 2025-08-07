@@ -254,75 +254,37 @@ public class SecureFileAccess {
 }
 ```
 
-=== Container and Isolation Strategies
+=== Web Application Security Headers
 
-==== Chroot Jail Implementation
-```bash
-# Create chroot environment
-chroot /var/www/sandbox /usr/bin/app
-
-# Application sees /var/www/sandbox as root
-# Cannot access files outside sandbox
-```
-
-==== Docker Container Isolation
-```dockerfile
-FROM openjdk:11-slim
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-# Set restricted directory
-WORKDIR /app
-# Copy only necessary files
-COPY --chown=appuser:appuser ./target/app.jar .
-# Run as non-root
-USER appuser
-# Minimal permissions
-RUN chmod 400 /app/app.jar
-```
-
-== Real-World Attack Patterns and Prevention
-
-=== Zip Slip Prevention
-
-The Zip Slip vulnerability (affecting thousands of projects) demonstrates archive extraction risks:
-
-==== Vulnerable Pattern
+==== Security Headers for Path Traversal Prevention
 ```java
-// VULNERABLE CODE - DO NOT USE
-Enumeration<ZipEntry> entries = zip.getEntries();
-while (entries.hasMoreElements()) {
-    ZipEntry entry = entries.nextElement();
-    File file = new File(destinationDir, entry.getName()); // VULNERABLE
-    // ... extract file
-}
-```
-
-==== Secure Implementation
-```java
-// SECURE IMPLEMENTATION
-public void extractZip(ZipFile zip, Path destinationDir) throws IOException {
-    Enumeration<ZipEntry> entries = zip.entries();
-    while (entries.hasMoreElements()) {
-        ZipEntry entry = entries.nextElement();
+public class SecurityHeaderFilter implements Filter {
+    
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, 
+                        FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         
-        // Validate entry name
-        Path entryPath = destinationDir.resolve(entry.getName()).normalize();
-        if (!entryPath.startsWith(destinationDir)) {
-            throw new SecurityException("Zip entry escapes target directory");
-        }
+        // Prevent directory listing
+        httpResponse.setHeader("X-Content-Type-Options", "nosniff");
         
-        // Safe extraction
-        if (entry.isDirectory()) {
-            Files.createDirectories(entryPath);
-        } else {
-            Files.createDirectories(entryPath.getParent());
-            try (InputStream is = zip.getInputStream(entry)) {
-                Files.copy(is, entryPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-        }
+        // Prevent clickjacking that might bypass path controls
+        httpResponse.setHeader("X-Frame-Options", "DENY");
+        
+        // Content Security Policy to limit resource loading
+        httpResponse.setHeader("Content-Security-Policy", 
+            "default-src 'self'; script-src 'self'; object-src 'none';");
+        
+        // Strict Transport Security
+        httpResponse.setHeader("Strict-Transport-Security", 
+            "max-age=31536000; includeSubDomains");
+        
+        chain.doFilter(request, response);
     }
 }
 ```
+
+== Real-World Attack Patterns and Prevention
 
 === URL Path Validation
 
@@ -536,7 +498,7 @@ public class BodyParameterValidator {
         
         // Validate against content-type specific rules
         if (isFilePathParameter(name)) {
-            return validateFilePath(decoded);
+            return validateFilePath(name, decoded);
         }
         
         return ValidationResult.allowed();
@@ -577,7 +539,7 @@ public class BodyParameterValidator {
     }
     
     // Multipart form data validation (file uploads)
-    public ValidationResult validateMultipartParameter(Part part) {
+    public ValidationResult validateMultipartParameter(Part part) throws IOException {
         String filename = extractFilename(part);
         
         if (filename != null) {
@@ -594,9 +556,11 @@ public class BodyParameterValidator {
         
         // Validate content if it's text-based
         if (isTextContent(part.getContentType())) {
-            String content = new String(part.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (containsPathTraversal(content)) {
-                return ValidationResult.blocked("Path traversal in file content");
+            try (InputStream is = part.getInputStream()) {
+                String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                if (containsPathTraversal(content)) {
+                    return ValidationResult.blocked("Path traversal in file content");
+                }
             }
         }
         

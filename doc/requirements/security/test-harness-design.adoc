@@ -149,7 +149,7 @@ public class HTTPEncodingTestMatrix {
         ENCODED_HASH("%23")
     }
     
-    public static String generateEncodedPath(String basePath, EncodingType encoding) {
+    public static String generateEncodedPath(String basePath, HTTPEncodingType encoding) {
         // Implementation for each encoding type
         switch(encoding) {
             case URL_SINGLE:
@@ -243,8 +243,8 @@ public abstract class PathTraversalSecurityTest {
     @Test
     public void testEncodingVariants() {
         String basePath = "../../../etc/passwd";
-        for (EncodingType encoding : EncodingType.values()) {
-            String encoded = EncodingTestMatrix.generateEncodedPath(basePath, encoding);
+        for (HTTPEncodingType encoding : HTTPEncodingType.values()) {
+            String encoded = HTTPEncodingTestMatrix.generateEncodedPath(basePath, encoding);
             assertThrows(
                 SecurityException.class,
                 () -> validator.validatePath(encoded),
@@ -279,50 +279,50 @@ public abstract class PathTraversalSecurityTest {
 }
 ```
 
-=== Archive Extraction Test Suite
+=== HTTP Parameter Attack Test Suite
 
 ```java
-public class ZipSlipTestSuite {
+public class HttpParameterAttackTestSuite {
     
     @Test
-    public void testMaliciousZipExtraction() throws IOException {
-        // Create malicious zip
-        Path maliciousZip = createMaliciousZip();
-        Path targetDir = Files.createTempDirectory("extract-test");
+    public void testMaliciousHttpHeaders() {
+        // Test malicious HTTP header patterns
+        String[] maliciousHeaders = {
+            "X-Original-URL: /../../../admin",
+            "X-Rewrite-URL: /../../etc/passwd",
+            "X-Forwarded-Path: %2e%2e%2f%2e%2e%2f"
+        };
         
-        // Test extraction
-        ArchiveExtractor extractor = new SecureArchiveExtractor();
+        HttpHeaderValidator validator = new HttpHeaderValidator();
         
-        assertThrows(
-            SecurityException.class,
-            () -> extractor.extract(maliciousZip, targetDir),
-            "Failed to detect Zip Slip attack"
-        );
-        
-        // Verify no files escaped
-        assertTrue(containsOnlyInDirectory(targetDir));
+        for (String header : maliciousHeaders) {
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validateHeader(header),
+                "Failed to detect malicious header: " + header
+            );
+        }
     }
     
-    private Path createMaliciousZip() throws IOException {
-        Path zipFile = Files.createTempFile("malicious", ".zip");
-        try (ZipOutputStream zos = new ZipOutputStream(
-                Files.newOutputStream(zipFile))) {
-            
-            // Add malicious entries
-            String[] maliciousNames = {
-                "../../../../tmp/evil.sh",
-                "../../passwords.txt",
-                "../../../.ssh/authorized_keys"
-            };
-            
-            for (String name : maliciousNames) {
-                ZipEntry entry = new ZipEntry(name);
-                zos.putNextEntry(entry);
-                zos.write("malicious content".getBytes());
-                zos.closeEntry();
-            }
-        }
-        return zipFile;
+    @Test
+    public void testUrlParameterInjection() {
+        // Test URL parameter injection patterns
+        Map<String, String> maliciousParams = Map.of(
+            "file", "../../../etc/passwd",
+            "path", "%2e%2e%2f%2e%2e%2f",
+            "doc", "..\\..\\windows\\system32",
+            "page", "%252e%252e%252f"
+        );
+        
+        UrlParameterValidator validator = new UrlParameterValidator();
+        
+        maliciousParams.forEach((name, value) -> {
+            assertThrows(
+                SecurityException.class,
+                () -> validator.validateParameter(name, value),
+                "Failed to detect injection in parameter: " + name
+            );
+        });
     }
 }
 ```
@@ -381,7 +381,8 @@ public class PathValidationBenchmark {
 ```java
 public class WebAttackSimulator {
     
-    private MockHttpServletRequest request;
+    // Simulated HTTP request for testing
+    private HttpServletRequest request;
     private PathTraversalFilter filter;
     
     @Test
@@ -395,8 +396,8 @@ public class WebAttackSimulator {
         };
         
         for (String param : attackParams) {
-            request = new MockHttpServletRequest();
-            request.setQueryString(param);
+            // Create test request with malicious parameters
+            request = createTestRequest(param);
             
             assertThrows(
                 SecurityException.class,
@@ -408,78 +409,77 @@ public class WebAttackSimulator {
     
     @Test
     public void simulateFileUploadAttack() {
-        MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "../../webapps/ROOT/shell.jsp",
-            "application/octet-stream",
-            "<%@ page import=\"java.io.*\" %>".getBytes()
-        );
+        // Simulate malicious file upload
+        String maliciousFilename = "../../webapps/ROOT/shell.jsp";
+        String maliciousContent = "<%@ page import=\"java.io.*\" %>";
+        byte[] contentBytes = maliciousContent.getBytes();
         
         FileUploadValidator validator = new FileUploadValidator();
         assertThrows(
             SecurityException.class,
-            () -> validator.validateUpload(file),
+            () -> validator.validateUpload(maliciousFilename, contentBytes),
             "Failed to block malicious file upload"
         );
     }
     
     @Test
     public void simulateCookieAttack() {
-        Cookie maliciousCookie = new Cookie(
-            "path", 
-            Base64.encode("../../../etc/passwd")
+        // Simulate malicious cookie
+        String cookieName = "path";
+        String cookieValue = Base64.getEncoder().encodeToString(
+            "../../../etc/passwd".getBytes()
         );
         
         CookieValidator validator = new CookieValidator();
         assertThrows(
             SecurityException.class,
-            () -> validator.validate(maliciousCookie),
+            () -> validator.validate(cookieName, cookieValue),
             "Failed to detect path traversal in cookie"
         );
     }
 }
 ```
 
-=== Container Escape Simulator
+=== HTTP API Endpoint Security Tests
 
 ```java
-public class ContainerEscapeSimulator {
+public class HttpApiSecurityTests {
     
     @Test
-    public void testDockerEscapePatterns() {
-        String[] escapePatterns = {
-            "/proc/1/root/etc/shadow",
-            "/proc/self/root/etc/passwd",
-            "/sys/kernel/vmcoreinfo",
-            "/../../../../../../../host/etc/passwd"
+    public void testRestApiPathTraversal() {
+        String[] apiPatterns = {
+            "/api/v1/files/../../../etc/passwd",
+            "/api/resources/%2e%2e%2fadmin",
+            "/api/download?file=../../config/db.properties",
+            "/api/data/..;/admin/users"
         };
         
-        ContainerPathValidator validator = new ContainerPathValidator();
+        RestApiValidator validator = new RestApiValidator();
         
-        for (String pattern : escapePatterns) {
+        for (String pattern : apiPatterns) {
             assertThrows(
                 SecurityException.class,
-                () -> validator.validateContainerPath(pattern),
-                "Failed to prevent container escape: " + pattern
+                () -> validator.validateApiPath(pattern),
+                "Failed to prevent API path traversal: " + pattern
             );
         }
     }
     
     @Test
-    public void testKubernetesVolumeTraversal() {
-        String[] k8sPatterns = {
-            "/var/run/secrets/kubernetes.io/../../../etc/passwd",
-            "/mnt/../../host/etc/shadow",
-            "/opt/../../proc/1/environ"
+    public void testGraphQLPathInjection() {
+        String[] graphqlPatterns = {
+            "{ file(path: \"../../../etc/passwd\") { content } }",
+            "{ resource(id: \"../../admin/config\") { data } }",
+            "{ download(file: \"%2e%2e%2f%2e%2e%2f\") { url } }"
         };
         
-        KubernetesPathValidator validator = new KubernetesPathValidator();
+        GraphQLValidator validator = new GraphQLValidator();
         
-        for (String pattern : k8sPatterns) {
+        for (String pattern : graphqlPatterns) {
             assertThrows(
                 SecurityException.class,
-                () -> validator.validatePath(pattern),
-                "Failed to block Kubernetes traversal: " + pattern
+                () -> validator.validateQuery(pattern),
+                "Failed to block GraphQL injection: " + pattern
             );
         }
     }
@@ -506,9 +506,9 @@ public class ContainerEscapeSimulator {
 |100%
 |Windows, Linux, macOS, containers
 
-|Archive Formats
-|90%
-|ZIP, TAR, JAR, WAR, 7Z, RAR
+|HTTP Headers
+|95%
+|X-Original-URL, X-Rewrite-URL, X-Forwarded-Path
 
 |HTTP Methods
 |100%
