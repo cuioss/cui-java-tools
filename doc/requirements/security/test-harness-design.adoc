@@ -8,7 +8,7 @@ link:README.adoc[← Back to Documentation Index]
 
 == Executive Summary
 
-This document defines a comprehensive test harness design for validating path traversal security implementations. The harness incorporates test cases derived from real CVEs, OWASP testing guidelines, and security research to ensure robust validation of path security mechanisms. The design emphasizes both positive and negative testing, cross-platform compatibility, and automated security verification.
+This document defines a comprehensive test harness design for HTTP URL path traversal security validation using Java 21+ built-in types. The harness incorporates test cases derived from real CVEs, OWASP testing guidelines, and HTTP RFC standards to ensure robust validation of URL security. The design emphasizes leveraging Java's native URL, URI, and URLDecoder classes for validation.
 
 == Test Harness Architecture
 
@@ -18,17 +18,17 @@ This document defines a comprehensive test harness design for validating path tr
 |===
 |Component |Purpose |Key Features
 
-|Test Data Generator
-|Creates malicious path patterns
-|CVE-based patterns, encoding variants, platform-specific
+|HTTP Pattern Generator
+|Creates malicious URL patterns
+|CVE-based patterns, encoding variants, HTTP-specific
 
-|Validation Engine
-|Executes security validations
-|Multiple validation strategies, performance metrics
+|URL Validation Engine
+|Executes URL validations using Java built-in types
+|URI class validation, URLDecoder, Pattern matching
 
-|Attack Simulator
-|Simulates real attack scenarios
-|Archive extraction, file upload, URL manipulation
+|HTTP Attack Simulator
+|Simulates HTTP attack scenarios
+|URL manipulation, parameter pollution, header injection
 
 |Result Analyzer
 |Evaluates test outcomes
@@ -91,25 +91,25 @@ public class CVETestVectors {
         "/themes/casper%2F..%2F..%2F/config.production.json"
     };
     
-    // CVE-2023-50164 - Apache Struts
-    public static final String[] STRUTS_PATTERNS = {
-        "../../WEB-INF/web.xml",
-        "../../../webapps/ROOT/shell.jsp",
-        "..\\..\\..\\windows\\win.ini"
+    // CVE-2023-50164 - Apache Struts (URL context)
+    public static final String[] STRUTS_URL_PATTERNS = {
+        "/app/../../WEB-INF/web.xml",
+        "/static/../../../webapps/ROOT/config",
+        "/files/%2e%2e%2fWEB-INF/classes/"
     };
     
-    // CVE-2024-38819 - Spring Framework
-    public static final String[] SPRING_PATTERNS = {
+    // CVE-2024-38819 - Double URL Encoding
+    public static final String[] DOUBLE_ENCODING_PATTERNS = {
         "%252e%252e%252f%252e%252e%252f",
         "%252E%252E%252F%252E%252E%252F",
         "%%32%65%%32%65%%32%66"
     };
     
-    // Zip Slip Patterns
-    public static final String[] ZIP_SLIP_PATTERNS = {
-        "../../../../../../../../tmp/evil.sh",
-        "..\\..\\..\\..\\..\\..\\..\\..\\windows\\system32\\calc.exe",
-        "../../../.ssh/authorized_keys"
+    // HTTP Header Injection Patterns
+    public static final String[] HEADER_PATTERNS = {
+        "X-Original-URL: /admin",
+        "X-Rewrite-URL: /../../../etc/passwd",
+        "X-Forwarded-Path: /../../protected/"
     };
 }
 ```
@@ -165,45 +165,45 @@ public class HTTPEncodingTestMatrix {
 }
 ```
 
-=== Platform-Specific Test Cases
+=== HTTP Protocol-Specific Test Cases
 
-==== Operating System Variants
+==== HTTP Method and Protocol Variants
 
 ```java
-public class PlatformSpecificTests {
+public class HttpProtocolTests {
     
-    // Windows-specific patterns
-    public static final String[] WINDOWS_PATTERNS = {
-        "..\\..\\windows\\system32\\config\\sam",
-        "C:\\..\\..\\windows\\win.ini",
-        "\\\\?\\C:\\Windows\\System32\\config\\sam",
-        "file:///C:/windows/win.ini",
-        "C:../../../windows/system32/drivers/etc/hosts",
-        "\\\\server\\share\\..\\..\\sensitive"
+    // HTTP method-specific patterns
+    public static final String[] METHOD_PATTERNS = {
+        "GET /../../../admin HTTP/1.1",
+        "POST /api/%2e%2e/config HTTP/1.1",
+        "PUT /files/..%252f..%252f HTTP/2",
+        "OPTIONS * HTTP/1.1",
+        "TRACE /../../ HTTP/1.0"
     };
     
-    // Linux-specific patterns
-    public static final String[] LINUX_PATTERNS = {
-        "../../../etc/passwd",
-        "/proc/self/environ",
-        "/dev/null/../../etc/shadow",
-        "~/../../../root/.ssh/id_rsa",
-        "/var/www/../../etc/apache2/apache2.conf"
+    // Query string attack patterns
+    public static final String[] QUERY_PATTERNS = {
+        "?page=../../../etc/passwd",
+        "?file=%2e%2e%2f%2e%2e%2f%2e%2e%2f",
+        "?path=..%252f..%252f..%252f",
+        "?url=http://evil.com&file=../../",
+        "?redirect=//evil.com/../../"
     };
     
-    // macOS-specific patterns
-    public static final String[] MACOS_PATTERNS = {
-        "../../../../../System/Library/CoreServices/SystemVersion.plist",
-        "~/../../../../etc/passwd",
-        "/Applications/../../../etc/passwd",
-        "/Volumes/../../etc/master.passwd"
+    // Fragment identifier patterns
+    public static final String[] FRAGMENT_PATTERNS = {
+        "#/../../../",
+        "#%2e%2e%2f",
+        "#..;/",
+        "#../admin"
     };
     
-    // Container-specific patterns
-    public static final String[] CONTAINER_PATTERNS = {
-        "/proc/1/root/etc/passwd",
-        "/host_proc/1/root/etc/shadow",
-        "/../../../../../../../proc/self/cgroup"
+    // Cookie path patterns
+    public static final String[] COOKIE_PATTERNS = {
+        "Path=/../../",
+        "Path=%2e%2e%2f",
+        "Domain=..",
+        "Path=//evil.com/"
     };
 }
 ```

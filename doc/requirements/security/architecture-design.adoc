@@ -8,19 +8,19 @@ link:README.adoc[← Back to Documentation Index]
 
 == Executive Summary
 
-This document presents a comprehensive architecture and design for a unified path traversal security utility that serves as a single point of entry for validating paths across all contexts (file systems, URLs, archives, containers). The design incorporates lessons learned from CVE analysis, industry best practices, and comparative analysis of existing security libraries to create a robust, performant, and extensible security framework.
+This document presents a comprehensive architecture and design for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
 
 == Design Goals and Principles
 
 === Primary Goals
 
-1. **Unified Security Interface**: Single API for all path validation needs
-2. **Zero False Negatives**: Block all known attack patterns
-3. **Minimal False Positives**: Allow legitimate use cases
-4. **Performance**: Sub-millisecond validation for 95th percentile
-5. **Extensibility**: Support for new attack patterns and contexts
-6. **Cross-Platform**: Consistent behavior across OS platforms
-7. **Security by Default**: Safe defaults, explicit unsafe operations
+1. **HTTP/URL Focus**: Specialized validation for HTTP request paths and parameters
+2. **Java Built-in Types**: Leverage Java 21+ native URL/URI validation capabilities
+3. **Zero False Negatives**: Block all known HTTP path traversal patterns
+4. **RFC Compliance**: Full RFC 3986 and RFC 7230 compliance using Java's URI class
+5. **Performance**: Sub-millisecond validation using native Java types
+6. **Simplicity**: Minimal custom code by leveraging Java standard library
+7. **Security by Default**: Combine Java's syntactic validation with semantic security
 
 === Design Principles
 
@@ -50,31 +50,20 @@ This document presents a comprehensive architecture and design for a unified pat
 
 == System Architecture
 
-=== High-Level Architecture
+=== High-Level Architecture Using Java 21+ Built-in Types
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Public API Layer                      │
-│  PathSecurityValidator (Main Entry Point)                │
+│                 HTTP URL Validator                       │
+│         (Leveraging Java 21 Built-in Types)             │
 └─────────────┬───────────────────────────────────────────┘
               │
 ┌─────────────▼───────────────────────────────────────────┐
-│              Validation Orchestrator                     │
-│  Coordinates multiple validation strategies              │
-└─────────────┬───────────────────────────────────────────┘
-              │
-┌─────────────▼───────────────────────────────────────────┐
-│           Validation Pipeline                            │
+│              Validation Pipeline                         │
+│     Using Java Standard Library Components               │
 ├──────────────┬────────────┬────────────┬───────────────┤
-│   Decoder    │ Normalizer │ Validator  │   Verifier    │
-│   Engine     │   Engine   │   Engine   │    Engine     │
-└──────────────┴────────────┴────────────┴───────────────┘
-              │
-┌─────────────▼───────────────────────────────────────────┐
-│           Platform Abstraction Layer                     │
-├──────────────┬────────────┬────────────┬───────────────┤
-│   Windows    │   Linux    │   macOS    │  Container    │
-│   Handler    │  Handler   │  Handler   │   Handler     │
+│ URLDecoder   │    URI     │  Pattern   │   Custom      │
+│ (Built-in)   │ (Built-in) │ (Built-in) │  Security     │
 └──────────────┴────────────┴────────────┴───────────────┘
 ```
 
@@ -83,98 +72,213 @@ This document presents a comprehensive architecture and design for a unified pat
 ==== Core Components
 
 ```java
-package de.cuioss.tools.security.path;
+package de.cuioss.tools.security.http;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
- * Main entry point for path security validation
+ * HTTP URL path validator using Java 21 built-in types
  */
-public final class PathSecurityValidator {
-    
-    private final ValidationOrchestrator orchestrator;
-    private final SecurityConfiguration config;
-    private final AuditLogger auditLogger;
-    
-    private PathSecurityValidator(Builder builder) {
-        this.config = builder.config;
-        this.orchestrator = new ValidationOrchestrator(config);
-        this.auditLogger = new AuditLogger(config);
-    }
+public final class HttpUrlValidator {
     
     /**
-     * Validates a file system path
+     * Validates an HTTP URL path using Java's built-in validation
      */
-    public ValidationResult validateFilePath(String path, Path baseDirectory) {
-        return orchestrator.validate(
-            ValidationContext.forFilePath(path, baseDirectory)
-        );
+    public ValidationResult validateUrlPath(String urlPath) {
+        // Step 1: Decode using Java's URLDecoder
+        String decoded = fullyDecode(urlPath);
+        
+        // Step 2: Check for double encoding (security issue)
+        if (hasDoubleEncoding(urlPath, decoded)) {
+            return ValidationResult.blocked("Double encoding detected");
+        }
+        
+        // Step 3: Use Java's URI for RFC 3986 validation and normalization
+        try {
+            URI uri = new URI(null, null, decoded, null);
+            String normalized = uri.normalize().getPath();
+            
+            // Step 4: Check if normalization revealed traversal
+            if (normalized != null && !normalized.equals(decoded)) {
+                if (normalized.contains("..")) {
+                    return ValidationResult.blocked("Path traversal detected after normalization");
+                }
+            }
+            
+            // Step 5: Use Java 21 pattern matching for additional checks
+            return switch (decoded) {
+                case String s when s.contains("..") -> 
+                    ValidationResult.blocked("Direct traversal pattern");
+                case String s when s.contains("./") -> 
+                    ValidationResult.blocked("Current directory reference");
+                case String s when s.contains("//") -> 
+                    ValidationResult.blocked("Double slash pattern");
+                case String s when s.matches(".*[\\x00-\\x1f].*") -> 
+                    ValidationResult.blocked("Control characters detected");
+                default -> ValidationResult.allowed();
+            };
+            
+        } catch (URISyntaxException e) {
+            return ValidationResult.blocked("Invalid URI syntax: " + e.getMessage());
+        }
     }
     
-    /**
-     * Validates a URL path component
-     */
-    public ValidationResult validateURLPath(String urlPath) {
-        return orchestrator.validate(
-            ValidationContext.forURL(urlPath)
-        );
+    private String fullyDecode(String input) {
+        String decoded = input;
+        String previous;
+        int iterations = 0;
+        
+        do {
+            previous = decoded;
+            try {
+                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException e) {
+                // Invalid encoding, return current state
+                break;
+            }
+            iterations++;
+        } while (!decoded.equals(previous) && iterations < 10);
+        
+        return decoded;
     }
     
-    /**
-     * Validates an archive entry
-     */
-    public ValidationResult validateArchiveEntry(String entryName, Path targetDir) {
-        return orchestrator.validate(
-            ValidationContext.forArchive(entryName, targetDir)
-        );
-    }
-    
-    public static Builder builder() {
-        return new Builder();
-    }
-    
-    public static class Builder {
-        // Builder implementation
+    private boolean hasDoubleEncoding(String original, String decoded) {
+        try {
+            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            return !decoded.equals(doubleDecoded);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
 ```
 
-=== Validation Pipeline Architecture
+=== Validation Pipeline Using Java 21 Built-in Types
 
-==== Pipeline Design
+==== Pipeline Design with Native Java Components
 
 ```java
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
+
 /**
- * Validation pipeline processing stages
+ * HTTP validation pipeline leveraging Java 21 features
  */
-public class ValidationPipeline {
+public class HttpValidationPipeline {
     
-    private final List<ValidationStage> stages;
+    // Java 21 Pattern for attack detection
+    private static final Pattern TRAVERSAL_PATTERN = Pattern.compile(
+        "(\\.\\./)|(%2e%2e%2f)|(%252e%252e%252f)|(\\.\\.\\\\)|" +
+        "(%5c%2e%2e%5c)|(%255c%252e%252e%255c)",
+        Pattern.CASE_INSENSITIVE
+    );
     
-    public ValidationPipeline() {
-        this.stages = Arrays.asList(
-            new DecodingStage(),      // Handle all encoding schemes
-            new NormalizationStage(),  // Normalize paths
-            new ValidationStage(),     // Core validation logic
-            new VerificationStage()    // Final verification
-        );
+    public sealed interface ValidationResult 
+        permits ValidationResult.Allowed, ValidationResult.Blocked {
+        
+        record Allowed() implements ValidationResult {}
+        record Blocked(String reason) implements ValidationResult {}
     }
     
-    public ValidationResult process(ValidationContext context) {
-        ValidationData data = new ValidationData(context);
+    public ValidationResult validate(String urlPath) {
+        // Stage 1: URL Decoding with Java's URLDecoder
+        var decoded = decodeUrl(urlPath);
+        if (decoded.isBlocked()) return decoded;
         
-        for (ValidationStage stage : stages) {
-            StageResult result = stage.process(data);
+        // Stage 2: URI Normalization with Java's URI class
+        var normalized = normalizeUri(decoded.value());
+        if (normalized.isBlocked()) return normalized;
+        
+        // Stage 3: Pattern-based validation using Java regex
+        var validated = validatePatterns(normalized.value());
+        if (validated.isBlocked()) return validated;
+        
+        // Stage 4: Semantic validation
+        return validateSemantics(validated.value());
+    }
+    
+    private DecodingResult decodeUrl(String input) {
+        try {
+            String decoded = URLDecoder.decode(input, StandardCharsets.UTF_8);
             
-            if (result.isBlocked()) {
-                return ValidationResult.blocked(
-                    result.getReason(),
-                    stage.getName()
-                );
+            // Check for double encoding
+            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            if (!decoded.equals(doubleDecoded)) {
+                return new DecodingResult.Failed("Double encoding detected");
             }
             
-            data = result.getTransformedData();
+            return new DecodingResult.Success(decoded);
+        } catch (IllegalArgumentException e) {
+            return new DecodingResult.Failed("Invalid URL encoding");
         }
-        
-        return ValidationResult.allowed();
+    }
+    
+    private NormalizationResult normalizeUri(String path) {
+        try {
+            URI uri = new URI(null, null, path, null);
+            String normalized = uri.normalize().getPath();
+            
+            if (normalized == null) {
+                return new NormalizationResult.Failed("Invalid path");
+            }
+            
+            // Check if normalization changed the path (potential traversal)
+            if (!normalized.equals(path) && normalized.contains("..")) {
+                return new NormalizationResult.Failed("Path traversal via normalization");
+            }
+            
+            return new NormalizationResult.Success(normalized);
+        } catch (URISyntaxException e) {
+            return new NormalizationResult.Failed("Invalid URI syntax");
+        }
+    }
+    
+    private ValidationResult validatePatterns(String path) {
+        if (TRAVERSAL_PATTERN.matcher(path).find()) {
+            return new ValidationResult.Blocked("Traversal pattern detected");
+        }
+        return new ValidationResult.Allowed();
+    }
+    
+    private ValidationResult validateSemantics(String path) {
+        // Java 21 pattern matching switch
+        return switch (path) {
+            case String s when s.startsWith("/admin") -> 
+                new ValidationResult.Blocked("Admin path access denied");
+            case String s when s.contains("WEB-INF") -> 
+                new ValidationResult.Blocked("Protected directory access");
+            case String s when s.contains("META-INF") -> 
+                new ValidationResult.Blocked("Protected directory access");
+            default -> new ValidationResult.Allowed();
+        };
+    }
+    
+    // Java 21 sealed classes for type-safe results
+    private sealed interface DecodingResult {
+        record Success(String value) implements DecodingResult {
+            ValidationResult.Blocked isBlocked() { return null; }
+        }
+        record Failed(String reason) implements DecodingResult {
+            ValidationResult.Blocked isBlocked() { 
+                return new ValidationResult.Blocked(reason); 
+            }
+        }
+    }
+    
+    private sealed interface NormalizationResult {
+        record Success(String value) implements NormalizationResult {
+            ValidationResult.Blocked isBlocked() { return null; }
+        }
+        record Failed(String reason) implements NormalizationResult {
+            ValidationResult.Blocked isBlocked() { 
+                return new ValidationResult.Blocked(reason); 
+            }
+        }
     }
 }
 ```
@@ -311,75 +415,6 @@ public class AttackPatternDetector {
 }
 ```
 
-== Platform-Specific Implementations
-
-=== Platform Abstraction
-
-```java
-public interface PlatformHandler {
-    
-    /**
-     * Normalize path for specific platform
-     */
-    String normalizePath(String path);
-    
-    /**
-     * Validate path against platform-specific rules
-     */
-    boolean isValidPath(String path);
-    
-    /**
-     * Get canonical representation
-     */
-    String getCanonicalPath(String path) throws IOException;
-    
-    /**
-     * Check if path is absolute
-     */
-    boolean isAbsolutePath(String path);
-    
-    /**
-     * Get platform-specific separators
-     */
-    String[] getSeparators();
-}
-
-public class WindowsPlatformHandler implements PlatformHandler {
-    
-    @Override
-    public String normalizePath(String path) {
-        // Handle both / and \ separators
-        path = path.replace('/', '\\');
-        
-        // Handle UNC paths
-        if (path.startsWith("\\\\")) {
-            return normalizeUNCPath(path);
-        }
-        
-        // Handle drive letters
-        if (isDrivePath(path)) {
-            return normalizeDrivePath(path);
-        }
-        
-        return path;
-    }
-    
-    @Override
-    public boolean isValidPath(String path) {
-        // Check for invalid Windows characters
-        if (containsInvalidChars(path)) {
-            return false;
-        }
-        
-        // Check for reserved names (CON, PRN, AUX, etc.)
-        if (isReservedName(path)) {
-            return false;
-        }
-        
-        return true;
-    }
-}
-```
 
 === Comprehensive HTTP Parameter Validation
 
@@ -403,10 +438,8 @@ public class URLParameterValueValidator {
         // 3. Fully decode the parameter value
         String decoded = fullyDecode(value);
         
-        // 4. Validate based on parameter type/context
-        if (isFilePathParameter(name)) {
-            return validateFilePathValue(name, decoded);
-        } else if (isURLParameter(name)) {
+        // 4. Validate based on parameter context
+        if (isURLParameter(name)) {
             return validateURLValue(name, decoded);
         } else if (isNumericParameter(name)) {
             return validateNumericValue(name, decoded);
@@ -416,25 +449,15 @@ public class URLParameterValueValidator {
         return validateGenericValue(name, decoded);
     }
     
-    private ValidationResult validateFilePathValue(String name, String value) {
+    private ValidationResult validateGenericValue(String name, String value) {
         // Path traversal patterns
         if (containsPathTraversal(value)) {
             return ValidationResult.blocked("Path traversal in: " + name);
         }
         
-        // Absolute path check
-        if (isAbsolutePath(value)) {
-            return ValidationResult.blocked("Absolute path not allowed: " + name);
-        }
-        
         // Null byte injection
         if (value.contains("\0")) {
             return ValidationResult.blocked("Null byte in: " + name);
-        }
-        
-        // Special file references
-        if (isSpecialFile(value)) {
-            return ValidationResult.blocked("Special file reference: " + name);
         }
         
         return ValidationResult.allowed();
@@ -454,9 +477,10 @@ public class URLParameterValueValidator {
         // Validate URL format
         try {
             URL url = new URL(value);
-            // Check for local file access
-            if ("file".equalsIgnoreCase(url.getProtocol())) {
-                return ValidationResult.blocked("File protocol not allowed: " + name);
+            // Check for non-HTTP protocols
+            String protocol = url.getProtocol();
+            if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
+                return ValidationResult.blocked("Only HTTP/HTTPS protocols allowed: " + name);
             }
         } catch (MalformedURLException e) {
             return ValidationResult.blocked("Invalid URL format: " + name);
@@ -554,24 +578,16 @@ public class BodyParameterValueValidator {
     }
     
     private ValidationResult validateMultipartValue(String name, String value) {
-        // For file uploads, validate the filename
+        // Validate Content-Disposition filename parameter
         if (name.equals("filename")) {
-            // Remove path components from filename
-            String filename = Paths.get(value).getFileName().toString();
-            
-            // Check for path traversal in filename
-            if (containsPathTraversal(filename)) {
-                return ValidationResult.blocked("Path traversal in filename");
+            // Check for path traversal patterns in filename
+            if (value.contains("..") || value.contains("/") || value.contains("\\")) {
+                return ValidationResult.blocked("Path traversal in filename parameter");
             }
             
-            // Check for double extensions
-            if (hasDoubleExtension(filename)) {
-                return ValidationResult.blocked("Double extension in filename");
-            }
-            
-            // Validate extension
-            if (!isAllowedExtension(filename)) {
-                return ValidationResult.blocked("Disallowed file extension");
+            // Check for null bytes
+            if (value.contains("\0")) {
+                return ValidationResult.blocked("Null byte in filename");
             }
         }
         
@@ -791,10 +807,10 @@ public class PathSecurityConfiguration {
     private StrictnessLevel strictness = StrictnessLevel.HIGH;
     
     /**
-     * Allowed file extensions
+     * Allowed content types for multipart uploads
      */
-    private Set<String> allowedExtensions = Set.of(
-        ".pdf", ".txt", ".doc", ".docx", ".jpg", ".png"
+    private Set<String> allowedContentTypes = Set.of(
+        "text/plain", "application/json", "application/xml"
     );
     
     /**
@@ -813,9 +829,9 @@ public class PathSecurityConfiguration {
     private List<CustomRule> customRules = new ArrayList<>();
     
     /**
-     * Platform-specific settings
+     * HTTP-specific settings
      */
-    private PlatformSettings platformSettings = new PlatformSettings();
+    private HttpSettings httpSettings = new HttpSettings();
     
     public enum StrictnessLevel {
         LOW,      // Basic validation only
@@ -867,153 +883,6 @@ public class SecurityErrorHandler {
 
 == Integration Patterns
 
-=== Spring Integration
-
-```java
-@Configuration
-@EnableConfigurationProperties(PathSecurityConfiguration.class)
-public class PathSecurityAutoConfiguration {
-    
-    @Bean
-    @ConditionalOnMissingBean
-    public PathSecurityValidator pathSecurityValidator(
-            PathSecurityConfiguration config) {
-        return PathSecurityValidator.builder()
-            .configuration(config)
-            .build();
-    }
-    
-    @Bean
-    public PathSecurityFilter pathSecurityFilter(
-            PathSecurityValidator validator) {
-        return new PathSecurityFilter(validator);
-    }
-}
-
-@Component
-public class PathSecurityFilter extends OncePerRequestFilter {
-    
-    private final PathSecurityValidator validator;
-    
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain) throws ServletException, IOException {
-        
-        String path = extractPath(request);
-        ValidationResult result = validator.validateURLPath(path);
-        
-        if (result.isBlocked()) {
-            response.sendError(
-                HttpServletResponse.SC_BAD_REQUEST,
-                "Invalid path"
-            );
-            return;
-        }
-        
-        chain.doFilter(request, response);
-    }
-}
-```
-
-=== Jakarta EE Integration
-
-```java
-@WebFilter("/*")
-public class JakartaPathSecurityFilter implements Filter {
-    
-    @Inject
-    private PathSecurityValidator validator;
-    
-    @Override
-    public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
-        
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String path = httpRequest.getRequestURI();
-        
-        ValidationResult result = validator.validateURLPath(path);
-        
-        if (result.isBlocked()) {
-            ((HttpServletResponse) response).sendError(
-                HttpServletResponse.SC_BAD_REQUEST
-            );
-            return;
-        }
-        
-        chain.doFilter(request, response);
-    }
-}
-```
-
-== Migration Strategy
-
-=== From Existing Libraries
-
-```java
-/**
- * Migration adapter for Apache Commons IO
- */
-public class CommonsIOMigrationAdapter {
-    
-    private final PathSecurityValidator validator;
-    
-    /**
-     * Drop-in replacement for FileNameUtils.normalize()
-     */
-    public String normalize(String filename) {
-        ValidationResult result = validator.validateFilePath(
-            filename, 
-            Paths.get(".")
-        );
-        
-        if (result.isBlocked()) {
-            return null; // Commons IO behavior
-        }
-        
-        return result.getNormalizedPath();
-    }
-}
-
-/**
- * Migration adapter for OWASP ESAPI
- */
-public class ESAPIMigrationAdapter {
-    
-    private final PathSecurityValidator validator;
-    
-    /**
-     * Drop-in replacement for Validator.getValidDirectoryPath()
-     */
-    public String getValidDirectoryPath(
-            String context,
-            String input,
-            File parent,
-            boolean allowNull) throws ValidationException {
-        
-        if (input == null && allowNull) {
-            return null;
-        }
-        
-        ValidationResult result = validator.validateFilePath(
-            input,
-            parent.toPath()
-        );
-        
-        if (result.isBlocked()) {
-            throw new ValidationException(
-                context,
-                "Invalid directory path"
-            );
-        }
-        
-        return result.getNormalizedPath();
-    }
-}
-```
 
 == Monitoring and Observability
 
