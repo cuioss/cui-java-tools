@@ -16,9 +16,11 @@
 package de.cuioss.tools.formatting.template.token;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
+@EnableGeneratorController
 class ActionTokenTest {
 
     @Test

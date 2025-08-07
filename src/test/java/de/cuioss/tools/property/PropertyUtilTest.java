@@ -16,6 +16,7 @@
 package de.cuioss.tools.property;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.property.support.BeanForTestingTypeResolving;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithPrimitives;
@@ -32,6 +33,7 @@ import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("java:S5738")
+@EnableGeneratorController
 class PropertyUtilTest {
 
     static final String PROPERTY_NAME = "property";

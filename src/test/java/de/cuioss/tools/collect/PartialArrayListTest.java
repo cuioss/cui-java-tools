@@ -16,6 +16,7 @@
 package de.cuioss.tools.collect;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,7 @@ import static de.cuioss.tools.collect.PartialArrayList.emptyList;
 import static de.cuioss.tools.collect.PartialArrayList.of;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class PartialArrayListTest {
 
     private static final int DEFAULT_SIZE = 10;

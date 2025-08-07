@@ -16,6 +16,7 @@
 package de.cuioss.tools.string;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("JoinerConfig")
+@EnableGeneratorController
 class JoinerConfigTest {
 
     @Nested

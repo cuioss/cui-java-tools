@@ -16,6 +16,7 @@
 package de.cuioss.tools.net.ssl;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.TestDataGenerator;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -39,6 +40,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class KeyStoreProviderTest {
 
     /**

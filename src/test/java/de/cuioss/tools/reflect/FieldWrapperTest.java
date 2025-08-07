@@ -16,6 +16,7 @@
 package de.cuioss.tools.reflect;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.reflect.support.FieldNameClass;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class FieldWrapperTest {
 
     @Test

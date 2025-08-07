@@ -16,6 +16,7 @@
 package de.cuioss.tools.io;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link IOCase} class focusing on case sensitivity handling in file operations.
  * Based on Apache Commons IO test cases.
  */
+@EnableGeneratorController
 class IOCaseTest {
 
     private static final boolean WINDOWS = File.separatorChar == '\\';

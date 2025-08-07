@@ -16,6 +16,7 @@
 package de.cuioss.tools.net.ssl;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import de.cuioss.tools.support.TestDataGenerator;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class KeyMaterialHolderTest {
 
     @Test

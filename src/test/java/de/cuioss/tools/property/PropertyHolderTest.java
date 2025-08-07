@@ -16,6 +16,7 @@
 package de.cuioss.tools.property;
 
 import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
 import de.cuioss.tools.property.support.BeanWithMethodOverload;
 import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
@@ -31,6 +32,7 @@ import static de.cuioss.tools.property.PropertyReadWrite.*;
 import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class PropertyHolderTest {
 
     static final String PROPERTY_NAME = "property";

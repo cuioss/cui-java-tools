@@ -17,6 +17,7 @@ package de.cuioss.tools.formatting.support;
 
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ul>
  */
 @DisplayName("PersonName Tests")
+@EnableGeneratorController
 class PersonNameTest {
 
     private static final TypedGenerator<String> STRING_GENERATOR = Generators.nonEmptyStrings();
