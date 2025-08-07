@@ -110,13 +110,13 @@ public final class HttpUrlValidator {
             
             // Step 5: Use Java 21 pattern matching for additional checks
             return switch (decoded) {
-                case String s when s.contains("..") -> 
+                case String s when (s.contains("..")) -> 
                     ValidationResult.blocked("Direct traversal pattern");
-                case String s when s.contains("./") -> 
+                case String s when (s.contains("./")) -> 
                     ValidationResult.blocked("Current directory reference");
-                case String s when s.contains("//") -> 
+                case String s when (s.contains("//")) -> 
                     ValidationResult.blocked("Double slash pattern");
-                case String s when s.matches(".*[\\x00-\\x1f].*") -> 
+                case String s when (s.matches(".*[\\x00-\\x1f].*")) -> 
                     ValidationResult.blocked("Control characters detected");
                 default -> ValidationResult.allowed();
             };
@@ -246,13 +246,13 @@ public class HttpValidationPipeline {
     }
     
     private ValidationResult validateSemantics(String path) {
-        // Java 21 pattern matching switch
+        // Java 21 pattern matching switch with guard conditions
         return switch (path) {
-            case String s when s.startsWith("/admin") -> 
+            case String s when (s.startsWith("/admin")) -> 
                 new ValidationResult.Blocked("Admin path access denied");
-            case String s when s.contains("WEB-INF") -> 
+            case String s when (s.contains("WEB-INF")) -> 
                 new ValidationResult.Blocked("Protected directory access");
-            case String s when s.contains("META-INF") -> 
+            case String s when (s.contains("META-INF")) -> 
                 new ValidationResult.Blocked("Protected directory access");
             default -> new ValidationResult.Allowed();
         };
