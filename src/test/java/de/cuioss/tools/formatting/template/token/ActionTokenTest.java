@@ -15,15 +15,18 @@
  */
 package de.cuioss.tools.formatting.template.token;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
+@EnableGeneratorController
 class ActionTokenTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        var token = Generators.randomString();
+        // Use letterStrings to avoid regex special characters in token
+        var token = Generators.letterStrings(5, 10).next();
         var template = "prefix" + token + "suffix";
         ObjectMethodsAsserts.assertNiceObject(new ActionToken(template, token));
     }

@@ -15,7 +15,8 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.support.Generators;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@EnableGeneratorController
 class StructuredFilenameTest {
 
     static final String EXISTING_FILE_NAME = "/META-INF/someTestFile.txt";
@@ -77,8 +79,8 @@ class StructuredFilenameTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        var name = Generators.randomString();
-        var suffix = Generators.randomString();
+        var name = Generators.nonEmptyStrings().next();
+        var suffix = Generators.nonEmptyStrings().next();
         ObjectMethodsAsserts.assertNiceObject(new StructuredFilename(name + "." + suffix));
     }
 }

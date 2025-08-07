@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.codec;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for {@link Hex} class, based on Apache Commons Codec's HexTest.
  */
 @DisplayName("Hex should")
+@EnableGeneratorController
 class HexTest {
 
     private static final String BAD_ENCODING_NAME = "UNKNOWN";
@@ -331,7 +334,8 @@ class HexTest {
             final var random = new Random();
 
             for (int i = 0; i < 100; i++) {
-                final var bytes = new byte[random.nextInt(256)];
+                final var size = Generators.integers(0, 256).next();
+                final var bytes = new byte[size];
                 random.nextBytes(bytes);
 
                 final var encoded = hex.encode(bytes);

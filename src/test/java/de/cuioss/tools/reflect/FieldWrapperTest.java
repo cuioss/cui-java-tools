@@ -15,14 +15,16 @@
  */
 package de.cuioss.tools.reflect;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.reflect.support.FieldNameClass;
-import de.cuioss.tools.support.Generators;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class FieldWrapperTest {
 
     @Test
@@ -36,7 +38,7 @@ class FieldWrapperTest {
         var nameClass = new FieldNameClass();
         var wrapper = getMyFieldFieldWrapper();
         assertFalse(wrapper.readValue(nameClass).isPresent());
-        var test = Generators.randomString();
+        var test = Generators.nonEmptyStrings().next();
         nameClass.setMyField(test);
         var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
@@ -61,7 +63,7 @@ class FieldWrapperTest {
         field.setAccessible(true);
         var wrapper = new FieldWrapper(field);
         assertFalse(wrapper.readValue(nameClass).isPresent());
-        var test = Generators.randomString();
+        var test = Generators.nonEmptyStrings().next();
         nameClass.setMyField(test);
         var read = wrapper.readValue(nameClass);
         assertTrue(read.isPresent());
@@ -77,7 +79,7 @@ class FieldWrapperTest {
 
         assertFalse(wrapper.readValue(nameClass).isPresent());
 
-        var test = Generators.randomString();
+        var test = Generators.nonEmptyStrings().next();
         wrapper.writeValue(nameClass, test);
 
         var read = wrapper.readValue(nameClass);
@@ -94,7 +96,7 @@ class FieldWrapperTest {
 
         assertFalse(wrapper.readValue(nameClass).isPresent());
 
-        var test = Generators.randomString();
+        var test = Generators.nonEmptyStrings().next();
         wrapper.writeValue(nameClass, test);
 
         var read = wrapper.readValue(nameClass);
@@ -109,7 +111,7 @@ class FieldWrapperTest {
         var nameClass = new FieldNameClass();
         var wrapper = getMyFieldFieldWrapper();
 
-        var test = Generators.randomString();
+        var test = Generators.nonEmptyStrings().next();
 
         assertThrows(NullPointerException.class, () -> wrapper.writeValue(null, null));
 
@@ -125,7 +127,7 @@ class FieldWrapperTest {
     @Test
     void readValue() {
         final var nameClass = new FieldNameClass();
-        final var test = Generators.randomString();
+        final var test = Generators.nonEmptyStrings().next();
         nameClass.setMyField(test);
         var field = getMyFieldField();
         var wrapper = new FieldWrapper(field);

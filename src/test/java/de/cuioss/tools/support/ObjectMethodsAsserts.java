@@ -69,7 +69,7 @@ public class ObjectMethodsAsserts {
     public static void assertToString(Object underTest) {
         assertNotNull(underTest);
 
-        ReflectionUtil.assertToStringMethodIsOverriden(underTest.getClass());
+        ReflectionUtil.assertToStringMethodIsOverridden(underTest.getClass());
         assertNotNull(underTest.toString(), "toString must not return 'null'");
     }
 
@@ -91,7 +91,7 @@ public class ObjectMethodsAsserts {
 
     private static void assertBasicContractOnEquals(final Object underTest) {
 
-        ReflectionUtil.assertEqualsMethodIsOverriden(underTest.getClass());
+        ReflectionUtil.assertEqualsMethodIsOverridden(underTest.getClass());
 
         // basic checks to equals implementation
         final var msgNotEqualsNull = "Expected result for equals(null) will be 'false'. Class was : "
@@ -117,7 +117,7 @@ public class ObjectMethodsAsserts {
      * @param underTest object under test
      */
     private static void assertBasicContractOnHashCode(final Object underTest) {
-        ReflectionUtil.assertHashCodeMethodIsOverriden(underTest.getClass());
+        ReflectionUtil.assertHashCodeMethodIsOverridden(underTest.getClass());
 
         // basic checks to hashCode implementation
         assertNotEquals(DEFAULT_INT_VALUE, underTest.hashCode(),

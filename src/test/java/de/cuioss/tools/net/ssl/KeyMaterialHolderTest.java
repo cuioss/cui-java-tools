@@ -15,13 +15,16 @@
  */
 package de.cuioss.tools.net.ssl;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.net.ssl.KeyMaterialHolder.KeyMaterialHolderBuilder;
-import de.cuioss.tools.support.Generators;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
+import de.cuioss.tools.support.TestDataGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class KeyMaterialHolderTest {
 
     @Test
@@ -50,7 +53,7 @@ class KeyMaterialHolderTest {
         assertNull(noPassword.getKeyPassword());
         assertNotNull(noPassword.getKeyPasswordAsCharArray());
 
-        var password = Generators.randomString();
+        var password = Generators.nonEmptyStrings().next();
         var withPassword = withRandomKeyMaterial().keyPassword(password).build();
         assertEquals(password, withPassword.getKeyPassword());
         assertArrayEquals(password.toCharArray(), withPassword.getKeyPasswordAsCharArray());
@@ -67,17 +70,17 @@ class KeyMaterialHolderTest {
     @Test
     void shouldBehaveWell() {
         ObjectMethodsAsserts.assertNiceObject(withRandomKeyMaterial()
-                .name(Generators.randomString())
-                .description(Generators.randomString())
-                .keyAlias(Generators.randomString())
-                .keyPassword(Generators.randomString())
+                .name(Generators.nonEmptyStrings().next())
+                .description(Generators.nonEmptyStrings().next())
+                .keyAlias(Generators.nonEmptyStrings().next())
+                .keyPassword(Generators.nonEmptyStrings().next())
                 .keyHolderType(KeyHolderType.KEY_STORE)
                 .keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
                 .build());
     }
 
     private byte[] randomKeyMaterial() {
-        return Generators.generateTestData(100);
+        return TestDataGenerator.generateTestData(100);
     }
 
     private KeyMaterialHolderBuilder withRandomKeyMaterial() {

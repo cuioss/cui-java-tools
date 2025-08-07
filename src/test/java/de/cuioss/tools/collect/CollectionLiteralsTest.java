@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.collect;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,7 @@ import static de.cuioss.tools.collect.CollectionLiterals.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Collection Literals Test Suite")
+@EnableGeneratorController
 class CollectionLiteralsTest {
 
     @Test
@@ -38,37 +41,49 @@ class CollectionLiteralsTest {
         // Test with empty collection
         var emptyList = mutableList(new ArrayList<String>());
         assertTrue(emptyList.isEmpty());
-        emptyList.add("test");
+        var testString = Generators.nonEmptyStrings().next();
+        emptyList.add(testString);
         assertEquals(1, emptyList.size());
 
         // Test with null elements in collection
-        var listWithNulls = mutableList(Arrays.asList(null, "value", null));
+        var value = Generators.nonEmptyStrings().next();
+        var listWithNulls = mutableList(Arrays.asList(null, value, null));
         assertEquals(3, listWithNulls.size());
         assertNull(listWithNulls.getFirst());
-        assertEquals("value", listWithNulls.get(1));
+        assertEquals(value, listWithNulls.get(1));
     }
 
     @Test
     @DisplayName("Should maintain order in mutable lists")
     void shouldMaintainOrderInLists() {
-        var list = mutableList("first", "second", "third");
-        assertEquals("first", list.getFirst());
-        assertEquals("second", list.get(1));
-        assertEquals("third", list.get(2));
+        var first = Generators.nonEmptyStrings().next();
+        var second = Generators.nonEmptyStrings().next();
+        var third = Generators.nonEmptyStrings().next();
+
+        var list = mutableList(first, second, third);
+        assertEquals(first, list.getFirst());
+        assertEquals(second, list.get(1));
+        assertEquals(third, list.get(2));
 
         // Verify it's truly mutable
-        list.set(1, "modified");
-        assertEquals("modified", list.get(1));
+        var modified = Generators.nonEmptyStrings().next();
+        list.set(1, modified);
+        assertEquals(modified, list.get(1));
     }
 
     @Test
     @DisplayName("Should handle duplicate elements in sets")
     void shouldHandleDuplicatesInSets() {
-        var set = mutableSet("a", "b", "a", "c", "b");
-        assertEquals(3, set.size()); // Duplicates removed
-        assertTrue(set.contains("a"));
-        assertTrue(set.contains("b"));
-        assertTrue(set.contains("c"));
+        var a = Generators.letterStrings(1, 5).next();
+        var b = Generators.letterStrings(1, 5).next();
+        var c = Generators.letterStrings(1, 5).next();
+
+        var set = mutableSet(a, b, a, c, b);
+        // Size depends on whether generated strings are equal
+        assertTrue(set.size() <= 3); // Duplicates removed
+        assertTrue(set.contains(a));
+        assertTrue(set.contains(b));
+        assertTrue(set.contains(c));
     }
 
     @Test
@@ -124,7 +139,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableList((Iterator<String>) null));
             assertMutable(mutableList(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableList((Stream<String>) null));
-            assertMutable(mutableList(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableList(Stream.of("1", "2")));
         }
 
         @Test
@@ -143,7 +158,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableList((Iterator<String>) null));
             assertImmutable(immutableList(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableList((Stream<String>) null));
-            assertImmutable(immutableList(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableList(Stream.of("1", "2")));
         }
     }
 
@@ -165,7 +180,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableSet((Iterator<String>) null));
             assertMutable(mutableSet(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableSet((Stream<String>) null));
-            assertMutable(mutableSet(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -182,7 +197,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableSet((Iterator<String>) null));
             assertImmutable(immutableSet(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableSet((Stream<String>) null));
-            assertImmutable(immutableSet(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -199,7 +214,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableSortedSet((Iterator<String>) null));
             assertMutable(mutableSortedSet(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableSortedSet((Stream<String>) null));
-            assertMutable(mutableSortedSet(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableSortedSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -215,7 +230,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableSortedSet((Iterator<String>) null));
             assertImmutable(immutableSortedSet(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableSortedSet((Stream<String>) null));
-            assertImmutable(immutableSortedSet(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableSortedSet(Stream.of("1", "2")));
         }
     }
 

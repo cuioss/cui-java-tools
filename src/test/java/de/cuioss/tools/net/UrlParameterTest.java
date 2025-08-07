@@ -15,8 +15,13 @@
  */
 package de.cuioss.tools.net;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,40 +33,40 @@ import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.net.UrlParameter.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class UrlParameterTest {
 
     private UrlParameter parameter;
 
     @Test
     void urlParameterConstructorValidParameter() {
-        parameter = new UrlParameter("name", "value");
+        var name = Generators.letterStrings(3, 10).next();
+        var value = Generators.nonEmptyStrings().next();
+        parameter = new UrlParameter(name, value);
         assertNotNull(parameter);
+
         parameter = new UrlParameter("na/me", "va/lue");
         assertNotNull(parameter);
         assertEquals("na%2Fme", parameter.getName());
         assertEquals("va%2Flue", parameter.getValue());
     }
 
-    @Test
-    void urlParameterConstructorInvalidNameNull() {
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter(null, "value"));
-    }
-
-    @Test
-    void urlParameterConstructorInvalidNameEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("", "value"));
-    }
-
-    @Test
-    void urlParameterConstructorInvalidNameTrimEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter("   ", "value"));
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void urlParameterConstructorInvalidName(String invalidName) {
+        var value = Generators.nonEmptyStrings().next();
+        assertThrows(IllegalArgumentException.class, () -> parameter = new UrlParameter(invalidName, value));
     }
 
     @Test
     void isEmpty() {
-        parameter = new UrlParameter("name", null);
+        var name = Generators.letterStrings(3, 10).next();
+        parameter = new UrlParameter(name, null);
         assertTrue(parameter.isEmpty());
-        parameter = new UrlParameter("na/me", "va/lue");
+
+        var value = Generators.nonEmptyStrings().next();
+        parameter = new UrlParameter(name, value);
         assertFalse(parameter.isEmpty());
     }
 

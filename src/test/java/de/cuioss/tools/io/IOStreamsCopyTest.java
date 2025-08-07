@@ -21,7 +21,7 @@ import de.cuioss.tools.io.support.NullReader;
 import de.cuioss.tools.io.support.NullWriter;
 import de.cuioss.tools.io.support.YellOnCloseInputStream;
 import de.cuioss.tools.io.support.YellOnFlushAndCloseOutputStream;
-import de.cuioss.tools.support.Generators;
+import de.cuioss.tools.support.TestDataGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ class IOStreamsCopyTest {
 
     private static final int FILE_SIZE = 1024 * 4 + 1;
 
-    private final byte[] inData = Generators.generateTestData(FILE_SIZE);
+    private final byte[] inData = TestDataGenerator.generateTestData(FILE_SIZE);
 
     /*
      * Note: this is not particularly beautiful code. A better way to check for
