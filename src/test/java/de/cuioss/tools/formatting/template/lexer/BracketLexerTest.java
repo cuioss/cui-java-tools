@@ -24,7 +24,7 @@ import de.cuioss.tools.formatting.template.lexer.BracketLexer.Brackets;
 import de.cuioss.tools.formatting.template.lexer.Lexer.ExpressionLanguage;
 import de.cuioss.tools.formatting.template.token.Token;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
-import de.cuioss.tools.support.TypedGenerator;
+import de.cuioss.test.generator.TypedGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -15,7 +15,7 @@
  */
 package de.cuioss.tools.formatting.support;
 
-import de.cuioss.tools.support.TypedGenerator;
+import de.cuioss.test.generator.TypedGenerator;
 
 public class PersonAddressGenerator implements TypedGenerator<PersonAddress> {
 
