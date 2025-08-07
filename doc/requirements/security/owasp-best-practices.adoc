@@ -101,6 +101,7 @@ public Path validatePath(String userInput, Path baseDirectory)
 ----
 
 ==== Platform-Specific Considerations
+
 * **Windows**: Handle both forward and backward slashes
 * **Unix/Linux**: Consider case sensitivity
 * **All Platforms**: Handle symbolic links appropriately
