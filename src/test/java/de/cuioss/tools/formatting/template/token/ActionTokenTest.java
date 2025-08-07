@@ -23,7 +23,8 @@ class ActionTokenTest {
 
     @Test
     void shouldImplementObjectContracts() {
-        var token = Generators.nonEmptyStrings().next();
+        // Use letterStrings to avoid regex special characters in token
+        var token = Generators.letterStrings(5, 10).next();
         var template = "prefix" + token + "suffix";
         ObjectMethodsAsserts.assertNiceObject(new ActionToken(template, token));
     }
