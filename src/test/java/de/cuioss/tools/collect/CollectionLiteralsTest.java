@@ -139,7 +139,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableList((Iterator<String>) null));
             assertMutable(mutableList(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableList((Stream<String>) null));
-            assertMutable(mutableList(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableList(Stream.of("1", "2")));
         }
 
         @Test
@@ -158,7 +158,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableList((Iterator<String>) null));
             assertImmutable(immutableList(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableList((Stream<String>) null));
-            assertImmutable(immutableList(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableList(Stream.of("1", "2")));
         }
     }
 
@@ -180,7 +180,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableSet((Iterator<String>) null));
             assertMutable(mutableSet(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableSet((Stream<String>) null));
-            assertMutable(mutableSet(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -197,7 +197,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableSet((Iterator<String>) null));
             assertImmutable(immutableSet(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableSet((Stream<String>) null));
-            assertImmutable(immutableSet(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -214,7 +214,7 @@ class CollectionLiteralsTest {
             assertMutable(mutableSortedSet((Iterator<String>) null));
             assertMutable(mutableSortedSet(Arrays.asList("1", "2").iterator()));
             assertMutable(mutableSortedSet((Stream<String>) null));
-            assertMutable(mutableSortedSet(Arrays.asList("1", "2").stream()));
+            assertMutable(mutableSortedSet(Stream.of("1", "2")));
         }
 
         @Test
@@ -230,7 +230,7 @@ class CollectionLiteralsTest {
             assertImmutable(immutableSortedSet((Iterator<String>) null));
             assertImmutable(immutableSortedSet(Arrays.asList("1", "2").iterator()));
             assertImmutable(immutableSortedSet((Stream<String>) null));
-            assertImmutable(immutableSortedSet(Arrays.asList("1", "2").stream()));
+            assertImmutable(immutableSortedSet(Stream.of("1", "2")));
         }
     }
 

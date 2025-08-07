@@ -208,32 +208,16 @@ class BooleanOperationsTest {
             }
 
             // Test isAnyTrue performance
-            assertDoesNotThrow(() -> {
-                var result = isAnyTrue(largeArray);
-                // Result depends on random data, just verify it runs
-                assertNotNull(result);
-            });
+            assertDoesNotThrow(() -> isAnyTrue(largeArray));
 
             // Test isAnyFalse performance
-            assertDoesNotThrow(() -> {
-                var result = isAnyFalse(largeArray);
-                // Result depends on random data, just verify it runs
-                assertNotNull(result);
-            });
+            assertDoesNotThrow(() -> isAnyFalse(largeArray));
 
             // Test areAllTrue performance
-            assertDoesNotThrow(() -> {
-                var result = areAllTrue(largeArray);
-                // Result depends on random data, just verify it runs
-                assertNotNull(result);
-            });
+            assertDoesNotThrow(() -> areAllTrue(largeArray));
 
             // Test areAllFalse performance
-            assertDoesNotThrow(() -> {
-                var result = areAllFalse(largeArray);
-                // Result depends on random data, just verify it runs
-                assertNotNull(result);
-            });
+            assertDoesNotThrow(() -> areAllFalse(largeArray));
         }
 
         @Test
