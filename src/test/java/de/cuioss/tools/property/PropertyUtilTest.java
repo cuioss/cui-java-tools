@@ -32,7 +32,7 @@ import static de.cuioss.tools.property.PropertyUtil.*;
 import static de.cuioss.tools.property.support.BeanWithReadWriteProperties.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("java:S5738")
+@SuppressWarnings({"java:S5738"})
 @EnableGeneratorController
 class PropertyUtilTest {
 
