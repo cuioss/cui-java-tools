@@ -1,4 +1,4 @@
-= Path Traversal Security Test Harness Design
+= URL Security Validation Test Harness Design
 :toc: left
 :toclevels: 3
 :sectnums:
@@ -6,784 +6,1067 @@
 
 link:README.adoc[← Back to Documentation Index]
 
-== Executive Summary
+[IMPORTANT]
+====
+This document describes HOW to test the URL Security Validation system.
+For WHAT tasks to implement, see link:../../../plan.adoc[Implementation Plan].
+For HOW the system architecture works, see link:architecture-design.adoc[Architecture Design].
+====
 
-This document defines a comprehensive test harness design for HTTP URL path traversal security validation using Java 21+ built-in types. The harness incorporates test cases derived from real CVEs, OWASP testing guidelines, and HTTP RFC standards to ensure robust validation of URL security. The design emphasizes leveraging Java's native URL, URI, and URLDecoder classes for validation.
+== Testing Philosophy
 
-== Test Harness Architecture
+. **Generator-Based Testing**: Dynamic test data generation using TypedGenerator pattern
+. **Deterministic Generation**: Using cui-tools Generator (not Random) for reproducibility
+. **Comprehensive Coverage**: 36 explicit test cases covering all attack categories
+. **Performance Validation**: Sub-millisecond requirement verification
+. **False Positive Prevention**: Ensuring legitimate URLs pass validation
 
-=== Core Components
-
-[cols="2,3,2"]
-|===
-|Component |Purpose |Key Features
-
-|HTTP Pattern Generator
-|Creates malicious URL patterns
-|CVE-based patterns, encoding variants, HTTP-specific
-
-|URL Validation Engine
-|Executes URL validations using Java built-in types
-|URI class validation, URLDecoder, Pattern matching
-
-|HTTP Attack Simulator
-|Simulates HTTP attack scenarios
-|URL manipulation, parameter pollution, header injection
-
-|Result Analyzer
-|Evaluates test outcomes
-|Security scoring, vulnerability detection, reporting
-
-|===
-
-=== Test Framework Structure
+== Test Framework Structure
 
 ----
-test-harness/
-├── core/
-│   ├── generators/
-│   │   ├── HttpPatternGenerator.java
-│   │   └── EncodingGenerator.java
-│   ├── validators/
-│   │   ├── HttpPathValidator.java
-│   │   └── URLValidator.java
-│   └── analyzers/
-│       ├── SecurityAnalyzer.java
-│       └── PerformanceAnalyzer.java
-├── attacks/
-│   ├── cve-based/
-│   ├── encoding/
-│   └── advanced/
-├── reports/
-│   └── templates/
-└── config/
-    └── test-profiles/
+src/test/java/de/cuioss/tools/security/http/
+├── generators/                              # Test data generators
+│   ├── PathTraversalGenerator.java         # Path traversal patterns
+│   ├── EncodingCombinationGenerator.java   # Encoding combinations
+│   ├── UnicodeAttackGenerator.java         # Unicode attacks
+│   ├── BoundaryFuzzingGenerator.java       # Boundary conditions
+│   ├── ValidURLGenerator.java              # Valid URLs
+│   ├── InvalidURLGenerator.java            # Malformed URLs
+│   ├── URLParameterGenerator.java          # URL parameters
+│   ├── CookieGenerator.java                # Cookie data
+│   ├── HTTPBodyGenerator.java              # HTTP body content
+│   └── GeneratorTestSuite.java             # Generator tests
+│
+├── attacks/                                 # Attack test cases
+│   ├── PathTraversalAttackTest.java        # Path traversal tests
+│   ├── EncodingAttackTest.java             # Encoding attack tests
+│   ├── UnicodeAttackTest.java              # Unicode attack tests
+│   ├── InjectionAttackTest.java            # Injection tests
+│   ├── HTTPAttackTest.java                 # HTTP-specific tests
+│   ├── DoSAttackTest.java                  # DoS attack tests
+│   ├── ProtocolEdgeCaseTest.java           # Protocol edge cases
+│   ├── CVEValidationTest.java              # Known CVE tests
+│   ├── OWASPComplianceTest.java            # OWASP compliance
+│   ├── FalsePositiveTest.java              # False positive tests
+│   └── PerformanceValidationTest.java      # Performance tests
+│
+├── database/                                # Attack patterns
+│   ├── AttackPatternDatabase.java          # Pattern repository
+│   ├── CVEPatterns.java                    # CVE patterns
+│   └── OWASPPatterns.java                  # OWASP patterns
+│
+└── harness/                                 # Test orchestration
+    ├── SecurityTestSuite.java              # Main test suite
+    ├── TestReporter.java                   # Report generation
+    └── SecurityCoverageAnalyzer.java       # Coverage analysis
 ----
 
-== Test Data Categories
+== Test Data Generators
 
-=== CVE-Based Test Vectors
-
-==== Critical CVE Patterns
+=== G1: PathTraversalGenerator
 
 [source,java]
 ----
-public class CVETestVectors {
-    
-    // HTTP URL Path Traversal Patterns
-    public static final String[] HTTP_TRAVERSAL_PATTERNS = {
-        "GET /images/../../../etc/passwd HTTP/1.1",
-        "GET /static/%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd HTTP/1.1",
-        "GET /files/..%252f..%252f..%252fetc%252fpasswd HTTP/1.1",
-        "GET /%2e%2e%2f%2e%2e%2f%2e%2e%2f HTTP/1.1"
-    };
-    
-    // CVE-2023-32235 - Ghost CMS (URL Encoding)
-    public static final String[] GHOST_URL_PATTERNS = {
-        "/assets/built%2F..%2F..%2F/package.json",
-        "/assets/built%2F..%2F..%2F..%2F/etc/passwd",
-        "/themes/casper%2F..%2F..%2F/config.production.json"
-    };
-    
-    // CVE-2023-50164 - Apache Struts (URL context)
-    public static final String[] STRUTS_URL_PATTERNS = {
-        "/app/../../WEB-INF/web.xml",
-        "/static/../../../webapps/ROOT/config",
-        "/files/%2e%2e%2fWEB-INF/classes/"
-    };
-    
-    // CVE-2024-38819 - Double URL Encoding
-    public static final String[] DOUBLE_ENCODING_PATTERNS = {
-        "%252e%252e%252f%252e%252e%252f",
-        "%252E%252E%252F%252E%252E%252F",
-        "%%32%65%%32%65%%32%66"
-    };
-    
-    // HTTP Header Injection Patterns
-    public static final String[] HEADER_PATTERNS = {
-        "X-Original-URL: /admin",
-        "X-Rewrite-URL: /../../../etc/passwd",
-        "X-Forwarded-Path: /../../protected/"
-    };
-}
-----
+package de.cuioss.tools.security.http.generators;
 
-=== HTTP/URL Encoding Test Matrices
+import de.cuioss.tools.generator.TypedGenerator;
+import de.cuioss.tools.generator.Generator;
 
-==== HTTP-Specific Encoding Tests
-
-[source,java]
-----
-public class HTTPEncodingTestMatrix {
+/**
+ * Generates path traversal attack patterns.
+ * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G1]
+ */
+public class PathTraversalGenerator implements TypedGenerator<String> {
     
-    public enum HTTPEncodingType {
-        // RFC 3986 Percent-Encoding
-        URL_SINGLE("%2e%2e%2f"),
-        URL_DOUBLE("%252e%252e%252f"),
-        URL_TRIPLE("%25252e%25252e%25252f"),
-        
-        // Mixed Case Encoding (RFC 3986 Section 2.1)
-        MIXED_CASE_HEX("%2E%2e%2F"),
-        
-        // Unicode in URLs (RFC 3987 - IRI)
-        UNICODE_URL("%u002e%u002e%u002f"),
-        
-        // HTML Entity Encoding (for parameters)
-        HTML_ENTITY("&#46;&#46;&#47;"),
-        HTML_HEX("&#x2e;&#x2e;&#x2f;"),
-        
-        // Null Byte Injection
-        NULL_BYTE("..%00/"),
-        
-        // Non-standard but seen in attacks
-        PLUS_FOR_SPACE("..+/"),
-        
-        // RFC 3986 Reserved Character Encoding
-        ENCODED_SLASH("%2F"),
-        ENCODED_QUESTION("%3F"),
-        ENCODED_HASH("%23")
-    }
+    private static final String[] BASE_PATTERNS = {
+        "../", ".../", "..\\", "..\\\\",
+        ".%2e/", "%2e%2e/", "%2e%2e%2f",
+        "..;/", "..\\../", "..//..//"
+    };
     
-    public static String generateEncodedPath(String basePath, HTTPEncodingType encoding) {
-        // Implementation for each encoding type
-        switch(encoding) {
-            case URL_SINGLE:
-                return URLEncoder.encode(basePath, StandardCharsets.UTF_8);
-            case URL_DOUBLE:
-                return URLEncoder.encode(
-                    URLEncoder.encode(basePath, StandardCharsets.UTF_8),
-                    StandardCharsets.UTF_8
-                );
-            // ... other encoding implementations
+    private static final String[] TARGET_FILES = {
+        "etc/passwd", "etc/shadow", "etc/hosts",
+        "windows/system32/config/sam",
+        "windows/win.ini", "boot.ini"
+    };
+    
+    private final Generator<Integer> depthGen = Generator.integers(1, 10);
+    private final Generator<Integer> patternGen = Generator.integers(0, BASE_PATTERNS.length - 1);
+    private final Generator<Integer> targetGen = Generator.integers(0, TARGET_FILES.length - 1);
+    
+    @Override
+    public String next() {
+        int depth = depthGen.next();
+        String pattern = BASE_PATTERNS[patternGen.next()];
+        String target = TARGET_FILES[targetGen.next()];
+        
+        StringBuilder attack = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            attack.append(pattern);
         }
+        attack.append(target);
+        
+        return attack.toString();
+    }
+    
+    @Override
+    public Class<String> getType() {
+        return String.class;
     }
 }
 ----
 
-=== HTTP Protocol-Specific Test Cases
-
-==== HTTP Method and Protocol Variants
+=== G2: EncodingCombinationGenerator
 
 [source,java]
 ----
-public class HttpProtocolTests {
+package de.cuioss.tools.security.http.generators;
+
+/**
+ * Generates various encoding combinations for bypass attempts.
+ * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G2]
+ */
+public class EncodingCombinationGenerator implements TypedGenerator<String> {
     
-    // HTTP method-specific patterns
-    public static final String[] METHOD_PATTERNS = {
-        "GET /../../../admin HTTP/1.1",
-        "POST /api/%2e%2e/config HTTP/1.1",
-        "PUT /files/..%252f..%252f HTTP/2",
-        "OPTIONS * HTTP/1.1",
-        "TRACE /../../ HTTP/1.0"
-    };
+    private final Generator<Integer> encodingLevelGen = Generator.integers(1, 3);
+    private final Generator<Boolean> mixedCaseGen = Generator.booleans();
     
-    // Query string attack patterns
-    public static final String[] QUERY_PATTERNS = {
-        "?page=../../../etc/passwd",
-        "?file=%2e%2e%2f%2e%2e%2f%2e%2e%2f",
-        "?path=..%252f..%252f..%252f",
-        "?url=http://evil.com&file=../../",
-        "?redirect=//evil.com/../../"
-    };
+    @Override
+    public String next() {
+        int level = encodingLevelGen.next();
+        boolean mixedCase = mixedCaseGen.next();
+        
+        String base = "../";
+        String encoded = base;
+        
+        // Apply encoding levels
+        for (int i = 0; i < level; i++) {
+            encoded = urlEncode(encoded);
+        }
+        
+        // Apply mixed case if selected
+        if (mixedCase) {
+            encoded = applyMixedCase(encoded);
+        }
+        
+        return encoded;
+    }
     
-    // Fragment identifier patterns
-    public static final String[] FRAGMENT_PATTERNS = {
-        "#/../../../",
-        "#%2e%2e%2f",
-        "#..;/",
-        "#../admin"
-    };
+    private String urlEncode(String input) {
+        // URL encode with %25 for % in multi-level
+        return input.replace(".", "%2e")
+                   .replace("/", "%2f")
+                   .replace("%", "%25");
+    }
     
-    // Cookie path patterns
-    public static final String[] COOKIE_PATTERNS = {
-        "Path=/../../",
-        "Path=%2e%2e%2f",
-        "Domain=..",
-        "Path=//evil.com/"
-    };
+    private String applyMixedCase(String input) {
+        // Mix uppercase and lowercase in hex encoding
+        return input.replaceAll("%2e", "%2E")
+                   .replaceAll("%2f", "%2F");
+    }
 }
 ----
 
-== Test Implementation Framework
-
-=== Base Test Class
+=== G3: UnicodeAttackGenerator
 
 [source,java]
 ----
-public abstract class PathTraversalSecurityTest {
+package de.cuioss.tools.security.http.generators;
+
+/**
+ * Generates Unicode-based attack patterns.
+ * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G3]
+ */
+public class UnicodeAttackGenerator implements TypedGenerator<String> {
     
-    protected PathValidator validator;
-    protected SecurityAnalyzer analyzer;
-    protected TestReport report;
+    private static final String[] UNICODE_ATTACKS = {
+        "\u002e\u002e\u002f",           // Unicode dots and slash
+        "\u2024\u2024\u2215",           // Lookalike characters
+        "\u202e",                       // Right-to-left override
+        "\u200b",                       // Zero-width space
+        "\uFEFF",                       // Zero-width no-break space
+        "\u0000"                        // Null character
+    };
     
-    @BeforeEach
+    private final Generator<Integer> attackGen = 
+        Generator.integers(0, UNICODE_ATTACKS.length - 1);
+    private final Generator<Boolean> combineGen = Generator.booleans();
+    
+    @Override
+    public String next() {
+        String attack = UNICODE_ATTACKS[attackGen.next()];
+        
+        if (combineGen.next()) {
+            // Combine with path traversal
+            return attack + "../etc/passwd";
+        }
+        
+        return attack;
+    }
+}
+----
+
+=== G4: BoundaryFuzzingGenerator
+
+[source,java]
+----
+package de.cuioss.tools.security.http.generators;
+
+/**
+ * Generates boundary condition test cases.
+ * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G4]
+ */
+public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
+    
+    private final Generator<Integer> lengthGen = Generator.integers(1000, 10000);
+    private final Generator<Integer> nestingGen = Generator.integers(50, 200);
+    
+    @Override
+    public String next() {
+        int type = Generator.integers(0, 5).next();
+        
+        return switch (type) {
+            case 0 -> generateLongPath();
+            case 1 -> generateDeepNesting();
+            case 2 -> generateNullBytes();
+            case 3 -> generateControlCharacters();
+            case 4 -> generateMixedBoundaryAttacks();
+            default -> generateSpecialChars();
+        };
+    }
+    
+    private String generateLongPath() {
+        int length = lengthGen.next();
+        StringBuilder path = new StringBuilder("/");
+        while (path.length() < length) {
+            path.append("verylongpathsegment/");
+        }
+        return path.toString();
+    }
+    
+    private String generateDeepNesting() {
+        int depth = nestingGen.next();
+        StringBuilder path = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            path.append("dir/");
+        }
+        return path.toString();
+    }
+    
+    private String generateNullBytes() {
+        String[] patterns = {
+            "/file\u0000.txt",              // Raw null byte
+            "/admin%00.php",                // Encoded null byte  
+            "../etc/passwd%00.jpg",         // Path traversal with null
+            "file.jsp%00.png",              // Extension bypass
+            "%00../../etc/shadow"           // Leading null byte
+        };
+        return patterns[Generator.integers(0, patterns.length - 1).next()];
+    }
+    
+    private String generateControlCharacters() {
+        // Various control characters that should be rejected
+        String[] controls = {
+            "/file\r\n.txt",                // CRLF injection
+            "/path\t\tfile",                // Tab characters
+            "/dir\b\bfile",                 // Backspace
+            "/test\u001Ffile"               // Unit separator
+        };
+        return controls[Generator.integers(0, controls.length - 1).next()];
+    }
+    
+    private String generateMixedBoundaryAttacks() {
+        // Combine multiple boundary issues
+        int attack = Generator.integers(0, 3).next();
+        return switch (attack) {
+            case 0 -> "../".repeat(100) + "etc/passwd";  // Excessive traversal
+            case 1 -> "/a".repeat(2000);                  // Near max length
+            case 2 -> "/%00" + "../".repeat(10);          // Null + traversal
+            default -> "/\u0000/../\u0000/../file";       // Multiple nulls
+        };
+    }
+    
+    private String generateSpecialChars() {
+        // Other special characters
+        String[] specials = {
+            "/file|command",                // Pipe character
+            "/file;command",                // Semicolon
+            "/file`command`",               // Backticks
+            "/file$variable",               // Variable expansion
+            "/file>output"                  // Redirection
+        };
+        return specials[Generator.integers(0, specials.length - 1).next()];
+    }
+}
+----
+
+=== G5: ValidURLGenerator
+
+[source,java]
+----
+package de.cuioss.tools.security.http.generators;
+
+import de.cuioss.tools.security.http.config.UrlSecurityConfig;
+
+/**
+ * Generates legitimate URLs that should pass validation.
+ * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G5]
+ */
+public class ValidURLGenerator implements TypedGenerator<String> {
+    
+    private static final String[] VALID_PATHS = {
+        "/api/v1/users",
+        "/static/css/style.css",
+        "/index.html",
+        "/docs/guide.pdf",
+        "/search?q=test&limit=10",
+        "/products/123/reviews",
+        "/admin/dashboard"
+    };
+    
+    private final Generator<Integer> pathGen = 
+        Generator.integers(0, VALID_PATHS.length - 1);
+    private final Generator<Boolean> paramGen = Generator.booleans();
+    
+    @Override
+    public String next() {
+        String path = VALID_PATHS[pathGen.next()];
+        
+        if (paramGen.next()) {
+            // Add valid parameters
+            path += "?page=" + Generator.integers(1, 100).next();
+            path += "&sort=" + Generator.from("asc", "desc").next();
+        }
+        
+        // Ensure within DEFAULT_MAX_PATH_LENGTH (2048)
+        if (path.length() > UrlSecurityConfig.DEFAULT_MAX_PATH_LENGTH) {
+            path = path.substring(0, UrlSecurityConfig.DEFAULT_MAX_PATH_LENGTH);
+        }
+        
+        return path;
+    }
+}
+----
+
+== Attack Test Implementation
+
+=== Path Traversal Tests (T1-T4)
+
+[source,java]
+----
+package de.cuioss.tools.security.http.attacks;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import de.cuioss.tools.security.http.generators.*;
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Stream;
+
+/**
+ * Path traversal attack tests using TypedGenerators.
+ * Implements: link:../../../plan.adoc#_phase_71_path_traversal_attack_tests[Tasks T1-T4]
+ */
+public class PathTraversalAttackTest {
+    
+    private final HttpSecurityValidator validator = createValidator();
+    
+    @ParameterizedTest(name = "T1: Path traversal [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.PATH_TRAVERSAL, limit = 100)
+    void testBasicPathTraversal_T1(String attack, String generatorType) {
+        // T1: Basic path traversal patterns from generator
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class, 
+            () -> validator.execute(attack),
+            "Failed to detect path traversal: " + attack
+        );
+        
+        // Verify appropriate failure type
+        assertTrue(
+            exception.getFailureType() == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
+            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+            "Unexpected failure type: " + exception.getFailureType()
+        );
+    }
+    
+    @ParameterizedTest(name = "T2: Encoded [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.ENCODING, limit = 100)
+    void testEncodedPathTraversal_T2(String encoded, String generatorType) {
+        // T2: URL-encoded path traversal - caught early at character validation
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class, 
+            () -> validator.execute(encoded)
+        );
+        
+        // Should be caught at character validation or as encoding issue
+        assertTrue(
+            exception.getFailureType() == UrlSecurityFailureType.INVALID_ENCODING ||
+            exception.getFailureType() == UrlSecurityFailureType.DOUBLE_ENCODING ||
+            exception.getFailureType() == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED
+        );
+    }
+    
+    @ParameterizedTest(name = "T3: Unicode [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.UNICODE, limit = 100)
+    void testUnicodePathTraversal_T3(String unicode, String generatorType) {
+        // T3: Unicode-based path traversal
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class, 
+            () -> validator.execute(unicode)
+        );
+        
+        // Should detect unicode attacks
+        assertTrue(
+            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+            exception.getFailureType() == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
+            exception.getFailureType() == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED
+        );
+    }
+    
+    @ParameterizedTest(name = "T4: Null byte/Boundary [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.BOUNDARY, limit = 50)
+    void testNullBytePathTraversal_T4(String nullByteAttack, String generatorType) {
+        // T4: Null byte injection and boundary conditions
+        // BoundaryFuzzingGenerator includes null byte patterns
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class, 
+            () -> validator.execute(nullByteAttack)
+        );
+        
+        // Must be caught as appropriate security issue
+        assertTrue(
+            exception.getFailureType() == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
+            exception.getFailureType() == UrlSecurityFailureType.PATH_TOO_LONG ||
+            exception.getFailureType() == UrlSecurityFailureType.EXCESSIVE_NESTING ||
+            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+            "Unexpected failure for boundary test: " + exception.getFailureType()
+        );
+    }
+}
+----
+
+== Attack Pattern Database
+
+=== Database Structure
+
+[source,java]
+----
+package de.cuioss.tools.security.http.database;
+
+/**
+ * Central repository of attack patterns.
+ * Implements: link:../../../plan.adoc#_phase_712_integration_tasks[Task I2]
+ */
+public class AttackPatternDatabase {
+    
+    private final Map<String, AttackPattern> patterns = new HashMap<>();
+    
+    public record AttackPattern(
+        String id,
+        String name,
+        String pattern,
+        AttackCategory category,
+        String cveReference,
+        String owaspReference,
+        String description,
+        boolean shouldBlock,
+        String justification
+    ) {}
+    
+    public enum AttackCategory {
+        PATH_TRAVERSAL,
+        ENCODING_BYPASS,
+        UNICODE_ATTACK,
+        INJECTION,
+        HTTP_SMUGGLING,
+        DOS_ATTACK,
+        PROTOCOL_ABUSE
+    }
+    
+    public AttackPatternDatabase() {
+        loadCVEPatterns();
+        loadOWASPPatterns();
+        loadModSecurityPatterns();
+    }
+    
+    private void loadCVEPatterns() {
+        // CVE-2021-41773: Apache path traversal
+        patterns.put("CVE-2021-41773", new AttackPattern(
+            "CVE-2021-41773",
+            "Apache Path Traversal",
+            "/.%2e/",
+            AttackCategory.PATH_TRAVERSAL,
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-41773",
+            "CWE-22",
+            "Apache HTTP Server 2.4.49 path traversal",
+            true,
+            "Known critical vulnerability allowing directory traversal"
+        ));
+        
+        // CVE-2021-42013: Apache double encoding
+        patterns.put("CVE-2021-42013", new AttackPattern(
+            "CVE-2021-42013",
+            "Apache Double Encoding",
+            "%%32%65",
+            AttackCategory.ENCODING_BYPASS,
+            "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-42013",
+            "CWE-22",
+            "Apache HTTP Server double encoding bypass",
+            true,
+            "Double encoding bypass of CVE-2021-41773 fix"
+        ));
+        
+        // More CVE patterns loaded from database...
+    }
+}
+----
+
+== Test Execution Strategy
+
+=== Test Suite Orchestration
+
+[source,java]
+----
+package de.cuioss.tools.security.http.harness;
+
+import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.SelectPackages;
+
+/**
+ * Main security test suite orchestrator.
+ * Implements: link:../../../plan.adoc#_phase_712_integration_tasks[Task I1]
+ */
+@Suite
+@SelectPackages({
+    "de.cuioss.tools.security.http.attacks",
+    "de.cuioss.tools.security.http.generators"
+})
+public class SecurityTestSuite {
+    
+    @BeforeAll
+    static void setupTestEnvironment() {
+        // Initialize attack pattern database
+        AttackPatternDatabase database = new AttackPatternDatabase();
+        
+        // Configure test reporting
+        TestReporter reporter = new TestReporter();
+        
+        // Set performance baselines
+        PerformanceBaseline.set(1.0); // 1ms threshold
+    }
+    
+    @AfterAll
+    static void generateTestReport() {
+        // Generate comprehensive test report
+        TestReport report = reporter.generateReport();
+        
+        // Export results in multiple formats
+        reporter.generateHTMLReport(report);
+        reporter.generateJSONReport(report);
+        reporter.generateJUnitXML(report);
+    }
+}
+----
+
+=== Performance Benchmarking
+
+[source,java]
+----
+package de.cuioss.tools.security.http.attacks;
+
+import org.openjdk.jmh.annotations.*;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Performance validation benchmarks.
+ * Implements: link:../../../plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
+ */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Benchmark)
+public class PerformanceValidationBenchmark {
+    
+    private HttpSecurityValidator validator;
+    private PathTraversalGenerator attackGen;
+    private ValidURLGenerator validGen;
+    
+    @Setup
     public void setup() {
-        validator = createValidator();
-        analyzer = new SecurityAnalyzer();
-        report = new TestReport();
-    }
-    
-    protected abstract PathValidator createValidator();
-    
-    @Test
-    public void testAllCVEPatterns() {
-        for (String pattern : CVETestVectors.getAllPatterns()) {
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validatePath(pattern),
-                "Failed to block CVE pattern: " + pattern
-            );
-            report.addTestResult("CVE", pattern, true);
-        }
-    }
-    
-    @Test
-    public void testEncodingVariants() {
-        String basePath = "../../../etc/passwd";
-        for (HTTPEncodingType encoding : HTTPEncodingType.values()) {
-            String encoded = HTTPEncodingTestMatrix.generateEncodedPath(basePath, encoding);
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validatePath(encoded),
-                "Failed to block encoding: " + encoding
-            );
-            report.addTestResult("Encoding", encoded, true);
-        }
-    }
-    
-    @Test
-    public void testLegitimateAccess() {
-        String[] legitimatePaths = {
-            "documents/report.pdf",
-            "images/logo.png",
-            "data/2024/january/sales.csv"
-        };
-        
-        for (String path : legitimatePaths) {
-            assertDoesNotThrow(
-                () -> validator.validatePath(path),
-                "Incorrectly blocked legitimate path: " + path
-            );
-            report.addTestResult("Legitimate", path, true);
-        }
-    }
-    
-    @AfterEach
-    public void generateReport() {
-        report.generateSummary();
-        analyzer.analyzeResults(report);
-    }
-}
-----
-
-=== HTTP Parameter Attack Test Suite
-
-[source,java]
-----
-public class HttpParameterAttackTestSuite {
-    
-    @Test
-    public void testMaliciousHttpHeaders() {
-        // Test malicious HTTP header patterns
-        String[] maliciousHeaders = {
-            "X-Original-URL: /../../../admin",
-            "X-Rewrite-URL: /../../etc/passwd",
-            "X-Forwarded-Path: %2e%2e%2f%2e%2e%2f"
-        };
-        
-        HttpHeaderValidator validator = new HttpHeaderValidator();
-        
-        for (String header : maliciousHeaders) {
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validateHeader(header),
-                "Failed to detect malicious header: " + header
-            );
-        }
-    }
-    
-    @Test
-    public void testUrlParameterInjection() {
-        // Test URL parameter injection patterns
-        Map<String, String> maliciousParams = Map.of(
-            "file", "../../../etc/passwd",
-            "path", "%2e%2e%2f%2e%2e%2f",
-            "doc", "..\\..\\windows\\system32",
-            "page", "%252e%252e%252f"
+        validator = new URLPathValidationPipeline(
+            UrlSecurityConfig.builder().build(),
+            new SecurityEventCounter()
         );
-        
-        UrlParameterValidator validator = new UrlParameterValidator();
-        
-        maliciousParams.forEach((name, value) -> {
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validateParameter(name, value),
-                "Failed to detect injection in parameter: " + name
-            );
-        });
-    }
-}
-----
-
-=== Performance Benchmark Suite
-
-[source,java]
-----
-public class PathValidationBenchmark {
-    
-    private static final int ITERATIONS = 100000;
-    
-    @Test
-    public void benchmarkValidationMethods() {
-        Map<String, Long> results = new HashMap<>();
-        
-        // Test string-based validation
-        long stringTime = measureTime(() -> {
-            for (int i = 0; i < ITERATIONS; i++) {
-                stringBasedValidation("../../../etc/passwd");
-            }
-        });
-        results.put("String-based", stringTime);
-        
-        // Test canonical path validation
-        long canonicalTime = measureTime(() -> {
-            for (int i = 0; i < ITERATIONS; i++) {
-                canonicalPathValidation("../../../etc/passwd");
-            }
-        });
-        results.put("Canonical", canonicalTime);
-        
-        // Test NIO-based validation
-        long nioTime = measureTime(() -> {
-            for (int i = 0; i < ITERATIONS; i++) {
-                nioBasedValidation("../../../etc/passwd");
-            }
-        });
-        results.put("NIO-based", nioTime);
-        
-        // Generate performance report
-        generatePerformanceReport(results);
+        attackGen = new PathTraversalGenerator();
+        validGen = new ValidURLGenerator();
     }
     
-    private long measureTime(Runnable task) {
-        long start = System.nanoTime();
-        task.run();
-        return System.nanoTime() - start;
-    }
-}
-----
-
-== Attack Simulation Framework
-
-=== Web Application Attack Simulator
-
-[source,java]
-----
-public class WebAttackSimulator {
-    
-    // Simulated HTTP request for testing
-    private HttpServletRequest request;
-    private PathTraversalFilter filter;
-    
-    @Test
-    public void simulateHttpParameterAttack() {
-        // Simulate various HTTP parameter attacks
-        String[] attackParams = {
-            "?file=../../../etc/passwd",
-            "?page=%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd",
-            "?doc=..\\..\\..\\windows\\win.ini",
-            "?image=../../../../../../../../dev/null"
-        };
-        
-        for (String param : attackParams) {
-            // Create test request with malicious parameters
-            request = createTestRequest(param);
-            
-            assertThrows(
-                SecurityException.class,
-                () -> filter.doFilter(request),
-                "Failed to block parameter attack: " + param
-            );
+    @Benchmark
+    public void benchmarkNormalLoad_T34() {
+        // T34: Verify <1ms for typical inputs
+        String valid = validGen.next();
+        try {
+            validator.execute(valid);
+        } catch (UrlSecurityException e) {
+            // Should not happen for valid URLs
         }
     }
     
-    @Test
-    public void simulateFileUploadAttack() {
-        // Simulate malicious file upload
-        String maliciousFilename = "../../webapps/ROOT/shell.jsp";
-        String maliciousContent = "<%@ page import=\"java.io.*\" %>";
-        byte[] contentBytes = maliciousContent.getBytes();
-        
-        FileUploadValidator validator = new FileUploadValidator();
-        assertThrows(
-            SecurityException.class,
-            () -> validator.validateUpload(maliciousFilename, contentBytes),
-            "Failed to block malicious file upload"
-        );
-    }
-    
-    @Test
-    public void simulateCookieAttack() {
-        // Simulate malicious cookie
-        String cookieName = "path";
-        String cookieValue = Base64.getEncoder().encodeToString(
-            "../../../etc/passwd".getBytes()
-        );
-        
-        CookieValidator validator = new CookieValidator();
-        assertThrows(
-            SecurityException.class,
-            () -> validator.validate(cookieName, cookieValue),
-            "Failed to detect path traversal in cookie"
-        );
-    }
-}
-----
-
-=== HTTP API Endpoint Security Tests
-
-[source,java]
-----
-public class HttpApiSecurityTests {
-    
-    @Test
-    public void testRestApiPathTraversal() {
-        String[] apiPatterns = {
-            "/api/v1/files/../../../etc/passwd",
-            "/api/resources/%2e%2e%2fadmin",
-            "/api/download?file=../../config/db.properties",
-            "/api/data/..;/admin/users"
-        };
-        
-        RestApiValidator validator = new RestApiValidator();
-        
-        for (String pattern : apiPatterns) {
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validateApiPath(pattern),
-                "Failed to prevent API path traversal: " + pattern
-            );
-        }
-    }
-    
-    @Test
-    public void testGraphQLPathInjection() {
-        String[] graphqlPatterns = {
-            "{ file(path: \"../../../etc/passwd\") { content } }",
-            "{ resource(id: \"../../admin/config\") { data } }",
-            "{ download(file: \"%2e%2e%2f%2e%2e%2f\") { url } }"
-        };
-        
-        GraphQLValidator validator = new GraphQLValidator();
-        
-        for (String pattern : graphqlPatterns) {
-            assertThrows(
-                SecurityException.class,
-                () -> validator.validateQuery(pattern),
-                "Failed to block GraphQL injection: " + pattern
-            );
+    @Benchmark
+    public void benchmarkAttackPayload_T35() {
+        // T35: Verify <1ms even with attacks
+        String attack = attackGen.next();
+        try {
+            validator.execute(attack);
+        } catch (UrlSecurityException e) {
+            // Expected for attacks
         }
     }
 }
 ----
 
-== Security Validation Metrics
+== Test Coverage Requirements
 
-=== Test Coverage Requirements
+=== Security Coverage Metrics
 
-[cols="2,1,3"]
-|===
-|Category |Minimum Coverage |Test Cases
+1. **Attack Pattern Coverage**: 100% of patterns in AttackPatternDatabase
+2. **CVE Coverage**: All relevant CVEs from 2020-2024
+3. **OWASP Coverage**: Complete OWASP Top 10 2021
+4. **Encoding Coverage**: All encoding combinations up to 3 levels
+5. **Unicode Coverage**: All Unicode normalization forms (NFC, NFD, NFKC, NFKD)
+6. **Performance Coverage**: 95th percentile <1ms
 
-|CVE Patterns
-|100%
-|All known CVE patterns from 2019-2024
+=== False Positive Requirements
 
-|Encoding Variants
-|95%
-|URL, Unicode, UTF-8, Base64, HTML entities
+- Maximum 0.1% false positive rate on legitimate URLs
+- All RFC 3986 compliant URLs must pass
+- International domain names must be supported
+- Valid relative paths must work correctly
 
-|HTTP Headers
-|95%
-|X-Original-URL, X-Rewrite-URL, X-Forwarded-Path
+== Test Reporting
 
-|HTTP Methods
-|100%
-|GET, POST, PUT, DELETE, PATCH
-
-|Performance
-|N/A
-|< 1ms per validation for 95th percentile
-
-|===
-
-=== Security Score Calculation
+=== Report Structure
 
 [source,java]
 ----
-public class SecurityScoreCalculator {
+package de.cuioss.tools.security.http.harness;
+
+/**
+ * Comprehensive test report generator.
+ */
+public class TestReporter {
     
-    public SecurityScore calculateScore(TestReport report) {
-        SecurityScore score = new SecurityScore();
-        
-        // CVE protection (40% weight)
-        double cveScore = report.getCVEBlockRate() * 40;
-        score.addComponent("CVE Protection", cveScore);
-        
-        // Encoding resistance (30% weight)
-        double encodingScore = report.getEncodingBlockRate() * 30;
-        score.addComponent("Encoding Resistance", encodingScore);
-        
-        // HTTP method coverage (15% weight)
-        double methodScore = report.getHttpMethodCoverage() * 15;
-        score.addComponent("HTTP Method Coverage", methodScore);
-        
-        // False positive rate (10% weight)
-        double fpScore = (1 - report.getFalsePositiveRate()) * 10;
-        score.addComponent("False Positive Rate", fpScore);
-        
-        // Performance (10% weight)
-        double perfScore = report.getPerformanceScore() * 10;
-        score.addComponent("Performance", perfScore);
-        
-        return score;
+    public record TestReport(
+        Instant timestamp,
+        int totalTests,
+        int passed,
+        int failed,
+        Map<AttackCategory, CategoryResult> categoryResults,
+        List<PerformanceMetric> performanceMetrics,
+        List<FalsePositive> falsePositives,
+        double securityScore
+    ) {}
+    
+    public void generateHTMLReport(TestReport report) {
+        // Generate visual HTML report with charts
+        // Include attack coverage heatmap
+        // Show performance distribution graphs
+    }
+    
+    public void generateJSONReport(TestReport report) {
+        // Generate machine-readable JSON report
+        // Include all metrics for CI/CD integration
+    }
+    
+    public void generateJUnitXML(TestReport report) {
+        // Generate JUnit XML for CI/CD tools
+        // Compatible with Jenkins, GitLab CI, etc.
     }
 }
 ----
 
-== Automated Test Execution
+== Continuous Testing Strategy
 
 === CI/CD Integration
 
-[source,yaml]
-----
-# GitHub Actions workflow
-name: Path Traversal Security Tests
+1. **Pre-commit**: Run quick smoke tests (T1, T5, T11, T34)
+2. **Pull Request**: Run full test suite (T1-T36)
+3. **Nightly**: Run extended fuzzing with all generators
+4. **Release**: Full security audit with performance benchmarks
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+=== Regression Testing
 
-jobs:
-  security-tests:
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        java: [11, 17, 21]
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: ${{ matrix.java }}
-    
-    - name: Run Path Traversal Tests
-      run: |
-        mvn test -Dtest=PathTraversalTestSuite
-        mvn test -Dtest=CVEValidationTests
-        mvn test -Dtest=EncodingResistanceTests
-    
-    - name: Run Performance Benchmarks
-      run: mvn test -Dtest=PathValidationBenchmark
-    
-    - name: Generate Security Report
-      run: mvn security:report
-    
-    - name: Upload Test Results
-      uses: actions/upload-artifact@v3
-      with:
-        name: security-test-results-${{ matrix.os }}-java${{ matrix.java }}
-        path: target/security-reports/
-----
+- Maintain test case for every security issue found
+- Add new CVE patterns as they are discovered
+- Update OWASP patterns with each OWASP update
+- Performance regression detection (<5% degradation threshold)
 
-=== Test Execution Framework
+== Generator Usage Guidelines
+
+=== Custom Test Annotations
 
 [source,java]
 ----
-@TestConfiguration
-public class PathTraversalTestConfiguration {
+package de.cuioss.tools.security.http.testing;
+
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import java.lang.annotation.*;
+
+/**
+ * Custom annotation for generator-based tests.
+ * Automatically provides test data from all security generators.
+ */
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@ArgumentsSource(GeneratorsArgumentsProvider.class)
+@Documented
+public @interface GeneratorsSource {
+    /**
+     * Which generator types to use
+     */
+    GeneratorType[] value() default {
+        GeneratorType.PATH_TRAVERSAL,
+        GeneratorType.ENCODING,
+        GeneratorType.UNICODE,
+        GeneratorType.BOUNDARY
+    };
     
-    @Bean
-    public TestExecutor testExecutor() {
-        return TestExecutor.builder()
-            .parallel(true)
-            .timeout(Duration.ofMinutes(5))
-            .retryCount(3)
-            .reportFormat(ReportFormat.HTML)
-            .includePerformanceMetrics(true)
-            .build();
+    /**
+     * Number of test cases to generate per generator
+     */
+    int limit() default 100;
+}
+
+public enum GeneratorType {
+    PATH_TRAVERSAL,
+    ENCODING,
+    UNICODE,
+    BOUNDARY,
+    VALID_URL,
+    INVALID_URL,
+    URL_PARAMETER,
+    COOKIE,
+    HTTP_BODY
+}
+
+/**
+ * ArgumentsProvider for @GeneratorsSource annotation.
+ */
+public class GeneratorsArgumentsProvider implements ArgumentsProvider {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        GeneratorsSource annotation = context.getRequiredTestMethod()
+            .getAnnotation(GeneratorsSource.class);
+        
+        List<Stream<Arguments>> streams = new ArrayList<>();
+        
+        for (GeneratorType type : annotation.value()) {
+            TypedGenerator<String> generator = createGenerator(type);
+            Stream<Arguments> stream = Stream.generate(() -> 
+                Arguments.of(generator.next(), type.name())
+            ).limit(annotation.limit());
+            streams.add(stream);
+        }
+        
+        // Combine all streams
+        return streams.stream().flatMap(Function.identity());
     }
     
-    @Bean
-    public TestDataProvider testDataProvider() {
-        return new CompositeTestDataProvider(
-            new CVETestDataProvider(),
-            new EncodingTestDataProvider(),
-            new HttpMethodTestDataProvider(),
-            new FuzzingTestDataProvider()
+    private TypedGenerator<String> createGenerator(GeneratorType type) {
+        return switch (type) {
+            case PATH_TRAVERSAL -> new PathTraversalGenerator();
+            case ENCODING -> new EncodingCombinationGenerator();
+            case UNICODE -> new UnicodeAttackGenerator();
+            case BOUNDARY -> new BoundaryFuzzingGenerator();
+            case VALID_URL -> new ValidURLGenerator();
+            case INVALID_URL -> new InvalidURLGenerator();
+            case URL_PARAMETER -> new URLParameterGenerator();
+            case COOKIE -> new CookieGenerator();
+            case HTTP_BODY -> new HTTPBodyGenerator();
+        };
+    }
+}
+----
+
+=== Comprehensive Test Example
+
+[source,java]
+----
+package de.cuioss.tools.security.http.attacks;
+
+/**
+ * Comprehensive security test using all generators.
+ */
+public class ComprehensiveSecurityTest {
+    
+    private final HttpSecurityValidator pathValidator = createPathValidator();
+    private final HttpSecurityValidator paramValidator = createParameterValidator();
+    private final HttpSecurityValidator headerValidator = createHeaderValidator();
+    
+    @ParameterizedTest(name = "Attack detection [{index}]: {1}")
+    @GeneratorsSource(value = {
+        GeneratorType.PATH_TRAVERSAL,
+        GeneratorType.ENCODING,
+        GeneratorType.UNICODE,
+        GeneratorType.BOUNDARY
+    }, limit = 200)
+    void testAllAttackPatterns(String attack, String generatorType) {
+        // All attack patterns should be blocked
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class,
+            () -> pathValidator.execute(attack),
+            "Failed to detect attack from " + generatorType + ": " + attack
+        );
+        
+        // Log failure type for analysis
+        logger.debug("Detected {} for {} attack: {}", 
+            exception.getFailureType(), generatorType, attack);
+    }
+    
+    @ParameterizedTest(name = "Valid URL [{index}]")
+    @GeneratorsSource(value = {GeneratorType.VALID_URL}, limit = 500)
+    void testValidURLs(String validUrl, String generatorType) {
+        // Valid URLs should pass without exception
+        String result = assertDoesNotThrow(
+            () -> pathValidator.execute(validUrl),
+            "False positive for valid URL: " + validUrl
+        );
+        
+        assertNotNull(result);
+        // Result might be normalized but should still be valid
+        assertTrue(isValidPath(result));
+    }
+    
+    @ParameterizedTest(name = "Parameter validation [{index}]")
+    @GeneratorsSource(value = GeneratorType.URL_PARAMETER, limit = 200)
+    void testParameterValidation(String paramValue, String generatorType) {
+        // Test parameter-specific validation
+        // URLParameterGenerator creates both attack and valid parameters
+        try {
+            String result = paramValidator.execute(paramValue);
+            // Valid parameter passed
+            assertNotNull(result);
+        } catch (UrlSecurityException e) {
+            // Attack parameter detected - verify it's a known attack type
+            assertTrue(
+                e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                e.getFailureType() == UrlSecurityFailureType.INVALID_ENCODING ||
+                e.getFailureType() == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
+                e.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN
+            );
+        }
+    }
+    
+    @ParameterizedTest(name = "Boundary fuzzing [{index}]")
+    @GeneratorsSource(value = {GeneratorType.BOUNDARY}, limit = 100)
+    void testBoundaryConditions(String boundary, String generatorType) {
+        // Boundary conditions should be handled gracefully
+        try {
+            pathValidator.execute(boundary);
+            // If it passes, verify length constraints
+            assertTrue(boundary.length() <= UrlSecurityConfig.DEFAULT_MAX_PATH_LENGTH);
+        } catch (UrlSecurityException e) {
+            // Expected for oversized or malformed inputs
+            assertTrue(
+                e.getFailureType() == UrlSecurityFailureType.PATH_TOO_LONG ||
+                e.getFailureType() == UrlSecurityFailureType.EXCESSIVE_NESTING ||
+                e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER
+            );
+        }
+    }
+    
+    @Test
+    void testGeneratorCoverage() {
+        // Verify all generators produce unique patterns
+        Set<String> uniquePatterns = new HashSet<>();
+        PathTraversalGenerator gen = new PathTraversalGenerator();
+        
+        for (int i = 0; i < 1000; i++) {
+            uniquePatterns.add(gen.next());
+        }
+        
+        // Should generate many unique patterns
+        assertTrue(uniquePatterns.size() > 500, 
+            "Generator should produce diverse patterns");
+    }
+}
+----
+
+=== Best Practices
+
+1. **Always use TypedGenerator interface** - Ensures type safety
+2. **Use Generator class, never Random** - Maintains determinism  
+3. **Respect configuration limits** - Check DEFAULT_* constants
+4. **Document attack sources** - Include CVE/OWASP references
+5. **Test generators themselves** - Task G10 validates all generators
+6. **Use @GeneratorsSource** - For comprehensive parameterized testing
+7. **Combine generators** - Test interaction between different attack types
+8. **Track failure types** - Ensure attacks are caught for the right reasons
+
+=== Additional Test Examples
+
+[source,java]
+----
+/**
+ * False positive prevention tests.
+ * Implements: link:../../../plan.adoc#_phase_710_false_positive_prevention_tests[Tasks T31-T33]
+ */
+public class FalsePositiveTest {
+    
+    private final HttpSecurityValidator validator = createValidator();
+    
+    @ParameterizedTest(name = "Valid URLs should pass [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.VALID_URL, limit = 500)
+    void testValidURLsNoFalsePositives(String validUrl, String generatorType) {
+        // T31: Legitimate paths should pass validation
+        String result = assertDoesNotThrow(
+            () -> validator.execute(validUrl),
+            "False positive on valid URL: " + validUrl
+        );
+        
+        // Result should be non-null and potentially normalized
+        assertNotNull(result);
+    }
+    
+    @ParameterizedTest(name = "Invalid URLs should fail [{index}]: {0}")
+    @GeneratorsSource(value = GeneratorType.INVALID_URL, limit = 200)
+    void testInvalidURLsDetected(String invalidUrl, String generatorType) {
+        // T32: Malformed URLs should be rejected
+        assertThrows(
+            UrlSecurityException.class,
+            () -> validator.execute(invalidUrl),
+            "Failed to detect invalid URL: " + invalidUrl
         );
     }
 }
-----
 
-== Fuzzing and Edge Case Testing
-
-=== Intelligent Fuzzing Engine
-
-[source,java]
-----
-public class PathTraversalFuzzer {
+/**
+ * Performance validation tests.
+ * Implements: link:../../../plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
+ */
+public class PerformanceValidationTest {
     
-    private static final int FUZZ_ITERATIONS = 10000;
-    private final Random random = new SecureRandom();
+    private final HttpSecurityValidator validator = createValidator();
     
-    @Test
-    public void fuzzPathValidation() {
-        PathValidator validator = new SecurePathValidator();
-        List<String> findings = new ArrayList<>();
+    @ParameterizedTest(name = "Performance test [{index}]")
+    @GeneratorsSource(value = {
+        GeneratorType.VALID_URL,
+        GeneratorType.PATH_TRAVERSAL,
+        GeneratorType.ENCODING
+    }, limit = 1000)
+    void testPerformanceUnderLoad_T34(String input, String generatorType) {
+        // T34-T36: Verify <1ms performance requirement
+        long startTime = System.nanoTime();
         
-        for (int i = 0; i < FUZZ_ITERATIONS; i++) {
-            String fuzzInput = generateFuzzInput();
-            
-            try {
-                validator.validatePath(fuzzInput);
-                // If no exception, check if it should have been blocked
-                if (containsTraversalPattern(fuzzInput)) {
-                    findings.add("Missed traversal: " + fuzzInput);
-                }
-            } catch (SecurityException e) {
-                // Expected for malicious input
-                if (!containsTraversalPattern(fuzzInput)) {
-                    findings.add("False positive: " + fuzzInput);
-                }
-            } catch (Exception e) {
-                findings.add("Unexpected error: " + e.getMessage() + 
-                           " for input: " + fuzzInput);
-            }
+        try {
+            validator.execute(input);
+        } catch (UrlSecurityException e) {
+            // Expected for attack inputs
         }
         
-        assertTrue(findings.isEmpty(), 
-                  "Fuzzing found issues: " + findings);
-    }
-    
-    private String generateFuzzInput() {
-        StringBuilder input = new StringBuilder();
-        int length = random.nextInt(100) + 1;
+        long duration = System.nanoTime() - startTime;
+        long durationMs = duration / 1_000_000;
         
-        for (int i = 0; i < length; i++) {
-            input.append(getRandomPathComponent());
+        // Must complete within 1ms
+        assertTrue(durationMs < 1, 
+            "Validation took " + durationMs + "ms for " + generatorType);
+    }
+}
+
+/**
+ * Cookie and HTTP body validation tests.
+ */
+public class HTTPDataValidationTest {
+    
+    private final HttpSecurityValidator cookieValidator = createCookieValidator();
+    private final HttpSecurityValidator bodyValidator = createBodyValidator();
+    
+    @ParameterizedTest(name = "Cookie validation [{index}]")
+    @GeneratorsSource(value = GeneratorType.COOKIE, limit = 100)
+    void testCookieValidation(String cookieValue, String generatorType) {
+        // CookieGenerator creates both valid and attack cookies
+        try {
+            String result = cookieValidator.execute(cookieValue);
+            // Valid cookie
+            assertNotNull(result);
+        } catch (UrlSecurityException e) {
+            // Attack cookie detected
+            assertNotNull(e.getFailureType());
         }
-        
-        return input.toString();
     }
     
-    private String getRandomPathComponent() {
-        String[] components = {
-            "..", ".", "/", "\\", "%2e", "%2f", 
-            "normal", "file.txt", "%00", "\0",
-            ":", "*", "?", "<", ">", "|",
-            "\\u002e", "\\u002f", "../", "..\\",
-            "....//", "..;/", "%c0%ae"
-        };
-        return components[random.nextInt(components.length)];
+    @ParameterizedTest(name = "HTTP body validation [{index}]")
+    @GeneratorsSource(value = GeneratorType.HTTP_BODY, limit = 100)
+    void testHTTPBodyValidation(String bodyContent, String generatorType) {
+        // HTTPBodyGenerator creates various body content types
+        try {
+            String result = bodyValidator.execute(bodyContent);
+            // Valid body content
+            assertNotNull(result);
+        } catch (UrlSecurityException e) {
+            // Malicious body content detected
+            assertNotNull(e.getFailureType());
+        }
+    }
+}
+
+/**
+ * Combined attack tests using multiple generators.
+ */
+public class CombinedAttackTest {
+    
+    private final HttpSecurityValidator validator = createValidator();
+    
+    @ParameterizedTest(name = "Combined attacks [{index}]: {1}")
+    @GeneratorsSource(value = {
+        GeneratorType.PATH_TRAVERSAL,
+        GeneratorType.ENCODING,
+        GeneratorType.UNICODE,
+        GeneratorType.BOUNDARY
+    }, limit = 50)  // 50 each = 200 total tests
+    void testAllAttackTypes(String attack, String generatorType) {
+        // Test that all attack types are properly detected
+        UrlSecurityException exception = assertThrows(
+            UrlSecurityException.class,
+            () -> validator.execute(attack),
+            "Failed to detect " + generatorType + " attack: " + attack
+        );
+        
+        // Track which failure types are triggered by which generators
+        logger.info("Generator: {} -> FailureType: {}", 
+            generatorType, exception.getFailureType());
+    }
+    
+    @ParameterizedTest(name = "Mixed valid/invalid [{index}]: {1}")
+    @GeneratorsSource(value = {
+        GeneratorType.VALID_URL,
+        GeneratorType.INVALID_URL,
+        GeneratorType.PATH_TRAVERSAL
+    }, limit = 33)  // ~100 total tests mixed
+    void testMixedInputs(String input, String generatorType) {
+        // Test mix of valid and invalid inputs
+        boolean isValid = generatorType.equals("VALID_URL");
+        
+        if (isValid) {
+            assertDoesNotThrow(() -> validator.execute(input));
+        } else {
+            assertThrows(UrlSecurityException.class, 
+                () -> validator.execute(input));
+        }
     }
 }
 ----
 
-== Test Report Generation
+== Success Criteria
 
-=== Comprehensive Report Template
+The test harness achieves success when:
 
-[source,java]
-----
-public class SecurityTestReport {
-    
-    public void generateHTMLReport(TestResults results) {
-        StringBuilder html = new StringBuilder();
-        html.append("<!DOCTYPE html><html><head>");
-        html.append("<title>Path Traversal Security Test Report</title>");
-        html.append("<style>/* CSS styles */</style>");
-        html.append("</head><body>");
-        
-        // Executive Summary
-        html.append("<h1>Executive Summary</h1>");
-        html.append("<div class='summary'>");
-        html.append("Security Score: ").append(results.getSecurityScore());
-        html.append("</div>");
-        
-        // CVE Coverage
-        html.append("<h2>CVE Pattern Coverage</h2>");
-        html.append("<table>");
-        for (CVETest test : results.getCVETests()) {
-            html.append("<tr>");
-            html.append("<td>").append(test.getCVE()).append("</td>");
-            html.append("<td>").append(test.isPassed() ? "✓" : "✗").append("</td>");
-            html.append("</tr>");
-        }
-        html.append("</table>");
-        
-        // Encoding Resistance
-        html.append("<h2>Encoding Resistance</h2>");
-        appendEncodingResults(html, results);
-        
-        // Performance Metrics
-        html.append("<h2>Performance Metrics</h2>");
-        appendPerformanceMetrics(html, results);
-        
-        // Recommendations
-        html.append("<h2>Recommendations</h2>");
-        appendRecommendations(html, results);
-        
-        html.append("</body></html>");
-        
-        saveReport(html.toString());
-    }
-}
-----
-
-== Continuous Improvement
-
-=== CVE Database Integration
-
-[source,java]
-----
-@Component
-public class CVEDatabaseUpdater {
-    
-    @Scheduled(cron = "0 0 * * * *") // Hourly
-    public void updateCVEPatterns() {
-        List<CVE> newCVEs = fetchLatestCVEs();
-        
-        for (CVE cve : newCVEs) {
-            if (isPathTraversalCVE(cve)) {
-                addTestPattern(cve);
-                notifySecurityTeam(cve);
-            }
-        }
-    }
-    
-    private List<CVE> fetchLatestCVEs() {
-        // Fetch from NVD API
-        return nvdClient.getRecentCVEs(24); // Last 24 hours
-    }
-}
-----
-
-== References
-
-* link:https://owasp.org/www-project-web-security-testing-guide/[OWASP Testing Guide v4.2]
-* link:https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final[NIST Special Publication 800-53]
-* link:https://cwe.mitre.org/data/definitions/22.html[Common Weakness Enumeration (CWE-22)]
-* link:https://www.iso.org/standard/44378.html[ISO/IEC 27034 Application Security]
-* link:https://www.sans.org/top25-software-errors/[SANS Top 25 Software Errors]
-* link:https://nvd.nist.gov/[CVE Database Testing Patterns]
-* link:https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal[PayloadsAllTheThings - Directory Traversal]
-* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - URI Generic Syntax]
-* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - HTTP/1.1 Message Syntax]
-
+1. ✅ All 10 generators (G1-G10) implemented and tested
+2. ✅ All 36 test cases (T1-T36) passing
+3. ✅ 100% of known CVE patterns blocked
+4. ✅ OWASP Top 10 compliance achieved
+5. ✅ <1ms performance for 95% of validations
+6. ✅ <0.1% false positive rate
+7. ✅ Zero false negatives for known attacks
+8. ✅ CI/CD integration complete
+9. ✅ Comprehensive reporting available

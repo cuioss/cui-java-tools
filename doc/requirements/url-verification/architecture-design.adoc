@@ -1,4 +1,4 @@
-= Path Traversal Security Architecture and Design Document
+= URL Security Validation Architecture and Design
 :toc: left
 :toclevels: 3
 :sectnums:
@@ -6,1083 +6,1229 @@
 
 link:README.adoc[← Back to Documentation Index]
 
+[IMPORTANT]
+====
+This document describes HOW the URL Security Validation system architecture works.
+For WHAT tasks to implement, see link:../../../plan.adoc[Implementation Plan].
+For HOW to test the system, see link:test-harness-design.adoc[Test Harness Design].
+====
+
 == Executive Summary
 
-This document presents a comprehensive architecture and design for HTTP URL path traversal security validation leveraging Java 21+ built-in types. The design focuses exclusively on HTTP/URL contexts, utilizing Java's native URL, URI, URLDecoder, and Pattern classes to minimize custom code while maintaining robust security.
+The URL Security Validation system provides comprehensive protection against path traversal attacks, encoding bypasses, and injection attempts through a layered, immutable, high-performance architecture in the `de.cuioss.tools.security.http` package.
 
-== Design Goals and Principles
-
-=== Primary Goals
-
-. **HTTP/URL Focus**: Specialized validation for HTTP request paths and parameters
-. **Java Built-in Types**: Leverage Java 21+ native URL/URI validation capabilities
-. **Zero False Negatives**: Block all known HTTP path traversal patterns
-. **RFC Compliance**: Full RFC 3986 and RFC 7230 compliance using Java's URI class
-. **Performance**: Sub-millisecond validation using native Java types
-. **Simplicity**: Minimal custom code by leveraging Java standard library
-. **Security by Default**: Combine Java's syntactic validation with semantic security
-
-=== Design Principles
+== Design Principles
 
 [cols="2,3"]
 |===
 |Principle |Implementation
 
 |Defense in Depth
-|Multiple validation layers, each catching different attack classes
+|Sequential validation stages, each catching different attack classes
 
 |Fail Secure
-|Reject ambiguous or unparseable input rather than attempting correction
+|String/throws pattern - reject on any security violation
 
-|Least Privilege
-|Minimal permissions required for validation operations
+|Secure Defaults
+|Configuration constants based on OWASP/RFC with documented sources
 
-|Separation of Concerns
-|Distinct components for different validation aspects
+|Immutability
+|All validation stages immutable after construction for thread safety
 
-|Zero Trust
-|Assume all input is malicious until proven otherwise
+|Performance First
+|Pre-compiled patterns, optimized algorithms, <1ms requirement
 
 |Transparency
-|Clear logging and audit trail for security decisions
-
+|Structured logging via LogRecord pattern, security event counting
 |===
 
 == System Architecture
 
-=== High-Level Architecture Using Java 21+ Built-in Types
+=== High-Level Architecture
 
 ----
 ┌─────────────────────────────────────────────────────────┐
-│                 HTTP URL Validator                       │
-│         (Leveraging Java 21 Built-in Types)             │
-└─────────────┬───────────────────────────────────────────┘
-              │
-┌─────────────▼───────────────────────────────────────────┐
+│                    Client Request                        │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│              HttpSecurityValidator                       │
+│         (Core validation interface)                      │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
 │              Validation Pipeline                         │
-│     Using Java Standard Library Components               │
-├──────────────┬────────────┬────────────┬───────────────┤
-│ URLDecoder   │    URI     │  Pattern   │   Custom      │
-│ (Built-in)   │ (Built-in) │ (Built-in) │  Security     │
-└──────────────┴────────────┴────────────┴───────────────┘
+│         (Sequential stage execution)                     │
+├──────────────────────────────────────────────────────────┤
+│  Stage 1: LengthValidationStage                         │
+│  Stage 2: CharacterValidationStage                      │
+│  Stage 3: DecodingStage                                 │
+│  Stage 4: NormalizationStage                            │
+│  Stage 5: PatternMatchingStage                          │
+└──────────────────────────────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│          Security Event Tracking                         │
+│    (Counter + LogRecord based logging)                   │
+└──────────────────────────────────────────────────────────┘
 ----
 
-=== Component Architecture
+=== Package Structure
 
-==== Core Components
+----
+de.cuioss.tools.security.http/
+├── HttpSecurityValidator.java         # Core validation interface
+├── UrlSecurityException.java          # Main exception with failure types
+├── UrlSecurityFailureType.java        # Comprehensive failure enum
+├── ValidationType.java                # Input type classification
+│
+├── config/
+│   ├── UrlSecurityConfig.java        # Base configuration with defaults
+│   ├── URLConfig.java                # URL path specific config
+│   ├── ParameterConfig.java          # Parameter validation config
+│   ├── HeaderConfig.java             # HTTP header config
+│   └── BodyConfig.java               # HTTP body validation config
+│
+├── security/
+│   ├── SecurityEventCounter.java     # Thread-safe event counting
+│   └── URLSecurityLogMessages.java   # LogRecord pattern messages
+│
+├── validation/
+│   ├── LengthValidationStage.java    # Size limit validation (FIRST!)
+│   ├── CharacterValidationStage.java # RFC character validation (SECOND!)
+│   ├── DecodingStage.java            # Multi-layer decoding
+│   ├── NormalizationStage.java       # Path normalization
+│   └── PatternMatchingStage.java     # Attack pattern detection
+│
+└── pipeline/
+    ├── URLPathValidationPipeline.java      # URL path pipeline
+    ├── URLParameterValidationPipeline.java # Parameter pipeline
+    ├── HTTPHeaderValidationPipeline.java   # Header pipeline
+    ├── HTTPBodyValidationPipeline.java     # Body pipeline
+    └── PipelineFactory.java                # Pipeline creation
+----
+
+== Core Components
+
+=== Core Interfaces and Data Types
 
 [source,java]
 ----
 package de.cuioss.tools.security.http;
 
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+/**
+ * Core interface for HTTP security validation.
+ * Follows the String/throws pattern consistently.
+ * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
+ */
+public interface HttpSecurityValidator {
+    /**
+     * Validates the input and returns the sanitized version.
+     * @param value The input to validate
+     * @return The validated/normalized value
+     * @throws UrlSecurityException on any security violation
+     */
+    String execute(String value) throws UrlSecurityException;
+    
+    /**
+     * @return The type of validation this validator performs
+     */
+    ValidationType getType();
+}
 
 /**
- * Enumeration of URL security validation failure types
+ * Classification of input types for appropriate validation.
+ * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
+ */
+public enum ValidationType {
+    URL_PATH,        // URL path segments
+    URL_PARAMETER,   // Query parameters
+    HTTP_HEADER,     // HTTP headers
+    HTTP_BODY,       // Request/response bodies
+    COOKIE          // HTTP cookies
+}
+
+/**
+ * Comprehensive enumeration of security failure types.
+ * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B1]
  */
 public enum UrlSecurityFailureType {
+    // Encoding Issues
     INVALID_ENCODING("Invalid URL encoding detected"),
     DOUBLE_ENCODING("Double URL encoding detected"),
-    PATH_TRAVERSAL("Path traversal pattern detected"),
-    MALFORMED_URI("Malformed URI syntax"),
+    UNICODE_NORMALIZATION_CHANGED("Unicode normalization altered input"),
+    
+    // Path Traversal
+    PATH_TRAVERSAL_DETECTED("Path traversal pattern detected"),
+    DIRECTORY_ESCAPE_ATTEMPT("Directory escape attempt detected"),
+    
+    // Character Issues
+    INVALID_CHARACTER("Invalid character detected"),
+    NULL_BYTE_INJECTION("Null byte injection detected"),
     CONTROL_CHARACTERS("Control characters detected"),
-    NULL_BYTE_INJECTION("Null byte injection detected");
+    
+    // Length/Size Issues
+    PATH_TOO_LONG("Path exceeds maximum length"),
+    EXCESSIVE_NESTING("Excessive directory nesting"),
+    
+    // Pattern Matches
+    SUSPICIOUS_PATTERN("Suspicious pattern detected"),
+    KNOWN_ATTACK_SIGNATURE("Known attack signature detected"),
+    
+    // Structural Issues
+    MALFORMED_INPUT("Malformed input structure"),
+    INVALID_STRUCTURE("Invalid input structure"),
+    
+    // Protocol Issues  
+    PROTOCOL_VIOLATION("Protocol specification violation"),
+    RFC_VIOLATION("RFC specification violation");
     
     private final String description;
     
     UrlSecurityFailureType(String description) {
         this.description = description;
     }
-    
-    public String getDescription() {
-        return description;
-    }
 }
 
 /**
- * Runtime exception for URL security violations
+ * Main exception for security violations.
+ * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
  */
 public class UrlSecurityException extends RuntimeException {
     private final UrlSecurityFailureType failureType;
-    private final String originalValue;
-    private final String decodedValue;
+    private final String originalInput;
+    private final String sanitizedInput;
     
-    public UrlSecurityException(UrlSecurityFailureType failureType, String originalValue, String decodedValue) {
-        super(failureType.getDescription() + ": " + originalValue);
-        this.failureType = failureType;
-        this.originalValue = originalValue;
-        this.decodedValue = decodedValue;
-    }
-    
-    public UrlSecurityException(UrlSecurityFailureType failureType, String originalValue, String decodedValue, Throwable cause) {
-        super(failureType.getDescription() + ": " + originalValue, cause);
-        this.failureType = failureType;
-        this.originalValue = originalValue;
-        this.decodedValue = decodedValue;
-    }
-    
-    public UrlSecurityFailureType getFailureType() {
-        return failureType;
-    }
-    
-    public String getOriginalValue() {
-        return originalValue;
-    }
-    
-    public String getDecodedValue() {
-        return decodedValue;
-    }
-}
-
-/**
- * Utility class for secure URL decoding operations
- */
-public final class UrlDecodingTools {
-    
-    private UrlDecodingTools() {
-        // Utility class
-    }
-    
-    /**
-     * Safely decodes a URL-encoded string with security validation
-     * 
-     * @param encodedValue the URL-encoded string to decode
-     * @return the decoded string
-     * @throws UrlSecurityException if security violations are detected
-     */
-    public static String getDecodedValue(String encodedValue) {
-        if (encodedValue == null) {
-            return null;
-        }
-        
-        String decoded;
-        try {
-            // First decode
-            decoded = URLDecoder.decode(encodedValue, StandardCharsets.UTF_8);
-            
-            // Check for double encoding by attempting second decode
-            String doubleDecoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
-            if (!decoded.equals(doubleDecoded)) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.DOUBLE_ENCODING,
-                    encodedValue,
-                    decoded
-                );
-            }
-            
-            // Check for null bytes
-            if (decoded.contains("\0")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.NULL_BYTE_INJECTION,
-                    encodedValue,
-                    decoded
-                );
-            }
-            
-            // Check for control characters
-            if (decoded.matches(".*[\\x00-\\x1f].*")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.CONTROL_CHARACTERS,
-                    encodedValue,
-                    decoded
-                );
-            }
-            
-        } catch (IllegalArgumentException e) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.INVALID_ENCODING,
-                encodedValue,
-                null,
-                e
-            );
-        }
-        
-        return decoded;
-    }
-}
-
-/**
- * HTTP URL path validator using Java 21 built-in types
- */
-public final class HttpUrlValidator {
-    
-    /**
-     * Validates an HTTP URL path using Java's built-in validation
-     * 
-     * @param urlPath the URL path to validate
-     * @return the validated and normalized path
-     * @throws UrlSecurityException if validation fails
-     */
-    public String validateUrlPath(String urlPath) {
-        // Step 1: Decode using secure utility
-        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
-        
-        // Step 2: Use Java's URI for RFC 3986 validation and normalization
-        try {
-            // Create URI with just the path component for validation
-            URI uri = new URI(null, null, null, -1, decoded, null, null);
-            String normalized = uri.normalize().getPath();
-            
-            // Step 3: Check if normalization revealed traversal
-            if (normalized != null && !normalized.equals(decoded)) {
-                if (normalized.contains("..")) {
-                    throw new UrlSecurityException(
-                        UrlSecurityFailureType.PATH_TRAVERSAL,
-                        urlPath,
-                        decoded
-                    );
-                }
-            }
-            
-            // Step 4: Check for direct path traversal patterns
-            if (decoded.contains("..")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    urlPath,
-                    decoded
-                );
-            }
-            if (decoded.contains("./")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    urlPath,
-                    decoded
-                );
-            }
-            if (decoded.contains("//")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    urlPath,
-                    decoded
-                );
-            }
-            
-            return normalized != null ? normalized : decoded;
-            
-        } catch (URISyntaxException e) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.MALFORMED_URI,
-                urlPath,
-                decoded,
-                e
-            );
-        }
+    // Builder pattern for complex scenarios
+    public static Builder builder() {
+        return new Builder();
     }
 }
 ----
 
-=== Validation Pipeline Using Java 21 Built-in Types
-
-==== Pipeline Design with Native Java Components
+=== Data Records
 
 [source,java]
 ----
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Pattern;
+package de.cuioss.tools.security.http;
 
 /**
- * HTTP validation pipeline leveraging Java 21 features
+ * Data records used throughout the system.
+ * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
-public class HttpValidationPipeline {
-    
-    // Java 21 Pattern for attack detection
-    private static final Pattern TRAVERSAL_PATTERN = Pattern.compile(
-        "(\\.\\./)|(%2e%2e%2f)|(%252e%252e%252f)|(\\.\\.\\\\)|" +
-        "(%5c%2e%2e%5c)|(%255c%252e%252e%255c)",
-        Pattern.CASE_INSENSITIVE
-    );
+public record URLParameter(String key, String value) {}
+
+public record Cookie(
+    String name, 
+    String value, 
+    Map<String, String> attributes
+) {}
+
+public record HTTPBody(
+    String contentType, 
+    byte[] content
+) {}
+----
+
+== Configuration Architecture
+
+Configuration follows the embedded constants pattern from `ParserConfig`:
+
+=== ConfigStageProvider Interface
+
+[source,java]
+----
+package de.cuioss.tools.security.http.config;
+
+/**
+ * Provides factory methods for creating pre-configured validation stages.
+ * This interface decouples pipelines from concrete configuration implementations.
+ * All methods return HttpSecurityValidator for flexibility.
+ */
+public interface ConfigStageProvider {
     
     /**
-     * Validates a URL path through the complete pipeline
-     * 
-     * @param urlPath the URL path to validate
-     * @return the validated and normalized path
-     * @throws UrlSecurityException if validation fails at any stage
+     * @return Pre-configured length validation stage
      */
-    public String validate(String urlPath) {
-        // Stage 1: URL Decoding with Java's URLDecoder
-        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
+    HttpSecurityValidator getLengthValidationStage();
+    
+    /**
+     * @return Pre-configured character validation stage for URL paths
+     */
+    HttpSecurityValidator getPathCharacterValidationStage();
+    
+    /**
+     * @return Pre-configured character validation stage for URL parameters
+     */
+    HttpSecurityValidator getParameterCharacterValidationStage();
+    
+    /**
+     * @return Pre-configured character validation stage for HTTP headers
+     */
+    HttpSecurityValidator getHeaderCharacterValidationStage();
+    
+    /**
+     * @return Pre-configured decoding stage with security checks
+     */
+    HttpSecurityValidator getDecodingStage();
+    
+    /**
+     * @return Pre-configured normalization stage
+     */
+    HttpSecurityValidator getNormalizationStage();
+    
+    /**
+     * @return Pre-configured pattern matching stage
+     */
+    HttpSecurityValidator getPatternMatchingStage();
+}
+----
+
+=== UrlSecurityConfig Implementation
+
+[source,java]
+----
+package de.cuioss.tools.security.http.config;
+
+import lombok.Builder;
+import lombok.Value;
+
+/**
+ * Base configuration for URL security validation.
+ * All defaults are based on OWASP guidelines and RFC specifications.
+ * Implements ConfigStageProvider to provide factory methods for validation stages.
+ * Implemented by: link:../../../plan.adoc#_phase_3_configuration_system[Tasks C1-C2]
+ */
+@Builder
+@Value
+public class UrlSecurityConfig implements ConfigStageProvider {
+    
+    /**
+     * Maximum URL path length in characters.
+     * Default: 2048 based on RFC 3986 Section 3.3 and common browser limits.
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc3986#section-3.3">RFC 3986</a>
+     * @see <a href="https://owasp.org/www-community/vulnerabilities/Buffer_Overflow">OWASP Buffer Overflow</a>
+     */
+    public static final int DEFAULT_MAX_PATH_LENGTH = 2048;
+    
+    /**
+     * Maximum directory traversal depth.
+     * Default: 10 based on typical filesystem depth and OWASP recommendations.
+     * @see <a href="https://owasp.org/www-community/attacks/Path_Traversal">OWASP Path Traversal</a>
+     */
+    public static final int DEFAULT_MAX_DIRECTORY_DEPTH = 10;
+    
+    /**
+     * Maximum parameter value length.
+     * Default: 4096 based on common server configurations.
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.1">RFC 7230</a>
+     */
+    public static final int DEFAULT_MAX_PARAMETER_LENGTH = 4096;
+    
+    /**
+     * Maximum number of parameters.
+     * Default: 100 to prevent parameter pollution attacks.
+     * @see <a href="https://owasp.org/www-community/attacks/HTTP_Parameter_Pollution">OWASP HPP</a>
+     */
+    public static final int DEFAULT_MAX_PARAMETER_COUNT = 100;
+    
+    /**
+     * Enable Unicode normalization (NFC).
+     * Default: true per OWASP guidelines for Unicode security.
+     * @see <a href="https://owasp.org/www-community/attacks/Unicode_Encoding">OWASP Unicode</a>
+     */
+    public static final boolean DEFAULT_UNICODE_NORMALIZATION = true;
+    
+    /**
+     * Reject null bytes in input.
+     * Default: true to prevent null byte injection attacks.
+     * @see <a href="https://owasp.org/www-community/attacks/Null_Byte_Injection">OWASP Null Byte</a>
+     */
+    public static final boolean DEFAULT_REJECT_NULL_BYTES = true;
+    
+    @Builder.Default
+    int maxPathLength = DEFAULT_MAX_PATH_LENGTH;
+    
+    @Builder.Default
+    int maxDirectoryDepth = DEFAULT_MAX_DIRECTORY_DEPTH;
+    
+    @Builder.Default
+    int maxParameterLength = DEFAULT_MAX_PARAMETER_LENGTH;
+    
+    @Builder.Default
+    int maxParameterCount = DEFAULT_MAX_PARAMETER_COUNT;
+    
+    @Builder.Default
+    boolean unicodeNormalization = DEFAULT_UNICODE_NORMALIZATION;
+    
+    @Builder.Default
+    boolean rejectNullBytes = DEFAULT_REJECT_NULL_BYTES;
+    
+    // Cached stage instances - created once, reused everywhere
+    @Getter(lazy = true)
+    private final LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(this);
+    
+    @Getter(lazy = true)
+    private final CharacterValidationStage pathCharacterValidationStage = 
+        new CharacterValidationStage(this, ValidationType.URL_PATH);
+    
+    @Getter(lazy = true)
+    private final CharacterValidationStage parameterCharacterValidationStage = 
+        new CharacterValidationStage(this, ValidationType.URL_PARAMETER);
+    
+    @Getter(lazy = true)
+    private final CharacterValidationStage headerCharacterValidationStage = 
+        new CharacterValidationStage(this, ValidationType.HTTP_HEADER);
+    
+    @Getter(lazy = true)
+    private final DecodingStage decodingStage = 
+        new DecodingStage(this);
+    
+    @Getter(lazy = true)
+    private final NormalizationStage normalizationStage = 
+        new NormalizationStage(this);
+    
+    @Getter(lazy = true)
+    private final PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(this);
+    
+    // ConfigStageProvider implementation methods
+    @Override
+    public HttpSecurityValidator getLengthValidationStage() {
+        return lengthValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getPathCharacterValidationStage() {
+        return pathCharacterValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getParameterCharacterValidationStage() {
+        return parameterCharacterValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getHeaderCharacterValidationStage() {
+        return headerCharacterValidationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getDecodingStage() {
+        return decodingStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getNormalizationStage() {
+        return normalizationStage;
+    }
+    
+    @Override
+    public HttpSecurityValidator getPatternMatchingStage() {
+        return patternMatchingStage;
+    }
+}
+----
+
+== Validation Stages
+
+All validation stages follow these principles:
+
+1. **Immutability**: Configuration stored in final fields, no runtime state changes
+2. **Performance**: Pre-compiled patterns, optimized algorithms, <1ms per stage
+3. **Thread Safety**: No mutable state, safe for concurrent use
+4. **Clear Contracts**: String input/output with UrlSecurityException on violations
+
+=== LengthValidationStage
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+/**
+ * Length validation MUST be the first stage to prevent DoS attacks.
+ * Rejects oversized inputs before any processing.
+ * Immutable and thread-safe.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V4]
+ */
+public final class LengthValidationStage implements HttpSecurityValidator {
+    
+    private final int maxLength;
+    private final int maxDepth;
+    
+    public LengthValidationStage(UrlSecurityConfig config) {
+        this.maxLength = config.getMaxPathLength();
+        this.maxDepth = config.getMaxDirectoryDepth();
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        // First check: total length
+        if (value.length() > maxLength) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.PATH_TOO_LONG)
+                .originalInput(value)
+                .build();
+        }
         
-        // Stage 2: URI Normalization with Java's URI class
-        String normalized = normalizeUri(decoded, urlPath);
+        // Second check: nesting depth
+        long depth = value.chars().filter(ch -> ch == '/' || ch == '\\').count();
+        if (depth > maxDepth) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
+                .originalInput(value)
+                .build();
+        }
         
-        // Stage 3: Pattern-based validation using Java regex
-        validatePatterns(normalized, urlPath);
+        return value;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.URL_PATH;
+    }
+}
+----
+
+=== DecodingStage
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+import java.text.Normalizer;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * Multi-layer decoding with security checks.
+ * Immutable and thread-safe.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V1]
+ */
+public final class DecodingStage implements HttpSecurityValidator {
+    
+    private final UrlSecurityConfig config;
+    private final Pattern doubleEncodingPattern;
+    
+    public DecodingStage(UrlSecurityConfig config) {
+        this.config = config;
+        // Pre-compile patterns for performance
+        this.doubleEncodingPattern = Pattern.compile("%25[0-9a-fA-F]{2}");
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        // Detect double encoding before decoding
+        if (doubleEncodingPattern.matcher(value).find()) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.DOUBLE_ENCODING)
+                .originalInput(value)
+                .build();
+        }
         
-        // Stage 4: Semantic validation
-        validateSemantics(normalized, urlPath);
+        // URL decode
+        String decoded;
+        try {
+            decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                .originalInput(value)
+                .cause(e)
+                .build();
+        }
+        
+        // Unicode normalization with change detection
+        if (config.isUnicodeNormalization()) {
+            String normalized = Normalizer.normalize(decoded, Normalizer.Form.NFC);
+            if (!decoded.equals(normalized)) {
+                // Normalization changed the string - potential attack
+                throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED)
+                    .originalInput(value)
+                    .sanitizedInput(normalized)
+                    .build();
+            }
+            decoded = normalized;
+        }
+        
+        // Note: Null byte detection moved to CharacterValidationStage for earlier detection
+        
+        return decoded;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.URL_PATH;
+    }
+}
+----
+
+=== CharacterValidationStage
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+import java.util.BitSet;
+
+/**
+ * Validates characters according to RFC 3986 for URLs.
+ * MUST be the second stage after length validation.
+ * Rejects invalid characters BEFORE any decoding/processing.
+ * Immutable and thread-safe.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
+ */
+public final class CharacterValidationStage implements HttpSecurityValidator {
+    
+    // RFC 3986 unreserved characters: ALPHA / DIGIT / "-" / "." / "_" / "~"
+    // RFC 3986 reserved characters: gen-delims / sub-delims
+    // gen-delims: ":" / "/" / "?" / "#" / "[" / "]" / "@"
+    // sub-delims: "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+    // pct-encoded: "%" HEXDIG HEXDIG
+    
+    private final BitSet allowedChars;
+    private final ValidationType validationType;
+    private final boolean allowPercentEncoding;
+    
+    public CharacterValidationStage(UrlSecurityConfig config, ValidationType type) {
+        this.validationType = type;
+        this.allowedChars = new BitSet(256);
+        
+        // Initialize allowed characters based on type
+        switch (type) {
+            case URL_PATH -> {
+                // RFC 3986 path characters
+                addUnreservedChars();  // A-Z, a-z, 0-9, -, ., _, ~
+                addPathChars();        // /, @, :, !, $, &, ', (, ), *, +, ,, ;, =
+                this.allowPercentEncoding = true;
+            }
+            case URL_PARAMETER -> {
+                // Query string characters
+                addUnreservedChars();
+                addQueryChars();       // All sub-delims plus ? and &
+                this.allowPercentEncoding = true;
+            }
+            case HTTP_HEADER -> {
+                // RFC 7230 header field characters
+                addVisibleASCII();     // ASCII 33-126 except delimiters
+                this.allowPercentEncoding = false;
+            }
+            default -> {
+                // Most restrictive set
+                addUnreservedChars();
+                this.allowPercentEncoding = false;
+            }
+        }
+    }
+    
+    private void addUnreservedChars() {
+        // ALPHA
+        for (int i = 'A'; i <= 'Z'; i++) allowedChars.set(i);
+        for (int i = 'a'; i <= 'z'; i++) allowedChars.set(i);
+        // DIGIT
+        for (int i = '0'; i <= '9'; i++) allowedChars.set(i);
+        // "-" / "." / "_" / "~"
+        allowedChars.set('-');
+        allowedChars.set('.');
+        allowedChars.set('_');
+        allowedChars.set('~');
+    }
+    
+    private void addPathChars() {
+        // Path-specific characters
+        allowedChars.set('/');
+        allowedChars.set('@');
+        allowedChars.set(':');
+        // sub-delims for path
+        "!$&'()*+,;=".chars().forEach(allowedChars::set);
+    }
+    
+    private void addQueryChars() {
+        // Query-specific characters
+        allowedChars.set('?');
+        allowedChars.set('&');
+        allowedChars.set('=');
+        // sub-delims for query
+        "!$'()*+,;".chars().forEach(allowedChars::set);
+    }
+    
+    private void addVisibleASCII() {
+        // RFC 7230: VCHAR = %x21-7E (visible ASCII)
+        for (int i = 33; i <= 126; i++) {
+            // Exclude HTTP delimiters
+            if (!"\"(),/:;<=>?@[\\]{}".contains(String.valueOf((char)i))) {
+                allowedChars.set(i);
+            }
+        }
+        allowedChars.set(' '); // Space is allowed in headers
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        // Quick check for null/empty
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        
+        // Check each character
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            
+            // Check for null byte FIRST (highest priority security check)
+            if (ch == '\0') {
+                throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
+                    .originalInput(value)
+                    .detail("Null byte detected at position " + i)
+                    .build();
+            }
+            
+            // Handle percent encoding
+            if (ch == '%' && allowPercentEncoding) {
+                // Must be followed by two hex digits
+                if (i + 2 >= value.length()) {
+                    throw UrlSecurityException.builder()
+                        .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                        .originalInput(value)
+                        .detail("Incomplete percent encoding at position " + i)
+                        .build();
+                }
+                
+                char hex1 = value.charAt(i + 1);
+                char hex2 = value.charAt(i + 2);
+                if (!isHexDigit(hex1) || !isHexDigit(hex2)) {
+                    throw UrlSecurityException.builder()
+                        .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                        .originalInput(value)
+                        .detail("Invalid hex digits in percent encoding at position " + i)
+                        .build();
+                }
+                
+                // Check for encoded null byte %00
+                if (hex1 == '0' && hex2 == '0') {
+                    throw UrlSecurityException.builder()
+                        .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
+                        .originalInput(value)
+                        .detail("Encoded null byte (%00) detected at position " + i)
+                        .build();
+                }
+                
+                i += 2; // Skip the two hex digits
+                continue;
+            }
+            
+            // Check if character is allowed
+            if (ch > 255 || !allowedChars.get(ch)) {
+                throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.INVALID_CHARACTER)
+                    .originalInput(value)
+                    .detail(String.format("Invalid character '%c' (0x%02X) at position %d", 
+                                        ch, (int)ch, i))
+                    .build();
+            }
+        }
+        
+        return value;
+    }
+    
+    private boolean isHexDigit(char ch) {
+        return (ch >= '0' && ch <= '9') || 
+               (ch >= 'A' && ch <= 'F') || 
+               (ch >= 'a' && ch <= 'f');
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return validationType;
+    }
+}
+----
+
+=== NormalizationStage
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+import java.nio.file.Paths;
+
+/**
+ * Path normalization stage to resolve . and .. segments.
+ * Follows RFC 3986 Section 5.2.4 for path normalization.
+ * Immutable and thread-safe.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V2]
+ */
+public final class NormalizationStage implements HttpSecurityValidator {
+    
+    private final UrlSecurityConfig config;
+    
+    public NormalizationStage(UrlSecurityConfig config) {
+        this.config = config;
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        
+        // Save original for comparison
+        String original = value;
+        
+        // Normalize path segments (resolve . and ..)
+        String normalized = normalizePath(value);
+        
+        // Check if normalization revealed path traversal
+        if (containsPathTraversal(normalized)) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                .originalInput(original)
+                .sanitizedInput(normalized)
+                .detail("Path normalization revealed traversal attempt")
+                .build();
+        }
+        
+        // Check if path escapes root after normalization
+        if (escapesRoot(normalized)) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT)
+                .originalInput(original)
+                .sanitizedInput(normalized)
+                .detail("Path attempts to escape root directory")
+                .build();
+        }
         
         return normalized;
     }
     
-    private String normalizeUri(String path, String originalPath) {
-        try {
-            // Create URI with path component only
-            URI uri = new URI(null, null, null, -1, path, null, null);
-            String normalized = uri.normalize().getPath();
-            
-            if (normalized == null) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.MALFORMED_URI,
-                    originalPath,
-                    path
-                );
-            }
-            
-            // Check if normalization changed the path (potential traversal)
-            if (!normalized.equals(path) && normalized.contains("..")) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    originalPath,
-                    path
-                );
-            }
-            
-            return normalized;
-        } catch (URISyntaxException e) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.MALFORMED_URI,
-                originalPath,
-                path,
-                e
-            );
-        }
-    }
-    
-    private void validatePatterns(String path, String originalPath) {
-        if (TRAVERSAL_PATTERN.matcher(path).find()) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalPath,
-                path
-            );
-        }
-    }
-    
-    private void validateSemantics(String path, String originalPath) {
-        // Semantic validation using simple conditionals
-        if (path.startsWith("/admin")) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalPath,
-                path
-            );
-        }
-        if (path.contains("WEB-INF")) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalPath,
-                path
-            );
-        }
-        if (path.contains("META-INF")) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalPath,
-                path
-            );
-        }
-    }
-}
-----
-
-==== Stage Implementations
-
-[source,java]
-----
-/**
- * Decoding stage - handles all encoding schemes
- */
-public class DecodingStage implements ValidationStage {
-    
-    private final List<Decoder> decoders = Arrays.asList(
-        new UrlDecoderWrapper(),
-        new UnicodeDecoder(),
-        new HTMLEntityDecoder(),
-        new Base64DecoderWrapper(),
-        new DoubleEncodingDetector()
-    );
-    
-    @Override
-    public StageResult process(ValidationData data) {
-        String path = data.getPath();
+    private String normalizePath(String path) {
+        // RFC 3986 path segment normalization
+        String[] segments = path.split("/", -1);
+        StringBuilder result = new StringBuilder();
+        int depth = 0;
         
-        for (Decoder decoder : decoders) {
-            if (decoder.canDecode(path)) {
-                path = decoder.decode(path);
-                data.addDecodingStep(decoder.getName());
-            }
-        }
-        
-        // Check for remaining encoding
-        if (hasRemainingEncoding(path)) {
-            return StageResult.blocked("Undecodeable content detected");
-        }
-        
-        return StageResult.proceed(data.withPath(path));
-    }
-}
-
-/**
- * Normalization stage - platform-aware path normalization
- */
-public class NormalizationStage implements ValidationStage {
-    
-    @Override
-    public StageResult process(ValidationData data) {
-        String normalized = normalizePath(data.getPath(), data.getPlatform());
-        
-        // Detect normalization bypass attempts
-        if (isNormalizationBypass(data.getPath(), normalized)) {
-            return StageResult.blocked("Normalization bypass detected");
-        }
-        
-        return StageResult.proceed(data.withPath(normalized));
-    }
-    
-    private String normalizePath(String path, Platform platform) {
-        // Platform-specific normalization
-        return platform.getNormalizer().normalize(path);
-    }
-}
-----
-
-== Security Validation Strategies
-
-=== Multi-Layer Validation Approach
-
-[source,java]
-----
-public class ValidationEngine {
-    
-    private final List<Validator> validators = Arrays.asList(
-        new BlacklistValidator(),      // Known attack patterns
-        new WhitelistValidator(),      // Allowed patterns only
-        new ContainmentValidator(),    // Path containment checks
-        new CanonicalValidator(),      // Canonical path validation
-        new SemanticValidator()        // Context-aware validation
-    );
-    
-    public ValidationResult validate(ValidationContext context) {
-        for (Validator validator : validators) {
-            if (validator.appliesTo(context)) {
-                ValidationResult result = validator.validate(context);
-                if (result.isBlocked()) {
-                    return result;
-                }
-            }
-        }
-        return ValidationResult.allowed();
-    }
-}
-----
-
-=== Attack Pattern Detection
-
-[source,java]
-----
-public class AttackPatternDetector {
-    
-    private final PatternMatcher patterns;
-    
-    public AttackPatternDetector() {
-        this.patterns = new PatternMatcher();
-        loadCVEPatterns();
-        loadOWASPPatterns();
-        loadCustomPatterns();
-    }
-    
-    public boolean detectAttack(String path) {
-        // Direct pattern matching
-        if (patterns.matches(path)) {
-            return true;
-        }
-        
-        // Semantic analysis
-        if (hasTraversalSemantics(path)) {
-            return true;
-        }
-        
-        // Anomaly detection
-        if (isAnomalous(path)) {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    private void loadCVEPatterns() {
-        // Load patterns from CVE database
-        patterns.addPattern("CVE-2021-29425", "//../*");
-        patterns.addPattern("CVE-2023-32235", "*%2F..%2F..%2F*");
-        patterns.addPattern("CVE-2023-50164", "../../WEB-INF/*");
-        // ... more CVE patterns
-    }
-}
-----
-
-
-=== Comprehensive HTTP Parameter Validation
-
-==== URL Query Parameter Value Validation
-
-[source,java]
-----
-public class URLParameterValueValidator {
-    
-    /**
-     * Validates and decodes an HTTP query parameter
-     * 
-     * @param name the parameter name
-     * @param value the parameter value
-     * @return the validated and decoded parameter value
-     * @throws UrlSecurityException if validation fails
-     */
-    public String validateQueryParameter(String name, String value) {
-        // 1. Validate parameter name (RFC 7230 token)
-        if (!isValidParameterName(name)) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.INVALID_ENCODING,
-                value,
-                null
-            );
-        }
-        
-        // 2. Decode the parameter value using secure utility
-        String decoded = UrlDecodingTools.getDecodedValue(value);
-        
-        // 3. Validate based on parameter context
-        if (isURLParameter(name)) {
-            return validateURLValue(name, decoded, value);
-        } else if (isNumericParameter(name)) {
-            return validateNumericValue(name, decoded, value);
-        }
-        
-        // 4. Generic validation for all parameters
-        return validateGenericValue(name, decoded, value);
-    }
-    
-    private String validateGenericValue(String name, String value, String originalValue) {
-        // Path traversal patterns
-        if (containsPathTraversal(value)) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalValue,
-                value
-            );
-        }
-        
-        // Null byte injection already checked in UrlDecodingTools
-        return value;
-    }
-    
-    private String validateURLValue(String name, String value, String originalValue) {
-        // Check for javascript: protocol
-        if (value.toLowerCase().startsWith("javascript:")) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalValue,
-                value
-            );
-        }
-        
-        // Check for data: protocol (potential XSS)
-        if (value.toLowerCase().startsWith("data:")) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                originalValue,
-                value
-            );
-        }
-        
-        // Validate URL format
-        try {
-            URL url = new URL(value);
-            // Check for non-HTTP protocols
-            String protocol = url.getProtocol();
-            if (!"http".equalsIgnoreCase(protocol) && !"https".equalsIgnoreCase(protocol)) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    originalValue,
-                    value
-                );
-            }
-        } catch (MalformedURLException e) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.MALFORMED_URI,
-                originalValue,
-                value,
-                e
-            );
-        }
-        
-        return value;
-    }
-    
-    private String validateNumericValue(String name, String value, String originalValue) {
-        // Implementation for numeric parameter validation
-        return value;
-    }
-    
-    private boolean isValidParameterName(String name) {
-        // RFC 7230 token characters
-        return name.matches("^[a-zA-Z0-9!#$%&'*+\\-.^_`|~]+$");
-    }
-    
-}
-----
-
-==== HTTP POST Body Parameter Value Validation
-
-[source,java]
-----
-public class BodyParameterValueValidator {
-    
-    private static final int MAX_FORM_FIELD_LENGTH = 8192;
-    
-    // Content-Type specific validation
-    public ValidationResult validateBodyParameter(String contentType, String name, String value) {
-        switch (contentType.toLowerCase()) {
-            case "application/x-www-form-urlencoded":
-                return validateFormEncodedValue(name, value);
-            case "application/json":
-                return validateJsonValue(name, value);
-            case "multipart/form-data":
-                return validateMultipartValue(name, value);
-            case "application/xml":
-            case "text/xml":
-                return validateXmlValue(name, value);
-            default:
-                return validateGenericValue(name, value);
-        }
-    }
-    
-    private ValidationResult validateFormEncodedValue(String name, String value) {
-        // URL decode the value
-        String decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
-        
-        // Check for path traversal
-        if (containsPathTraversal(decoded)) {
-            return ValidationResult.blocked("Path traversal in form field: " + name);
-        }
-        
-        // Check length limits
-        if (decoded.length() > MAX_FORM_FIELD_LENGTH) {
-            return ValidationResult.blocked("Form field too long: " + name);
-        }
-        
-        // Check for SQL injection patterns
-        if (containsSQLInjection(decoded)) {
-            return ValidationResult.blocked("SQL injection pattern in: " + name);
-        }
-        
-        return ValidationResult.allowed();
-    }
-    
-    private ValidationResult validateJsonValue(String name, String value) {
-        // Check for JSON injection attacks
-        if (value.contains("$where") || value.contains("$regex")) {
-            return ValidationResult.blocked("NoSQL injection pattern in: " + name);
-        }
-        
-        // Validate string values for path traversal
-        if (containsPathTraversal(value)) {
-            return ValidationResult.blocked("Path traversal in JSON: " + name);
-        }
-        
-        // Check for prototype pollution
-        if (name.equals("__proto__") || name.equals("constructor") || name.equals("prototype")) {
-            return ValidationResult.blocked("Prototype pollution attempt: " + name);
-        }
-        
-        return ValidationResult.allowed();
-    }
-    
-    private ValidationResult validateMultipartValue(String name, String value) {
-        // Validate Content-Disposition filename parameter
-        if (name.equals("filename")) {
-            // Check for path traversal patterns in filename
-            if (value.contains("..") || value.contains("/") || value.contains("\\")) {
-                return ValidationResult.blocked("Path traversal in filename parameter");
-            }
-            
-            // Check for null bytes
-            if (value.contains("\0")) {
-                return ValidationResult.blocked("Null byte in filename");
-            }
-        }
-        
-        return ValidationResult.allowed();
-    }
-}
-----
-
-=== Cookie Path Validation
-
-[source,java]
-----
-public class CookiePathValidator {
-    
-    // RFC 6265 - HTTP State Management
-    public ValidationResult validateCookiePath(String path) {
-        // RFC 6265 Section 5.1.4 - Paths
-        if (!path.startsWith("/")) {
-            return ValidationResult.blocked("Cookie path must start with /");
-        }
-        
-        // Check for path traversal in cookie paths
-        if (containsPathTraversal(path)) {
-            return ValidationResult.blocked("Path traversal in cookie path");
-        }
-        
-        return ValidationResult.allowed();
-    }
-}
-----
-
-== URL Path Validation (Primary Focus)
-
-=== HTTP Standards Compliance
-
-==== RFC 3986 - URI Generic Syntax Implementation
-
-[source,java]
-----
-public class RFC3986Validator {
-    
-    // RFC 3986 Section 2.2 - Reserved Characters
-    private static final String RESERVED = ":/?#[]@!$&'()*+,;=";
-    private static final String UNRESERVED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-    
-    public boolean isValidURIPath(String path) {
-        // RFC 3986 Section 3.3 - Path validation
-        for (char c : path.toCharArray()) {
-            if (!isUnreserved(c) && !isReserved(c) && !isPercentEncoded(path, c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    private boolean isPercentEncoded(String path, char c) {
-        // RFC 3986 Section 2.1 - Percent-Encoding
-        return c == '%' && isHexDigit(path.charAt(path.indexOf(c) + 1)) 
-                        && isHexDigit(path.charAt(path.indexOf(c) + 2));
-    }
-}
-----
-
-==== RFC 7230 - HTTP/1.1 Message Syntax
-
-[source,java]
-----
-public class RFC7230Validator {
-    
-    // RFC 7230 Section 3.2 - Header Field Structure
-    private static final Pattern TOKEN = Pattern.compile("^[!#$%&'*+\\-.0-9A-Z^_`a-z|~]+$");
-    
-    // RFC 7230 Section 5.3 - Request Target
-    public ValidationResult validateRequestTarget(String target) {
-        // origin-form = absolute-path [ "?" query ]
-        if (target.startsWith("/")) {
-            return validateOriginForm(target);
-        }
-        // absolute-form = absolute-URI
-        else if (target.matches("^https?://.*")) {
-            return validateAbsoluteForm(target);
-        }
-        return ValidationResult.blocked("Invalid request target format");
-    }
-    
-    public boolean isValidHeaderName(String name) {
-        return TOKEN.matcher(name).matches();
-    }
-}
-----
-
-=== URL-Specific Security
-
-[source,java]
-----
-public class URLPathSecurityValidator {
-    
-    /**
-     * Validates a URL path for security issues
-     * 
-     * @param urlPath the URL path to validate
-     * @return the validated and decoded URL path
-     * @throws UrlSecurityException if validation fails
-     */
-    public String validateURLPath(String urlPath) {
-        // Decode URL encoding using secure utility
-        String decoded = UrlDecodingTools.getDecodedValue(urlPath);
-        
-        // Validate URL path components
-        String[] segments = decoded.split("/");
         for (String segment : segments) {
-            if (isTraversalSegment(segment)) {
-                throw new UrlSecurityException(
-                    UrlSecurityFailureType.PATH_TRAVERSAL,
-                    urlPath,
-                    decoded
-                );
+            if (".".equals(segment)) {
+                // Current directory - skip
+                continue;
+            } else if ("..".equals(segment)) {
+                // Parent directory
+                if (result.length() > 0) {
+                    // Remove last segment
+                    int lastSlash = result.lastIndexOf("/");
+                    if (lastSlash >= 0) {
+                        result.setLength(lastSlash);
+                        depth--;
+                    }
+                } else {
+                    // Trying to go above root
+                    depth--;
+                }
+            } else if (!segment.isEmpty()) {
+                // Normal segment
+                if (result.length() > 0 || path.startsWith("/")) {
+                    result.append("/");
+                }
+                result.append(segment);
+                depth++;
             }
         }
         
-        // Check for URL-specific attacks
-        if (hasURLAttackPattern(decoded)) {
-            throw new UrlSecurityException(
-                UrlSecurityFailureType.PATH_TRAVERSAL,
-                urlPath,
-                decoded
-            );
+        // Check depth limit
+        if (depth > config.getMaxDirectoryDepth()) {
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
+                .originalInput(path)
+                .detail("Path depth " + depth + " exceeds maximum " + config.getMaxDirectoryDepth())
+                .build();
         }
         
-        return decoded;
+        // Preserve trailing slash if present
+        if (path.endsWith("/") && !result.toString().endsWith("/")) {
+            result.append("/");
+        }
+        
+        return result.toString();
     }
     
+    private boolean containsPathTraversal(String path) {
+        // After normalization, there should be no .. segments
+        return path.contains("../") || path.contains("..\\") || path.equals("..");
+    }
+    
+    private boolean escapesRoot(String path) {
+        // Check if normalized path tries to escape root
+        return path.startsWith("../") || path.startsWith("..\\");
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.URL_PATH;
+    }
+}
+----
+
+=== PatternMatchingStage
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+/**
+ * Pattern-based attack detection using pre-compiled patterns.
+ * Immutable and optimized for performance.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V3]
+ */
+public final class PatternMatchingStage implements HttpSecurityValidator {
+    
+    // Pre-compiled patterns stored in final fields
+    private final Pattern pathTraversalPattern;
+    private final Pattern windowsTraversalPattern;
+    private final Pattern encodedTraversalPattern;
+    
+    public PatternMatchingStage(UrlSecurityConfig config) {
+        // Compile all patterns during construction
+        this.pathTraversalPattern = Pattern.compile(
+            "(?:^|/)\\.\\.(?:/|$)"
+        );
+        this.windowsTraversalPattern = Pattern.compile(
+            "(?:^|\\\\)\\.\\.(?:\\\\|$)"
+        );
+        this.encodedTraversalPattern = Pattern.compile(
+            "%(?:2e|2E)%(?:2e|2E)"
+        );
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        // Check all patterns efficiently
+        if (pathTraversalPattern.matcher(value).find() ||
+            windowsTraversalPattern.matcher(value).find() ||
+            encodedTraversalPattern.matcher(value).find()) {
+            
+            throw UrlSecurityException.builder()
+                .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                .originalInput(value)
+                .build();
+        }
+        
+        return value;
+    }
+}
+----
+
+== Pipeline Architecture
+
+=== Sequential Execution Model
+
+Pipelines execute validation stages sequentially with early termination:
+
+[source,java]
+----
+package de.cuioss.tools.security.http.pipeline;
+
+import java.util.List;
+
+/**
+ * URL path validation pipeline.
+ * Uses ConfigStageProvider interface for dependency injection.
+ * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P1]
+ */
+public final class URLPathValidationPipeline implements HttpSecurityValidator {
+    
+    private final List<HttpSecurityValidator> stages;
+    private final SecurityEventCounter eventCounter;
+    
+    public URLPathValidationPipeline(ConfigStageProvider stageProvider, 
+                                    SecurityEventCounter eventCounter) {
+        // Get individual stages from provider in correct order
+        // Order is critical: Length first, then Character validation BEFORE processing
+        this.stages = List.of(
+            stageProvider.getLengthValidationStage(),          // First: prevent DoS
+            stageProvider.getPathCharacterValidationStage(),   // Second: RFC path validation
+            stageProvider.getDecodingStage(),                  // Third: decode input
+            stageProvider.getNormalizationStage(),             // Fourth: normalize paths
+            stageProvider.getPatternMatchingStage()            // Fifth: detect attacks
+        );
+        this.eventCounter = eventCounter;
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        String result = value;
+        
+        // Sequential execution with early termination
+        for (HttpSecurityValidator stage : stages) {
+            try {
+                result = stage.execute(result);
+            } catch (UrlSecurityException e) {
+                // Track security event
+                eventCounter.increment(e.getFailureType());
+                // Log via URLSecurityLogMessages
+                logSecurityEvent(e);
+                // Re-throw for caller
+                throw e;
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.URL_PATH;
+    }
+}
+
+/**
+ * URL parameter validation pipeline.
+ * Uses ConfigStageProvider but skips normalization stage.
+ * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P2]
+ */
+public final class URLParameterValidationPipeline implements HttpSecurityValidator {
+    
+    private final List<HttpSecurityValidator> stages;
+    private final SecurityEventCounter eventCounter;
+    
+    public URLParameterValidationPipeline(ConfigStageProvider stageProvider,
+                                         SecurityEventCounter eventCounter) {
+        // Parameters: validate chars before decoding, skip normalization
+        this.stages = List.of(
+            stageProvider.getLengthValidationStage(),
+            stageProvider.getParameterCharacterValidationStage(),
+            stageProvider.getDecodingStage(),
+            stageProvider.getPatternMatchingStage()
+        );
+        this.eventCounter = eventCounter;
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        String result = value;
+        for (HttpSecurityValidator stage : stages) {
+            try {
+                result = stage.execute(result);
+            } catch (UrlSecurityException e) {
+                eventCounter.increment(e.getFailureType());
+                throw e;
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.URL_PARAMETER;
+    }
+}
+
+/**
+ * HTTP header validation pipeline.
+ * Uses ConfigStageProvider but only needs subset of stages.
+ * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Task P3]
+ */
+public final class HTTPHeaderValidationPipeline implements HttpSecurityValidator {
+    
+    private final List<HttpSecurityValidator> stages;
+    private final SecurityEventCounter eventCounter;
+    
+    public HTTPHeaderValidationPipeline(ConfigStageProvider stageProvider,
+                                       SecurityEventCounter eventCounter) {
+        // Headers: validate RFC 7230 chars first, no decoding/normalization needed
+        this.stages = List.of(
+            stageProvider.getLengthValidationStage(),
+            stageProvider.getHeaderCharacterValidationStage(),
+            stageProvider.getPatternMatchingStage()
+        );
+        this.eventCounter = eventCounter;
+    }
+    
+    @Override
+    public String execute(String value) throws UrlSecurityException {
+        String result = value;
+        for (HttpSecurityValidator stage : stages) {
+            try {
+                result = stage.execute(result);
+            } catch (UrlSecurityException e) {
+                eventCounter.increment(e.getFailureType());
+                throw e;
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public ValidationType getType() {
+        return ValidationType.HTTP_HEADER;
+    }
+}
+----
+
+== Security Event Tracking
+
+=== Event Counter Pattern
+
+[source,java]
+----
+package de.cuioss.tools.security.http.security;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * Thread-safe security event counter.
+ * Tracks occurrences of each UrlSecurityFailureType.
+ * Implemented by: link:../../../plan.adoc#_phase_4_security_tracking_and_monitoring[Task S1]
+ */
+public class SecurityEventCounter {
+    
+    private final ConcurrentHashMap<UrlSecurityFailureType, AtomicLong> counters = 
+        new ConcurrentHashMap<>();
+    
+    /**
+     * Increment counter for a failure type.
+     * @return new count value
+     */
+    public long increment(UrlSecurityFailureType type) {
+        return counters.computeIfAbsent(type, k -> new AtomicLong(0))
+                      .incrementAndGet();
+    }
+    
+    /**
+     * Get current count for a failure type.
+     */
+    public long getCount(UrlSecurityFailureType type) {
+        AtomicLong counter = counters.get(type);
+        return counter != null ? counter.get() : 0;
+    }
+}
+----
+
+=== Structured Logging
+
+[source,java]
+----
+package de.cuioss.tools.security.http.security;
+
+import de.cuioss.tools.logging.LogRecord;
+import de.cuioss.tools.logging.LogRecordModel;
+
+/**
+ * Structured log messages for URL security events.
+ * Follows cui-jwt-validation LogRecord pattern.
+ * Implemented by: link:../../../plan.adoc#_phase_4_security_tracking_and_monitoring[Task S2]
+ */
+public final class URLSecurityLogMessages {
+    
+    private static final String PREFIX = "URLSecurity";
+    
+    public static final class WARN {
+        
+        public static final LogRecord PATH_TRAVERSAL_DETECTED = 
+            LogRecordModel.builder()
+                .prefix(PREFIX)
+                .identifier(301)
+                .template("Path traversal attempt detected: %s")
+                .build();
+        
+        public static final LogRecord DOUBLE_ENCODING_DETECTED = 
+            LogRecordModel.builder()
+                .prefix(PREFIX)
+                .identifier(302)
+                .template("Double encoding attack detected: %s")
+                .build();
+        
+        public static final LogRecord UNICODE_ATTACK_DETECTED = 
+            LogRecordModel.builder()
+                .prefix(PREFIX)
+                .identifier(303)
+                .template("Unicode normalization attack detected")
+                .build();
+    }
+    
+    public static final class ERROR {
+        
+        public static final LogRecord VALIDATION_FAILED = 
+            LogRecordModel.builder()
+                .prefix(PREFIX)
+                .identifier(401)
+                .template("URL validation failed: %s - %s")
+                .build();
+    }
 }
 ----
 
 == Performance Optimization
 
-=== Caching Strategy
+=== Optimization Strategies
+
+1. **Pre-compilation**: All patterns compiled during construction
+2. **Immutable Caching**: Configuration and patterns stored in final fields
+3. **Early Termination**: Stop processing on first security violation
+4. **Efficient Algorithms**: Use StringBuilder, BitSet for character validation
+5. **Memory Management**: Minimize string allocations
+
+=== Performance Requirements
+
+- Individual stage: <0.2ms per stage
+- Complete pipeline: <1ms total for typical inputs (5 stages × 0.2ms)
+- Memory: O(n) where n is input length
+- Thread safety: No synchronization needed (immutable)
+- Benchmark: 95th percentile must meet these requirements
+
+== Usage Example
 
 [source,java]
 ----
-public class ValidationCache {
-    
-    private final Map<String, ValidationResult> cache = new ConcurrentHashMap<>();
-    private final Set<String> knownMalicious = Collections.synchronizedSet(new HashSet<>());
-    
-    public ValidationCache() {
-        // Initialize cache with size limit using a simple LRU approach
-        // In production, consider using Caffeine or a proper cache library
-        // For now, we'll use a simple map with manual eviction
-    }
-    
-    public Optional<ValidationResult> get(String path) {
-        // Quick check for known malicious
-        if (knownMalicious.contains(path)) {
-            return Optional.of(ValidationResult.blocked("Known attack pattern"));
-        }
-        
-        return Optional.ofNullable(cache.get(path));
-    }
-    
-    public void put(String path, ValidationResult result) {
-        cache.put(path, result);
-        
-        if (result.isBlocked()) {
-            knownMalicious.add(path);
-        }
-    }
+// Create configuration with secure defaults
+UrlSecurityConfig config = UrlSecurityConfig.builder()
+    .maxPathLength(2048)  // Uses DEFAULT_MAX_PATH_LENGTH
+    .build();
+
+// Create pipeline using ConfigStageProvider interface
+HttpSecurityValidator validator = new URLPathValidationPipeline(
+    config,  // UrlSecurityConfig implements ConfigStageProvider
+    new SecurityEventCounter()
+);
+
+// Validate input
+try {
+    String safe = validator.execute(userInput);
+    // Use validated input
+} catch (UrlSecurityException e) {
+    // Handle security violation
+    log.warn(URLSecurityLogMessages.WARN.PATH_TRAVERSAL_DETECTED, 
+             e.getOriginalInput());
 }
+
+// Different pipelines can use the same config provider
+HttpSecurityValidator paramValidator = new URLParameterValidationPipeline(
+    config,  // Same config, different stage selection
+    new SecurityEventCounter()
+);
+
+HttpSecurityValidator headerValidator = new HTTPHeaderValidationPipeline(
+    config,  // Same config, minimal stages
+    new SecurityEventCounter()
+);
 ----
 
-=== Performance Metrics
+== Security Considerations
 
-[source,java]
-----
-public class PerformanceMonitor {
-    
-    private final MeterRegistry registry;
-    
-    public PerformanceMonitor(MeterRegistry registry) {
-        this.registry = registry;
-    }
-    
-    public <T> T measure(String operation, Supplier<T> task) {
-        return Timer.Sample
-            .start(registry)
-            .stop(registry.timer("path.validation", "operation", operation))
-            .recordCallable(task);
-    }
-    
-    public void recordValidation(ValidationContext context, long duration) {
-        registry.timer("path.validation.duration",
-            "type", context.getType().name(),
-            "result", context.getResult().name()
-        ).record(duration, TimeUnit.NANOSECONDS);
-        
-        registry.counter("path.validation.count",
-            "type", context.getType().name()
-        ).increment();
-    }
-}
-----
+=== Attack Coverage
 
-== Security Configuration
+- Path traversal: ../, ..\, encoded variants
+- Encoding attacks: Double/triple encoding, mixed encoding
+- Unicode attacks: Normalization, homographs, control characters
+- Injection: XSS, SQL, LDAP, command injection patterns
+- Protocol attacks: Header injection, request smuggling
+- DoS: Size limits, algorithmic complexity
 
-=== Configuration Model
+=== Default Security Posture
 
-[source,java]
-----
-@ConfigurationProperties(prefix = "security.path")
-public class PathSecurityConfiguration {
-    
-    /**
-     * Validation strictness level
-     */
-    private StrictnessLevel strictness = StrictnessLevel.HIGH;
-    
-    /**
-     * Allowed content types for multipart uploads
-     */
-    private Set<String> allowedContentTypes = Set.of(
-        "text/plain", "application/json", "application/xml"
-    );
-    
-    /**
-     * Maximum path length
-     */
-    private int maxPathLength = 4096;
-    
-    /**
-     * Enable caching
-     */
-    private boolean cachingEnabled = true;
-    
-    /**
-     * Custom validation rules
-     */
-    private List<CustomRule> customRules = new ArrayList<>();
-    
-    /**
-     * HTTP-specific settings
-     */
-    private HttpSettings httpSettings = new HttpSettings();
-    
-    public enum StrictnessLevel {
-        LOW,      // Basic validation only
-        MEDIUM,   // Standard validation
-        HIGH,     // Strict validation (default)
-        PARANOID  // Maximum security, may block legitimate paths
-    }
-}
-----
-
-== Error Handling and Logging
-
-=== Security-Aware Error Handling
-
-[source,java]
-----
-public class SecurityErrorHandler {
-    
-    /**
-     * Handle validation errors without information disclosure
-     */
-    public ErrorResponse handleError(ValidationException e) {
-        // Log detailed error internally
-        securityLogger.error("Validation failed", e);
-        
-        // Return generic error to client
-        return ErrorResponse.builder()
-            .code("INVALID_PATH")
-            .message("The requested path is invalid")
-            .build();
-    }
-    
-    /**
-     * Audit logging for security events
-     */
-    public void auditValidation(ValidationContext context, ValidationResult result) {
-        AuditEvent event = AuditEvent.builder()
-            .timestamp(Instant.now())
-            .principal(context.getPrincipal())
-            .action("PATH_VALIDATION")
-            .resource(sanitizePath(context.getPath()))
-            .result(result.isAllowed() ? "ALLOWED" : "BLOCKED")
-            .reason(result.getReason())
-            .build();
-            
-        auditLogger.log(event);
-    }
-}
-----
-
-== Integration Patterns
-
-
-== Monitoring and Observability
-
-=== Metrics Collection
-
-[source,java]
-----
-@Component
-public class PathSecurityMetrics {
-    
-    private final MeterRegistry registry;
-    
-    public void recordValidation(ValidationMetrics metrics) {
-        // Record validation counts
-        registry.counter("path.validation.total",
-            "type", metrics.getType(),
-            "result", metrics.getResult()
-        ).increment();
-        
-        // Record performance metrics
-        registry.timer("path.validation.duration",
-            "type", metrics.getType()
-        ).record(metrics.getDuration());
-        
-        // Record attack detection
-        if (metrics.isAttackDetected()) {
-            registry.counter("path.validation.attacks",
-                "pattern", metrics.getAttackPattern()
-            ).increment();
-        }
-    }
-    
-    public void exportMetrics() {
-        // Prometheus format
-        String metrics = registry.scrape();
-        
-        // Custom format for security dashboard
-        SecurityMetrics securityMetrics = SecurityMetrics.builder()
-            .totalValidations(getTotalValidations())
-            .blockedAttempts(getBlockedAttempts())
-            .averageLatency(getAverageLatency())
-            .topAttackPatterns(getTopAttackPatterns())
-            .build();
-    }
-}
-----
-
-
-== Conclusion
-
-This architecture provides a comprehensive, extensible, and performant solution for HTTP/URL path traversal security that addresses the limitations found in existing libraries while incorporating lessons learned from real-world vulnerabilities.
-
-== References
-
-=== Security Standards and Frameworks
-
-* link:https://owasp.org/www-project-application-security-verification-standard/[OWASP Application Security Architecture Guide]
-* link:https://www.nist.gov/cyberframework[NIST Cybersecurity Framework]
-* link:https://www.iso.org/standard/44378.html[ISO/IEC 27034 - Application Security]
-* link:https://www.commoncriteriaportal.org/[Common Criteria for Information Technology Security Evaluation]
-* link:https://attack.mitre.org/[MITRE ATT&CK Framework]
-* link:https://csrc.nist.gov/publications/detail/sp/800-207/final[Zero Trust Architecture (NIST SP 800-207)]
-
-=== HTTP and URL Standards
-
-* link:https://www.rfc-editor.org/rfc/rfc3986[RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax]
-* link:https://www.rfc-editor.org/rfc/rfc7230[RFC 7230 - Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing]
-* link:https://www.rfc-editor.org/rfc/rfc6265[RFC 6265 - HTTP State Management Mechanism]
-* link:https://www.rfc-editor.org/rfc/rfc8941[RFC 8941 - Structured Field Values for HTTP]
-* link:https://www.rfc-editor.org/rfc/rfc3987[RFC 3987 - Internationalized Resource Identifiers (IRIs)]
-
-=== Vulnerability Resources
-
-* link:https://cwe.mitre.org/data/definitions/22.html[CWE-22: Improper Limitation of a Pathname to a Restricted Directory]
-* link:https://nvd.nist.gov/[National Vulnerability Database]
-* link:https://www.first.org/cvss/[Common Vulnerability Scoring System (CVSS)]
-
+- All defaults follow maximum security (OWASP/RFC)
+- No lenient modes - security by default
+- Explicit overrides required for less restrictive settings
+- Comprehensive logging and monitoring
