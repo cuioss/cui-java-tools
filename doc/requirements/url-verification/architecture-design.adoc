@@ -692,6 +692,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import lombok.Value;
 import java.text.Normalizer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -702,18 +703,14 @@ import java.util.regex.Pattern;
  * Immutable and thread-safe.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V1]
  */
-public final class DecodingStage implements HttpSecurityValidator {
+@Value
+public class DecodingStage implements HttpSecurityValidator {
     
     // Static pattern shared across all instances
     private static final Pattern DOUBLE_ENCODING_PATTERN = Pattern.compile("%25[0-9a-fA-F]{2}");
     
-    private final UrlSecurityConfig config;
-    private final ValidationType validationType;
-    
-    public DecodingStage(UrlSecurityConfig config, ValidationType validationType) {
-        this.config = config;
-        this.validationType = validationType;
-    }
+    UrlSecurityConfig config;
+    ValidationType validationType;
     
     @Override
     public String execute(String value) throws UrlSecurityException {
@@ -1083,6 +1080,7 @@ public class NormalizationStage implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import lombok.Value;
 import java.util.regex.Pattern;
 
 /**
@@ -1090,7 +1088,8 @@ import java.util.regex.Pattern;
  * Immutable and optimized for performance.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V3]
  */
-public final class PatternMatchingStage implements HttpSecurityValidator {
+@Value
+public class PatternMatchingStage implements HttpSecurityValidator {
     
     // Static patterns shared across all instances
     private static final Pattern PATH_TRAVERSAL_PATTERN = Pattern.compile(
@@ -1103,11 +1102,8 @@ public final class PatternMatchingStage implements HttpSecurityValidator {
         "%(?:2e|2E)%(?:2e|2E)"
     );
     
-    private final ValidationType validationType;
-    
-    public PatternMatchingStage(UrlSecurityConfig config, ValidationType validationType) {
-        this.validationType = validationType;
-    }
+    UrlSecurityConfig config; // Keep for consistency even if not used
+    ValidationType validationType;
     
     @Override
     public String execute(String value) throws UrlSecurityException {
