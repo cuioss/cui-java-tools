@@ -132,7 +132,7 @@ public interface HttpSecurityValidator {
     /**
      * @return The type of validation this validator performs
      */
-    ValidationType getType();
+    ValidationType getValidationType();
 }
 
 /**
@@ -580,11 +580,6 @@ public final class IdentityValidator implements HttpSecurityValidator {
         // Identity function - return input unchanged
         return value;
     }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
-    }
 }
 ----
 
@@ -609,6 +604,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     
     private final int maxLength;
     private final int maxDepth;
+    @Getter
     private final ValidationType validationType;
     
     public LengthValidationStage(UrlSecurityConfig config, ValidationType validationType) {
@@ -639,11 +635,6 @@ public final class LengthValidationStage implements HttpSecurityValidator {
         }
         
         return value;
-    }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
     }
 }
 ----
@@ -717,11 +708,6 @@ public class DecodingStage implements HttpSecurityValidator {
         
         return decoded;
     }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
-    }
 }
 ----
 
@@ -753,6 +739,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
     // pct-encoded: "%" HEXDIG HEXDIG
     
     private final BitSet allowedChars;
+    @Getter
     private final ValidationType validationType;
     private final boolean allowPercentEncoding;
     
@@ -906,11 +893,6 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
                (ch >= 'A' && ch <= 'F') || 
                (ch >= 'a' && ch <= 'f');
     }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
-    }
 }
 ----
 
@@ -1032,11 +1014,6 @@ public class NormalizationStage implements HttpSecurityValidator {
         // Check if normalized path tries to escape root
         return path.startsWith("../") || path.startsWith("..\\");
     }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
-    }
 }
 ----
 
@@ -1061,9 +1038,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     private static final Pattern PATH_TRAVERSAL_PATTERN = Pattern.compile(
         "(?:^|/)\\.\\.(?:/|$)"
     );
-    private static final Pattern WINDOWS_TRAVERSAL_PATTERN = Pattern.compile(
-        "(?:^|\\\\)\\.\\.(?:\\\\|$)"
-    );
     private static final Pattern ENCODED_TRAVERSAL_PATTERN = Pattern.compile(
         "%(?:2e|2E)%(?:2e|2E)"
     );
@@ -1075,7 +1049,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     public String execute(String value) throws UrlSecurityException {
         // Check all patterns efficiently
         if (PATH_TRAVERSAL_PATTERN.matcher(value).find() ||
-            WINDOWS_TRAVERSAL_PATTERN.matcher(value).find() ||
             ENCODED_TRAVERSAL_PATTERN.matcher(value).find()) {
             
             throw UrlSecurityException.builder()
@@ -1086,11 +1059,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
         }
         
         return value;
-    }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
     }
 }
 ----
@@ -1122,6 +1090,7 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     private final ConfigStageProvider config;
     private final List<HttpSecurityValidator> stages;
     private final SecurityEventCounter eventCounter;
+    @Getter
     private final ValidationType validationType;
     
     public UnifiedValidationPipeline(ConfigStageProvider config, 
@@ -1174,11 +1143,6 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
         }
         
         return result;
-    }
-    
-    @Override
-    public ValidationType getType() {
-        return validationType;
     }
     
     private void logSecurityEvent(UrlSecurityException e) {
