@@ -30,22 +30,22 @@ Defines the core functionality that the system must provide:
 * **Character and Encoding** (HTTP-10 to HTTP-12): Input character handling
 * **Configuration** (HTTP-13 to HTTP-14): System configuration capabilities
 * **Error Handling** (HTTP-15 to HTTP-16): Exception and error management
-* **Integration** (HTTP-17 to HTTP-18): Framework and system integration
-* **Performance** (HTTP-19 to HTTP-20): Performance and resource management
+* **Integration** (HTTP-17): System integration
+* **Performance** (HTTP-18 to HTTP-19): Performance and resource management
 
 === link:security-requirements.adoc[Security Requirements]
 
 Defines the security-specific requirements and controls:
 
-* **OWASP Compliance** (SEC-1 to SEC-3): OWASP Top 10 prevention
-* **Path Security** (SEC-4 to SEC-6): Path traversal and directory security
-* **Input Validation** (SEC-7 to SEC-9): Security validation requirements
-* **DoS Prevention** (SEC-10 to SEC-11): Denial of service protection
-* **Monitoring** (SEC-12 to SEC-13): Security event tracking and alerting
-* **Cryptographic** (SEC-14 to SEC-15): Encoding and cryptographic security
-* **Audit** (SEC-16 to SEC-17): Audit trail and compliance
-* **Integration Security** (SEC-18 to SEC-19): Secure integration requirements
-* **Updates** (SEC-20 to SEC-21): Security update and threat management
+* **OWASP Compliance** (SEC-1 to SEC-2): OWASP Top 10 prevention
+* **Path Security** (SEC-3 to SEC-5): Path traversal and directory security
+* **Input Validation** (SEC-6 to SEC-8): Security validation requirements
+* **DoS Prevention** (SEC-9 to SEC-10): Denial of service protection
+* **Monitoring** (SEC-11 to SEC-12): Security event tracking and alerting
+* **Cryptographic** (SEC-13 to SEC-14): Encoding and cryptographic security
+* **Audit** (SEC-15 to SEC-16): Audit trail and compliance
+* **API Security** (SEC-17): Secure API requirements
+* **Updates** (SEC-18): Attack pattern configuration
 
 == Related Documentation
 
@@ -66,25 +66,25 @@ Defines the security-specific requirements and controls:
 |===
 | Category | Total | Functional | Security
 
-| **Total Requirements** | 41 | 20 | 21
-| **General/OWASP** | 6 | 3 (HTTP-1 to HTTP-3) | 3 (SEC-1 to SEC-3)
-| **Validation/Path** | 12 | 6 (HTTP-4 to HTTP-9) | 6 (SEC-4 to SEC-9)
-| **Configuration/Cryptographic** | 4 | 2 (HTTP-13 to HTTP-14) | 2 (SEC-14 to SEC-15)
-| **Error/Monitoring** | 4 | 2 (HTTP-15 to HTTP-16) | 2 (SEC-12 to SEC-13)
-| **Integration** | 4 | 2 (HTTP-17 to HTTP-18) | 2 (SEC-18 to SEC-19)
-| **Performance/DoS** | 4 | 2 (HTTP-19 to HTTP-20) | 2 (SEC-10 to SEC-11)
-| **Character/Audit/Updates** | 7 | 3 (HTTP-10 to HTTP-12) | 4 (SEC-16 to SEC-17, SEC-20 to SEC-21)
+| **Total Requirements** | 36 | 19 | 17
+| **General/OWASP** | 5 | 3 (HTTP-1 to HTTP-3) | 2 (SEC-1 to SEC-2)
+| **Validation/Path** | 11 | 6 (HTTP-4 to HTTP-9) | 5 (SEC-3 to SEC-7)
+| **Configuration/Cryptographic** | 4 | 2 (HTTP-13 to HTTP-14) | 2 (SEC-13 to SEC-14)
+| **Error/Monitoring** | 4 | 2 (HTTP-15 to HTTP-16) | 2 (SEC-11 to SEC-12)
+| **Integration** | 2 | 1 (HTTP-17) | 1 (SEC-17)
+| **Performance/DoS** | 4 | 2 (HTTP-18 to HTTP-19) | 2 (SEC-9 to SEC-10)
+| **Character/Audit/Updates** | 6 | 3 (HTTP-10 to HTTP-12) | 3 (SEC-8, SEC-15 to SEC-16, SEC-18)
 |===
 
 == Requirement Prefixes
 
 The following prefixes are used to categorize requirements:
 
-* **HTTP-**: Functional requirements for HTTP security validation (HTTP-1 through HTTP-20)
+* **HTTP-**: Functional requirements for HTTP security validation (HTTP-1 through HTTP-19)
   ** Sequential numbering for all functional requirements
   ** Covers general, validation, path security, character handling, configuration, error handling, integration, and performance requirements
 
-* **SEC-**: Security-specific requirements (SEC-1 through SEC-21)
+* **SEC-**: Security-specific requirements (SEC-1 through SEC-18)
   ** Sequential numbering for all security requirements
   ** Covers OWASP compliance, path security, input validation, DoS prevention, monitoring, cryptographic, audit, integration security, and update management
 

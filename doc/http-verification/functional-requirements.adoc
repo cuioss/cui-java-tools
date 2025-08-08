@@ -206,18 +206,7 @@ These requirements are derived from:
 == Integration Requirements
 
 === [#HTTP-17]
-=== HTTP-17: Framework Integration Support
-
-* The system must integrate with common Java frameworks:
-  ** Spring Boot (via interceptors/filters)
-  ** Jakarta EE (via filters)
-  ** JAX-RS (via providers)
-* Must provide clear integration points
-* Must not require framework-specific dependencies
-* Reference: link:specification/specification.adoc#_example_usage[Integration Examples]
-
-=== [#HTTP-18]
-=== HTTP-18: Logging Integration
+=== HTTP-17: Logging Integration
 
 * The system must integrate with standard logging frameworks
 * Must use CuiLogger for internal logging
@@ -227,8 +216,8 @@ These requirements are derived from:
 
 == Performance Requirements
 
-=== [#HTTP-19]
-=== HTTP-19: Efficient Validation Processing
+=== [#HTTP-18]
+=== HTTP-18: Efficient Validation Processing
 
 * Validation must complete within reasonable time limits:
   ** Simple paths: < 1ms
@@ -238,8 +227,8 @@ These requirements are derived from:
 * Must not cause memory leaks
 * Reference: link:specification/testing.adoc#_performance_benchmarking[Performance Benchmarks]
 
-=== [#HTTP-20]
-=== HTTP-20: Resource Constraints
+=== [#HTTP-19]
+=== HTTP-19: Resource Constraints
 
 * The system must enforce resource limits:
   ** Maximum input length (configurable)
@@ -271,8 +260,7 @@ These requirements are derived from:
 | HTTP-14 | Type Configuration | link:specification/specification.adoc#_validation_type_configurations[§Type Config]
 | HTTP-15 | Security Exceptions | link:specification/specification.adoc#_urlsecurityexception[§Exceptions]
 | HTTP-16 | Event Tracking | link:specification/specification.adoc#_event_counter_pattern[§Event Counter]
-| HTTP-17 | Framework Integration | link:specification/specification.adoc#_example_usage[§Integration]
-| HTTP-18 | Logging Integration | link:specification/specification.adoc#_securityeventcounter[§Logging]
-| HTTP-19 | Efficient Processing | link:specification/testing.adoc#_performance_benchmarking[§Performance]
-| HTTP-20 | Resource Constraints | link:specification/specification.adoc#_lengthvalidationstage[§Constraints]
+| HTTP-17 | Logging Integration | link:specification/specification.adoc#_securityeventcounter[§Logging]
+| HTTP-18 | Efficient Processing | link:specification/testing.adoc#_performance_benchmarking[§Performance]
+| HTTP-19 | Resource Constraints | link:specification/specification.adoc#_lengthvalidationstage[§Constraints]
 |===
