@@ -116,23 +116,20 @@ de.cuioss.tools.security.http/
 package de.cuioss.tools.security.http;
 
 /**
- * Core interface for HTTP security validation.
+ * Core functional interface for HTTP security validation.
  * Follows the String/throws pattern consistently.
+ * Can be used with lambda expressions and method references.
  * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
+@FunctionalInterface
 public interface HttpSecurityValidator {
     /**
-     * Validates the input and returns the sanitized version.
+     * Validates the input and returns the sanitized/normalized version.
      * @param value The input to validate
      * @return The validated/normalized value
      * @throws UrlSecurityException on any security violation
      */
-    String execute(String value) throws UrlSecurityException;
-    
-    /**
-     * @return The type of validation this validator performs
-     */
-    ValidationType getValidationType();
+    String validate(String value) throws UrlSecurityException;
 }
 
 /**
@@ -559,7 +556,6 @@ import lombok.ToString;
 @ToString
 public final class IdentityValidator implements HttpSecurityValidator {
     
-    @Getter
     private final ValidationType validationType;
     
     /**
@@ -576,7 +572,7 @@ public final class IdentityValidator implements HttpSecurityValidator {
     }
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) {
         // Identity function - return input unchanged
         return value;
     }
@@ -604,7 +600,6 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     
     private final int maxLength;
     private final int maxDepth;
-    @Getter
     private final ValidationType validationType;
     
     public LengthValidationStage(UrlSecurityConfig config, ValidationType validationType) {
@@ -614,7 +609,7 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     }
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         // First check: total length
         if (value.length() > maxLength) {
             throw UrlSecurityException.builder()
@@ -666,7 +661,7 @@ public class DecodingStage implements HttpSecurityValidator {
     ValidationType validationType;
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         // Detect double encoding before decoding
         if (DOUBLE_ENCODING_PATTERN.matcher(value).find()) {
             throw UrlSecurityException.builder()
@@ -828,7 +823,6 @@ import java.util.BitSet;
 public final class CharacterValidationStage implements HttpSecurityValidator {
     
     private final BitSet allowedChars;
-    @Getter
     private final ValidationType validationType;
     private final boolean allowPercentEncoding;
     
@@ -845,7 +839,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
     }
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         // Quick check for null/empty
         if (value == null || value.isEmpty()) {
             return value;
@@ -946,7 +940,7 @@ public class NormalizationStage implements HttpSecurityValidator {
     ValidationType validationType;
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         if (value == null || value.isEmpty()) {
             return value;
         }
@@ -1074,7 +1068,7 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     ValidationType validationType;
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         // Check all patterns efficiently
         if (PATH_TRAVERSAL_PATTERN.matcher(value).find() ||
             ENCODED_TRAVERSAL_PATTERN.matcher(value).find()) {
@@ -1118,7 +1112,6 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     private final ConfigStageProvider config;
     private final List<HttpSecurityValidator> stages;
     private final SecurityEventCounter eventCounter;
-    @Getter
     private final ValidationType validationType;
     
     public UnifiedValidationPipeline(ConfigStageProvider config, 
@@ -1136,7 +1129,7 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     }
     
     @Override
-    public String execute(String value) throws UrlSecurityException {
+    public String validate(String value) throws UrlSecurityException {
         String result = value;
         
         // Sequential execution with early termination
@@ -1144,7 +1137,7 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
             // Skip null stages and identity validators
             if (stage != null && !(stage instanceof IdentityValidator)) {
                 try {
-                    result = stage.execute(result);
+                    result = stage.validate(result);
                 } catch (UrlSecurityException e) {
                     // Add validation type to exception if not already set
                     if (e.getValidationType() == null) {
@@ -1340,9 +1333,9 @@ HttpSecurityValidator headerValidator = new UnifiedValidationPipeline(
 
 // Use validators - they all share the same pipeline implementation
 try {
-    String safePath = pathValidator.execute("/api/users/123");
-    String safeParam = paramValidator.execute("search=test%20query");
-    String safeHeader = headerValidator.execute("Bearer abc123");
+    String safePath = pathValidator.validate("/api/users/123");
+    String safeParam = paramValidator.validate("search=test%20query");
+    String safeHeader = headerValidator.validate("Bearer abc123");
 } catch (UrlSecurityException e) {
     // Exception now includes ValidationType
     log.warn("Security violation in {}: {} - {}", 
