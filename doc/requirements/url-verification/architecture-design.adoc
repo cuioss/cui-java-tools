@@ -212,18 +212,61 @@ public enum UrlSecurityFailureType {
 
 /**
  * Main exception for security violations.
- * Uses Java record for immutability and conciseness.
+ * Extends RuntimeException for clean functional interface usage.
  * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
  */
-public record UrlSecurityException(
-    @NonNull UrlSecurityFailureType failureType,
-    @NonNull ValidationType validationType,
-    @NonNull String originalInput,
-    @Nullable String sanitizedInput,
-    @Nullable String detail
-) {
+public class UrlSecurityException extends RuntimeException {
+    @NonNull private final UrlSecurityFailureType failureType;
+    @NonNull private final ValidationType validationType;
+    @NonNull private final String originalInput;
+    @Nullable private final String sanitizedInput;
+    @Nullable private final String detail;
+    
+    public UrlSecurityException(
+            @NonNull UrlSecurityFailureType failureType,
+            @NonNull ValidationType validationType,
+            @NonNull String originalInput,
+            @Nullable String sanitizedInput,
+            @Nullable String detail) {
+        super(buildMessage(failureType, validationType, originalInput, detail));
+        this.failureType = failureType;
+        this.validationType = validationType;
+        this.originalInput = originalInput;
+        this.sanitizedInput = sanitizedInput;
+        this.detail = detail;
+    }
+    
+    public UrlSecurityException(
+            @NonNull UrlSecurityFailureType failureType,
+            @NonNull ValidationType validationType,
+            @NonNull String originalInput,
+            @Nullable String sanitizedInput,
+            @Nullable String detail,
+            @Nullable Throwable cause) {
+        super(buildMessage(failureType, validationType, originalInput, detail), cause);
+        this.failureType = failureType;
+        this.validationType = validationType;
+        this.originalInput = originalInput;
+        this.sanitizedInput = sanitizedInput;
+        this.detail = detail;
+    }
+    
+    private static String buildMessage(UrlSecurityFailureType failureType,
+                                        ValidationType validationType,
+                                        String originalInput,
+                                        String detail) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Security validation failed [").append(validationType).append("]: ");
+        sb.append(failureType);
+        if (detail != null) {
+            sb.append(" - ").append(detail);
+        }
+        sb.append(" (input: '").append(originalInput).append("')");
+        return sb.toString();
+    }
+    
     /**
-     * Constructor with cause support.
+     * Static factory with cause support.
      */
     public static UrlSecurityException withCause(
             UrlSecurityFailureType failureType,
@@ -232,11 +275,31 @@ public record UrlSecurityException(
             @Nullable String sanitizedInput,
             @Nullable String detail,
             @Nullable Throwable cause) {
-        var ex = new UrlSecurityException(failureType, validationType, originalInput, sanitizedInput, detail);
-        if (cause != null) {
-            ex.initCause(cause);
-        }
-        return ex;
+        return new UrlSecurityException(failureType, validationType, originalInput, 
+                                         sanitizedInput, detail, cause);
+    }
+    
+    // Getters
+    public UrlSecurityFailureType getFailureType() {
+        return failureType;
+    }
+    
+    public ValidationType getValidationType() {
+        return validationType;
+    }
+    
+    public String getOriginalInput() {
+        return originalInput;
+    }
+    
+    @Nullable
+    public String getSanitizedInput() {
+        return sanitizedInput;
+    }
+    
+    @Nullable
+    public String getDetail() {
+        return detail;
     }
     
     /**
@@ -676,21 +739,23 @@ public final class LengthValidationStage implements HttpSecurityValidator {
     public String validate(String value) throws UrlSecurityException {
         // First check: total length
         if (value.length() > maxLength) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.PATH_TOO_LONG)
-                .validationType(validationType)
-                .originalInput(value)
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TOO_LONG,
+                validationType,
+                value,
+                null,
+                null);
         }
         
         // Second check: nesting depth
         long depth = value.chars().filter(ch -> ch == '/' || ch == '\\').count();
         if (depth > maxDepth) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
-                .validationType(validationType)
-                .originalInput(value)
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.EXCESSIVE_NESTING,
+                validationType,
+                value,
+                null,
+                null);
         }
         
         return value;
@@ -728,11 +793,12 @@ public class DecodingStage implements HttpSecurityValidator {
     public String validate(String value) throws UrlSecurityException {
         // Detect double encoding before decoding
         if (DOUBLE_ENCODING_PATTERN.matcher(value).find()) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.DOUBLE_ENCODING)
-                .validationType(validationType)
-                .originalInput(value)
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.DOUBLE_ENCODING,
+                validationType,
+                value,
+                null,
+                null);
         }
         
         // URL decode
@@ -740,12 +806,13 @@ public class DecodingStage implements HttpSecurityValidator {
         try {
             decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.INVALID_ENCODING)
-                .validationType(validationType)
-                .originalInput(value)
-                .cause(e)
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.INVALID_ENCODING,
+                validationType,
+                value,
+                null,
+                null,
+                e);
         }
         
         // Unicode normalization with change detection
@@ -753,12 +820,12 @@ public class DecodingStage implements HttpSecurityValidator {
             String normalized = Normalizer.normalize(decoded, Normalizer.Form.NFC);
             if (!decoded.equals(normalized)) {
                 // Normalization changed the string - potential attack
-                throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED)
-                    .validationType(validationType)
-                    .originalInput(value)
-                    .sanitizedInput(normalized)
-                    .build();
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED,
+                    validationType,
+                    value,
+                    normalized,
+                    null);
             }
             decoded = normalized;
         }
@@ -916,44 +983,45 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
             
             // Check for null byte FIRST (highest priority security check)
             if (ch == '\0') {
-                throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
-                    .validationType(validationType)
-                    .originalInput(value)
-                    .detail("Null byte detected at position " + i)
-                    .build();
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.NULL_BYTE_INJECTION,
+                    validationType,
+                    value,
+                    null,
+                    "Null byte detected at position " + i);
             }
             
             // Handle percent encoding
             if (ch == '%' && allowPercentEncoding) {
                 // Must be followed by two hex digits
                 if (i + 2 >= value.length()) {
-                    throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.INVALID_ENCODING)
-                        .validationType(validationType)
-                        .originalInput(value)
-                        .detail("Incomplete percent encoding at position " + i)
-                        .build();
+                    throw new UrlSecurityException(
+                        UrlSecurityFailureType.INVALID_ENCODING,
+                        validationType,
+                        value,
+                        null,
+                        "Incomplete percent encoding at position " + i);
                 }
                 
                 char hex1 = value.charAt(i + 1);
                 char hex2 = value.charAt(i + 2);
                 if (isNotHexDigit(hex1) || isNotHexDigit(hex2)) {
-                    throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.INVALID_ENCODING)
-                        .originalInput(value)
-                        .detail("Invalid hex digits in percent encoding at position " + i)
-                        .build();
+                    throw new UrlSecurityException(
+                        UrlSecurityFailureType.INVALID_ENCODING,
+                        validationType,
+                        value,
+                        null,
+                        "Invalid hex digits in percent encoding at position " + i);
                 }
                 
                 // Check for encoded null byte %00
                 if (hex1 == '0' && hex2 == '0') {
-                    throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.NULL_BYTE_INJECTION)
-                        .validationType(validationType)
-                        .originalInput(value)
-                        .detail("Encoded null byte (%00) detected at position " + i)
-                        .build();
+                    throw new UrlSecurityException(
+                        UrlSecurityFailureType.NULL_BYTE_INJECTION,
+                        validationType,
+                        value,
+                        null,
+                        "Encoded null byte (%00) detected at position " + i);
                 }
                 
                 i += 2; // Skip the two hex digits
@@ -962,12 +1030,12 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
             
             // Check if character is allowed
             if (ch > 255 || !allowedChars.get(ch)) {
-                throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.INVALID_CHARACTER)
-                    .validationType(validationType)
-                    .originalInput(value)
-                    .detail(STR."Invalid character '\{ch}' (0x\{Integer.toHexString(ch).toUpperCase()}) at position \{i}")
-                    .build();
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.INVALID_CHARACTER,
+                    validationType,
+                    value,
+                    null,
+                    STR."Invalid character '\{ch}' (0x\{Integer.toHexString(ch).toUpperCase()}) at position \{i}");
             }
         }
         
@@ -1017,24 +1085,22 @@ public class NormalizationStage implements HttpSecurityValidator {
         
         // Check if normalization revealed path traversal
         if (containsPathTraversal(normalized)) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
-                .validationType(validationType)
-                .originalInput(original)
-                .sanitizedInput(normalized)
-                .detail("Path normalization revealed traversal attempt")
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+                validationType,
+                original,
+                normalized,
+                "Path normalization revealed traversal attempt");
         }
         
         // Check if path escapes root after normalization
         if (escapesRoot(normalized)) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT)
-                .validationType(validationType)
-                .originalInput(original)
-                .sanitizedInput(normalized)
-                .detail("Path attempts to escape root directory")
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT,
+                validationType,
+                original,
+                normalized,
+                "Path attempts to escape root directory");
         }
         
         return normalized;
@@ -1170,11 +1236,12 @@ public class PatternMatchingStage implements HttpSecurityValidator {
         if (PATH_TRAVERSAL_PATTERN.matcher(value).find() ||
             ENCODED_TRAVERSAL_PATTERN.matcher(value).find()) {
             
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
-                .validationType(validationType)
-                .originalInput(value)
-                .build();
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+                validationType,
+                value,
+                null,
+                null);
         }
         
         return value;
@@ -1240,14 +1307,13 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
                 } catch (UrlSecurityException e) {
                     // Add validation type to exception if not already set
                     if (e.getValidationType() == null) {
-                        throw UrlSecurityException.builder()
-                            .failureType(e.getFailureType())
-                            .validationType(this.validationType)
-                            .originalInput(e.getOriginalInput())
-                            .sanitizedInput(e.getSanitizedInput())
-                            .detail(e.getMessage())
-                            .cause(e.getCause())
-                            .build();
+                        throw new UrlSecurityException(
+                            e.getFailureType(),
+                            this.validationType,
+                            e.getOriginalInput(),
+                            e.getSanitizedInput(),
+                            e.getMessage(),
+                            e.getCause());
                     }
                     
                     // Track security event
