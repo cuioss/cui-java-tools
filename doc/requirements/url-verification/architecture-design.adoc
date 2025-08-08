@@ -711,6 +711,98 @@ public class DecodingStage implements HttpSecurityValidator {
 }
 ----
 
+=== Character Validation Constants
+
+[source,java]
+----
+package de.cuioss.tools.security.http.validation;
+
+import java.util.BitSet;
+
+/**
+ * Pre-computed character sets for validation according to RFC specifications.
+ * These BitSets are immutable after initialization and thread-safe for concurrent reads.
+ * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
+ */
+public final class CharacterValidationConstants {
+    
+    private CharacterValidationConstants() {
+        // Utility class
+    }
+    
+    // RFC 3986 unreserved characters: ALPHA / DIGIT / "-" / "." / "_" / "~"
+    public static final BitSet RFC3986_UNRESERVED;
+    
+    // RFC 3986 path characters including unreserved + path-specific
+    public static final BitSet RFC3986_PATH_CHARS;
+    
+    // RFC 3986 query characters including unreserved + query-specific  
+    public static final BitSet RFC3986_QUERY_CHARS;
+    
+    // RFC 7230 header field characters (visible ASCII minus delimiters)
+    public static final BitSet RFC7230_HEADER_CHARS;
+    
+    static {
+        // Initialize RFC3986_UNRESERVED
+        BitSet unreserved = new BitSet(256);
+        // ALPHA
+        for (int i = 'A'; i <= 'Z'; i++) unreserved.set(i);
+        for (int i = 'a'; i <= 'z'; i++) unreserved.set(i);
+        // DIGIT
+        for (int i = '0'; i <= '9'; i++) unreserved.set(i);
+        // "-" / "." / "_" / "~"
+        unreserved.set('-');
+        unreserved.set('.');
+        unreserved.set('_');
+        unreserved.set('~');
+        RFC3986_UNRESERVED = (BitSet) unreserved.clone();
+        
+        // Initialize RFC3986_PATH_CHARS
+        BitSet pathChars = (BitSet) unreserved.clone();
+        pathChars.set('/');
+        pathChars.set('@');
+        pathChars.set(':');
+        // sub-delims for path: "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
+        "!$&'()*+,;=".chars().forEach(pathChars::set);
+        RFC3986_PATH_CHARS = (BitSet) pathChars.clone();
+        
+        // Initialize RFC3986_QUERY_CHARS
+        BitSet queryChars = (BitSet) unreserved.clone();
+        queryChars.set('?');
+        queryChars.set('&');
+        queryChars.set('=');
+        // sub-delims for query
+        "!$'()*+,;".chars().forEach(queryChars::set);
+        RFC3986_QUERY_CHARS = (BitSet) queryChars.clone();
+        
+        // Initialize RFC7230_HEADER_CHARS
+        BitSet headerChars = new BitSet(256);
+        // RFC 7230: VCHAR = %x21-7E (visible ASCII)
+        for (int i = 33; i <= 126; i++) {
+            // Exclude HTTP delimiters: " ( ) , / : ; < = > ? @ [ \ ] { }
+            if (!"\"(),/:;<=>?@[\\]{}".contains(String.valueOf((char)i))) {
+                headerChars.set(i);
+            }
+        }
+        headerChars.set(' '); // Space is allowed in headers
+        RFC7230_HEADER_CHARS = (BitSet) headerChars.clone();
+    }
+    
+    /**
+     * Returns a defensive copy of the character set for the given validation type.
+     * This ensures the original BitSets remain immutable.
+     */
+    public static BitSet getCharacterSet(ValidationType type) {
+        return switch (type) {
+            case URL_PATH -> (BitSet) RFC3986_PATH_CHARS.clone();
+            case URL_PARAMETER -> (BitSet) RFC3986_QUERY_CHARS.clone();
+            case HTTP_HEADER -> (BitSet) RFC7230_HEADER_CHARS.clone();
+            default -> (BitSet) RFC3986_UNRESERVED.clone();
+        };
+    }
+}
+----
+
 === CharacterValidationStage
 
 [source,java]
@@ -719,6 +811,7 @@ package de.cuioss.tools.security.http.validation;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.Getter;
 import java.util.BitSet;
 
 /**
@@ -732,12 +825,6 @@ import java.util.BitSet;
 @ToString
 public final class CharacterValidationStage implements HttpSecurityValidator {
     
-    // RFC 3986 unreserved characters: ALPHA / DIGIT / "-" / "." / "_" / "~"
-    // RFC 3986 reserved characters: gen-delims / sub-delims
-    // gen-delims: ":" / "/" / "?" / "#" / "[" / "]" / "@"
-    // sub-delims: "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
-    // pct-encoded: "%" HEXDIG HEXDIG
-    
     private final BitSet allowedChars;
     @Getter
     private final ValidationType validationType;
@@ -745,75 +832,15 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
     
     public CharacterValidationStage(UrlSecurityConfig config, ValidationType type) {
         this.validationType = type;
-        this.allowedChars = new BitSet(256);
+        // Get a defensive copy of the appropriate character set
+        this.allowedChars = CharacterValidationConstants.getCharacterSet(type);
         
-        // Initialize allowed characters based on type
-        switch (type) {
-            case URL_PATH -> {
-                // RFC 3986 path characters
-                addUnreservedChars();  // A-Z, a-z, 0-9, -, ., _, ~
-                addPathChars();        // /, @, :, !, $, &, ', (, ), *, +, ,, ;, =
-                this.allowPercentEncoding = true;
-            }
-            case URL_PARAMETER -> {
-                // Query string characters
-                addUnreservedChars();
-                addQueryChars();       // All sub-delims plus ? and &
-                this.allowPercentEncoding = true;
-            }
-            case HTTP_HEADER -> {
-                // RFC 7230 header field characters
-                addVisibleASCII();     // ASCII 33-126 except delimiters
-                this.allowPercentEncoding = false;
-            }
-            default -> {
-                // Most restrictive set
-                addUnreservedChars();
-                this.allowPercentEncoding = false;
-            }
-        }
-    }
-    
-    private void addUnreservedChars() {
-        // ALPHA
-        for (int i = 'A'; i <= 'Z'; i++) allowedChars.set(i);
-        for (int i = 'a'; i <= 'z'; i++) allowedChars.set(i);
-        // DIGIT
-        for (int i = '0'; i <= '9'; i++) allowedChars.set(i);
-        // "-" / "." / "_" / "~"
-        allowedChars.set('-');
-        allowedChars.set('.');
-        allowedChars.set('_');
-        allowedChars.set('~');
-    }
-    
-    private void addPathChars() {
-        // Path-specific characters
-        allowedChars.set('/');
-        allowedChars.set('@');
-        allowedChars.set(':');
-        // sub-delims for path
-        "!$&'()*+,;=".chars().forEach(allowedChars::set);
-    }
-    
-    private void addQueryChars() {
-        // Query-specific characters
-        allowedChars.set('?');
-        allowedChars.set('&');
-        allowedChars.set('=');
-        // sub-delims for query
-        "!$'()*+,;".chars().forEach(allowedChars::set);
-    }
-    
-    private void addVisibleASCII() {
-        // RFC 7230: VCHAR = %x21-7E (visible ASCII)
-        for (int i = 33; i <= 126; i++) {
-            // Exclude HTTP delimiters
-            if (!"\"(),/:;<=>?@[\\]{}".contains(String.valueOf((char)i))) {
-                allowedChars.set(i);
-            }
-        }
-        allowedChars.set(' '); // Space is allowed in headers
+        // Determine if percent encoding is allowed based on type
+        this.allowPercentEncoding = switch (type) {
+            case URL_PATH, URL_PARAMETER -> true;
+            case HTTP_HEADER -> false;
+            default -> false;
+        };
     }
     
     @Override
