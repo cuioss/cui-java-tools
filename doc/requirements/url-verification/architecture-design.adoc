@@ -721,7 +721,7 @@ import java.util.BitSet;
 
 /**
  * Pre-computed character sets for validation according to RFC specifications.
- * These BitSets are immutable after initialization and thread-safe for concurrent reads.
+ * These BitSets are read-only after initialization and thread-safe for concurrent reads.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
  */
 public final class CharacterValidationConstants {
@@ -755,25 +755,27 @@ public final class CharacterValidationConstants {
         unreserved.set('.');
         unreserved.set('_');
         unreserved.set('~');
-        RFC3986_UNRESERVED = (BitSet) unreserved.clone();
+        RFC3986_UNRESERVED = unreserved;
         
         // Initialize RFC3986_PATH_CHARS
-        BitSet pathChars = (BitSet) unreserved.clone();
+        BitSet pathChars = new BitSet(256);
+        pathChars.or(unreserved);  // Include all unreserved chars
         pathChars.set('/');
         pathChars.set('@');
         pathChars.set(':');
         // sub-delims for path: "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
         "!$&'()*+,;=".chars().forEach(pathChars::set);
-        RFC3986_PATH_CHARS = (BitSet) pathChars.clone();
+        RFC3986_PATH_CHARS = pathChars;
         
         // Initialize RFC3986_QUERY_CHARS
-        BitSet queryChars = (BitSet) unreserved.clone();
+        BitSet queryChars = new BitSet(256);
+        queryChars.or(unreserved);  // Include all unreserved chars
         queryChars.set('?');
         queryChars.set('&');
         queryChars.set('=');
         // sub-delims for query
         "!$'()*+,;".chars().forEach(queryChars::set);
-        RFC3986_QUERY_CHARS = (BitSet) queryChars.clone();
+        RFC3986_QUERY_CHARS = queryChars;
         
         // Initialize RFC7230_HEADER_CHARS
         BitSet headerChars = new BitSet(256);
@@ -785,19 +787,19 @@ public final class CharacterValidationConstants {
             }
         }
         headerChars.set(' '); // Space is allowed in headers
-        RFC7230_HEADER_CHARS = (BitSet) headerChars.clone();
+        RFC7230_HEADER_CHARS = headerChars;
     }
     
     /**
-     * Returns a defensive copy of the character set for the given validation type.
-     * This ensures the original BitSets remain immutable.
+     * Returns the character set for the given validation type.
+     * Note: Returns the actual BitSet, not a copy. Do not modify!
      */
     public static BitSet getCharacterSet(ValidationType type) {
         return switch (type) {
-            case URL_PATH -> (BitSet) RFC3986_PATH_CHARS.clone();
-            case URL_PARAMETER -> (BitSet) RFC3986_QUERY_CHARS.clone();
-            case HTTP_HEADER -> (BitSet) RFC7230_HEADER_CHARS.clone();
-            default -> (BitSet) RFC3986_UNRESERVED.clone();
+            case URL_PATH -> RFC3986_PATH_CHARS;
+            case URL_PARAMETER -> RFC3986_QUERY_CHARS;
+            case HTTP_HEADER -> RFC7230_HEADER_CHARS;
+            default -> RFC3986_UNRESERVED;
         };
     }
 }
@@ -832,14 +834,13 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
     
     public CharacterValidationStage(UrlSecurityConfig config, ValidationType type) {
         this.validationType = type;
-        // Get a defensive copy of the appropriate character set
+        // Use the shared BitSet directly - it's read-only after initialization
         this.allowedChars = CharacterValidationConstants.getCharacterSet(type);
         
         // Determine if percent encoding is allowed based on type
         this.allowPercentEncoding = switch (type) {
             case URL_PATH, URL_PARAMETER -> true;
-            case HTTP_HEADER -> false;
-            default -> false;
+            default -> false;  // HTTP_HEADER and others don't allow percent encoding
         };
     }
     
