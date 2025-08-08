@@ -938,7 +938,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
                 
                 char hex1 = value.charAt(i + 1);
                 char hex2 = value.charAt(i + 2);
-                if (!isHexDigit(hex1) || !isHexDigit(hex2)) {
+                if (isNotHexDigit(hex1) || isNotHexDigit(hex2)) {
                     throw UrlSecurityException.builder()
                         .failureType(UrlSecurityFailureType.INVALID_ENCODING)
                         .originalInput(value)
@@ -974,10 +974,10 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
         return value;
     }
     
-    private boolean isHexDigit(char ch) {
-        return (ch >= '0' && ch <= '9') || 
-               (ch >= 'A' && ch <= 'F') || 
-               (ch >= 'a' && ch <= 'f');
+    private boolean isNotHexDigit(char ch) {
+        return !((ch >= '0' && ch <= '9') || 
+                 (ch >= 'A' && ch <= 'F') || 
+                 (ch >= 'a' && ch <= 'f'));
     }
 }
 ----
