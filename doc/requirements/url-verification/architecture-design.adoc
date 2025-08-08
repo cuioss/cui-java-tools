@@ -24,7 +24,7 @@ This architecture leverages modern Java 21+ features for improved code quality a
 * **String Templates** - Clean formatting without String.format complexity
 * **Enhanced Pattern Matching** - Modern switch expressions with type patterns and record deconstruction
 * **Records** - Immutable data carriers replacing @Value classes
-* **SequencedCollections** - Ordered collection processing with first/last access
+* **Modern Collections** - Efficient collection processing with streams
 * **JSpecify Annotations** - Null-safety guarantees with @NonNull/@Nullable
 * **Optional Integration** - Explicit null handling for sensitive data
 * **Switch Expressions** - Concise, exhaustive pattern matching
@@ -416,7 +416,7 @@ public interface ConfigStageProvider {
     /**
      * @return List of stages to use in the pipeline, in the correct order
      */
-    SequencedCollection<HttpSecurityValidator> getStages();
+    List<HttpSecurityValidator> getStages();
 }
 ----
 
@@ -541,7 +541,7 @@ public class URLPathConfig implements ConfigStageProvider {
     }
     
     @Override
-    public SequencedCollection<HttpSecurityValidator> getStages() {
+    public List<HttpSecurityValidator> getStages() {
         return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
@@ -593,7 +593,7 @@ public class URLParameterConfig implements ConfigStageProvider {
     }
     
     @Override
-    public SequencedCollection<HttpSecurityValidator> getStages() {
+    public List<HttpSecurityValidator> getStages() {
         return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
@@ -645,7 +645,7 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     }
     
     @Override
-    public SequencedCollection<HttpSecurityValidator> getStages() {
+    public List<HttpSecurityValidator> getStages() {
         return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
@@ -1261,7 +1261,7 @@ package de.cuioss.tools.security.http.pipeline;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import java.util.SequencedCollection;
+import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -1276,7 +1276,7 @@ import org.jspecify.annotations.Nullable;
 public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     
     private final @NonNull ConfigStageProvider config;
-    private final @NonNull SequencedCollection<HttpSecurityValidator> stages;
+    private final @NonNull List<HttpSecurityValidator> stages;
     private final @NonNull SecurityEventCounter eventCounter;
     private final @NonNull ValidationType validationType;
     
