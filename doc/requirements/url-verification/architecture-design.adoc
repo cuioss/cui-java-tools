@@ -413,32 +413,7 @@ public class URLPathConfig implements ConfigStageProvider {
     
     @Override
     public ValidationType getValidationType() {
-        return ValidationType.URL_PATH;
-    }
-    
-    @Override
-    public HttpSecurityValidator getLengthValidationStage() {
-        return lengthValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getCharacterValidationStage() {
-        return characterValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getDecodingStage() {
-        return decodingStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getNormalizationStage() {
-        return normalizationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getPatternMatchingStage() {
-        return patternMatchingStage;
+        return validationType;
     }
     
     @Override
@@ -485,32 +460,12 @@ public class URLParameterConfig implements ConfigStageProvider {
     
     @Override
     public ValidationType getValidationType() {
-        return ValidationType.URL_PARAMETER;
-    }
-    
-    @Override
-    public HttpSecurityValidator getLengthValidationStage() {
-        return lengthValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getCharacterValidationStage() {
-        return characterValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getDecodingStage() {
-        return decodingStage;
+        return validationType;
     }
     
     @Override
     public HttpSecurityValidator getNormalizationStage() {
         return IdentityValidator.URL_PARAMETER; // Not used for parameters
-    }
-    
-    @Override
-    public HttpSecurityValidator getPatternMatchingStage() {
-        return patternMatchingStage;
     }
     
     @Override
@@ -552,17 +507,7 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     
     @Override
     public ValidationType getValidationType() {
-        return ValidationType.HTTP_HEADER;
-    }
-    
-    @Override
-    public HttpSecurityValidator getLengthValidationStage() {
-        return lengthValidationStage;
-    }
-    
-    @Override
-    public HttpSecurityValidator getCharacterValidationStage() {
-        return characterValidationStage;
+        return validationType;
     }
     
     @Override
@@ -573,11 +518,6 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     @Override
     public HttpSecurityValidator getNormalizationStage() {
         return IdentityValidator.HTTP_HEADER; // Not used for headers
-    }
-    
-    @Override
-    public HttpSecurityValidator getPatternMatchingStage() {
-        return patternMatchingStage;
     }
     
     @Override
