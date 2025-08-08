@@ -24,28 +24,28 @@ The HTTP Security Validation system provides comprehensive validation and saniti
 
 Defines the core functionality that the system must provide:
 
-* **General Requirements** (HTTP-GEN): System-wide functional capabilities
-* **Validation Pipeline** (HTTP-VAL): Validation architecture and processing
-* **Path Traversal Prevention** (HTTP-PATH): Path security functionality
-* **Character and Encoding** (HTTP-CHAR): Input character handling
-* **Configuration** (HTTP-CFG): System configuration capabilities
-* **Error Handling** (HTTP-ERR): Exception and error management
-* **Integration** (HTTP-INT): Framework and system integration
-* **Performance** (HTTP-PERF): Performance and resource management
+* **General Requirements** (HTTP-1 to HTTP-3): System-wide functional capabilities
+* **Validation Pipeline** (HTTP-4 to HTTP-6): Validation architecture and processing
+* **Path Traversal Prevention** (HTTP-7 to HTTP-9): Path security functionality
+* **Character and Encoding** (HTTP-10 to HTTP-12): Input character handling
+* **Configuration** (HTTP-13 to HTTP-14): System configuration capabilities
+* **Error Handling** (HTTP-15 to HTTP-16): Exception and error management
+* **Integration** (HTTP-17 to HTTP-18): Framework and system integration
+* **Performance** (HTTP-19 to HTTP-20): Performance and resource management
 
 === link:security-requirements.adoc[Security Requirements]
 
 Defines the security-specific requirements and controls:
 
-* **OWASP Compliance** (SEC-OWASP): OWASP Top 10 prevention
-* **Path Security** (SEC-PATH): Path traversal and directory security
-* **Input Validation** (SEC-VAL): Security validation requirements
-* **DoS Prevention** (SEC-DOS): Denial of service protection
-* **Monitoring** (SEC-MON): Security event tracking and alerting
-* **Cryptographic** (SEC-CRYPTO): Encoding and cryptographic security
-* **Audit** (SEC-AUDIT): Audit trail and compliance
-* **Integration Security** (SEC-INT): Secure integration requirements
-* **Updates** (SEC-UPDATE): Security update and threat management
+* **OWASP Compliance** (SEC-1 to SEC-3): OWASP Top 10 prevention
+* **Path Security** (SEC-4 to SEC-6): Path traversal and directory security
+* **Input Validation** (SEC-7 to SEC-9): Security validation requirements
+* **DoS Prevention** (SEC-10 to SEC-11): Denial of service protection
+* **Monitoring** (SEC-12 to SEC-13): Security event tracking and alerting
+* **Cryptographic** (SEC-14 to SEC-15): Encoding and cryptographic security
+* **Audit** (SEC-16 to SEC-17): Audit trail and compliance
+* **Integration Security** (SEC-18 to SEC-19): Secure integration requirements
+* **Updates** (SEC-20 to SEC-21): Security update and threat management
 
 == Related Documentation
 
@@ -66,41 +66,27 @@ Defines the security-specific requirements and controls:
 |===
 | Category | Total | Functional | Security
 
-| **Core Requirements** | 41 | 20 | 21
-| **General/OWASP** | 6 | 3 | 3
-| **Validation/Path** | 11 | 5 | 6
-| **Character/Input** | 6 | 3 | 3
-| **Configuration** | 4 | 2 | 2
-| **Error/Monitoring** | 4 | 2 | 2
-| **Integration** | 4 | 2 | 2
-| **Performance/DoS** | 4 | 2 | 2
-| **Audit/Updates** | 4 | 0 | 4
+| **Total Requirements** | 41 | 20 | 21
+| **General/OWASP** | 6 | 3 (HTTP-1 to HTTP-3) | 3 (SEC-1 to SEC-3)
+| **Validation/Path** | 12 | 6 (HTTP-4 to HTTP-9) | 6 (SEC-4 to SEC-9)
+| **Configuration/Cryptographic** | 4 | 2 (HTTP-13 to HTTP-14) | 2 (SEC-14 to SEC-15)
+| **Error/Monitoring** | 4 | 2 (HTTP-15 to HTTP-16) | 2 (SEC-12 to SEC-13)
+| **Integration** | 4 | 2 (HTTP-17 to HTTP-18) | 2 (SEC-18 to SEC-19)
+| **Performance/DoS** | 4 | 2 (HTTP-19 to HTTP-20) | 2 (SEC-10 to SEC-11)
+| **Character/Audit/Updates** | 7 | 3 (HTTP-10 to HTTP-12) | 4 (SEC-16 to SEC-17, SEC-20 to SEC-21)
 |===
 
 == Requirement Prefixes
 
 The following prefixes are used to categorize requirements:
 
-* **HTTP-**: Functional requirements for HTTP security validation
-  ** HTTP-GEN: General functional requirements
-  ** HTTP-VAL: Validation pipeline requirements
-  ** HTTP-PATH: Path traversal prevention requirements
-  ** HTTP-CHAR: Character and encoding requirements
-  ** HTTP-CFG: Configuration requirements
-  ** HTTP-ERR: Error handling requirements
-  ** HTTP-INT: Integration requirements
-  ** HTTP-PERF: Performance requirements
+* **HTTP-**: Functional requirements for HTTP security validation (HTTP-1 through HTTP-20)
+  ** Sequential numbering for all functional requirements
+  ** Covers general, validation, path security, character handling, configuration, error handling, integration, and performance requirements
 
-* **SEC-**: Security-specific requirements
-  ** SEC-OWASP: OWASP compliance requirements
-  ** SEC-PATH: Path security requirements
-  ** SEC-VAL: Validation security requirements
-  ** SEC-DOS: Denial of service prevention
-  ** SEC-MON: Monitoring requirements
-  ** SEC-CRYPTO: Cryptographic requirements
-  ** SEC-AUDIT: Audit requirements
-  ** SEC-INT: Integration security requirements
-  ** SEC-UPDATE: Update management requirements
+* **SEC-**: Security-specific requirements (SEC-1 through SEC-21)
+  ** Sequential numbering for all security requirements
+  ** Covers OWASP compliance, path security, input validation, DoS prevention, monitoring, cryptographic, audit, integration security, and update management
 
 == Traceability
 
@@ -124,24 +110,3 @@ All requirements maintain bidirectional traceability:
 | PCI DSS | 6.5.1, 6.5.8, 10.2 | ✓ Complete
 |===
 
-== Version History
-
-[cols="1,2,3,1"]
-|===
-| Version | Date | Description | Author
-
-| 1.0 | 2025-01-08 | Initial requirements documentation | System
-| | | Extracted from specification and analysis documents |
-|===
-
-== Review and Approval
-
-[cols="2,2,1,1"]
-|===
-| Role | Name | Date | Signature
-
-| Security Architect | _Pending_ | | 
-| Development Lead | _Pending_ | |
-| QA Lead | _Pending_ | |
-| Product Owner | _Pending_ | |
-|===

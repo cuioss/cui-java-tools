@@ -17,8 +17,8 @@ These requirements are derived from:
 
 == OWASP Compliance Requirements
 
-=== [#SEC-OWASP-1]
-=== SEC-OWASP-1: A03:2021 Injection Prevention
+=== [#SEC-1]
+=== SEC-1: A03:2021 Injection Prevention
 
 * The system must prevent all forms of injection attacks through HTTP inputs
 * Must validate and sanitize all input before processing
@@ -30,8 +30,8 @@ These requirements are derived from:
   ** SQL injection via parameters
 * Reference: link:analysis/owasp-best-practices.adoc#_a032021_injection[OWASP A03:2021]
 
-=== [#SEC-OWASP-2]
-=== SEC-OWASP-2: A01:2021 Broken Access Control
+=== [#SEC-2]
+=== SEC-2: A01:2021 Broken Access Control
 
 * The system must prevent unauthorized access to resources
 * Must enforce path boundaries and access restrictions
@@ -40,8 +40,8 @@ These requirements are derived from:
 * Must prevent privilege escalation through path manipulation
 * Reference: link:analysis/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01:2021]
 
-=== [#SEC-OWASP-3]
-=== SEC-OWASP-3: A04:2021 Insecure Design
+=== [#SEC-3]
+=== SEC-3: A04:2021 Insecure Design
 
 * The system must implement defense in depth
 * Must use multiple validation layers:
@@ -55,8 +55,8 @@ These requirements are derived from:
 
 == Path Traversal Security Requirements
 
-=== [#SEC-PATH-1]
-=== SEC-PATH-1: Comprehensive Traversal Pattern Detection
+=== [#SEC-4]
+=== SEC-4: Comprehensive Traversal Pattern Detection
 
 * The system must detect all known path traversal patterns
 * Must detect patterns from CVE database including:
@@ -68,8 +68,8 @@ These requirements are derived from:
 * Must maintain pattern database for emerging threats
 * Reference: link:analysis/cve-analysis.adoc[CVE Analysis]
 
-=== [#SEC-PATH-2]
-=== SEC-PATH-2: Encoding Attack Prevention
+=== [#SEC-5]
+=== SEC-5: Encoding Attack Prevention
 
 * The system must prevent all encoding-based bypass attempts
 * Must handle:
@@ -82,8 +82,8 @@ These requirements are derived from:
 * Must validate at each decoding stage
 * Reference: link:specification/specification.adoc#_decodingstage[Encoding Security]
 
-=== [#SEC-PATH-3]
-=== SEC-PATH-3: Canonicalization Security
+=== [#SEC-6]
+=== SEC-6: Canonicalization Security
 
 * The system must safely canonicalize paths
 * Must resolve all symbolic references before validation
@@ -97,8 +97,8 @@ These requirements are derived from:
 
 == Input Validation Security Requirements
 
-=== [#SEC-VAL-1]
-=== SEC-VAL-1: Strict Input Validation
+=== [#SEC-7]
+=== SEC-7: Strict Input Validation
 
 * The system must enforce strict input validation rules
 * Must reject any input that doesn't match expected patterns
@@ -110,8 +110,8 @@ These requirements are derived from:
 * Must not attempt to "fix" invalid input
 * Reference: link:specification/specification.adoc#_charactervalidationstage[Input Validation]
 
-=== [#SEC-VAL-2]
-=== SEC-VAL-2: Null Byte and Control Character Prevention
+=== [#SEC-8]
+=== SEC-8: Null Byte and Control Character Prevention
 
 * The system must block all null bytes and control characters
 * Must detect:
@@ -123,8 +123,8 @@ These requirements are derived from:
 * Must prevent log injection via control characters
 * Reference: link:specification/specification.adoc#_charactervalidationstage[Character Security]
 
-=== [#SEC-VAL-3]
-=== SEC-VAL-3: Unicode and Internationalization Security
+=== [#SEC-9]
+=== SEC-9: Unicode and Internationalization Security
 
 * The system must handle Unicode securely
 * Must prevent:
@@ -139,8 +139,8 @@ These requirements are derived from:
 
 == Denial of Service Prevention Requirements
 
-=== [#SEC-DOS-1]
-=== SEC-DOS-1: Resource Exhaustion Prevention
+=== [#SEC-10]
+=== SEC-10: Resource Exhaustion Prevention
 
 * The system must prevent resource exhaustion attacks
 * Must enforce limits on:
@@ -151,8 +151,8 @@ These requirements are derived from:
 * Must fail fast when limits are exceeded
 * Reference: link:specification/specification.adoc#_lengthvalidationstage[Resource Limits]
 
-=== [#SEC-DOS-2]
-=== SEC-DOS-2: Algorithmic Complexity Protection
+=== [#SEC-11]
+=== SEC-11: Algorithmic Complexity Protection
 
 * The system must use algorithms with predictable complexity
 * Must avoid:
@@ -165,8 +165,8 @@ These requirements are derived from:
 
 == Security Monitoring Requirements
 
-=== [#SEC-MON-1]
-=== SEC-MON-1: Security Event Logging
+=== [#SEC-12]
+=== SEC-12: Security Event Logging
 
 * The system must log all security events
 * Must log:
@@ -178,8 +178,8 @@ These requirements are derived from:
 * Must support security information and event management (SIEM) integration
 * Reference: link:specification/specification.adoc#_securityeventcounter[Security Monitoring]
 
-=== [#SEC-MON-2]
-=== SEC-MON-2: Attack Pattern Recognition
+=== [#SEC-13]
+=== SEC-13: Attack Pattern Recognition
 
 * The system must recognize attack patterns
 * Must detect:
@@ -193,8 +193,8 @@ These requirements are derived from:
 
 == Cryptographic and Encoding Requirements
 
-=== [#SEC-CRYPTO-1]
-=== SEC-CRYPTO-1: Secure Encoding Handling
+=== [#SEC-14]
+=== SEC-14: Secure Encoding Handling
 
 * The system must handle encoding securely
 * Must:
@@ -205,8 +205,8 @@ These requirements are derived from:
 * Must not leak information through error messages
 * Reference: link:specification/specification.adoc#_decodingstage[Encoding Security]
 
-=== [#SEC-CRYPTO-2]
-=== SEC-CRYPTO-2: Secure Defaults
+=== [#SEC-15]
+=== SEC-15: Secure Defaults
 
 * The system must use secure defaults for all security settings
 * Defaults must include:
@@ -219,8 +219,8 @@ These requirements are derived from:
 
 == Compliance and Audit Requirements
 
-=== [#SEC-AUDIT-1]
-=== SEC-AUDIT-1: Audit Trail Support
+=== [#SEC-16]
+=== SEC-16: Audit Trail Support
 
 * The system must support comprehensive audit trails
 * Must record:
@@ -232,8 +232,8 @@ These requirements are derived from:
 * Must integrate with enterprise audit systems
 * Reference: link:specification/specification.adoc#_securityeventcounter[Audit Support]
 
-=== [#SEC-AUDIT-2]
-=== SEC-AUDIT-2: Security Testing Support
+=== [#SEC-17]
+=== SEC-17: Security Testing Support
 
 * The system must support security testing
 * Must provide:
@@ -246,8 +246,8 @@ These requirements are derived from:
 
 == Third-Party Integration Security
 
-=== [#SEC-INT-1]
-=== SEC-INT-1: Framework Integration Security
+=== [#SEC-18]
+=== SEC-18: Framework Integration Security
 
 * The system must integrate securely with frameworks
 * Must:
@@ -258,8 +258,8 @@ These requirements are derived from:
 * Must provide secure integration examples
 * Reference: link:specification/specification.adoc#_example_usage[Secure Integration]
 
-=== [#SEC-INT-2]
-=== SEC-INT-2: API Security
+=== [#SEC-19]
+=== SEC-19: API Security
 
 * The system must provide a secure API
 * Must:
@@ -272,8 +272,8 @@ These requirements are derived from:
 
 == Security Update Requirements
 
-=== [#SEC-UPDATE-1]
-=== SEC-UPDATE-1: Security Patch Management
+=== [#SEC-20]
+=== SEC-20: Security Patch Management
 
 * The system must support rapid security updates
 * Must:
@@ -284,8 +284,8 @@ These requirements are derived from:
 * Must maintain backward compatibility for security features
 * Reference: link:specification/specification.adoc#_configuration_architecture[Update Management]
 
-=== [#SEC-UPDATE-2]
-=== SEC-UPDATE-2: Threat Intelligence Integration
+=== [#SEC-21]
+=== SEC-21: Threat Intelligence Integration
 
 * The system must support threat intelligence feeds
 * Must:
@@ -302,25 +302,25 @@ These requirements are derived from:
 |===
 | Requirement ID | Description | Reference
 
-| SEC-OWASP-1 | Injection Prevention | link:analysis/owasp-best-practices.adoc#_a032021_injection[OWASP A03]
-| SEC-OWASP-2 | Access Control | link:analysis/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01]
-| SEC-OWASP-3 | Secure Design | link:specification/specification.adoc#_defense_in_depth[Architecture]
-| SEC-PATH-1 | Traversal Detection | link:analysis/cve-analysis.adoc[CVE Analysis]
-| SEC-PATH-2 | Encoding Prevention | link:specification/specification.adoc#_decodingstage[Encoding]
-| SEC-PATH-3 | Canonicalization | link:specification/specification.adoc#_normalizationstage[Normalization]
-| SEC-VAL-1 | Strict Validation | link:specification/specification.adoc#_charactervalidationstage[Validation]
-| SEC-VAL-2 | Null Byte Prevention | link:specification/specification.adoc#_charactervalidationstage[Characters]
-| SEC-VAL-3 | Unicode Security | link:specification/specification.adoc#_encodingvalidationstage[Unicode]
-| SEC-DOS-1 | Resource Limits | link:specification/specification.adoc#_lengthvalidationstage[Limits]
-| SEC-DOS-2 | Complexity Protection | link:specification/testing.adoc#_performance_validation[Performance]
-| SEC-MON-1 | Event Logging | link:specification/specification.adoc#_securityeventcounter[Monitoring]
-| SEC-MON-2 | Attack Recognition | link:specification/specification.adoc#_event_counter_pattern[Detection]
-| SEC-CRYPTO-1 | Encoding Security | link:specification/specification.adoc#_decodingstage[Encoding]
-| SEC-CRYPTO-2 | Secure Defaults | link:specification/specification.adoc#_configuration_architecture[Defaults]
-| SEC-AUDIT-1 | Audit Trail | link:specification/specification.adoc#_securityeventcounter[Audit]
-| SEC-AUDIT-2 | Testing Support | link:specification/testing.adoc[Testing]
-| SEC-INT-1 | Framework Security | link:specification/specification.adoc#_example_usage[Integration]
-| SEC-INT-2 | API Security | link:specification/specification.adoc#_core_interfaces_and_data_types[API]
-| SEC-UPDATE-1 | Patch Management | link:specification/specification.adoc#_configuration_architecture[Updates]
-| SEC-UPDATE-2 | Threat Intelligence | link:analysis/cve-analysis.adoc[Threats]
+| SEC-1 | Injection Prevention | link:analysis/owasp-best-practices.adoc#_a032021_injection[OWASP A03]
+| SEC-2 | Access Control | link:analysis/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01]
+| SEC-3 | Secure Design | link:specification/specification.adoc#_defense_in_depth[Architecture]
+| SEC-4 | Traversal Detection | link:analysis/cve-analysis.adoc[CVE Analysis]
+| SEC-5 | Encoding Prevention | link:specification/specification.adoc#_decodingstage[Encoding]
+| SEC-6 | Canonicalization | link:specification/specification.adoc#_normalizationstage[Normalization]
+| SEC-7 | Strict Validation | link:specification/specification.adoc#_charactervalidationstage[Validation]
+| SEC-8 | Null Byte Prevention | link:specification/specification.adoc#_charactervalidationstage[Characters]
+| SEC-9 | Unicode Security | link:specification/specification.adoc#_encodingvalidationstage[Unicode]
+| SEC-10 | Resource Limits | link:specification/specification.adoc#_lengthvalidationstage[Limits]
+| SEC-11 | Complexity Protection | link:specification/testing.adoc#_performance_validation[Performance]
+| SEC-12 | Event Logging | link:specification/specification.adoc#_securityeventcounter[Monitoring]
+| SEC-13 | Attack Recognition | link:specification/specification.adoc#_event_counter_pattern[Detection]
+| SEC-14 | Encoding Security | link:specification/specification.adoc#_decodingstage[Encoding]
+| SEC-15 | Secure Defaults | link:specification/specification.adoc#_configuration_architecture[Defaults]
+| SEC-16 | Audit Trail | link:specification/specification.adoc#_securityeventcounter[Audit]
+| SEC-17 | Testing Support | link:specification/testing.adoc[Testing]
+| SEC-18 | Framework Security | link:specification/specification.adoc#_example_usage[Integration]
+| SEC-19 | API Security | link:specification/specification.adoc#_core_interfaces_and_data_types[API]
+| SEC-20 | Patch Management | link:specification/specification.adoc#_configuration_architecture[Updates]
+| SEC-21 | Threat Intelligence | link:analysis/cve-analysis.adoc[Threats]
 |===
