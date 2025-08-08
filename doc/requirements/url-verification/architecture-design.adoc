@@ -607,12 +607,16 @@ All validation stages follow these principles:
 package de.cuioss.tools.security.http.validation;
 
 import lombok.Getter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Identity validator that performs no validation - just returns the input unchanged.
  * Used as a placeholder for stages that are not applicable to certain validation types.
  * Thread-safe and immutable.
  */
+@EqualsAndHashCode
+@ToString
 public final class IdentityValidator implements HttpSecurityValidator {
     
     @Getter
@@ -650,12 +654,17 @@ public final class IdentityValidator implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 /**
  * Length validation MUST be the first stage to prevent DoS attacks.
  * Rejects oversized inputs before any processing.
  * Immutable and thread-safe.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V4]
  */
+@EqualsAndHashCode
+@ToString
 public final class LengthValidationStage implements HttpSecurityValidator {
     
     private final int maxLength;
@@ -782,6 +791,8 @@ public class DecodingStage implements HttpSecurityValidator {
 ----
 package de.cuioss.tools.security.http.validation;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import java.util.BitSet;
 
 /**
@@ -791,6 +802,8 @@ import java.util.BitSet;
  * Immutable and thread-safe.
  * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
  */
+@EqualsAndHashCode
+@ToString
 public final class CharacterValidationStage implements HttpSecurityValidator {
     
     // RFC 3986 unreserved characters: ALPHA / DIGIT / "-" / "." / "_" / "~"
@@ -1152,6 +1165,8 @@ A single pipeline implementation handles all validation types through configurat
 ----
 package de.cuioss.tools.security.http.pipeline;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import java.util.List;
 import java.util.Objects;
 
@@ -1160,6 +1175,8 @@ import java.util.Objects;
  * The validation type and stage selection is determined by the configuration.
  * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Tasks P1-P5]
  */
+@EqualsAndHashCode
+@ToString
 public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     
     private final ConfigStageProvider config;
