@@ -11,8 +11,8 @@ This document defines the security-specific requirements for the HTTP Security V
 
 These requirements are derived from:
 
-* link:../requirements/url-verification/owasp-best-practices.adoc[OWASP Security Best Practices]
-* link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis and Lessons Learned]
+* link:analysis/owasp-best-practices.adoc[OWASP Security Best Practices]
+* link:analysis/cve-analysis.adoc[CVE Analysis and Lessons Learned]
 * link:specification/specification.adoc[Architecture Specification]
 
 == OWASP Compliance Requirements
@@ -28,7 +28,7 @@ These requirements are derived from:
   ** Command injection via file paths
   ** LDAP injection via directory paths
   ** SQL injection via parameters
-* Reference: link:../requirements/url-verification/owasp-best-practices.adoc#_a032021_injection[OWASP A03:2021]
+* Reference: link:analysis/owasp-best-practices.adoc#_a032021_injection[OWASP A03:2021]
 
 === [#SEC-OWASP-2]
 === SEC-OWASP-2: A01:2021 Broken Access Control
@@ -38,7 +38,7 @@ These requirements are derived from:
 * Must prevent directory traversal attacks that bypass access controls
 * Must validate all path components against access policies
 * Must prevent privilege escalation through path manipulation
-* Reference: link:../requirements/url-verification/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01:2021]
+* Reference: link:analysis/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01:2021]
 
 === [#SEC-OWASP-3]
 === SEC-OWASP-3: A04:2021 Insecure Design
@@ -66,7 +66,7 @@ These requirements are derived from:
   ** CVE-2019-0232: Apache Tomcat RCE via traversal
 * Must detect novel combinations of known techniques
 * Must maintain pattern database for emerging threats
-* Reference: link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis]
+* Reference: link:analysis/cve-analysis.adoc[CVE Analysis]
 
 === [#SEC-PATH-2]
 === SEC-PATH-2: Encoding Attack Prevention
@@ -294,7 +294,7 @@ These requirements are derived from:
   ** Support multiple threat intelligence formats
   ** Provide threat correlation capabilities
 * Must handle threat intelligence updates safely
-* Reference: link:../requirements/url-verification/cve-analysis.adoc[Threat Intelligence]
+* Reference: link:analysis/cve-analysis.adoc[Threat Intelligence]
 
 == Traceability Matrix
 
@@ -302,10 +302,10 @@ These requirements are derived from:
 |===
 | Requirement ID | Description | Reference
 
-| SEC-OWASP-1 | Injection Prevention | link:../requirements/url-verification/owasp-best-practices.adoc#_a032021_injection[OWASP A03]
-| SEC-OWASP-2 | Access Control | link:../requirements/url-verification/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01]
+| SEC-OWASP-1 | Injection Prevention | link:analysis/owasp-best-practices.adoc#_a032021_injection[OWASP A03]
+| SEC-OWASP-2 | Access Control | link:analysis/owasp-best-practices.adoc#_a012021_broken_access_control[OWASP A01]
 | SEC-OWASP-3 | Secure Design | link:specification/specification.adoc#_defense_in_depth[Architecture]
-| SEC-PATH-1 | Traversal Detection | link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis]
+| SEC-PATH-1 | Traversal Detection | link:analysis/cve-analysis.adoc[CVE Analysis]
 | SEC-PATH-2 | Encoding Prevention | link:specification/specification.adoc#_decodingstage[Encoding]
 | SEC-PATH-3 | Canonicalization | link:specification/specification.adoc#_normalizationstage[Normalization]
 | SEC-VAL-1 | Strict Validation | link:specification/specification.adoc#_charactervalidationstage[Validation]
@@ -322,5 +322,5 @@ These requirements are derived from:
 | SEC-INT-1 | Framework Security | link:specification/specification.adoc#_example_usage[Integration]
 | SEC-INT-2 | API Security | link:specification/specification.adoc#_core_interfaces_and_data_types[API]
 | SEC-UPDATE-1 | Patch Management | link:specification/specification.adoc#_configuration_architecture[Updates]
-| SEC-UPDATE-2 | Threat Intelligence | link:../requirements/url-verification/cve-analysis.adoc[Threats]
+| SEC-UPDATE-2 | Threat Intelligence | link:analysis/cve-analysis.adoc[Threats]
 |===

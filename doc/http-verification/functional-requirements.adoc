@@ -12,8 +12,8 @@ This document defines the functional requirements for the HTTP Security Validati
 These requirements are derived from:
 
 * link:specification/specification.adoc[Architecture Specification]
-* link:../requirements/url-verification/owasp-best-practices.adoc[OWASP Best Practices Analysis]
-* link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis]
+* link:analysis/owasp-best-practices.adoc[OWASP Best Practices Analysis]
+* link:analysis/cve-analysis.adoc[CVE Analysis]
 
 == General Requirements
 

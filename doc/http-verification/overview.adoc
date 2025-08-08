@@ -1,4 +1,4 @@
-= Path Traversal Security Documentation
+= HTTP Security Validation Overview
 :toc: left
 :toclevels: 2
 :icons: font
@@ -12,29 +12,26 @@ This documentation suite provides comprehensive analysis and design specificatio
 
 === Core Documents
 
-link:library-comparison.adoc[Library Architecture Comparison]::
-Comparative analysis of path traversal implementations in Apache Commons IO, OWASP ESAPI, Spring Security, and Google Guava, including known vulnerabilities and design patterns.
-
-link:owasp-best-practices.adoc[OWASP Best Practices]::
+link:analysis/owasp-best-practices.adoc[OWASP Best Practices]::
 Comprehensive guide to OWASP-recommended prevention strategies, validation techniques, and security patterns for path traversal prevention.
 
-link:cve-analysis.adoc[CVE Analysis and Breach Studies]::
+link:analysis/cve-analysis.adoc[CVE Analysis and Breach Studies]::
 Detailed analysis of critical CVEs from 2019-2024 and real-world breach case studies demonstrating exploitation patterns and impacts.
 
-link:../../http-verification/specification/testing.adoc[Testing Framework]::
+link:specification/testing.adoc[Testing Framework]::
 Complete testing framework specification including CVE-based test vectors, encoding matrices, and automated security validation.
 
-link:../../http-verification/specification/specification.adoc[Architecture Specification]::
+link:specification/specification.adoc[Architecture Specification]::
 HTTP/URL path traversal security architecture leveraging Java 21+ built-in types with performance optimization strategies.
 
 == Quick Start
 
 For developers implementing path traversal security:
 
-1. Review link:owasp-best-practices.adoc#_core_prevention_principles[Core Prevention Principles]
-2. Understand link:cve-analysis.adoc#_attack_pattern_evolution[Attack Pattern Evolution]
-3. Implement using link:../../http-verification/specification/specification.adoc#_system_architecture[System Architecture]
-4. Validate with link:../../http-verification/specification/testing.adoc#_test_data_categories[Test Data Categories]
+1. Review link:analysis/owasp-best-practices.adoc#_core_prevention_principles[Core Prevention Principles]
+2. Understand link:analysis/cve-analysis.adoc#_attack_pattern_evolution[Attack Pattern Evolution]
+3. Implement using link:specification/specification.adoc#_system_architecture[System Architecture]
+4. Validate with link:specification/testing.adoc#_test_data_categories[Test Data Categories]
 
 == HTTP/URL Standards Reference
 

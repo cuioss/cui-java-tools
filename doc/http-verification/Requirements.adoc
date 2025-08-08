@@ -57,9 +57,8 @@ Defines the security-specific requirements and controls:
 
 === Analysis Documents
 
-* link:../requirements/url-verification/owasp-best-practices.adoc[OWASP Best Practices]: Security patterns and guidelines
-* link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis]: Vulnerability analysis and lessons learned
-* link:../requirements/url-verification/README.adoc[Path Traversal Security Documentation]: Overview and context
+* link:analysis/owasp-best-practices.adoc[OWASP Best Practices]: Security patterns and guidelines
+* link:analysis/cve-analysis.adoc[CVE Analysis]: Vulnerability analysis and lessons learned
 
 == Requirements Summary
 
@@ -110,7 +109,7 @@ All requirements maintain bidirectional traceability:
 1. **Forward Traceability**: Each requirement links to its implementation specification
 2. **Backward Traceability**: Specifications reference implementing requirements
 3. **Test Traceability**: Requirements link to test specifications in link:specification/testing.adoc[Testing Framework]
-4. **Security Traceability**: Security requirements trace to identified threats in link:../requirements/url-verification/cve-analysis.adoc[CVE Analysis]
+4. **Security Traceability**: Security requirements trace to identified threats in link:analysis/cve-analysis.adoc[CVE Analysis]
 
 == Compliance Matrix
 
