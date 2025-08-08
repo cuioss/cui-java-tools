@@ -17,6 +17,18 @@ For HOW to test the system, see link:test-harness-design.adoc[Test Harness Desig
 
 The URL Security Validation system provides comprehensive protection against path traversal attacks, encoding bypasses, and injection attempts through a layered, immutable, high-performance architecture in the `de.cuioss.tools.security.http` package.
 
+=== Java 21+ Features Utilized
+
+This architecture leverages modern Java 21+ features for improved code quality and maintainability:
+
+* **String Templates** - Clean formatting without String.format complexity
+* **Enhanced Pattern Matching** - Modern switch expressions with type patterns and record deconstruction
+* **Records** - Immutable data carriers replacing @Value classes
+* **SequencedCollections** - Ordered collection processing with first/last access
+* **JSpecify Annotations** - Null-safety guarantees with @NonNull/@Nullable
+* **Optional Integration** - Explicit null handling for sensitive data
+* **Switch Expressions** - Concise, exhaustive pattern matching
+
 == Design Principles
 
 [cols="2,3"]
@@ -115,6 +127,9 @@ de.cuioss.tools.security.http/
 ----
 package de.cuioss.tools.security.http;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Core functional interface for HTTP security validation.
  * Follows the String/throws pattern consistently.
@@ -125,11 +140,12 @@ package de.cuioss.tools.security.http;
 public interface HttpSecurityValidator {
     /**
      * Validates the input and returns the sanitized/normalized version.
-     * @param value The input to validate
+     * @param value The input to validate (may be null)
      * @return The validated/normalized value
      * @throws UrlSecurityException on any security violation
      */
-    String validate(String value) throws UrlSecurityException;
+    @NonNull
+    String validate(@Nullable String value) throws UrlSecurityException;
 }
 
 /**
@@ -141,7 +157,15 @@ public enum ValidationType {
     URL_PARAMETER,   // Query parameters
     HTTP_HEADER,     // HTTP headers
     HTTP_BODY,       // Request/response bodies
-    COOKIE          // HTTP cookies
+    COOKIE;          // HTTP cookies
+    
+    /**
+     * Check if this validation type requires URL decoding.
+     * Used in pattern matching scenarios.
+     */
+    public boolean requiresDecoding() {
+        return this == URL_PATH || this == URL_PARAMETER;
+    }
 }
 
 /**
@@ -188,29 +212,38 @@ public enum UrlSecurityFailureType {
 
 /**
  * Main exception for security violations.
+ * Uses Java record for immutability and conciseness.
  * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
  */
-@Value
-@Builder
-public class UrlSecurityException extends RuntimeException {
-    UrlSecurityFailureType failureType;
-    ValidationType validationType;
-    String originalInput;
-    String sanitizedInput;
-    String detail;
+public record UrlSecurityException(
+    @NonNull UrlSecurityFailureType failureType,
+    @NonNull ValidationType validationType,
+    @NonNull String originalInput,
+    @Nullable String sanitizedInput,
+    @Nullable String detail
+) {
+    /**
+     * Constructor with cause support.
+     */
+    public static UrlSecurityException withCause(
+            UrlSecurityFailureType failureType,
+            ValidationType validationType,
+            String originalInput,
+            @Nullable String sanitizedInput,
+            @Nullable String detail,
+            @Nullable Throwable cause) {
+        var ex = new UrlSecurityException(failureType, validationType, originalInput, sanitizedInput, detail);
+        if (cause != null) {
+            ex.initCause(cause);
+        }
+        return ex;
+    }
     
-    public UrlSecurityException(UrlSecurityFailureType failureType, 
-                               ValidationType validationType,
-                               String originalInput, 
-                               String sanitizedInput, 
-                               String detail,
-                               Throwable cause) {
-        super(detail, cause);
-        this.failureType = failureType;
-        this.validationType = validationType;
-        this.originalInput = originalInput;
-        this.sanitizedInput = sanitizedInput;
-        this.detail = detail;
+    /**
+     * Get sanitized input as Optional.
+     */
+    public Optional<String> getSanitizedInputOptional() {
+        return Optional.ofNullable(sanitizedInput);
     }
 }
 ----
@@ -225,18 +258,49 @@ package de.cuioss.tools.security.http;
  * Data records used throughout the system.
  * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
-public record URLParameter(String key, String value) {}
+public record URLParameter(
+    @NonNull String key, 
+    @Nullable String value
+) {
+    /**
+     * Check if this parameter contains sensitive data based on key name.
+     */
+    public boolean isSensitive() {
+        String lowerKey = key.toLowerCase();
+        return lowerKey.contains("password") || 
+               lowerKey.contains("token") || 
+               lowerKey.contains("secret") ||
+               lowerKey.contains("api_key");
+    }
+}
 
 public record Cookie(
-    String name, 
-    String value, 
-    Map<String, String> attributes
-) {}
+    @NonNull String name, 
+    @Nullable String value, 
+    @NonNull Map<String, String> attributes
+) {
+    /**
+     * Check if this is a security-sensitive cookie.
+     */
+    public boolean isSecuritySensitive() {
+        String lowerName = name.toLowerCase();
+        return lowerName.contains("session") || 
+               lowerName.contains("auth") || 
+               lowerName.contains("csrf");
+    }
+}
 
 public record HTTPBody(
-    String contentType, 
-    byte[] content
-) {}
+    @NonNull String contentType, 
+    byte @NonNull [] content
+) {
+    /**
+     * Get content length safely.
+     */
+    public int length() {
+        return content.length;
+    }
+}
 ----
 
 == Configuration Architecture
@@ -289,7 +353,7 @@ public interface ConfigStageProvider {
     /**
      * @return List of stages to use in the pipeline, in the correct order
      */
-    List<HttpSecurityValidator> getStages();
+    SequencedCollection<HttpSecurityValidator> getStages();
 }
 ----
 
@@ -414,14 +478,14 @@ public class URLPathConfig implements ConfigStageProvider {
     }
     
     @Override
-    public List<HttpSecurityValidator> getStages() {
-        return List.of(
+    public SequencedCollection<HttpSecurityValidator> getStages() {
+        return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
             getDecodingStage(),
             getNormalizationStage(),
             getPatternMatchingStage()
-        );
+        ));
     }
 }
 
@@ -466,13 +530,13 @@ public class URLParameterConfig implements ConfigStageProvider {
     }
     
     @Override
-    public List<HttpSecurityValidator> getStages() {
-        return List.of(
+    public SequencedCollection<HttpSecurityValidator> getStages() {
+        return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
             getDecodingStage(),
             getPatternMatchingStage()
-        );
+        ));
     }
 }
 
@@ -518,12 +582,12 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     }
     
     @Override
-    public List<HttpSecurityValidator> getStages() {
-        return List.of(
+    public SequencedCollection<HttpSecurityValidator> getStages() {
+        return new ArrayList<>(List.of(
             getLengthValidationStage(),
             getCharacterValidationStage(),
             getPatternMatchingStage()
-        );
+        ));
     }
 }
 ----
@@ -789,12 +853,13 @@ public final class CharacterValidationConstants {
      * Returns the character set for the given validation type.
      * Note: Returns the actual BitSet, not a copy. Do not modify!
      */
-    public static BitSet getCharacterSet(ValidationType type) {
+    @NonNull
+    public static BitSet getCharacterSet(@NonNull ValidationType type) {
         return switch (type) {
             case URL_PATH -> RFC3986_PATH_CHARS;
             case URL_PARAMETER -> RFC3986_QUERY_CHARS;
             case HTTP_HEADER -> RFC7230_HEADER_CHARS;
-            default -> RFC3986_UNRESERVED;
+            case HTTP_BODY, COOKIE -> RFC3986_UNRESERVED;
         };
     }
 }
@@ -901,8 +966,7 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
                     .failureType(UrlSecurityFailureType.INVALID_CHARACTER)
                     .validationType(validationType)
                     .originalInput(value)
-                    .detail(String.format("Invalid character '%c' (0x%02X) at position %d", 
-                                        ch, (int)ch, i))
+                    .detail(STR."Invalid character '\{ch}' (0x\{Integer.toHexString(ch).toUpperCase()}) at position \{i}")
                     .build();
             }
         }
@@ -977,46 +1041,79 @@ public class NormalizationStage implements HttpSecurityValidator {
     }
     
     private String normalizePath(String path) {
-        // RFC 3986 path segment normalization
+        // RFC 3986 path segment normalization with recursion protection
         String[] segments = path.split("/", -1);
         StringBuilder result = new StringBuilder();
         int depth = 0;
+        int totalSegments = 0;
         
-        for (String segment : segments) {
-            if (".".equals(segment)) {
-                // Current directory - skip
-                continue;
-            } else if ("..".equals(segment)) {
-                // Parent directory
-                if (result.length() > 0) {
-                    // Remove last segment
-                    int lastSlash = result.lastIndexOf("/");
-                    if (lastSlash >= 0) {
-                        result.setLength(lastSlash);
-                        depth--;
-                    }
-                } else {
-                    // Trying to go above root
-                    depth--;
-                }
-            } else if (!segment.isEmpty()) {
-                // Normal segment
-                if (result.length() > 0 || path.startsWith("/")) {
-                    result.append("/");
-                }
-                result.append(segment);
-                depth++;
-            }
+        // Prevent stack overflow with excessive segments
+        final int MAX_SEGMENTS = 1000; // Reasonable limit for path segments
+        if (segments.length > MAX_SEGMENTS) {
+            throw new UrlSecurityException(
+                UrlSecurityFailureType.EXCESSIVE_NESTING,
+                validationType,
+                path,
+                null,
+                STR."Path contains too many segments: \{segments.length} (max: \{MAX_SEGMENTS})"
+            );
         }
         
-        // Check depth limit
-        if (depth > config.getMaxDirectoryDepth()) {
-            throw UrlSecurityException.builder()
-                .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
-                .validationType(validationType)
-                .originalInput(path)
-                .detail("Path depth " + depth + " exceeds maximum " + config.getMaxDirectoryDepth())
-                .build();
+        for (String segment : segments) {
+            totalSegments++;
+            
+            // Additional recursion protection
+            if (totalSegments > MAX_SEGMENTS) {
+                throw new UrlSecurityException(
+                    UrlSecurityFailureType.EXCESSIVE_NESTING,
+                    validationType,
+                    path,
+                    null,
+                    STR."Processing exceeded maximum segment count: \{MAX_SEGMENTS}"
+                );
+            }
+            
+            switch (segment) {
+                case "." -> {
+                    // Current directory - skip
+                }
+                case ".." -> {
+                    // Parent directory
+                    if (!result.isEmpty()) {
+                        // Remove last segment
+                        int lastSlash = result.lastIndexOf("/");
+                        if (lastSlash >= 0) {
+                            result.setLength(lastSlash);
+                            depth = Math.max(0, depth - 1); // Prevent negative depth
+                        }
+                    } else {
+                        // Trying to go above root
+                        depth = Math.max(0, depth - 1);
+                    }
+                }
+                case "" -> {
+                    // Empty segment - skip
+                }
+                default -> {
+                    // Normal segment
+                    if (!result.isEmpty() || path.startsWith("/")) {
+                        result.append("/");
+                    }
+                    result.append(segment);
+                    depth++;
+                    
+                    // Check depth limit during processing
+                    if (depth > config.getMaxDirectoryDepth()) {
+                        throw new UrlSecurityException(
+                            UrlSecurityFailureType.EXCESSIVE_NESTING,
+                            validationType,
+                            path,
+                            result.toString(),
+                            STR."Path depth \{depth} exceeds maximum \{config.getMaxDirectoryDepth()}"
+                        );
+                    }
+                }
+            }
         }
         
         // Preserve trailing slash if present
@@ -1097,8 +1194,10 @@ package de.cuioss.tools.security.http.pipeline;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import java.util.List;
+import java.util.SequencedCollection;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Unified validation pipeline that works with any ConfigStageProvider.
@@ -1109,10 +1208,10 @@ import java.util.Objects;
 @ToString
 public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     
-    private final ConfigStageProvider config;
-    private final List<HttpSecurityValidator> stages;
-    private final SecurityEventCounter eventCounter;
-    private final ValidationType validationType;
+    private final @NonNull ConfigStageProvider config;
+    private final @NonNull SequencedCollection<HttpSecurityValidator> stages;
+    private final @NonNull SecurityEventCounter eventCounter;
+    private final @NonNull ValidationType validationType;
     
     public UnifiedValidationPipeline(ConfigStageProvider config, 
                                     SecurityEventCounter eventCounter) {
@@ -1167,22 +1266,55 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
     }
     
     private void logSecurityEvent(UrlSecurityException e) {
-        // Log security events based on failure type
+        // Log security events based on failure type with pattern guards
         CuiLogger logger = new CuiLogger(UnifiedValidationPipeline.class);
         
-        switch (e.getFailureType()) {
+        // Sanitize sensitive data before logging (only values, not keys/URLs)
+        String sanitizedInput = sanitizeForLogging(e.originalInput(), e.validationType());
+        
+        // Use direct enum switch - proper Java 21 syntax (no 'when' guards)
+        switch (e.failureType()) {
             case PATH_TRAVERSAL_DETECTED ->
                 logger.warn(URLSecurityLogMessages.WARN.PATH_TRAVERSAL_DETECTED, 
-                    e.getOriginalInput());
+                    sanitizedInput);
             case DOUBLE_ENCODING ->
                 logger.warn(URLSecurityLogMessages.WARN.DOUBLE_ENCODING_DETECTED, 
-                    e.getOriginalInput());
+                    sanitizedInput);
             case UNICODE_NORMALIZATION_CHANGED ->
                 logger.warn(URLSecurityLogMessages.WARN.UNICODE_ATTACK_DETECTED);
             default ->
                 logger.error(URLSecurityLogMessages.ERROR.VALIDATION_FAILED, 
-                    e.getFailureType(), e.getMessage());
+                    e.failureType(), e.getMessage());
         }
+    }
+    
+    /**
+     * Sanitizes sensitive data for logging.
+     * Only sanitizes parameter values and header values, not keys or URLs themselves.
+     */
+    private String sanitizeForLogging(@NonNull String input, @NonNull ValidationType type) {
+        return switch (type) {
+            case URL_PARAMETER -> {
+                // Sanitize parameter values only
+                String[] parts = input.split("=", 2);
+                yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
+            }
+            case HTTP_HEADER -> {
+                // Sanitize header values (especially Authorization)
+                if (input.toLowerCase().startsWith("authorization:") ||
+                    input.toLowerCase().startsWith("x-api-key:")) {
+                    int colonPos = input.indexOf(':');
+                    yield STR."\{input.substring(0, colonPos + 1)} ***";
+                }
+                yield input;
+            }
+            case COOKIE -> {
+                // Sanitize cookie values
+                String[] parts = input.split("=", 2);
+                yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
+            }
+            case URL_PATH, HTTP_BODY -> input; // These are generally safe to log
+        };
     }
 }
 ----
@@ -1220,9 +1352,10 @@ public class SecurityEventCounter {
     /**
      * Get current count for a failure type.
      */
-    public long getCount(UrlSecurityFailureType type) {
-        AtomicLong counter = counters.get(type);
-        return counter != null ? counter.get() : 0;
+    public long getCount(@NonNull UrlSecurityFailureType type) {
+        return Optional.ofNullable(counters.get(type))
+            .map(AtomicLong::get)
+            .orElse(0L);
     }
 }
 ----
@@ -1347,16 +1480,22 @@ try {
 // Alternative: Factory pattern for cleaner creation
 public class ValidationFactory {
     
-    private final UrlSecurityConfig baseConfig;
-    private final SecurityEventCounter eventCounter;
+    private final @NonNull UrlSecurityConfig baseConfig;
+    private final @NonNull SecurityEventCounter eventCounter;
     
-    public HttpSecurityValidator createValidator(ValidationType type) {
+    /**
+     * Creates a validator for the specified type using exhaustive switch.
+     * Java 21 ensures all enum cases are covered.
+     */
+    @NonNull
+    public HttpSecurityValidator createValidator(@NonNull ValidationType type) {
         ConfigStageProvider config = switch (type) {
             case URL_PATH -> new URLPathConfig(baseConfig);
             case URL_PARAMETER -> new URLParameterConfig(baseConfig);
             case HTTP_HEADER -> new HTTPHeaderConfig(baseConfig);
             case HTTP_BODY -> new HTTPBodyConfig(baseConfig);
             case COOKIE -> new CookieConfig(baseConfig);
+            // No default needed - exhaustive enum coverage
         };
         
         return new UnifiedValidationPipeline(config, eventCounter);
