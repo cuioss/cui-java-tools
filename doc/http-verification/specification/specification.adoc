@@ -10,7 +10,7 @@ link:../../requirements/url-verification/README.adoc[← Back to Documentation I
 ====
 This document describes HOW the URL Security Validation system architecture works.
 For WHAT tasks to implement, see link:plan.adoc[Implementation Plan].
-For HOW to test the system, see link:test-harness-design.adoc[Test Harness Design].
+For HOW to test the system, see link:testing.adoc[Testing Framework].
 ====
 
 == Executive Summary

@@ -1,10 +1,10 @@
-= URL Security Validation Test Harness Design
+= URL Security Validation Testing Framework
 :toc: left
 :toclevels: 3
 :sectnums:
 :icons: font
 
-link:README.adoc[← Back to Documentation Index]
+link:../../requirements/url-verification/README.adoc[← Back to Documentation Index]
 
 [IMPORTANT]
 ====
