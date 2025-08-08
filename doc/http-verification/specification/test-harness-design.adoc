@@ -10,7 +10,7 @@ link:README.adoc[← Back to Documentation Index]
 ====
 This document describes HOW to test the URL Security Validation system.
 For WHAT tasks to implement, see link:plan.adoc[Implementation Plan].
-For HOW the system architecture works, see link:architecture-design.adoc[Architecture Design].
+For HOW the system architecture works, see link:specification.adoc[Architecture Specification].
 ====
 
 == Testing Philosophy

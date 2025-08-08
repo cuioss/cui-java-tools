@@ -8,8 +8,8 @@
 [IMPORTANT]
 ====
 This document defines WHAT tasks need to be implemented for the URL Security Validation system.
-For HOW the system architecture works, see link:doc/requirements/url-verification/architecture-design.adoc[Architecture Design].
-For HOW to test the system, see link:doc/requirements/url-verification/test-harness-design.adoc[Test Harness Design].
+For HOW the system architecture works, see link:specification.adoc[Architecture Specification].
+For HOW to test the system, see link:test-harness-design.adoc[Test Harness Design].
 ====
 
 == Purpose
@@ -51,27 +51,27 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |G1
-|Implement PathTraversalGenerator - see link:doc/requirements/url-verification/test-harness-design.adoc#_g1_pathtraversalgenerator[Test Harness §G1]
+|Implement PathTraversalGenerator - see link:test-harness-design.adoc#_g1_pathtraversalgenerator[Test Harness §G1]
 |High
 |[ ]
 
 |G2
-|Implement EncodingCombinationGenerator - see link:doc/requirements/url-verification/test-harness-design.adoc#_g2_encodingcombinationgenerator[Test Harness §G2]
+|Implement EncodingCombinationGenerator - see link:test-harness-design.adoc#_g2_encodingcombinationgenerator[Test Harness §G2]
 |High
 |[ ]
 
 |G3
-|Implement UnicodeAttackGenerator - see link:doc/requirements/url-verification/test-harness-design.adoc#_g3_unicodeattackgenerator[Test Harness §G3]
+|Implement UnicodeAttackGenerator - see link:test-harness-design.adoc#_g3_unicodeattackgenerator[Test Harness §G3]
 |High
 |[ ]
 
 |G4
-|Implement BoundaryFuzzingGenerator - see link:doc/requirements/url-verification/test-harness-design.adoc#_g4_boundaryfuzzinggenerator[Test Harness §G4]
+|Implement BoundaryFuzzingGenerator - see link:test-harness-design.adoc#_g4_boundaryfuzzinggenerator[Test Harness §G4]
 |High
 |[ ]
 
 |G5
-|Implement ValidURLGenerator - see link:doc/requirements/url-verification/test-harness-design.adoc#_g5_validurlgenerator[Test Harness §G5]
+|Implement ValidURLGenerator - see link:test-harness-design.adoc#_g5_validurlgenerator[Test Harness §G5]
 |High
 |[ ]
 
@@ -108,7 +108,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |B1
-|Define UrlSecurityFailureType enum - see link:doc/requirements/url-verification/architecture-design.adoc#_core_interfaces_and_data_types[Architecture §Core]
+|Define UrlSecurityFailureType enum - see link:specification.adoc#_core_interfaces_and_data_types[Architecture §Core]
 |High
 |[ ]
 
@@ -130,7 +130,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |C1
-|Implement UrlSecurityConfig with documented defaults - see link:doc/requirements/url-verification/architecture-design.adoc#_configuration_architecture[Architecture §Config]
+|Implement UrlSecurityConfig with documented defaults - see link:specification.adoc#_configuration_architecture[Architecture §Config]
 |High
 |[ ]
 
@@ -152,7 +152,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |S1
-|Implement SecurityEventCounter - see link:doc/requirements/url-verification/architecture-design.adoc#_event_counter_pattern[Architecture §Events]
+|Implement SecurityEventCounter - see link:specification.adoc#_event_counter_pattern[Architecture §Events]
 |High
 |[ ]
 
@@ -169,7 +169,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |V1
-|Implement DecodingStage - see link:doc/requirements/url-verification/architecture-design.adoc#_decodingstage[Architecture §Decoding]
+|Implement DecodingStage - see link:specification.adoc#_decodingstage[Architecture §Decoding]
 |High
 |[ ]
 
@@ -179,7 +179,7 @@ Tasks are categorized with specific prefixes for tracking:
 |[ ]
 
 |V3
-|Implement PatternMatchingStage - see link:doc/requirements/url-verification/architecture-design.adoc#_patternmatchingstage[Architecture §Pattern]
+|Implement PatternMatchingStage - see link:specification.adoc#_patternmatchingstage[Architecture §Pattern]
 |High
 |[ ]
 
@@ -201,7 +201,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |P1
-|Implement URLPathValidationPipeline - see link:doc/requirements/url-verification/architecture-design.adoc#_sequential_execution_model[Architecture §Pipeline]
+|Implement URLPathValidationPipeline - see link:specification.adoc#_sequential_execution_model[Architecture §Pipeline]
 |High
 |[ ]
 
@@ -235,7 +235,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |T1
-|Test basic path traversal patterns - see link:doc/requirements/url-verification/test-harness-design.adoc#_path_traversal_tests_t1_t4[Test Cases §T1]
+|Test basic path traversal patterns - see link:test-harness-design.adoc#_path_traversal_tests_t1_t4[Test Cases §T1]
 |High
 |[ ]
 
@@ -470,7 +470,7 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |T34
-|Test performance under normal load - see link:doc/requirements/url-verification/test-harness-design.adoc#_performance_benchmarking[Test Harness §Perf]
+|Test performance under normal load - see link:test-harness-design.adoc#_performance_benchmarking[Test Harness §Perf]
 |High
 |[ ]
 
@@ -492,12 +492,12 @@ Tasks are categorized with specific prefixes for tracking:
 |Task ID |Description |Priority |Status
 
 |I1
-|Security attack test suite orchestration - see link:doc/requirements/url-verification/test-harness-design.adoc#_test_suite_orchestration[Test Harness §Suite]
+|Security attack test suite orchestration - see link:test-harness-design.adoc#_test_suite_orchestration[Test Harness §Suite]
 |High
 |[ ]
 
 |I2
-|Create attack pattern database - see link:doc/requirements/url-verification/test-harness-design.adoc#_database_structure[Test Harness §Database]
+|Create attack pattern database - see link:test-harness-design.adoc#_database_structure[Test Harness §Database]
 |High
 |[ ]
 

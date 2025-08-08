@@ -21,10 +21,10 @@ Comprehensive guide to OWASP-recommended prevention strategies, validation techn
 link:cve-analysis.adoc[CVE Analysis and Breach Studies]::
 Detailed analysis of critical CVEs from 2019-2024 and real-world breach case studies demonstrating exploitation patterns and impacts.
 
-link:test-harness-design.adoc[Test Harness Design]::
+link:../../http-verification/specification/test-harness-design.adoc[Test Harness Design]::
 Complete testing framework specification including CVE-based test vectors, encoding matrices, and automated security validation.
 
-link:architecture-design.adoc[Architecture and Design]::
+link:../../http-verification/specification/specification.adoc[Architecture Specification]::
 HTTP/URL path traversal security architecture leveraging Java 21+ built-in types with performance optimization strategies.
 
 == Quick Start
@@ -33,8 +33,8 @@ For developers implementing path traversal security:
 
 1. Review link:owasp-best-practices.adoc#_core_prevention_principles[Core Prevention Principles]
 2. Understand link:cve-analysis.adoc#_attack_pattern_evolution[Attack Pattern Evolution]
-3. Implement using link:architecture-design.adoc#_system_architecture[System Architecture]
-4. Validate with link:test-harness-design.adoc#_test_data_categories[Test Data Categories]
+3. Implement using link:../../http-verification/specification/specification.adoc#_system_architecture[System Architecture]
+4. Validate with link:../../http-verification/specification/test-harness-design.adoc#_test_data_categories[Test Data Categories]
 
 == HTTP/URL Standards Reference
 
