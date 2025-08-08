@@ -9,7 +9,7 @@ link:README.adoc[← Back to Documentation Index]
 [IMPORTANT]
 ====
 This document describes HOW to test the URL Security Validation system.
-For WHAT tasks to implement, see link:../../../plan.adoc[Implementation Plan].
+For WHAT tasks to implement, see link:plan.adoc[Implementation Plan].
 For HOW the system architecture works, see link:architecture-design.adoc[Architecture Design].
 ====
 
@@ -74,7 +74,7 @@ import de.cuioss.test.generator.Generators;
 
 /**
  * Generates path traversal attack patterns.
- * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G1]
+ * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G1]
  */
 public class PathTraversalGenerator implements TypedGenerator<String> {
     
@@ -125,7 +125,7 @@ import de.cuioss.test.generator.Generators;
 
 /**
  * Generates various encoding combinations for bypass attempts.
- * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G2]
+ * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G2]
  */
 public class EncodingCombinationGenerator implements TypedGenerator<String> {
     
@@ -183,7 +183,7 @@ import de.cuioss.test.generator.Generators;
 
 /**
  * Generates Unicode-based attack patterns.
- * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G3]
+ * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G3]
  */
 public class UnicodeAttackGenerator implements TypedGenerator<String> {
     
@@ -228,7 +228,7 @@ import de.cuioss.test.generator.Generators;
 
 /**
  * Generates boundary condition test cases.
- * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G4]
+ * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G4]
  */
 public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
     
@@ -329,7 +329,7 @@ import de.cuioss.tools.security.http.config.UrlSecurityConfig;
 
 /**
  * Generates legitimate URLs that should pass validation.
- * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G5]
+ * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G5]
  */
 public class ValidURLGenerator implements TypedGenerator<String> {
     
@@ -390,7 +390,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Path traversal attack tests using TypedGenerators.
- * Implements: link:../../../plan.adoc#_phase_71_path_traversal_attack_tests[Tasks T1-T4]
+ * Implements: link:plan.adoc#_phase_71_path_traversal_attack_tests[Tasks T1-T4]
  */
 @EnableGeneratorController
 public class PathTraversalAttackTest {
@@ -481,7 +481,7 @@ package de.cuioss.tools.security.http.database;
 
 /**
  * Central repository of attack patterns.
- * Implements: link:../../../plan.adoc#_phase_712_integration_tasks[Task I2]
+ * Implements: link:plan.adoc#_phase_712_integration_tasks[Task I2]
  */
 public class AttackPatternDatabase {
     
@@ -560,7 +560,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Performance validation benchmarks.
- * Implements: link:../../../plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
+ * Implements: link:plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -954,7 +954,7 @@ public class ComprehensiveSecurityTest {
 ----
 /**
  * False positive prevention tests.
- * Implements: link:../../../plan.adoc#_phase_710_false_positive_prevention_tests[Tasks T31-T33]
+ * Implements: link:plan.adoc#_phase_710_false_positive_prevention_tests[Tasks T31-T33]
  */
 public class FalsePositiveTest {
     
@@ -987,7 +987,7 @@ public class FalsePositiveTest {
 
 /**
  * Performance validation tests.
- * Implements: link:../../../plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
+ * Implements: link:plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
  */
 public class PerformanceValidationTest {
     

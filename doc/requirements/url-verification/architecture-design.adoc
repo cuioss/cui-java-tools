@@ -9,7 +9,7 @@ link:README.adoc[← Back to Documentation Index]
 [IMPORTANT]
 ====
 This document describes HOW the URL Security Validation system architecture works.
-For WHAT tasks to implement, see link:../../../plan.adoc[Implementation Plan].
+For WHAT tasks to implement, see link:plan.adoc[Implementation Plan].
 For HOW to test the system, see link:test-harness-design.adoc[Test Harness Design].
 ====
 
@@ -134,7 +134,7 @@ import org.jspecify.annotations.Nullable;
  * Core functional interface for HTTP security validation.
  * Follows the String/throws pattern consistently.
  * Can be used with lambda expressions and method references.
- * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
+ * Implemented by: link:plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
 @FunctionalInterface
 public interface HttpSecurityValidator {
@@ -150,7 +150,7 @@ public interface HttpSecurityValidator {
 
 /**
  * Classification of input types for appropriate validation.
- * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
+ * Implemented by: link:plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
 public enum ValidationType {
     URL_PATH,        // URL path segments
@@ -170,7 +170,7 @@ public enum ValidationType {
 
 /**
  * Comprehensive enumeration of security failure types.
- * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B1]
+ * Implemented by: link:plan.adoc#_phase_2_base_structure_and_core_components[Task B1]
  */
 public enum UrlSecurityFailureType {
     // Encoding Issues
@@ -213,7 +213,7 @@ public enum UrlSecurityFailureType {
 /**
  * Main exception for security violations.
  * Extends RuntimeException for clean functional interface usage.
- * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
+ * Implemented by: link:plan.adoc#_phase_2_base_structure_and_core_components[Task B2]
  */
 public class UrlSecurityException extends RuntimeException {
     @NonNull private final UrlSecurityFailureType failureType;
@@ -319,7 +319,7 @@ package de.cuioss.tools.security.http;
 
 /**
  * Data records used throughout the system.
- * Implemented by: link:../../../plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
+ * Implemented by: link:plan.adoc#_phase_2_base_structure_and_core_components[Task B3]
  */
 public record URLParameter(
     @NonNull String key, 
@@ -432,7 +432,7 @@ import lombok.Value;
 /**
  * Base configuration with security defaults.
  * All defaults are based on OWASP guidelines and RFC specifications.
- * Implemented by: link:../../../plan.adoc#_phase_3_configuration_system[Tasks C1-C2]
+ * Implemented by: link:plan.adoc#_phase_3_configuration_system[Tasks C1-C2]
  */
 @Builder
 @Value
@@ -719,7 +719,7 @@ import lombok.ToString;
  * Length validation MUST be the first stage to prevent DoS attacks.
  * Rejects oversized inputs before any processing.
  * Immutable and thread-safe.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V4]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V4]
  */
 @EqualsAndHashCode
 @ToString
@@ -778,7 +778,7 @@ import java.util.regex.Pattern;
 /**
  * Multi-layer decoding with security checks.
  * Immutable and thread-safe.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V1]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V1]
  */
 @Value
 public class DecodingStage implements HttpSecurityValidator {
@@ -848,7 +848,7 @@ import java.util.BitSet;
 /**
  * Pre-computed character sets for validation according to RFC specifications.
  * These BitSets are read-only after initialization and thread-safe for concurrent reads.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V5]
  */
 public final class CharacterValidationConstants {
     
@@ -948,7 +948,7 @@ import java.util.BitSet;
  * MUST be the second stage after length validation.
  * Rejects invalid characters BEFORE any decoding/processing.
  * Immutable and thread-safe.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V5]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V5]
  */
 @EqualsAndHashCode
 @ToString
@@ -1063,7 +1063,7 @@ import java.nio.file.Paths;
  * Path normalization stage to resolve . and .. segments.
  * Follows RFC 3986 Section 5.2.4 for path normalization.
  * Immutable and thread-safe.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V2]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V2]
  */
 @Value
 public class NormalizationStage implements HttpSecurityValidator {
@@ -1214,7 +1214,7 @@ import java.util.regex.Pattern;
 /**
  * Pattern-based attack detection using pre-compiled patterns.
  * Immutable and optimized for performance.
- * Implemented by: link:../../../plan.adoc#_phase_5_validation_stages[Task V3]
+ * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V3]
  */
 @Value
 public class PatternMatchingStage implements HttpSecurityValidator {
@@ -1269,7 +1269,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Unified validation pipeline that works with any ConfigStageProvider.
  * The validation type and stage selection is determined by the configuration.
- * Implemented by: link:../../../plan.adoc#_phase_6_pipeline_implementation[Tasks P1-P5]
+ * Implemented by: link:plan.adoc#_phase_6_pipeline_implementation[Tasks P1-P5]
  */
 @EqualsAndHashCode
 @ToString
@@ -1399,7 +1399,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Thread-safe security event counter.
  * Tracks occurrences of each UrlSecurityFailureType.
- * Implemented by: link:../../../plan.adoc#_phase_4_security_tracking_and_monitoring[Task S1]
+ * Implemented by: link:plan.adoc#_phase_4_security_tracking_and_monitoring[Task S1]
  */
 public class SecurityEventCounter {
     
@@ -1438,7 +1438,7 @@ import de.cuioss.tools.logging.LogRecordModel;
 /**
  * Structured log messages for URL security events.
  * Follows cui-jwt-validation LogRecord pattern.
- * Implemented by: link:../../../plan.adoc#_phase_4_security_tracking_and_monitoring[Task S2]
+ * Implemented by: link:plan.adoc#_phase_4_security_tracking_and_monitoring[Task S2]
  */
 public final class URLSecurityLogMessages {
     
