@@ -69,8 +69,8 @@ src/test/java/de/cuioss/tools/security/http/
 ----
 package de.cuioss.tools.security.http.generators;
 
-import de.cuioss.tools.generator.TypedGenerator;
-import de.cuioss.tools.generator.Generator;
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.Generators;
 
 /**
  * Generates path traversal attack patterns.
@@ -78,27 +78,25 @@ import de.cuioss.tools.generator.Generator;
  */
 public class PathTraversalGenerator implements TypedGenerator<String> {
     
-    private static final String[] BASE_PATTERNS = {
+    private static final TypedGenerator<String> BASE_PATTERNS = Generators.fixedValues(
         "../", ".../", "..\\", "..\\\\",
         ".%2e/", "%2e%2e/", "%2e%2e%2f",
         "..;/", "..\\../", "..//..//"
-    };
+    );
     
-    private static final String[] TARGET_FILES = {
+    private static final TypedGenerator<String> TARGET_FILES = Generators.fixedValues(
         "etc/passwd", "etc/shadow", "etc/hosts",
         "windows/system32/config/sam",
         "windows/win.ini", "boot.ini"
-    };
+    );
     
-    private final Generator<Integer> depthGen = Generator.integers(1, 10);
-    private final Generator<Integer> patternGen = Generator.integers(0, BASE_PATTERNS.length - 1);
-    private final Generator<Integer> targetGen = Generator.integers(0, TARGET_FILES.length - 1);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 10);
     
     @Override
     public String next() {
         int depth = depthGen.next();
-        String pattern = BASE_PATTERNS[patternGen.next()];
-        String target = TARGET_FILES[targetGen.next()];
+        String pattern = BASE_PATTERNS.next();
+        String target = TARGET_FILES.next();
         
         StringBuilder attack = new StringBuilder();
         for (int i = 0; i < depth; i++) {
@@ -122,22 +120,24 @@ public class PathTraversalGenerator implements TypedGenerator<String> {
 ----
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.Generators;
+
 /**
  * Generates various encoding combinations for bypass attempts.
  * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G2]
  */
 public class EncodingCombinationGenerator implements TypedGenerator<String> {
     
-    private final Generator<Integer> encodingLevelGen = Generator.integers(1, 3);
-    private final Generator<Boolean> mixedCaseGen = Generator.booleans();
+    private final TypedGenerator<Integer> encodingLevelGen = Generators.integers(1, 3);
+    private final TypedGenerator<Boolean> mixedCaseGen = Generators.booleans();
     
     @Override
     public String next() {
         int level = encodingLevelGen.next();
         boolean mixedCase = mixedCaseGen.next();
         
-        String base = "../";
-        String encoded = base;
+        String encoded = "../";
         
         // Apply encoding levels
         for (int i = 0; i < level; i++) {
@@ -164,6 +164,11 @@ public class EncodingCombinationGenerator implements TypedGenerator<String> {
         return input.replaceAll("%2e", "%2E")
                    .replaceAll("%2f", "%2F");
     }
+    
+    @Override
+    public Class<String> getType() {
+        return String.class;
+    }
 }
 ----
 
@@ -173,28 +178,29 @@ public class EncodingCombinationGenerator implements TypedGenerator<String> {
 ----
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.Generators;
+
 /**
  * Generates Unicode-based attack patterns.
  * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G3]
  */
 public class UnicodeAttackGenerator implements TypedGenerator<String> {
     
-    private static final String[] UNICODE_ATTACKS = {
+    private static final TypedGenerator<String> UNICODE_ATTACKS = Generators.fixedValues(
         "\u002e\u002e\u002f",           // Unicode dots and slash
         "\u2024\u2024\u2215",           // Lookalike characters
         "\u202e",                       // Right-to-left override
         "\u200b",                       // Zero-width space
         "\uFEFF",                       // Zero-width no-break space
         "\u0000"                        // Null character
-    };
+    );
     
-    private final Generator<Integer> attackGen = 
-        Generator.integers(0, UNICODE_ATTACKS.length - 1);
-    private final Generator<Boolean> combineGen = Generator.booleans();
+    private final TypedGenerator<Boolean> combineGen = Generators.booleans();
     
     @Override
     public String next() {
-        String attack = UNICODE_ATTACKS[attackGen.next()];
+        String attack = UNICODE_ATTACKS.next();
         
         if (combineGen.next()) {
             // Combine with path traversal
@@ -202,6 +208,11 @@ public class UnicodeAttackGenerator implements TypedGenerator<String> {
         }
         
         return attack;
+    }
+    
+    @Override
+    public Class<String> getType() {
+        return String.class;
     }
 }
 ----
@@ -212,18 +223,22 @@ public class UnicodeAttackGenerator implements TypedGenerator<String> {
 ----
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.Generators;
+
 /**
  * Generates boundary condition test cases.
  * Implements: link:../../../plan.adoc#_phase_1_test_infrastructure_and_generators[Task G4]
  */
 public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
     
-    private final Generator<Integer> lengthGen = Generator.integers(1000, 10000);
-    private final Generator<Integer> nestingGen = Generator.integers(50, 200);
+    private final TypedGenerator<Integer> lengthGen = Generators.integers(1000, 10000);
+    private final TypedGenerator<Integer> nestingGen = Generators.integers(50, 200);
+    private final TypedGenerator<Integer> typeGen = Generators.integers(0, 5);
     
     @Override
     public String next() {
-        int type = Generator.integers(0, 5).next();
+        int type = typeGen.next();
         
         return switch (type) {
             case 0 -> generateLongPath();
@@ -246,38 +261,35 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
     
     private String generateDeepNesting() {
         int depth = nestingGen.next();
-        StringBuilder path = new StringBuilder();
-        for (int i = 0; i < depth; i++) {
-            path.append("dir/");
-        }
-        return path.toString();
+        return "dir/".repeat(depth);
     }
     
     private String generateNullBytes() {
-        String[] patterns = {
+        TypedGenerator<String> patterns = Generators.fixedValues(
             "/file\u0000.txt",              // Raw null byte
             "/admin%00.php",                // Encoded null byte  
             "../etc/passwd%00.jpg",         // Path traversal with null
             "file.jsp%00.png",              // Extension bypass
             "%00../../etc/shadow"           // Leading null byte
-        };
-        return patterns[Generator.integers(0, patterns.length - 1).next()];
+        );
+        return patterns.next();
     }
     
     private String generateControlCharacters() {
         // Various control characters that should be rejected
-        String[] controls = {
+        TypedGenerator<String> controls = Generators.fixedValues(
             "/file\r\n.txt",                // CRLF injection
             "/path\t\tfile",                // Tab characters
             "/dir\b\bfile",                 // Backspace
             "/test\u001Ffile"               // Unit separator
-        };
-        return controls[Generator.integers(0, controls.length - 1).next()];
+        );
+        return controls.next();
     }
     
     private String generateMixedBoundaryAttacks() {
         // Combine multiple boundary issues
-        int attack = Generator.integers(0, 3).next();
+        TypedGenerator<Integer> attackGen = Generators.integers(0, 3);
+        int attack = attackGen.next();
         return switch (attack) {
             case 0 -> "../".repeat(100) + "etc/passwd";  // Excessive traversal
             case 1 -> "/a".repeat(2000);                  // Near max length
@@ -288,14 +300,19 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
     
     private String generateSpecialChars() {
         // Other special characters
-        String[] specials = {
+        TypedGenerator<String> specials = Generators.fixedValues(
             "/file|command",                // Pipe character
             "/file;command",                // Semicolon
             "/file`command`",               // Backticks
             "/file$variable",               // Variable expansion
             "/file>output"                  // Redirection
-        };
-        return specials[Generator.integers(0, specials.length - 1).next()];
+        );
+        return specials.next();
+    }
+    
+    @Override
+    public Class<String> getType() {
+        return String.class;
     }
 }
 ----
@@ -306,6 +323,8 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
 ----
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.Generators;
 import de.cuioss.tools.security.http.config.UrlSecurityConfig;
 
 /**
@@ -314,7 +333,7 @@ import de.cuioss.tools.security.http.config.UrlSecurityConfig;
  */
 public class ValidURLGenerator implements TypedGenerator<String> {
     
-    private static final String[] VALID_PATHS = {
+    private static final TypedGenerator<String> VALID_PATHS = Generators.fixedValues(
         "/api/v1/users",
         "/static/css/style.css",
         "/index.html",
@@ -322,20 +341,21 @@ public class ValidURLGenerator implements TypedGenerator<String> {
         "/search?q=test&limit=10",
         "/products/123/reviews",
         "/admin/dashboard"
-    };
+    );
     
-    private final Generator<Integer> pathGen = 
-        Generator.integers(0, VALID_PATHS.length - 1);
-    private final Generator<Boolean> paramGen = Generator.booleans();
+    private static final TypedGenerator<String> SORT_OPTIONS = Generators.fixedValues("asc", "desc");
+    
+    private final TypedGenerator<Boolean> paramGen = Generators.booleans();
+    private final TypedGenerator<Integer> pageGen = Generators.integers(1, 100);
     
     @Override
     public String next() {
-        String path = VALID_PATHS[pathGen.next()];
+        String path = VALID_PATHS.next();
         
         if (paramGen.next()) {
             // Add valid parameters
-            path += "?page=" + Generator.integers(1, 100).next();
-            path += "&sort=" + Generator.from("asc", "desc").next();
+            path += "?page=" + pageGen.next();
+            path += "&sort=" + SORT_OPTIONS.next();
         }
         
         // Ensure within DEFAULT_MAX_PATH_LENGTH (2048)
@@ -344,6 +364,11 @@ public class ValidURLGenerator implements TypedGenerator<String> {
         }
         
         return path;
+    }
+    
+    @Override
+    public Class<String> getType() {
+        return String.class;
     }
 }
 ----
@@ -358,23 +383,23 @@ package de.cuioss.tools.security.http.attacks;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.TypeGeneratorSource;
 import de.cuioss.tools.security.http.generators.*;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.stream.Stream;
 
 /**
  * Path traversal attack tests using TypedGenerators.
  * Implements: link:../../../plan.adoc#_phase_71_path_traversal_attack_tests[Tasks T1-T4]
  */
+@EnableGeneratorController
 public class PathTraversalAttackTest {
     
     private final HttpSecurityValidator validator = createValidator();
     
     @ParameterizedTest(name = "T1: Path traversal [{index}]: {0}")
-    @GeneratorsSource(value = GeneratorType.PATH_TRAVERSAL, limit = 100)
-    void testBasicPathTraversal_T1(String attack, String generatorType) {
+    @TypeGeneratorSource(value = PathTraversalGenerator.class, count = 100)
+    void testBasicPathTraversal_T1(String attack) {
         // T1: Basic path traversal patterns from generator
         UrlSecurityException exception = assertThrows(
             UrlSecurityException.class, 
@@ -391,8 +416,8 @@ public class PathTraversalAttackTest {
     }
     
     @ParameterizedTest(name = "T2: Encoded [{index}]: {0}")
-    @GeneratorsSource(value = GeneratorType.ENCODING, limit = 100)
-    void testEncodedPathTraversal_T2(String encoded, String generatorType) {
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 100)
+    void testEncodedPathTraversal_T2(String encoded) {
         // T2: URL-encoded path traversal - caught early at character validation
         UrlSecurityException exception = assertThrows(
             UrlSecurityException.class, 
@@ -408,8 +433,8 @@ public class PathTraversalAttackTest {
     }
     
     @ParameterizedTest(name = "T3: Unicode [{index}]: {0}")
-    @GeneratorsSource(value = GeneratorType.UNICODE, limit = 100)
-    void testUnicodePathTraversal_T3(String unicode, String generatorType) {
+    @TypeGeneratorSource(value = UnicodeAttackGenerator.class, count = 100)
+    void testUnicodePathTraversal_T3(String unicode) {
         // T3: Unicode-based path traversal
         UrlSecurityException exception = assertThrows(
             UrlSecurityException.class, 
@@ -425,8 +450,8 @@ public class PathTraversalAttackTest {
     }
     
     @ParameterizedTest(name = "T4: Null byte/Boundary [{index}]: {0}")
-    @GeneratorsSource(value = GeneratorType.BOUNDARY, limit = 50)
-    void testNullBytePathTraversal_T4(String nullByteAttack, String generatorType) {
+    @TypeGeneratorSource(value = BoundaryFuzzingGenerator.class, count = 50)
+    void testNullBytePathTraversal_T4(String nullByteAttack) {
         // T4: Null byte injection and boundary conditions
         // BoundaryFuzzingGenerator includes null byte patterns
         UrlSecurityException exception = assertThrows(
@@ -780,9 +805,17 @@ public class ValidationTypeTest {
 ----
 package de.cuioss.tools.security.http.attacks;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.TypeGeneratorSource;
+import de.cuioss.test.generator.junit.CompositeTypeGeneratorSource;
+import de.cuioss.tools.security.http.generators.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Comprehensive security test using all generators.
  */
+@EnableGeneratorController
 public class ComprehensiveSecurityTest {
     
     private final HttpSecurityValidator pathValidator = createPathValidator();
@@ -807,19 +840,22 @@ public class ComprehensiveSecurityTest {
         return new UnifiedValidationPipeline(headerConfig, new SecurityEventCounter());
     }
     
-    @ParameterizedTest(name = "Attack detection [{index}]: {1}")
-    @GeneratorsSource(value = {
-        GeneratorType.PATH_TRAVERSAL,
-        GeneratorType.ENCODING,
-        GeneratorType.UNICODE,
-        GeneratorType.BOUNDARY
-    }, limit = 200)
-    void testAllAttackPatterns(String attack, String generatorType) {
+    @ParameterizedTest(name = "Attack detection [{index}]: {0}")
+    @CompositeTypeGeneratorSource(
+        generatorClasses = {
+            PathTraversalGenerator.class,
+            EncodingCombinationGenerator.class,
+            UnicodeAttackGenerator.class,
+            BoundaryFuzzingGenerator.class
+        }, 
+        count = 200
+    )
+    void testAllAttackPatterns(String attack) {
         // All attack patterns should be blocked
         UrlSecurityException exception = assertThrows(
             UrlSecurityException.class,
             () -> pathValidator.execute(attack),
-            "Failed to detect attack from " + generatorType + ": " + attack
+            "Failed to detect attack: " + attack
         );
         
         // Verify ValidationType is properly set
@@ -827,14 +863,14 @@ public class ComprehensiveSecurityTest {
             "Exception should include ValidationType");
         
         // Log failure type for analysis
-        logger.debug("Detected {} for {} attack (type: {}): {}", 
-            exception.getFailureType(), generatorType, 
+        logger.debug("Detected {} for attack (type: {}): {}", 
+            exception.getFailureType(), 
             exception.getValidationType(), attack);
     }
     
     @ParameterizedTest(name = "Valid URL [{index}]")
-    @GeneratorsSource(value = {GeneratorType.VALID_URL}, limit = 500)
-    void testValidURLs(String validUrl, String generatorType) {
+    @TypeGeneratorSource(value = ValidURLGenerator.class, count = 500)
+    void testValidURLs(String validUrl) {
         // Valid URLs should pass without exception
         String result = assertDoesNotThrow(
             () -> pathValidator.execute(validUrl),
@@ -847,8 +883,8 @@ public class ComprehensiveSecurityTest {
     }
     
     @ParameterizedTest(name = "Parameter validation [{index}]")
-    @GeneratorsSource(value = GeneratorType.URL_PARAMETER, limit = 200)
-    void testParameterValidation(String paramValue, String generatorType) {
+    @TypeGeneratorSource(value = ValidURLGenerator.class, count = 200)
+    void testParameterValidation(String paramValue) {
         // Test parameter-specific validation
         // URLParameterGenerator creates both attack and valid parameters
         try {
@@ -867,8 +903,8 @@ public class ComprehensiveSecurityTest {
     }
     
     @ParameterizedTest(name = "Boundary fuzzing [{index}]")
-    @GeneratorsSource(value = {GeneratorType.BOUNDARY}, limit = 100)
-    void testBoundaryConditions(String boundary, String generatorType) {
+    @TypeGeneratorSource(value = BoundaryFuzzingGenerator.class, count = 100)
+    void testBoundaryConditions(String boundary) {
         // Boundary conditions should be handled gracefully
         try {
             pathValidator.execute(boundary);
