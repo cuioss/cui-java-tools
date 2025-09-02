@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * integration with {@link LogRecord} and {@link LogRecordModel}.
  */
 @DisplayName("CuiLogger Tests")
+// cui-rewrite:disable
 class CuiLoggerTest {
 
     private static final String TRACE = "trace";

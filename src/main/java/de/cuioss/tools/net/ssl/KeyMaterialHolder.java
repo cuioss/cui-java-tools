@@ -74,14 +74,16 @@ public final class KeyMaterialHolder implements Serializable {
 
     @Getter
     @Builder.Default
-    @SuppressWarnings("squid:S1170") // owolff: False positive: This is input for @Builder, no
+    // owolff: False positive: This is input for @Builder, no
     // constant, especially not public
+    @SuppressWarnings("squid:S1170")
     private final KeyHolderType keyHolderType = KeyHolderType.SINGLE_KEY;
 
     @Getter
     @Builder.Default
-    @SuppressWarnings("squid:S1170") // owolff: False positive: This is input for @Builder, no
+    // owolff: False positive: This is input for @Builder, no
     // constant, especially not public
+    @SuppressWarnings("squid:S1170")
     private final KeyAlgorithm keyAlgorithm = KeyAlgorithm.UNDEFINED;
 
     /**
@@ -89,8 +91,8 @@ public final class KeyMaterialHolder implements Serializable {
      * If keyPassword is {@code null} or empty it returns an empty char[],
      * never {@code null}
      */
-    @SuppressWarnings("javaarchitecture:S7027")
     // Sonar: "Cyclic dependency" - False positive. Both classes are in the same package.
+    @SuppressWarnings("javaarchitecture:S7027")
     public char[] getKeyPasswordAsCharArray() {
         return KeyStoreProvider.toCharArray(keyPassword);
     }

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LogRecordModelTest {
 
     private static final String PREFIX = "CUI-100";
-    private static final CuiLogger log = new CuiLogger(LogRecordModelTest.class);
+    private static final CuiLogger LOGGER = new CuiLogger(LogRecordModelTest.class);
 
     private final LogRecord infoModel = LogRecordModel.builder()
             .identifier(100)
@@ -56,24 +56,21 @@ class LogRecordModelTest {
     @Test
     void shouldHandleInfoLevel() {
         var result = "Operation completed";
-        assertDoesNotThrow(() -> log.info(infoModel.format(result, "success")));
+        assertDoesNotThrow(() -> LOGGER.info(infoModel.format(result, "success")));
     }
 
     @Test
     void shouldHandleErrorLevel() {
         var errorMessage = "Database connection failed";
-        try {
-            throw new RuntimeException(errorMessage);
-        } catch (Exception e) {
-            log.error(errorModel.format(errorMessage));
-            assertDoesNotThrow(() -> log.error(e, errorModel.format(errorMessage)));
-        }
+          var e = new IllegalStateException(errorMessage);
+            LOGGER.error(errorModel.format(errorMessage));
+            assertDoesNotThrow(() -> LOGGER.error(e, errorModel.format(errorMessage)));
     }
 
     @Test
     void shouldHandleWarnLevel() {
         var warningCondition = "Resource usage above 80%";
-        assertDoesNotThrow(() -> log.warn(warnModel.format(warningCondition)));
+        assertDoesNotThrow(() -> LOGGER.warn(warnModel. getTemplate(), warningCondition));
     }
 
     @Test
@@ -86,14 +83,14 @@ class LogRecordModelTest {
 
         var result = complexModel.format("first", "second", "third");
         assertEquals("COMPLEX-200: Value1: first, Value2: second, Value3: third", result);
-        log.info(result);
+        LOGGER.info(complexModel.getTemplate(),"first", "second", "third");
     }
 
     @Test
     void shouldHandleNullParameters() {
         var result = infoModel.format(null, null);
         assertEquals(PREFIX + ": null-null", result);
-        log.info(result);
+        LOGGER.info(infoModel.getTemplate(),null, null);
     }
 
     @Test
@@ -104,12 +101,9 @@ class LogRecordModelTest {
                 .template("Exception occurred: {} - Details: %s")
                 .build();
 
-        try {
-            throw new IllegalArgumentException("Invalid input");
-        } catch (Exception e) {
+            var e =  new IllegalArgumentException("Invalid input");
             var result = exceptionModel.format(e.getClass().getSimpleName(), e.getMessage());
             assertEquals("EX-600: Exception occurred: IllegalArgumentException - Details: Invalid input", result);
-            log.error(e, result);
-        }
+            LOGGER.error(e, exceptionModel.getTemplate(), e.getClass().getSimpleName(), e.getMessage());
     }
 }

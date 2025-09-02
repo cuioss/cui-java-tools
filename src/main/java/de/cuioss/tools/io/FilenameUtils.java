@@ -448,8 +448,8 @@ public class FilenameUtils {
         }
         context.size = size;
     }
-
-    @SuppressWarnings("squid:ForLoopCounterChangedCheck") // loop counter modification needed for algorithm
+    // loop counter modification needed for algorithm
+    @SuppressWarnings("squid:ForLoopCounterChangedCheck")
     private static void removeDoubleDotSlashes(NormalizationContext context) {
         var size = context.size;
         for (var i = context.prefix + 2; i < size; i++) {
@@ -709,7 +709,8 @@ public class FilenameUtils {
      * @param filename the filename to find the prefix in, null returns -1
      * @return the length of the prefix, -1 if invalid or null
      */
-    @SuppressWarnings({"squid:S3776"}) // owolff: original code
+    // owolff: original code
+    @SuppressWarnings({"squid:S3776"})
     public static int getPrefixLength(final String filename) {
         if (filename == null) {
             return NOT_FOUND;
@@ -1427,7 +1428,8 @@ public class FilenameUtils {
      *                        case-sensitive
      * @return true if the filename matches the wildcard string
      */
-    @SuppressWarnings({"squid:S3776", "squid:S135"}) // owolff: original code
+    // owolff: original code
+    @SuppressWarnings({"squid:S3776", "squid:S135"})
     public static boolean wildcardMatch(final String filename, final String wildcardMatcher, IOCase caseSensitivity) {
         if (filename == null && wildcardMatcher == null) {
             return true;

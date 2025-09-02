@@ -140,7 +140,8 @@ public final class HttpHandler {
      *
      * @return The HTTP status code family, or {@link HttpStatusFamily#UNKNOWN} if an error occurred
      */
-    @SuppressWarnings("try") // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    @SuppressWarnings("try")
     public HttpStatusFamily pingHead() {
         return pingWithMethod("HEAD", HttpRequest.BodyPublishers.noBody());
     }
@@ -150,7 +151,8 @@ public final class HttpHandler {
      *
      * @return The HTTP status code family, or {@link HttpStatusFamily#UNKNOWN} if an error occurred
      */
-    @SuppressWarnings("try") // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    @SuppressWarnings("try")
     public HttpStatusFamily pingGet() {
         return pingWithMethod("GET", HttpRequest.BodyPublishers.noBody());
     }
@@ -162,7 +164,9 @@ public final class HttpHandler {
      * @param bodyPublisher The body publisher to use for the request
      * @return The HTTP status code family, or {@link HttpStatusFamily#UNKNOWN} if an error occurred
      */
-    @SuppressWarnings("try") // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
+    @SuppressWarnings("try")
+    // cui-rewrite:disable
     private HttpStatusFamily pingWithMethod(String method, HttpRequest.BodyPublisher bodyPublisher) {
         try {
             HttpClient httpClient = createHttpClient();

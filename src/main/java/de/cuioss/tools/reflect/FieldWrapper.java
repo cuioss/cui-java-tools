@@ -78,7 +78,7 @@ public class FieldWrapper {
             return Optional.empty();
         }
         var initialAccessible = field.canAccess(source);
-        LOGGER.trace("Reading from field '{}' with accessibleFlag='{}' ", field, initialAccessible);
+        LOGGER.trace("Reading from field '%s' with accessibleFlag='%s' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
                 LOGGER.trace("Explicitly setting accessible flag");
@@ -87,7 +87,8 @@ public class FieldWrapper {
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                LOGGER.warn(e, "Reading from field '{}' with accessible='{}' and parameter ='{}' could not complete",
+                // cui-rewrite:disable
+                LOGGER.warn(e, "Reading from field '%s' with accessible='%s' and parameter ='%s' could not complete",
                         field, initialAccessible, source);
                 return Optional.empty();
             } finally {
@@ -109,7 +110,7 @@ public class FieldWrapper {
      */
     public static Optional<Object> readValue(final String fieldName, final Object object) {
         final var fieldProvider = from(object.getClass(), fieldName);
-        LOGGER.trace("FieldWrapper: {}", fieldProvider);
+        LOGGER.trace("FieldWrapper: %s", fieldProvider);
         if (fieldProvider.isPresent()) {
             var fieldWrapper = fieldProvider.get();
             return fieldWrapper.readValue(object);
@@ -128,7 +129,7 @@ public class FieldWrapper {
      */
     public void writeValue(@NonNull Object target, Object value) {
         var initialAccessible = field.canAccess(target);
-        LOGGER.trace("Writing to field '{}' with accessibleFlag='{}' ", field, initialAccessible);
+        LOGGER.trace("Writing to field '%s' with accessibleFlag='%s' ", field, initialAccessible);
         synchronized (field) {
             if (!initialAccessible) {
                 LOGGER.trace("Explicitly setting accessible flag");

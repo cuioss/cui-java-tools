@@ -760,7 +760,8 @@ public class CollectionLiterals {
      * @param <K> a K class
      * @param <V> a V class
      */
-    @SuppressWarnings("squid:S00107") // owolff: Number of parameters match to the use-case
+    // owolff: Number of parameters match to the use-case
+    @SuppressWarnings("squid:S00107")
     public static <K, V> Map<K, V> mutableMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         Map<K, V> map = new HashMap<>();
         map.put(k1, v1);
@@ -877,7 +878,8 @@ public class CollectionLiterals {
      * @param <K> a K class
      * @param <V> a V class
      */
-    @SuppressWarnings("squid:S00107") // owolff: Number of parameters match to the use-case
+    // owolff: Number of parameters match to the use-case
+    @SuppressWarnings("squid:S00107")
     public static <K, V> Map<K, V> immutableMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         Map<K, V> map = mutableMap();
         map.put(k1, v1);

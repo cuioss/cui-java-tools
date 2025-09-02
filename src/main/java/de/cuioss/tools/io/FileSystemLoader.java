@@ -125,7 +125,8 @@ public class FileSystemLoader implements FileReaderWriter {
                 newPathName = new File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
-                LOGGER.error("Retrieving the current dir failed: ", e);
+                // cui-rewrite:disable
+                LOGGER.error(e, "Retrieving the current dir failed: ");
             }
         }
 

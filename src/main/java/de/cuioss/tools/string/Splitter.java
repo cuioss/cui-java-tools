@@ -300,7 +300,7 @@ public final class Splitter {
 
         var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
         if (0 == splitted.length) {
-            LOGGER.trace("No content to be returned for input {} and configuration {}", sequence, splitterConfig);
+            LOGGER.trace("No content to be returned for input %s and configuration %s", sequence, splitterConfig);
             return Collections.emptyList();
         }
 

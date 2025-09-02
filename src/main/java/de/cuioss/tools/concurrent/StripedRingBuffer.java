@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StripedRingBuffer {
 
-    private static final CuiLogger log = new CuiLogger(StripedRingBuffer.class);
+    private static final CuiLogger LOGGER = new CuiLogger(StripedRingBuffer.class);
 
     /**
      * Number of independent ring buffer stripes.
@@ -120,7 +120,7 @@ public class StripedRingBuffer {
 
         int actualTotalCapacity = sizePerStripe * stripeCount;
         if (actualTotalCapacity != windowSize) {
-            log.debug("Striped ring buffer capacity adjusted from {} to {} (distributed across {} stripes)",
+            LOGGER.debug("Striped ring buffer capacity adjusted from %s to %s (distributed across %s stripes)",
                     windowSize, actualTotalCapacity, stripeCount);
         }
     }
