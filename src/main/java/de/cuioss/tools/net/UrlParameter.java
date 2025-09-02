@@ -162,7 +162,8 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * @return the found List of {@link UrlParameter} or empty list if the given map
      *         is null or empty. The List is always sorted by #getName()
      */
-    @SuppressWarnings("squid:S1166") // now need to throw exception
+    // now need to throw exception
+    @SuppressWarnings("squid:S1166")
     public static List<UrlParameter> getUrlParameterFromMap(final Map<String, List<String>> map,
             final ParameterFilter parameterFilter, final boolean encode) {
         if (MoreCollections.isEmpty(map)) {
@@ -179,7 +180,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
                 try {
                     extracted.add(new UrlParameter(key, value, encode));
                 } catch (final IllegalArgumentException e) {
-                    LOGGER.debug("Unable to read url parameter due to missing parameter name", e.getMessage());
+                    LOGGER.debug(e, "Unable to read url parameter due to missing parameter name");
                 }
             }
         }

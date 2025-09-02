@@ -30,7 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Oliver Wolff
  */
-@SuppressWarnings("java:S5785") // owolff THe fine-grained equals test is by design and not a bug
+// owolff The fine-grained equals test is by design and not a bug
+@SuppressWarnings("java:S5785")
 public class ObjectMethodsAsserts {
 
     private static final Integer DEFAULT_INT_VALUE = 0;
@@ -149,7 +150,7 @@ public class ObjectMethodsAsserts {
         try (var oas = new ObjectOutputStream(baos)) {
             oas.writeObject(object);
             oas.flush();
-        } catch (final Exception e) {
+        } /*~~>*/catch (final Exception e) {
             throw new AssertionError(
                     "Unable to serialize, due to " + ExceptionHelper.extractCauseMessageFromThrowable(e));
         }
@@ -167,6 +168,7 @@ public class ObjectMethodsAsserts {
         final var bais = new ByteArrayInputStream(bytes);
         try (var ois = new ObjectInputStream(bais)) {
             return ois.readObject();
+        // cui-rewrite:disable
         } catch (final Exception e) {
             throw new AssertionError(
                     "Unable to deserialize, due to " + ExceptionHelper.extractCauseMessageFromThrowable(e));

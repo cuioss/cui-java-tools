@@ -325,7 +325,8 @@ public final class MapBuilder<K, V> {
      * @return an instance of {@link de.cuioss.tools.collect.MapBuilder} initialized
      *         with the given key/value pairs.
      */
-    @SuppressWarnings("squid:S00107") // owolff: Number of parameters match to the use-case
+    // owolff: Number of parameters match to the use-case
+    @SuppressWarnings("squid:S00107")
     public static <K, V> MapBuilder<K, V> from(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
         return new MapBuilder<>(mutableMap(k1, v1, k2, v2, k3, v3, k4, v4));
     }

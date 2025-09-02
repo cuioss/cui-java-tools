@@ -135,7 +135,8 @@ public class PropertyHolder {
         try {
             return readMethod.invoke(source);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            LOGGER.error("Failed to read property '{}' from bean of type '{}'", name, source.getClass().getName(), e);
+            // cui-rewrite:disable
+            LOGGER.error(e, "Failed to read property '%s' from bean of type '%s'", name, source.getClass().getName());
             throw new IllegalStateException("Failed to read property: " + name, e);
         }
     }
@@ -171,7 +172,8 @@ public class PropertyHolder {
                 var result = writeMethod.invoke(target, value);
                 return Objects.requireNonNullElse(result, target);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LOGGER.error("Failed to write property '{}' to bean of type '{}'", name, target.getClass().getName(), e);
+                // cui-rewrite:disable
+                LOGGER.error(e, "Failed to write property '%s' to bean of type '%s'", name, target.getClass().getName());
                 throw new IllegalStateException("Failed to write property: " + name, e);
             }
         }

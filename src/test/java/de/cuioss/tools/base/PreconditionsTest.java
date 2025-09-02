@@ -255,6 +255,7 @@ class PreconditionsTest {
                 for (var future : futures) {
                     future.get(5, TimeUnit.SECONDS);
                 }
+            // cui-rewrite:disable
             } catch (Exception e) {
                 throw new AssertionError("Concurrent execution failed", e);
             } finally {
@@ -298,6 +299,7 @@ class PreconditionsTest {
                 for (var future : futures) {
                     future.get(5, TimeUnit.SECONDS);
                 }
+            // cui-rewrite:disable
             } catch (Exception e) {
                 throw new AssertionError("Concurrent execution failed", e);
             } finally {

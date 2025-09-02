@@ -1205,6 +1205,7 @@ public final class MoreStrings {
                 };
             }
             return String.valueOf(o);
+        // cui-rewrite:disable
         } catch (Exception e) {
             // Default toString() behavior - see Object.toString()
             final var objectToString = (o == null) ? "null" :

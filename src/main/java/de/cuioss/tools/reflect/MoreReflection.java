@@ -111,8 +111,9 @@ public final class MoreReflection {
      * @return an {@link Optional} {@link Field} if it can be found
      */
     @Synchronized
-    @SuppressWarnings("java:S3824") // owolff: computeIfAbsent is not an option because we add null
+    // owolff: computeIfAbsent is not an option because we add null
     // to the field
+    @SuppressWarnings("java:S3824")
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
@@ -179,7 +180,7 @@ public final class MoreReflection {
             if (0 == method.getParameterCount()) {
                 final var name = method.getName();
                 if (name.startsWith("get") || name.startsWith("is")) {
-                    LOGGER.debug("Adding found method '{}' on class '{}'", name, clazz);
+                    LOGGER.debug("Adding found method '%s' on class '%s'", name, clazz);
                     found.add(method);
                 }
             } else {
@@ -282,7 +283,8 @@ public final class MoreReflection {
             case "double" -> Double.class;
             case "float" -> Float.class;
             default -> {
-                LOGGER.warn("Unable to determine wrapper type for '{}', ", check);
+                // cui-rewrite:disable
+                LOGGER.warn("Unable to determine wrapper type for '%s', ", check);
                 yield check;
             }
         };
@@ -309,11 +311,11 @@ public final class MoreReflection {
             if (1 == method.getParameterCount()) {
                 final var name = method.getName();
                 if (propertyName.equals(name)) {
-                    LOGGER.debug("Returning found method '{}' on class '{}'", name, clazz);
+                    LOGGER.debug("Returning found method '%s' on class '%s'", name, clazz);
                     builder.add(method);
                 }
                 if (name.startsWith("set") && computePropertyNameFromMethodName(name).equalsIgnoreCase(propertyName)) {
-                    LOGGER.debug("Returning found method '{}' on class '{}'", name, clazz);
+                    LOGGER.debug("Returning found method '%s' on class '%s'", name, clazz);
                     builder.add(method);
                 }
             } else {
@@ -358,13 +360,13 @@ public final class MoreReflection {
             if (methodName.length() > 3) {
                 return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
             }
-            LOGGER.debug("Name to short for extracting attributeName '{}'", methodName);
+            LOGGER.debug("Name to short for extracting attributeName '%s'", methodName);
         }
         if (methodName.startsWith("is")) {
             if (methodName.length() > 2) {
                 return methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
             }
-            LOGGER.debug("Name to short for extracting attributeName '{}'", methodName);
+            LOGGER.debug("Name to short for extracting attributeName '%s'", methodName);
         }
         return methodName;
     }
@@ -423,7 +425,8 @@ public final class MoreReflection {
      * @throws IllegalArgumentException in case the given type does not represent a
      *                                  generic.
      */
-    @SuppressWarnings("unchecked") // owolff: The unchecked casting is necessary
+    // owolff: The unchecked casting is necessary
+    @SuppressWarnings("unchecked")
     public static <T> Class<T> extractFirstGenericTypeArgument(final Class<?> typeToBeExtractedFrom) {
         final var parameterizedType = extractParameterizedType(typeToBeExtractedFrom)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -457,15 +460,16 @@ public final class MoreReflection {
                 yield Optional.empty();
             }
             case Class<?> class1 -> {
-                LOGGER.debug("Found actual class returning as result {}", type);
+                LOGGER.debug("Found actual class returning as result %s", type);
                 yield Optional.of(class1);
             }
             case ParameterizedType parameterizedType -> {
-                LOGGER.debug("found Parameterized type, for {}, calling recursively", type);
+                LOGGER.debug("found Parameterized type, for %s, calling recursively", type);
                 yield extractGenericTypeCovariantly(parameterizedType.getRawType());
             }
             default -> {
-                LOGGER.warn("Unable to determines generic-type for {}", type);
+                // cui-rewrite:disable
+                LOGGER.warn("Unable to determines generic-type for %s", type);
                 yield Optional.empty();
             }
         };
@@ -479,7 +483,7 @@ public final class MoreReflection {
      * given class.
      */
     public static Optional<ParameterizedType> extractParameterizedType(final Class<?> typeToBeExtractedFrom) {
-        LOGGER.debug("Extracting ParameterizedType from {}", typeToBeExtractedFrom);
+        LOGGER.debug("Extracting ParameterizedType from %s", typeToBeExtractedFrom);
         if (null == typeToBeExtractedFrom) {
             return Optional.empty();
         }
