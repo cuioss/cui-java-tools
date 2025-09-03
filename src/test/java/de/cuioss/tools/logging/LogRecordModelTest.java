@@ -70,7 +70,7 @@ class LogRecordModelTest {
     @Test
     void shouldHandleWarnLevel() {
         var warningCondition = "Resource usage above 80%";
-        assertDoesNotThrow(() -> LOGGER.warn(warnModel. getTemplate(), warningCondition));
+        assertDoesNotThrow(() -> LOGGER.warn(warnModel.format(warningCondition)));
     }
 
     @Test
@@ -83,14 +83,14 @@ class LogRecordModelTest {
 
         var result = complexModel.format("first", "second", "third");
         assertEquals("COMPLEX-200: Value1: first, Value2: second, Value3: third", result);
-        LOGGER.info(complexModel.getTemplate(),"first", "second", "third");
+        LOGGER.info(complexModel.format("first", "second", "third"));
     }
 
     @Test
     void shouldHandleNullParameters() {
         var result = infoModel.format(null, null);
         assertEquals(PREFIX + ": null-null", result);
-        LOGGER.info(infoModel.getTemplate(),null, null);
+        LOGGER.info(infoModel.format(null, null));
     }
 
     @Test
@@ -104,6 +104,6 @@ class LogRecordModelTest {
             var e =  new IllegalArgumentException("Invalid input");
             var result = exceptionModel.format(e.getClass().getSimpleName(), e.getMessage());
             assertEquals("EX-600: Exception occurred: IllegalArgumentException - Details: Invalid input", result);
-            LOGGER.error(e, exceptionModel.getTemplate(), e.getClass().getSimpleName(), e.getMessage());
+            LOGGER.error(e, exceptionModel.format(e.getClass().getSimpleName(), e.getMessage()));
     }
 }

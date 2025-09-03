@@ -213,7 +213,7 @@ public class SecureSSLContextProvider {
                 }
 
                 // If not secure, create a new secure context
-                // cui-rewrite:disable
+                // cui-rewrite:disable CuiLoggerStandardsRecipe
                 LOGGER.warn(WARN_INSECURE_SSL_PROTOCOL, protocol);
                 SSLContext secureContext = createSecureSSLContext();
                 LOGGER.debug(DEBUG_CREATED_SECURE_CONTEXT, minimumTlsVersion);

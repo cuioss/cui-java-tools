@@ -141,7 +141,7 @@ public class ClassPathLoader implements FileLoader {
                 return url;
             }
         }
-        // cui-rewrite:disable
+        // cui-rewrite:disable CuiLogRecordPatternRecipe
         LOGGER.info("Unable to resolve '%s' from classpath", path);
         return null;
     }
