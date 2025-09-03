@@ -153,7 +153,7 @@ public final class MorePaths {
         if (checkForDirectory) {
             if (!pathFile.isDirectory()) {
                 if (verbose) {
-                    // cui-rewrite:disable CuiLogRecordPatternRecipe CuiLoggerStandardsRecipe
+                    // cui-rewrite:disable CuiLogRecordPatternRecipe
                     LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
                 }
                 return false;

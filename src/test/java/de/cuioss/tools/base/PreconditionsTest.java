@@ -171,6 +171,7 @@ class PreconditionsTest {
 
             var message = ex.getMessage();
             assertNotNull(message);
+            // cui-rewrite:disable CuiLoggerStandardsRecipe
             LOGGER.debug("Actual message: {}", message);
             // The message should start with the format string prefix
             assertTrue(message.startsWith("Complex format: "), "Message should start with 'Complex format: ' but was: " + message);
@@ -200,6 +201,7 @@ class PreconditionsTest {
 
             // Extra arguments are appended in square brackets
             var message = ex.getMessage();
+            // cui-rewrite:disable CuiLoggerStandardsRecipe
             LOGGER.debug("Actual message: {}", message);
             assertTrue(message.startsWith("one two"), "Message should start with 'one two' but was: " + message);
             assertTrue(message.contains("[three]"), "Message should contain [three] but was: " + message);
@@ -217,6 +219,7 @@ class PreconditionsTest {
 
             // The nested template is evaluated before being passed to lenientFormat
             var message = ex.getMessage();
+            // cui-rewrite:disable CuiLoggerStandardsRecipe
             LOGGER.debug("Actual message: {}", message);
             assertEquals("Outer{Inner{value}}", message);
         }

@@ -172,7 +172,7 @@ public class PropertyHolder {
                 var result = writeMethod.invoke(target, value);
                 return Objects.requireNonNullElse(result, target);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.error(e, "Failed to write property '%s' to bean of type '%s'", name, target.getClass().getName());
                 throw new IllegalStateException("Failed to write property: " + name, e);
             }
