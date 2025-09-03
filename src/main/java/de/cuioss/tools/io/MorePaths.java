@@ -374,7 +374,7 @@ public final class MorePaths {
 
                 }
             }
-        } catch (final Exception e) {
+        } catch (final SecurityException | UnsupportedOperationException e) {
             LOGGER.trace(e, "Unable to check Path %s whether it is a directory", absolutePath);
         }
 
@@ -384,7 +384,7 @@ public final class MorePaths {
             } else {
                 recursiveSucceful = false;
             }
-        } catch (final Exception e) {
+        } catch (final IOException | SecurityException e) {
             LOGGER.trace(e, "Unable to delete Path %s", absolutePath);
             return false;
         }

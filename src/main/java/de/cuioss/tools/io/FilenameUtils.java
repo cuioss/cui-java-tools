@@ -448,6 +448,7 @@ public class FilenameUtils {
         }
         context.size = size;
     }
+
     // loop counter modification needed for algorithm
     @SuppressWarnings("squid:ForLoopCounterChangedCheck")
     private static void removeDoubleDotSlashes(NormalizationContext context) {

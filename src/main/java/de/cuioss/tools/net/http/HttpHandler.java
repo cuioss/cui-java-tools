@@ -165,8 +165,8 @@ public final class HttpHandler {
      * @return The HTTP status code family, or {@link HttpStatusFamily#UNKNOWN} if an error occurred
      */
     // HttpClient implements AutoCloseable in Java 17 but doesn't need to be closed
-    @SuppressWarnings("try")
     // cui-rewrite:disable
+    @SuppressWarnings("try")
     private HttpStatusFamily pingWithMethod(String method, HttpRequest.BodyPublisher bodyPublisher) {
         try {
             HttpClient httpClient = createHttpClient();

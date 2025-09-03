@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.base;
 
+import de.cuioss.tools.logging.CuiLogger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,9 +24,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.base.Preconditions.checkState;
@@ -34,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Preconditions should")
 class PreconditionsTest {
 
+    private static final CuiLogger LOGGER = new CuiLogger(PreconditionsTest.class);
     private static final String MESSAGE = "message";
     private static final String MESSAGE_TEMPLATE = "message %s";
     private static final String MESSAGE_PARAMETER = "parameter";
@@ -167,7 +171,7 @@ class PreconditionsTest {
 
             var message = ex.getMessage();
             assertNotNull(message);
-            System.out.println("Actual message: " + message);
+            LOGGER.debug("Actual message: {}", message);
             // The message should start with the format string prefix
             assertTrue(message.startsWith("Complex format: "), "Message should start with 'Complex format: ' but was: " + message);
             // The complex object's toString() is inserted verbatim
@@ -196,7 +200,7 @@ class PreconditionsTest {
 
             // Extra arguments are appended in square brackets
             var message = ex.getMessage();
-            System.out.println("Actual message: " + message);
+            LOGGER.debug("Actual message: {}", message);
             assertTrue(message.startsWith("one two"), "Message should start with 'one two' but was: " + message);
             assertTrue(message.contains("[three]"), "Message should contain [three] but was: " + message);
         }
@@ -213,7 +217,7 @@ class PreconditionsTest {
 
             // The nested template is evaluated before being passed to lenientFormat
             var message = ex.getMessage();
-            System.out.println("Actual message: " + message);
+            LOGGER.debug("Actual message: {}", message);
             assertEquals("Outer{Inner{value}}", message);
         }
     }
@@ -255,8 +259,7 @@ class PreconditionsTest {
                 for (var future : futures) {
                     future.get(5, TimeUnit.SECONDS);
                 }
-            // cui-rewrite:disable
-            } catch (Exception e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new AssertionError("Concurrent execution failed", e);
             } finally {
                 executor.shutdownNow();
@@ -299,8 +302,7 @@ class PreconditionsTest {
                 for (var future : futures) {
                     future.get(5, TimeUnit.SECONDS);
                 }
-            // cui-rewrite:disable
-            } catch (Exception e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new AssertionError("Concurrent execution failed", e);
             } finally {
                 executor.shutdownNow();

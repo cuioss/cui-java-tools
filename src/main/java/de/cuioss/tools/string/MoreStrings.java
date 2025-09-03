@@ -1205,8 +1205,8 @@ public final class MoreStrings {
                 };
             }
             return String.valueOf(o);
-        // cui-rewrite:disable
-        } catch (Exception e) {
+        // cui-rewrite:disable InvalidExceptionUsageRecipe
+        } catch (RuntimeException e) {
             // Default toString() behavior - see Object.toString()
             final var objectToString = (o == null) ? "null" :
                     o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
