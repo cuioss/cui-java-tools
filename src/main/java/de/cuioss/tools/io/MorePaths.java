@@ -66,7 +66,7 @@ public final class MorePaths {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            // cui-rewrite:disable CuiLoggerStandardsRecipe
+            // cui-rewrite:disable CuiLogRecordPatternRecipe
             LOGGER.warn(
                     e, "Unable to resolve real path for '%s', due to '%s'. Returning absolutePath.", path, e.getMessage());
             return path.toAbsolutePath();
@@ -119,7 +119,7 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.canWrite()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Writable");
             }
             return false;
@@ -145,7 +145,7 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
@@ -153,21 +153,21 @@ public final class MorePaths {
         if (checkForDirectory) {
             if (!pathFile.isDirectory()) {
                 if (verbose) {
-                    // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                    // cui-rewrite:disable CuiLogRecordPatternRecipe CuiLoggerStandardsRecipe
                     LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
                 }
                 return false;
             }
         } else if (!pathFile.isFile()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canRead()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Readable");
             }
             return false;
@@ -190,21 +190,21 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
         }
         if (!pathFile.isFile()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canExecute()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Executable");
             }
             return false;
@@ -522,7 +522,7 @@ public final class MorePaths {
             try {
                 return Files.isSameFile(path, path2);
             } catch (final IOException e) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                LOGGER.error(e, "Unable to compare path_a=%s and path_b=%s", path, path2);
             }
         } else {

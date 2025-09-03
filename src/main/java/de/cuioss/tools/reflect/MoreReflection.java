@@ -283,7 +283,7 @@ public final class MoreReflection {
             case "double" -> Double.class;
             case "float" -> Float.class;
             default -> {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn("Unable to determine wrapper type for '%s', ", check);
                 yield check;
             }
@@ -468,7 +468,7 @@ public final class MoreReflection {
                 yield extractGenericTypeCovariantly(parameterizedType.getRawType());
             }
             default -> {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn("Unable to determines generic-type for %s", type);
                 yield Optional.empty();
             }

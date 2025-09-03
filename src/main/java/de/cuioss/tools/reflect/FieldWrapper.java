@@ -87,7 +87,7 @@ public class FieldWrapper {
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                // cui-rewrite:disable CuiLoggerStandardsRecipe
+                // cui-rewrite:disable CuiLogRecordPatternRecipe
                 LOGGER.warn(e, "Reading from field '%s' with accessible='%s' and parameter ='%s' could not complete",
                         field, initialAccessible, source);
                 return Optional.empty();
