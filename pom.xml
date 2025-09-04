@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
-        <version>1.1.6</version>
+        <version>1.2.0</version>
         <relativePath />
     </parent>
 
@@ -87,33 +87,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>openrewrite</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.openrewrite.maven</groupId>
-                        <artifactId>rewrite-maven-plugin</artifactId>
-                        <configuration>
-                            <activeRecipes>
-                                <recipe>de.cuioss.rewrite.format.AnnotationNewlineFormat</recipe>
-                                <recipe>de.cuioss.rewrite.logging.CuiLoggerStandardsRecipe</recipe>
-                                <recipe>de.cuioss.rewrite.logging.CuiLogRecordPatternRecipe</recipe>
-                                <recipe>de.cuioss.rewrite.logging.InvalidExceptionUsageRecipe</recipe>
-                            </activeRecipes>
-                        </configuration>
-                        <dependencies>
-                            <dependency>
-                                <groupId>de.cuioss.rewrite</groupId>
-                                <artifactId>cui-open-rewrite</artifactId>
-                                <version>1.1.0-SNAPSHOT</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

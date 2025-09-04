@@ -62,9 +62,9 @@ class LogRecordModelTest {
     @Test
     void shouldHandleErrorLevel() {
         var errorMessage = "Database connection failed";
-          var e = new IllegalStateException(errorMessage);
-            LOGGER.error(errorModel.format(errorMessage));
-            assertDoesNotThrow(() -> LOGGER.error(e, errorModel.format(errorMessage)));
+        var e = new IllegalStateException(errorMessage);
+        LOGGER.error(errorModel.format(errorMessage));
+        assertDoesNotThrow(() -> LOGGER.error(e, errorModel.format(errorMessage)));
     }
 
     @Test
@@ -101,9 +101,9 @@ class LogRecordModelTest {
                 .template("Exception occurred: {} - Details: %s")
                 .build();
 
-            var e =  new IllegalArgumentException("Invalid input");
-            var result = exceptionModel.format(e.getClass().getSimpleName(), e.getMessage());
-            assertEquals("EX-600: Exception occurred: IllegalArgumentException - Details: Invalid input", result);
-            LOGGER.error(e, exceptionModel.format(e.getClass().getSimpleName(), e.getMessage()));
+        var e = new IllegalArgumentException("Invalid input");
+        var result = exceptionModel.format(e.getClass().getSimpleName(), e.getMessage());
+        assertEquals("EX-600: Exception occurred: IllegalArgumentException - Details: Invalid input", result);
+        LOGGER.error(e, exceptionModel.format(e.getClass().getSimpleName(), e.getMessage()));
     }
 }

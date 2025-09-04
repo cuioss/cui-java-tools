@@ -58,7 +58,7 @@ public class FieldWrapper {
      */
     public FieldWrapper(@NonNull Field field) {
         this.field = field;
-        declaringClass = (field).getDeclaringClass();
+        declaringClass = field.getDeclaringClass();
     }
 
     /**

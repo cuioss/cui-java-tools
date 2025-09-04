@@ -1188,6 +1188,7 @@ public final class MoreStrings {
     /**
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Strings.java">Google Guava</a>
      */
+    // cui-rewrite:disable InvalidExceptionUsageRecipe
     static String lenientToString(Object o) {
         try {
             if (o != null && o.getClass().isArray()) {
@@ -1205,10 +1206,9 @@ public final class MoreStrings {
                 };
             }
             return String.valueOf(o);
-        // cui-rewrite:disable InvalidExceptionUsageRecipe
         } catch (RuntimeException e) {
             // Default toString() behavior - see Object.toString()
-            final var objectToString = (o == null) ? "null" :
+            final var objectToString = o == null ? "null" :
                     o.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(o));
             LOGGER.log(Level.WARNING, e, () -> "Exception during lenientFormat for " + objectToString);
             return "<" + objectToString + " threw " + e.getClass().getName() + ">";
