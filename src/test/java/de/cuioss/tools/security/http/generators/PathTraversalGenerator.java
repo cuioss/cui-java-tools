@@ -15,8 +15,8 @@
  */
 package de.cuioss.tools.security.http.generators;
 
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for path traversal attack patterns.
@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * This generator creates various path traversal patterns including:
  * - Basic traversal sequences (../, ..\\)
  * - Encoded variants (%2e%2e%2f, %252e%252e%252f)
- * - Unicode variants (\u002e\u002e\u002f)
+ * - Unicode variants (\\u002e\\u002e\\u002f)
  * - Mixed encoding attempts
  * - Null byte injection variants
  * 
@@ -32,9 +32,9 @@ import java.util.concurrent.ThreadLocalRandom;
  * 
  * @author Claude Code Generator
  */
-public class PathTraversalGenerator {
+public class PathTraversalGenerator implements TypedGenerator<String> {
 
-    private static final List<String> BASIC_PATTERNS = List.of(
+    private final TypedGenerator<String> basicPatterns = Generators.fixedValues(
             "../",
             "..\\",
             "../../",
@@ -51,7 +51,7 @@ public class PathTraversalGenerator {
             "..\\..\\..\\..\\..\\..\\..\\windows\\win.ini"
     );
 
-    private static final List<String> ENCODED_PATTERNS = List.of(
+    private final TypedGenerator<String> encodedPatterns = Generators.fixedValues(
             "%2e%2e%2f",
             "%2e%2e%5c",
             "%2e%2e%2f%2e%2e%2f",
@@ -67,7 +67,7 @@ public class PathTraversalGenerator {
             "%2e%2e%5cwindows%5cwin.ini"
     );
 
-    private static final List<String> UNICODE_PATTERNS = List.of(
+    private final TypedGenerator<String> unicodePatterns = Generators.fixedValues(
             "\\u002e\\u002e\\u002f",
             "\\u002e\\u002e\\u005c",
             "\u002e\u002e\u002f",
@@ -76,7 +76,7 @@ public class PathTraversalGenerator {
             "\\u002e\\u002e\\u005c\\u002e\\u002e\\u005c"
     );
 
-    private static final List<String> MIXED_ENCODING_PATTERNS = List.of(
+    private final TypedGenerator<String> mixedEncodingPatterns = Generators.fixedValues(
             "../%2e%2e%2f",
             "..\\%2e%2e%5c",
             "%2e%2e%2f../",
@@ -87,7 +87,7 @@ public class PathTraversalGenerator {
             "%c1%8s%c1%8s%c1%81"
     );
 
-    private static final List<String> NULL_BYTE_PATTERNS = List.of(
+    private final TypedGenerator<String> nullBytePatterns = Generators.fixedValues(
             "../%00",
             "..\\%00",
             "../../etc/passwd%00.jpg",
@@ -98,11 +98,11 @@ public class PathTraversalGenerator {
             "%2e%2e%5c%00"
     );
 
-    private static final List<String> ADVANCED_PATTERNS = List.of(
+    private final TypedGenerator<String> advancedPatterns = Generators.fixedValues(
             "....//....//",
             "....\\\\....\\\\",
-            "..;/..;/",
-            "..;//..;//",
+            "..//..//",
+            "..\\\\..\\\\",
             "/var/www/../../../etc/passwd",
             "C:\\inetpub\\wwwroot\\..\\..\\Windows\\win.ini",
             "....//....//....//",
@@ -113,63 +113,61 @@ public class PathTraversalGenerator {
             "\\\\%2e%2e\\\\%2e%2e\\\\%2e%2e\\\\"
     );
 
-    private final List<List<String>> allPatternGroups;
+    private final TypedGenerator<TypedGenerator<String>> patternGroupSelector = Generators.fixedValues(
+            basicPatterns,
+            encodedPatterns,
+            unicodePatterns,
+            mixedEncodingPatterns,
+            nullBytePatterns,
+            advancedPatterns
+    );
 
-    public PathTraversalGenerator() {
-        this.allPatternGroups = List.of(
-                BASIC_PATTERNS,
-                ENCODED_PATTERNS,
-                UNICODE_PATTERNS,
-                MIXED_ENCODING_PATTERNS,
-                NULL_BYTE_PATTERNS,
-                ADVANCED_PATTERNS
-        );
-    }
+    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
 
+    private final TypedGenerator<String> prefixSelector = Generators.fixedValues(
+            "/api/users/",
+            "/admin/",
+            "/files/",
+            "/uploads/",
+            "/documents/",
+            "/images/",
+            ""
+    );
+
+    private final TypedGenerator<String> suffixSelector = Generators.fixedValues(
+            "/sensitive.txt",
+            "/config.xml",
+            "/database.properties",
+            "/secret.key",
+            ".conf",
+            ".ini",
+            ""
+    );
+
+    @Override
     public String next() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
+        // Select a random pattern group generator
+        TypedGenerator<String> selectedPatternGenerator = patternGroupSelector.next();
 
-        // Select a random pattern group
-        List<String> selectedGroup = allPatternGroups.get(random.nextInt(allPatternGroups.size()));
-
-        // Select a random pattern from the group
-        String basePattern = selectedGroup.get(random.nextInt(selectedGroup.size()));
+        // Get a pattern from the selected group
+        String basePattern = selectedPatternGenerator.next();
 
         // Occasionally add random prefixes/suffixes to make patterns more realistic
-        if (random.nextBoolean()) {
-            return addRandomContext(basePattern, random);
+        if (contextSelector.next()) {
+            return addRandomContext(basePattern);
         }
 
         return basePattern;
     }
 
-    private String addRandomContext(String basePattern, ThreadLocalRandom random) {
-        String[] prefixes = {
-                "/api/users/",
-                "/admin/",
-                "/files/",
-                "/uploads/",
-                "/documents/",
-                "/images/",
-                ""
-        };
-
-        String[] suffixes = {
-                "/sensitive.txt",
-                "/config.xml",
-                "/database.properties",
-                "/secret.key",
-                ".conf",
-                ".ini",
-                ""
-        };
-
-        String prefix = prefixes[random.nextInt(prefixes.length)];
-        String suffix = suffixes[random.nextInt(suffixes.length)];
+    private String addRandomContext(String basePattern) {
+        String prefix = prefixSelector.next();
+        String suffix = suffixSelector.next();
 
         return prefix + basePattern + suffix;
     }
 
+    @Override
     public Class<String> getType() {
         return String.class;
     }
