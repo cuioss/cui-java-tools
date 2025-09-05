@@ -15,6 +15,7 @@
  */
 module de.cuioss.java.tools {
     requires static lombok;
+    requires static org.jspecify;
     requires transitive java.desktop;
     requires transitive java.logging;
     requires java.net.http;
@@ -35,5 +36,6 @@ module de.cuioss.java.tools {
     exports de.cuioss.tools.net.ssl;
     exports de.cuioss.tools.property;
     exports de.cuioss.tools.reflect;
+    exports de.cuioss.tools.security.http;
     exports de.cuioss.tools.string;
 }

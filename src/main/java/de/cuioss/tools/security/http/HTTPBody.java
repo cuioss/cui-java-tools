@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.security.http;
 
+import org.jspecify.annotations.Nullable;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -94,7 +96,7 @@ import java.util.Objects;
  * @since 2.5
  * @see ValidationType#BODY
  */
-public record HTTPBody(String content, String contentType, String encoding) {
+public record HTTPBody(@Nullable String content, @Nullable String contentType, @Nullable String encoding) {
     
     /**
      * Creates an HTTPBody with validation of basic constraints.
@@ -269,7 +271,7 @@ public record HTTPBody(String content, String contentType, String encoding) {
      * 
      * @return The charset name or null if not specified
      */
-    public String getCharset() {
+    public @Nullable String getCharset() {
         if (!hasContentType()) {
             return null;
         }

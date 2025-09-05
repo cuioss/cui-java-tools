@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.security.http;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +81,7 @@ import java.util.stream.Collectors;
  * @see ValidationType#COOKIE_NAME
  * @see ValidationType#COOKIE_VALUE
  */
-public record Cookie(String name, String value, String attributes) {
+public record Cookie(String name, @Nullable String value, @Nullable String attributes) {
     
     /**
      * Creates a Cookie with validation of basic constraints.
@@ -154,7 +156,7 @@ public record Cookie(String name, String value, String attributes) {
      * 
      * @return The domain value or null if not specified
      */
-    public String getDomain() {
+    public @Nullable String getDomain() {
         return extractAttributeValue("domain");
     }
     
@@ -163,7 +165,7 @@ public record Cookie(String name, String value, String attributes) {
      * 
      * @return The path value or null if not specified
      */
-    public String getPath() {
+    public @Nullable String getPath() {
         return extractAttributeValue("path");
     }
     
@@ -172,7 +174,7 @@ public record Cookie(String name, String value, String attributes) {
      * 
      * @return The SameSite value (e.g., "Strict", "Lax", "None") or null if not specified
      */
-    public String getSameSite() {
+    public @Nullable String getSameSite() {
         return extractAttributeValue("samesite");
     }
     
@@ -181,7 +183,7 @@ public record Cookie(String name, String value, String attributes) {
      * 
      * @return The Max-Age value as a string or null if not specified
      */
-    public String getMaxAge() {
+    public @Nullable String getMaxAge() {
         return extractAttributeValue("max-age");
     }
     
@@ -191,7 +193,7 @@ public record Cookie(String name, String value, String attributes) {
      * @param attributeName The name of the attribute (case-insensitive)
      * @return The attribute value or null if not found
      */
-    private String extractAttributeValue(String attributeName) {
+    private @Nullable String extractAttributeValue(String attributeName) {
         if (!hasAttributes()) {
             return null;
         }

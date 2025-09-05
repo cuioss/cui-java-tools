@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.security.http;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 
 /**
@@ -67,7 +69,7 @@ import java.util.Objects;
  * @see ValidationType#PARAMETER_NAME
  * @see ValidationType#PARAMETER_VALUE
  */
-public record URLParameter(String name, String value) {
+public record URLParameter(String name, @Nullable String value) {
     
     /**
      * Creates a URLParameter with validation of basic constraints.

@@ -16,6 +16,7 @@
 package de.cuioss.tools.security.http;
 
 import de.cuioss.tools.base.Preconditions;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -84,9 +85,9 @@ public class UrlSecurityException extends RuntimeException {
     private UrlSecurityException(UrlSecurityFailureType failureType,
                                  ValidationType validationType,
                                  String originalInput,
-                                 String sanitizedInput,
-                                 String detail,
-                                 Throwable cause) {
+                                 @Nullable String sanitizedInput,
+                                 @Nullable String detail,
+                                 @Nullable Throwable cause) {
         super(buildMessage(failureType, validationType, originalInput, detail), cause);
         this.failureType = Objects.requireNonNull(failureType, "failureType must not be null");
         this.validationType = Objects.requireNonNull(validationType, "validationType must not be null");
@@ -136,7 +137,7 @@ public class UrlSecurityException extends RuntimeException {
      * 
      * @return The sanitized input, or null if not provided
      */
-    public String getSanitizedInput() {
+    public @Nullable String getSanitizedInput() {
         return sanitizedInput;
     }
     
@@ -145,7 +146,7 @@ public class UrlSecurityException extends RuntimeException {
      * 
      * @return Additional detail, or null if not provided
      */
-    public String getDetail() {
+    public @Nullable String getDetail() {
         return detail;
     }
     
@@ -161,7 +162,7 @@ public class UrlSecurityException extends RuntimeException {
     private static String buildMessage(UrlSecurityFailureType failureType,
                                        ValidationType validationType,
                                        String originalInput,
-                                       String detail) {
+                                       @Nullable String detail) {
         StringBuilder sb = new StringBuilder();
         sb.append("Security validation failed [").append(validationType).append("]: ");
         sb.append(failureType.getDescription());
@@ -289,7 +290,7 @@ public class UrlSecurityException extends RuntimeException {
          * @param sanitizedInput The sanitized version of the input, may be null
          * @return This builder instance for method chaining
          */
-        public Builder sanitizedInput(String sanitizedInput) {
+        public Builder sanitizedInput(@Nullable String sanitizedInput) {
             this.sanitizedInput = sanitizedInput;
             return this;
         }
@@ -300,7 +301,7 @@ public class UrlSecurityException extends RuntimeException {
          * @param detail Additional detail information, may be null
          * @return This builder instance for method chaining
          */
-        public Builder detail(String detail) {
+        public Builder detail(@Nullable String detail) {
             this.detail = detail;
             return this;
         }
@@ -311,7 +312,7 @@ public class UrlSecurityException extends RuntimeException {
          * @param cause The underlying cause, may be null
          * @return This builder instance for method chaining
          */
-        public Builder cause(Throwable cause) {
+        public Builder cause(@Nullable Throwable cause) {
             this.cause = cause;
             return this;
         }

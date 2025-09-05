@@ -15,6 +15,8 @@
  */
 package de.cuioss.tools.security.http;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Core functional interface for HTTP security validation.
  * 
@@ -96,7 +98,7 @@ public interface HttpSecurityValidator {
      * @throws IllegalArgumentException If the input is malformed in a way that prevents
      *         security analysis (distinct from security violations).
      */
-    String validate(String value) throws UrlSecurityException;
+    String validate(@Nullable String value) throws UrlSecurityException;
     
     /**
      * Creates a composite validator that applies this validator followed by the given validator.
