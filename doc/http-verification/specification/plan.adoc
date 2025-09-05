@@ -264,7 +264,7 @@ Implement → Test → Verify → Document Progress → Commit
 |P3
 |Implement HTTPHeaderValidationPipeline
 |Medium
-|[ ]
+|[x]
 
 |P4
 |Implement HTTPBodyValidationPipeline
