@@ -91,37 +91,37 @@ Implement → Test → Verify → Document Progress → Commit
 |G2
 |Implement EncodingCombinationGenerator - see link:testing.adoc#_g2_encodingcombinationgenerator[Test Harness §G2]
 |High
-|[ ]
+|[x]
 
 |G3
 |Implement UnicodeAttackGenerator - see link:testing.adoc#_g3_unicodeattackgenerator[Test Harness §G3]
 |High
-|[ ]
+|[x]
 
 |G4
 |Implement BoundaryFuzzingGenerator - see link:testing.adoc#_g4_boundaryfuzzinggenerator[Test Harness §G4]
 |High
-|[ ]
+|[x]
 
 |G5
 |Implement ValidURLGenerator - see link:testing.adoc#_g5_validurlgenerator[Test Harness §G5]
 |High
-|[ ]
+|[x]
 
 |G6
 |Implement InvalidURLGenerator for malformed URLs
 |High
-|[ ]
+|[x]
 
 |G7
 |Implement URLParameterGenerator for URLParameter records
 |High
-|[ ]
+|[x]
 
 |G8
 |Implement CookieGenerator for Cookie records
 |High
-|[ ]
+|[x]
 
 |G9
 |Implement HTTPBodyGenerator for HTTPBody records
