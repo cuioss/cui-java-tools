@@ -126,7 +126,7 @@ Implement → Test → Verify → Document Progress → Commit
 |G9
 |Implement HTTPBodyGenerator for HTTPBody records
 |High
-|[ ]
+|[x]
 
 |G10
 |Create unit tests for all generators
@@ -159,7 +159,7 @@ Implement → Test → Verify → Document Progress → Commit
 |B3
 |Define core interfaces and data records (HttpSecurityValidator, ValidationType, URLParameter, Cookie, HTTPBody)
 |High
-|[ ]
+|[x]
 |===
 
 === Phase 3: Configuration System
@@ -171,17 +171,17 @@ Implement → Test → Verify → Document Progress → Commit
 |C1
 |Implement UrlSecurityConfig with documented defaults - see link:specification.adoc#_configuration_architecture[Architecture §Config]
 |High
-|[ ]
+|[x]
 
 |C2
 |Define secure default constants in configuration classes (OWASP/RFC based)
 |High
-|[ ]
+|[x]
 
 |C3
 |Implement pipeline-specific configurations (URLConfig, ParameterConfig, HeaderConfig, BodyConfig)
 |Medium
-|[ ]
+|[x]
 |===
 
 === Phase 4: Security Tracking and Monitoring
