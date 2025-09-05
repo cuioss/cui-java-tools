@@ -149,7 +149,7 @@ Implement → Test → Verify → Document Progress → Commit
 |B1
 |Define UrlSecurityFailureType enum - see link:specification.adoc#_core_interfaces_and_data_types[Architecture §Core]
 |High
-|[ ]
+|[x]
 
 |B2
 |Implement UrlSecurityException with builder pattern
