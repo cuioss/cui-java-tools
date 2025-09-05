@@ -193,12 +193,12 @@ Implement → Test → Verify → Document Progress → Commit
 |S1
 |Implement SecurityEventCounter - see link:specification.adoc#_event_counter_pattern[Architecture §Events]
 |High
-|[ ]
+|[x]
 
 |S2
 |Create URLSecurityLogMessages using LogRecord pattern
 |High
-|[ ]
+|[x]
 |===
 
 === Phase 5: Validation Stages
