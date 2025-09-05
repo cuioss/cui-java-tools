@@ -75,10 +75,17 @@ public record URLParameter(String name, @Nullable String value) {
      * 
      * @param name The parameter name
      * @param value The parameter value
+     * @throws IllegalArgumentException if name is empty string (null is allowed for edge cases)
      */
     public URLParameter {
-        // Record constructor - no additional validation needed for this simple case
-        // Security validation is handled by the appropriate validators
+        // Validate parameter name according to HTTP standards
+        if (name != null && name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Parameter name cannot be empty string");
+        }
+
+        // Note: We allow null name for parsing edge cases where malformed URLs 
+        // might have parameters like "=value" without a name
+        // We allow null value for flag parameters like "?debug" without a value
     }
 
     /**

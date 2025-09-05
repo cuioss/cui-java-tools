@@ -351,12 +351,64 @@ class HTTPBodyTest {
     }
 
     @Test
+    void shouldRejectInvalidContentTypes() {
+        // Invalid MIME type format should be rejected
+        IllegalArgumentException thrown1 = assertThrows(IllegalArgumentException.class,
+                () -> new HTTPBody("content", "invalid-mime-type", ""));
+        assertTrue(thrown1.getMessage().contains("Invalid MIME type format"));
+
+        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
+                () -> new HTTPBody("content", "application/", ""));
+        assertTrue(thrown2.getMessage().contains("Invalid MIME type format"));
+
+        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class,
+                () -> new HTTPBody("content", "/json", ""));
+        assertTrue(thrown3.getMessage().contains("Invalid MIME type format"));
+    }
+
+    @Test
+    void shouldRejectInvalidEncodings() {
+        // Invalid content encoding should be rejected
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> new HTTPBody("content", "text/plain", "invalid-encoding"));
+        assertTrue(thrown.getMessage().contains("Unsupported content encoding"));
+    }
+
+    @Test
+    void shouldAcceptValidContentTypes() {
+        // Valid MIME types should work
+        HTTPBody body1 = new HTTPBody("content", "text/plain", "");
+        HTTPBody body2 = new HTTPBody("content", "application/json", "");
+        HTTPBody body3 = new HTTPBody("content", "text/html; charset=utf-8", "");
+        HTTPBody body4 = new HTTPBody("content", "application/vnd.api+json", "");
+
+        assertEquals("text/plain", body1.contentType());
+        assertEquals("application/json", body2.contentType());
+        assertEquals("text/html; charset=utf-8", body3.contentType());
+        assertEquals("application/vnd.api+json", body4.contentType());
+    }
+
+    @Test
+    void shouldAcceptValidEncodings() {
+        // Valid encodings should work
+        HTTPBody body1 = new HTTPBody("content", "text/plain", "gzip");
+        HTTPBody body2 = new HTTPBody("content", "text/plain", "deflate");
+        HTTPBody body3 = new HTTPBody("content", "text/plain", "br");
+        HTTPBody body4 = new HTTPBody("content", "text/plain", "identity");
+
+        assertEquals("gzip", body1.encoding());
+        assertEquals("deflate", body2.encoding());
+        assertEquals("br", body3.encoding());
+        assertEquals("identity", body4.encoding());
+    }
+
+    @Test
     void shouldBeImmutable() {
         HTTPBody original = new HTTPBody(JSON_CONTENT, "application/json", "gzip");
 
         HTTPBody withNewContent = original.withContent("new");
-        HTTPBody withNewContentType = original.withContentType("new");
-        HTTPBody withNewEncoding = original.withEncoding("new");
+        HTTPBody withNewContentType = original.withContentType("text/plain");
+        HTTPBody withNewEncoding = original.withEncoding("deflate");
 
         // Original should be unchanged
         assertEquals(JSON_CONTENT, original.content());
@@ -365,8 +417,8 @@ class HTTPBodyTest {
 
         // New instances should have changes
         assertEquals("new", withNewContent.content());
-        assertEquals("new", withNewContentType.contentType());
-        assertEquals("new", withNewEncoding.encoding());
+        assertEquals("text/plain", withNewContentType.contentType());
+        assertEquals("deflate", withNewEncoding.encoding());
     }
 
     @Test

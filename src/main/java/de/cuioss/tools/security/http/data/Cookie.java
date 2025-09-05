@@ -85,15 +85,27 @@ import java.util.stream.Collectors;
 public record Cookie(String name, @Nullable String value, @Nullable String attributes) {
 
     /**
-     * Creates a Cookie with validation of basic constraints.
+     * Creates a Cookie with validation of basic constraints according to RFC 6265.
      * 
      * @param name The cookie name
      * @param value The cookie value
      * @param attributes The cookie attributes string
+     * @throws IllegalArgumentException if name is empty string or contains invalid characters
      */
     public Cookie {
-        // Record constructor - basic null-safety, but allow null values for edge case testing
-        // Security validation is handled by the appropriate validators
+        // Validate cookie name according to RFC 6265
+        if (name != null) {
+            if (name.trim().isEmpty()) {
+                throw new IllegalArgumentException("Cookie name cannot be empty string");
+            }
+            // Cookie names must not contain: space, tab, control characters, separators
+            if (name.matches(".*[\\s\\t\\r\\n\\f;,=\\(\\)\\<\\>@\\\\\"/\\[\\]\\?{}].*")) {
+                throw new IllegalArgumentException("Cookie name contains invalid characters: " + name);
+            }
+        }
+
+        // Note: We allow null name/value for parsing edge cases in malformed HTTP headers
+        // We allow null attributes for cookies without attributes
     }
 
     /**

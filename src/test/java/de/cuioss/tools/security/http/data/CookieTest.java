@@ -76,11 +76,31 @@ class CookieTest {
     void shouldDetectCookieWithName() {
         Cookie withName = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
         Cookie withoutName = new Cookie(null, COOKIE_VALUE, "");
-        Cookie withEmptyName = new Cookie("", COOKIE_VALUE, "");
 
         assertTrue(withName.hasName());
         assertFalse(withoutName.hasName());
-        assertFalse(withEmptyName.hasName());
+        // Note: Empty name is now rejected by constructor validation
+    }
+
+    @Test
+    void shouldRejectInvalidCookieNames() {
+        // Empty string names should be rejected
+        IllegalArgumentException thrown1 = assertThrows(IllegalArgumentException.class,
+                () -> new Cookie("", COOKIE_VALUE, ""));
+        assertTrue(thrown1.getMessage().contains("Cookie name cannot be empty string"));
+
+        // Names with invalid characters should be rejected
+        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
+                () -> new Cookie("name;invalid", COOKIE_VALUE, ""));
+        assertTrue(thrown2.getMessage().contains("Cookie name contains invalid characters"));
+
+        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class,
+                () -> new Cookie("name=invalid", COOKIE_VALUE, ""));
+        assertTrue(thrown3.getMessage().contains("Cookie name contains invalid characters"));
+
+        IllegalArgumentException thrown4 = assertThrows(IllegalArgumentException.class,
+                () -> new Cookie("name invalid", COOKIE_VALUE, ""));
+        assertTrue(thrown4.getMessage().contains("Cookie name contains invalid characters"));
     }
 
     @Test

@@ -52,11 +52,24 @@ class URLParameterTest {
     }
 
     @Test
-    void shouldCreateParameterWithEmptyStrings() {
-        URLParameter param = new URLParameter("", "");
+    void shouldRejectEmptyParameterName() {
+        // Empty string names should be rejected
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> new URLParameter("", PARAM_VALUE));
+        assertTrue(thrown.getMessage().contains("Parameter name cannot be empty string"));
 
-        assertEquals("", param.name());
-        assertEquals("", param.value());
+        // Whitespace-only names should be rejected
+        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
+                () -> new URLParameter("   ", PARAM_VALUE));
+        assertTrue(thrown2.getMessage().contains("Parameter name cannot be empty string"));
+    }
+
+    @Test
+    void shouldAllowNullParameterName() {
+        // Null names are allowed for edge cases like "=value"
+        URLParameter param = new URLParameter(null, PARAM_VALUE);
+        assertNull(param.name());
+        assertEquals(PARAM_VALUE, param.value());
     }
 
     @Test
@@ -71,11 +84,10 @@ class URLParameterTest {
     void shouldDetectParameterWithName() {
         URLParameter withName = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter withoutName = new URLParameter(null, PARAM_VALUE);
-        URLParameter withEmptyName = new URLParameter("", PARAM_VALUE);
 
         assertTrue(withName.hasName());
         assertFalse(withoutName.hasName());
-        assertFalse(withEmptyName.hasName());
+        // Note: Empty name is now rejected by constructor validation
     }
 
     @Test
@@ -94,7 +106,7 @@ class URLParameterTest {
         URLParameter normalParam = new URLParameter("name", "value");
         URLParameter flagParam1 = new URLParameter("flag", "");
         URLParameter flagParam2 = new URLParameter("flag", null);
-        URLParameter invalidFlag = new URLParameter(null, "");
+        URLParameter invalidFlag = new URLParameter(null, "value");
 
         assertFalse(normalParam.isFlag());
         assertTrue(flagParam1.isFlag());
@@ -195,21 +207,20 @@ class URLParameterTest {
     }
 
     @Test
-    void shouldHandleEmptyStringVsNull() {
-        URLParameter emptyName = new URLParameter("", "value");
+    void shouldHandleNullVsValue() {
         URLParameter nullName = new URLParameter(null, "value");
         URLParameter emptyValue = new URLParameter("name", "");
         URLParameter nullValue = new URLParameter("name", null);
 
-        assertFalse(emptyName.hasName());
         assertFalse(nullName.hasName());
         assertFalse(emptyValue.hasValue());
         assertFalse(nullValue.hasValue());
 
-        assertEquals("", emptyName.nameOrDefault("default"));
         assertEquals("default", nullName.nameOrDefault("default"));
         assertEquals("", emptyValue.valueOrDefault("default"));
         assertEquals("default", nullValue.valueOrDefault("default"));
+
+        // Note: Empty string names are now rejected by constructor validation
     }
 
     @Test

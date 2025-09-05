@@ -101,12 +101,30 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
      * Creates an HTTPBody with validation of basic constraints.
      * 
      * @param content The body content
-     * @param contentType The content type
+     * @param contentType The content type (must be valid MIME type if not null)
      * @param encoding The content encoding
+     * @throws IllegalArgumentException if contentType has invalid MIME type format
      */
     public HTTPBody {
-        // Record constructor - allow null values for edge case testing
-        // Security validation is handled by the appropriate validators
+        // Validate content type format according to RFC 2045 MIME type specification
+        if (contentType != null && !contentType.trim().isEmpty()) {
+            // Basic MIME type format: type/subtype[; parameter=value]
+            // Allow + in subtype (e.g., application/vnd.api+json)
+            if (!contentType.matches("^[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_]*\\/[a-zA-Z0-9][a-zA-Z0-9!#$&\\-\\^_.+]*(?:\\s*;.*)?$")) {
+                throw new IllegalArgumentException("Invalid MIME type format: " + contentType);
+            }
+        }
+
+        // Validate encoding if specified
+        if (encoding != null && !encoding.trim().isEmpty()) {
+            String lowerEncoding = encoding.toLowerCase().trim();
+            // Common content encodings: gzip, deflate, br, compress, identity
+            if (!lowerEncoding.matches("^(gzip|deflate|br|brotli|compress|identity|x-gzip|x-compress)$")) {
+                throw new IllegalArgumentException("Unsupported content encoding: " + encoding);
+            }
+        }
+
+        // Note: We allow null values for all fields to handle edge cases in HTTP parsing
     }
 
     /**
