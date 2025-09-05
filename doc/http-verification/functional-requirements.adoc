@@ -170,8 +170,10 @@ These requirements are derived from:
 
 * Each validation type must have its own configuration:
   ** `URL_PATH`: Strict path validation rules
-  ** `QUERY_PARAMETER`: Parameter-specific rules
-  ** `HTTP_HEADER`: Header validation rules
+  ** `PARAMETER_NAME`: Parameter name validation rules (RFC 7230 token rules)
+  ** `PARAMETER_VALUE`: Parameter value validation rules (URL decoding support)
+  ** `HEADER_NAME`: Header name validation rules (RFC 7230 token rules)
+  ** `HEADER_VALUE`: Header value validation rules (broader character set)
 * Configurations must be independently configurable
 * Must support configuration inheritance for common settings
 * Reference: link:specification/specification.adoc#_validation_type_configurations[Validation Type Configurations]

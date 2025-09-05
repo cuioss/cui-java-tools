@@ -533,32 +533,32 @@ public class URLPathConfig implements ConfigStageProvider {
 }
 
 /**
- * Configuration for URL parameter validation.
- * Implements ConfigStageProvider with URL_PARAMETER specific stages.
+ * Configuration for URL parameter name validation.
+ * Implements ConfigStageProvider with PARAMETER_NAME specific stages.
  */
 @Value
-public class URLParameterConfig implements ConfigStageProvider {
+public class URLParameterNameConfig implements ConfigStageProvider {
     
     UrlSecurityConfig baseConfig;
-    ValidationType validationType = ValidationType.URL_PARAMETER;
+    ValidationType validationType = ValidationType.PARAMETER_NAME;
     
     @Getter(lazy = true)
     LengthValidationStage lengthValidationStage = 
-        new LengthValidationStage(baseConfig, ValidationType.URL_PARAMETER);
+        new LengthValidationStage(baseConfig, ValidationType.PARAMETER_NAME);
     
     @Getter(lazy = true)
     CharacterValidationStage characterValidationStage = 
-        new CharacterValidationStage(baseConfig, ValidationType.URL_PARAMETER);
+        new CharacterValidationStage(baseConfig, ValidationType.PARAMETER_NAME);
     
     @Getter(lazy = true)
     DecodingStage decodingStage = 
-        new DecodingStage(baseConfig, ValidationType.URL_PARAMETER);
+        new DecodingStage(baseConfig, ValidationType.PARAMETER_NAME);
     
     @Getter(lazy = true)
     PatternMatchingStage patternMatchingStage = 
-        new PatternMatchingStage(baseConfig, ValidationType.URL_PARAMETER);
+        new PatternMatchingStage(baseConfig, ValidationType.PARAMETER_NAME);
     
-    public URLParameterConfig(UrlSecurityConfig baseConfig) {
+    public URLParameterNameConfig(UrlSecurityConfig baseConfig) {
         this.baseConfig = baseConfig;
     }
     
@@ -569,7 +569,7 @@ public class URLParameterConfig implements ConfigStageProvider {
     
     @Override
     public HttpSecurityValidator getNormalizationStage() {
-        return IdentityValidator.URL_PARAMETER; // Not used for parameters
+        return IdentityValidator.PARAMETER_NAME; // Not used for parameter names
     }
     
     @Override
@@ -584,28 +584,79 @@ public class URLParameterConfig implements ConfigStageProvider {
 }
 
 /**
- * Configuration for HTTP header validation.
- * Implements ConfigStageProvider with HTTP_HEADER specific stages.
+ * Configuration for URL parameter value validation.
+ * Implements ConfigStageProvider with PARAMETER_VALUE specific stages.
  */
 @Value
-public class HTTPHeaderConfig implements ConfigStageProvider {
+public class URLParameterValueConfig implements ConfigStageProvider {
     
     UrlSecurityConfig baseConfig;
-    ValidationType validationType = ValidationType.HTTP_HEADER;
+    ValidationType validationType = ValidationType.PARAMETER_VALUE;
     
     @Getter(lazy = true)
     LengthValidationStage lengthValidationStage = 
-        new LengthValidationStage(baseConfig, ValidationType.HTTP_HEADER);
+        new LengthValidationStage(baseConfig, ValidationType.PARAMETER_VALUE);
     
     @Getter(lazy = true)
     CharacterValidationStage characterValidationStage = 
-        new CharacterValidationStage(baseConfig, ValidationType.HTTP_HEADER);
+        new CharacterValidationStage(baseConfig, ValidationType.PARAMETER_VALUE);
+    
+    @Getter(lazy = true)
+    DecodingStage decodingStage = 
+        new DecodingStage(baseConfig, ValidationType.PARAMETER_VALUE);
     
     @Getter(lazy = true)
     PatternMatchingStage patternMatchingStage = 
-        new PatternMatchingStage(baseConfig, ValidationType.HTTP_HEADER);
+        new PatternMatchingStage(baseConfig, ValidationType.PARAMETER_VALUE);
     
-    public HTTPHeaderConfig(UrlSecurityConfig baseConfig) {
+    public URLParameterValueConfig(UrlSecurityConfig baseConfig) {
+        this.baseConfig = baseConfig;
+    }
+    
+    @Override
+    public ValidationType getValidationType() {
+        return validationType;
+    }
+    
+    @Override
+    public HttpSecurityValidator getNormalizationStage() {
+        return IdentityValidator.PARAMETER_VALUE; // Not used for parameter values
+    }
+    
+    @Override
+    public List<HttpSecurityValidator> getStages() {
+        return new ArrayList<>(List.of(
+            getLengthValidationStage(),
+            getCharacterValidationStage(),
+            getDecodingStage(),
+            getPatternMatchingStage()
+        ));
+    }
+}
+
+/**
+ * Configuration for HTTP header name validation.
+ * Implements ConfigStageProvider with HEADER_NAME specific stages.
+ */
+@Value
+public class HTTPHeaderNameConfig implements ConfigStageProvider {
+    
+    UrlSecurityConfig baseConfig;
+    ValidationType validationType = ValidationType.HEADER_NAME;
+    
+    @Getter(lazy = true)
+    LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(baseConfig, ValidationType.HEADER_NAME);
+    
+    @Getter(lazy = true)
+    CharacterValidationStage characterValidationStage = 
+        new CharacterValidationStage(baseConfig, ValidationType.HEADER_NAME);
+    
+    @Getter(lazy = true)
+    PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(baseConfig, ValidationType.HEADER_NAME);
+    
+    public HTTPHeaderNameConfig(UrlSecurityConfig baseConfig) {
         this.baseConfig = baseConfig;
     }
     
@@ -616,12 +667,63 @@ public class HTTPHeaderConfig implements ConfigStageProvider {
     
     @Override
     public HttpSecurityValidator getDecodingStage() {
-        return IdentityValidator.HTTP_HEADER; // Not used for headers
+        return IdentityValidator.HEADER_NAME; // Not used for header names
     }
     
     @Override
     public HttpSecurityValidator getNormalizationStage() {
-        return IdentityValidator.HTTP_HEADER; // Not used for headers
+        return IdentityValidator.HEADER_NAME; // Not used for header names
+    }
+    
+    @Override
+    public List<HttpSecurityValidator> getStages() {
+        return new ArrayList<>(List.of(
+            getLengthValidationStage(),
+            getCharacterValidationStage(),
+            getPatternMatchingStage()
+        ));
+    }
+}
+
+/**
+ * Configuration for HTTP header value validation.
+ * Implements ConfigStageProvider with HEADER_VALUE specific stages.
+ */
+@Value
+public class HTTPHeaderValueConfig implements ConfigStageProvider {
+    
+    UrlSecurityConfig baseConfig;
+    ValidationType validationType = ValidationType.HEADER_VALUE;
+    
+    @Getter(lazy = true)
+    LengthValidationStage lengthValidationStage = 
+        new LengthValidationStage(baseConfig, ValidationType.HEADER_VALUE);
+    
+    @Getter(lazy = true)
+    CharacterValidationStage characterValidationStage = 
+        new CharacterValidationStage(baseConfig, ValidationType.HEADER_VALUE);
+    
+    @Getter(lazy = true)
+    PatternMatchingStage patternMatchingStage = 
+        new PatternMatchingStage(baseConfig, ValidationType.HEADER_VALUE);
+    
+    public HTTPHeaderValueConfig(UrlSecurityConfig baseConfig) {
+        this.baseConfig = baseConfig;
+    }
+    
+    @Override
+    public ValidationType getValidationType() {
+        return validationType;
+    }
+    
+    @Override
+    public HttpSecurityValidator getDecodingStage() {
+        return IdentityValidator.HEADER_VALUE; // Not used for header values
+    }
+    
+    @Override
+    public HttpSecurityValidator getNormalizationStage() {
+        return IdentityValidator.HEADER_VALUE; // Not used for header values
     }
     
     @Override
@@ -669,10 +771,13 @@ public final class IdentityValidator implements HttpSecurityValidator {
      * Singleton instances for each validation type to avoid unnecessary object creation.
      */
     public static final IdentityValidator URL_PATH = new IdentityValidator(ValidationType.URL_PATH);
-    public static final IdentityValidator URL_PARAMETER = new IdentityValidator(ValidationType.URL_PARAMETER);
-    public static final IdentityValidator HTTP_HEADER = new IdentityValidator(ValidationType.HTTP_HEADER);
-    public static final IdentityValidator HTTP_BODY = new IdentityValidator(ValidationType.HTTP_BODY);
-    public static final IdentityValidator COOKIE = new IdentityValidator(ValidationType.COOKIE);
+    public static final IdentityValidator PARAMETER_NAME = new IdentityValidator(ValidationType.PARAMETER_NAME);
+    public static final IdentityValidator PARAMETER_VALUE = new IdentityValidator(ValidationType.PARAMETER_VALUE);
+    public static final IdentityValidator HEADER_NAME = new IdentityValidator(ValidationType.HEADER_NAME);
+    public static final IdentityValidator HEADER_VALUE = new IdentityValidator(ValidationType.HEADER_VALUE);
+    public static final IdentityValidator HTTP_BODY = new IdentityValidator(ValidationType.BODY);
+    public static final IdentityValidator COOKIE_NAME = new IdentityValidator(ValidationType.COOKIE_NAME);
+    public static final IdentityValidator COOKIE_VALUE = new IdentityValidator(ValidationType.COOKIE_VALUE);
     
     private IdentityValidator(ValidationType validationType) {
         this.validationType = validationType;
@@ -900,9 +1005,9 @@ public final class CharacterValidationConstants {
     public static BitSet getCharacterSet(@NonNull ValidationType type) {
         return switch (type) {
             case URL_PATH -> RFC3986_PATH_CHARS;
-            case URL_PARAMETER -> RFC3986_QUERY_CHARS;
-            case HTTP_HEADER -> RFC7230_HEADER_CHARS;
-            case HTTP_BODY, COOKIE -> RFC3986_UNRESERVED;
+            case PARAMETER_NAME, PARAMETER_VALUE -> RFC3986_QUERY_CHARS;
+            case HEADER_NAME, HEADER_VALUE -> RFC7230_HEADER_CHARS;
+            case BODY, COOKIE_NAME, COOKIE_VALUE -> RFC3986_UNRESERVED;
         };
     }
 }
@@ -941,8 +1046,8 @@ public final class CharacterValidationStage implements HttpSecurityValidator {
         
         // Determine if percent encoding is allowed based on type
         this.allowPercentEncoding = switch (type) {
-            case URL_PATH, URL_PARAMETER -> true;
-            default -> false;  // HTTP_HEADER and others don't allow percent encoding
+            case URL_PATH, PARAMETER_NAME, PARAMETER_VALUE -> true;
+            default -> false;  // HEADER_NAME, HEADER_VALUE and others don't allow percent encoding
         };
     }
     
@@ -1334,12 +1439,12 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
      */
     private String sanitizeForLogging(@NonNull String input, @NonNull ValidationType type) {
         return switch (type) {
-            case URL_PARAMETER -> {
+            case PARAMETER_VALUE -> {
                 // Sanitize parameter values only
                 String[] parts = input.split("=", 2);
                 yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
             }
-            case HTTP_HEADER -> {
+            case HEADER_VALUE -> {
                 // Sanitize header values (especially Authorization)
                 if (input.toLowerCase().startsWith("authorization:") ||
                     input.toLowerCase().startsWith("x-api-key:")) {
@@ -1348,12 +1453,12 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
                 }
                 yield input;
             }
-            case COOKIE -> {
+            case COOKIE_VALUE -> {
                 // Sanitize cookie values
                 String[] parts = input.split("=", 2);
                 yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
             }
-            case URL_PATH, HTTP_BODY -> input; // These are generally safe to log
+            case URL_PATH, BODY, PARAMETER_NAME, HEADER_NAME, COOKIE_NAME -> input; // These are generally safe to log
         };
     }
 }
@@ -1483,8 +1588,10 @@ UrlSecurityConfig baseConfig = UrlSecurityConfig.builder()
 
 // Create specific configurations for different validation types
 ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
-ConfigStageProvider paramConfig = new URLParameterConfig(baseConfig);
-ConfigStageProvider headerConfig = new HTTPHeaderConfig(baseConfig);
+ConfigStageProvider paramNameConfig = new URLParameterNameConfig(baseConfig);
+ConfigStageProvider paramValueConfig = new URLParameterValueConfig(baseConfig);
+ConfigStageProvider headerNameConfig = new HTTPHeaderNameConfig(baseConfig);
+ConfigStageProvider headerValueConfig = new HTTPHeaderValueConfig(baseConfig);
 
 // Create unified pipelines with different configurations
 SecurityEventCounter eventCounter = new SecurityEventCounter();
@@ -1547,10 +1654,13 @@ public class ValidationFactory {
     public HttpSecurityValidator createValidator(@NonNull ValidationType type) {
         ConfigStageProvider config = switch (type) {
             case URL_PATH -> new URLPathConfig(baseConfig);
-            case URL_PARAMETER -> new URLParameterConfig(baseConfig);
-            case HTTP_HEADER -> new HTTPHeaderConfig(baseConfig);
-            case HTTP_BODY -> new HTTPBodyConfig(baseConfig);
-            case COOKIE -> new CookieConfig(baseConfig);
+            case PARAMETER_NAME -> new URLParameterNameConfig(baseConfig);
+            case PARAMETER_VALUE -> new URLParameterValueConfig(baseConfig);
+            case HEADER_NAME -> new HTTPHeaderNameConfig(baseConfig);
+            case HEADER_VALUE -> new HTTPHeaderValueConfig(baseConfig);
+            case BODY -> new HTTPBodyConfig(baseConfig);
+            case COOKIE_NAME -> new CookieNameConfig(baseConfig);
+            case COOKIE_VALUE -> new CookieValueConfig(baseConfig);
             // No default needed - exhaustive enum coverage
         };
         

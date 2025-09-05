@@ -550,61 +550,312 @@ public class AttackPatternDatabase {
 == Test Execution Strategy
 
 === Performance Benchmarking
+[[_performance_benchmarking]]
+
+==== JMH Integration Setup
+
+Add JMH dependency to `pom.xml`:
+
+[source,xml]
+----
+<dependencies>
+    <!-- JMH for performance benchmarking -->
+    <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>1.37</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-generator-annprocess</artifactId>
+        <version>1.37</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
+<build>
+    <plugins>
+        <!-- JMH benchmark plugin -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.4.1</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <finalName>benchmarks</finalName>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>org.openjdk.jmh.Main</mainClass>
+                            </transformer>
+                        </transformers>
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
+                                </excludes>
+                            </filter>
+                        </filters>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+----
+
+==== Performance Benchmark Implementation
 
 [source,java]
 ----
 package de.cuioss.tools.security.http.attacks;
 
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Performance validation benchmarks.
+ * Performance validation benchmarks with JMH integration.
+ * Run with: mvn clean package && java -jar target/benchmarks.jar
+ * Or: mvn exec:java -Dexec.mainClass="org.openjdk.jmh.Main" -Dexec.args="PerformanceValidationBenchmark"
+ * 
  * Implements: link:plan.adoc#_phase_711_performance_validation_tests[Tasks T34-T36]
  */
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode({Mode.AverageTime, Mode.Throughput})
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
+@Warmup(iterations = 3, time = 2, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 3, timeUnit = TimeUnit.SECONDS)
+@Fork(value = 1, jvmArgs = {"-Xmx2G", "-Xms2G"})
 @State(Scope.Benchmark)
 public class PerformanceValidationBenchmark {
     
-    private HttpSecurityValidator validator;
+    private HttpSecurityValidator pathValidator;
+    private HttpSecurityValidator paramNameValidator;
+    private HttpSecurityValidator paramValueValidator;
+    private HttpSecurityValidator headerNameValidator;
+    private HttpSecurityValidator headerValueValidator;
+    
     private PathTraversalGenerator attackGen;
     private ValidURLGenerator validGen;
+    private EncodingCombinationGenerator encodingGen;
+    private UnicodeAttackGenerator unicodeGen;
     
-    @Setup
-    public void setup() {
-        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
-        ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
-        validator = new UnifiedValidationPipeline(
-            pathConfig,
-            new SecurityEventCounter()
-        );
+    @Setup(Level.Trial)
+    public void setupBenchmark() {
+        // Setup configuration
+        UrlSecurityConfig baseConfig = UrlSecurityConfig.builder()
+            .maxPathLength(2048)
+            .maxDirectoryDepth(10)
+            .build();
+        
+        SecurityEventCounter eventCounter = new SecurityEventCounter();
+        
+        // Create validators for different types
+        pathValidator = createPathValidator(baseConfig, eventCounter);
+        paramNameValidator = createParameterNameValidator(baseConfig, eventCounter);
+        paramValueValidator = createParameterValueValidator(baseConfig, eventCounter);
+        headerNameValidator = createHeaderNameValidator(baseConfig, eventCounter);
+        headerValueValidator = createHeaderValueValidator(baseConfig, eventCounter);
+        
+        // Setup generators
         attackGen = new PathTraversalGenerator();
         validGen = new ValidURLGenerator();
+        encodingGen = new EncodingCombinationGenerator();
+        unicodeGen = new UnicodeAttackGenerator();
     }
     
     @Benchmark
-    public void benchmarkNormalLoad_T34() {
+    @Group("path_validation")
+    public void benchmarkValidPaths_T34() {
         // T34: Verify <1ms for typical inputs
-        String valid = validGen.next();
+        String validPath = validGen.next();
         try {
-            validator.execute(valid);
+            pathValidator.validate(validPath);
         } catch (UrlSecurityException e) {
             // Should not happen for valid URLs
         }
     }
     
     @Benchmark
-    public void benchmarkAttackPayload_T35() {
+    @Group("attack_detection")
+    public void benchmarkPathTraversalAttacks_T35() {
         // T35: Verify <1ms even with attacks
         String attack = attackGen.next();
         try {
-            validator.execute(attack);
+            pathValidator.validate(attack);
         } catch (UrlSecurityException e) {
             // Expected for attacks
         }
     }
+    
+    @Benchmark
+    @Group("encoding_attacks")
+    public void benchmarkEncodingAttacks_T35() {
+        String encodedAttack = encodingGen.next();
+        try {
+            pathValidator.validate(encodedAttack);
+        } catch (UrlSecurityException e) {
+            // Expected for encoding attacks
+        }
+    }
+    
+    @Benchmark
+    @Group("unicode_attacks")
+    public void benchmarkUnicodeAttacks_T35() {
+        String unicodeAttack = unicodeGen.next();
+        try {
+            pathValidator.validate(unicodeAttack);
+        } catch (UrlSecurityException e) {
+            // Expected for unicode attacks
+        }
+    }
+    
+    @Benchmark
+    @Group("parameter_validation")
+    public void benchmarkParameterNames_T36() {
+        // Test parameter name validation performance
+        try {
+            paramNameValidator.validate("validParamName123");
+        } catch (UrlSecurityException e) {
+            // Should not happen for valid names
+        }
+    }
+    
+    @Benchmark
+    @Group("parameter_validation")
+    public void benchmarkParameterValues_T36() {
+        // Test parameter value validation performance
+        try {
+            paramValueValidator.validate("valid%20parameter%20value");
+        } catch (UrlSecurityException e) {
+            // Should not happen for valid values
+        }
+    }
+    
+    @Benchmark
+    @Group("header_validation")
+    public void benchmarkHeaderNames_T36() {
+        // Test header name validation performance
+        try {
+            headerNameValidator.validate("Content-Type");
+        } catch (UrlSecurityException e) {
+            // Should not happen for valid header names
+        }
+    }
+    
+    @Benchmark
+    @Group("header_validation")
+    public void benchmarkHeaderValues_T36() {
+        // Test header value validation performance
+        try {
+            headerValueValidator.validate("application/json; charset=utf-8");
+        } catch (UrlSecurityException e) {
+            // Should not happen for valid header values
+        }
+    }
+    
+    private HttpSecurityValidator createPathValidator(UrlSecurityConfig baseConfig, SecurityEventCounter eventCounter) {
+        ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
+        return new UnifiedValidationPipeline(pathConfig, eventCounter);
+    }
+    
+    private HttpSecurityValidator createParameterNameValidator(UrlSecurityConfig baseConfig, SecurityEventCounter eventCounter) {
+        ConfigStageProvider paramNameConfig = new URLParameterNameConfig(baseConfig);
+        return new UnifiedValidationPipeline(paramNameConfig, eventCounter);
+    }
+    
+    private HttpSecurityValidator createParameterValueValidator(UrlSecurityConfig baseConfig, SecurityEventCounter eventCounter) {
+        ConfigStageProvider paramValueConfig = new URLParameterValueConfig(baseConfig);
+        return new UnifiedValidationPipeline(paramValueConfig, eventCounter);
+    }
+    
+    private HttpSecurityValidator createHeaderNameValidator(UrlSecurityConfig baseConfig, SecurityEventCounter eventCounter) {
+        ConfigStageProvider headerNameConfig = new HTTPHeaderNameConfig(baseConfig);
+        return new UnifiedValidationPipeline(headerNameConfig, eventCounter);
+    }
+    
+    private HttpSecurityValidator createHeaderValueValidator(UrlSecurityConfig baseConfig, SecurityEventCounter eventCounter) {
+        ConfigStageProvider headerValueConfig = new HTTPHeaderValueConfig(baseConfig);
+        return new UnifiedValidationPipeline(headerValueConfig, eventCounter);
+    }
+    
+    /**
+     * Main method for running benchmarks standalone
+     */
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+            .include(PerformanceValidationBenchmark.class.getSimpleName())
+            .shouldDoGC(true)
+            .build();
+        
+        new Runner(opt).run();
+    }
 }
+----
+
+==== Running Performance Benchmarks
+
+===== Command Line Execution
+
+[source,bash]
+----
+# Build benchmarks
+mvn clean package
+
+# Run all benchmarks
+java -jar target/benchmarks.jar
+
+# Run specific benchmark group
+java -jar target/benchmarks.jar -rf json -rff results.json PerformanceValidationBenchmark.benchmarkValidPaths
+
+# Run with custom parameters
+java -jar target/benchmarks.jar -wi 5 -i 10 -f 2 -t 4
+----
+
+===== Maven Integration
+
+[source,bash]
+----
+# Run via Maven exec plugin
+mvn exec:java -Dexec.mainClass="org.openjdk.jmh.Main" -Dexec.args="PerformanceValidationBenchmark"
+
+# With custom JVM options
+mvn exec:java -Dexec.mainClass="org.openjdk.jmh.Main" -Dexec.args="-wi 3 -i 5 -f 1 PerformanceValidationBenchmark"
+----
+
+===== Performance Criteria
+
+* **Target**: <1ms average time for 95% of validations
+* **Throughput**: >1000 validations/second per thread
+* **Memory**: No memory leaks, stable heap usage
+* **Warmup**: 3 iterations × 2 seconds
+* **Measurement**: 5 iterations × 3 seconds
+* **Fork**: 1 JVM fork with 2GB heap
+
+===== CI/CD Integration
+
+Add to GitHub Actions or Jenkins:
+
+[source,yaml]
+----
+- name: Run Performance Benchmarks
+  run: |
+    mvn clean package
+    java -jar target/benchmarks.jar -rf json -rff benchmark-results.json
+    # Parse results and fail if performance regression detected
+    python scripts/check-performance-regression.py benchmark-results.json
+----
 ----
 
 == Test Coverage Requirements
@@ -684,7 +935,8 @@ public enum GeneratorType {
     BOUNDARY,
     VALID_URL,
     INVALID_URL,
-    URL_PARAMETER,
+    PARAMETER_NAME,
+    PARAMETER_VALUE,
     COOKIE,
     HTTP_BODY
 }
@@ -720,7 +972,8 @@ public class GeneratorsArgumentsProvider implements ArgumentsProvider {
             case BOUNDARY -> new BoundaryFuzzingGenerator();
             case VALID_URL -> new ValidURLGenerator();
             case INVALID_URL -> new InvalidURLGenerator();
-            case URL_PARAMETER -> new URLParameterGenerator();
+            case PARAMETER_NAME -> new URLParameterNameGenerator();
+            case PARAMETER_VALUE -> new URLParameterValueGenerator();
             case COOKIE -> new CookieGenerator();
             case HTTP_BODY -> new HTTPBodyGenerator();
         };
@@ -759,19 +1012,19 @@ public class ValidationTypeTest {
         );
         assertEquals(ValidationType.URL_PATH, pathException.getValidationType());
         
-        // Test URL_PARAMETER type
-        ConfigStageProvider paramConfig = new URLParameterConfig(config);
+        // Test PARAMETER_VALUE type
+        ConfigStageProvider paramConfig = new URLParameterValueConfig(config);
         HttpSecurityValidator paramValidator = new UnifiedValidationPipeline(
             paramConfig, new SecurityEventCounter());
         
         UrlSecurityException paramException = assertThrows(
             UrlSecurityException.class,
-            () -> paramValidator.execute("search=<script>alert(1)</script>")
+            () -> paramValidator.execute("<script>alert(1)</script>")
         );
-        assertEquals(ValidationType.URL_PARAMETER, paramException.getValidationType());
+        assertEquals(ValidationType.PARAMETER_VALUE, paramException.getValidationType());
         
-        // Test HTTP_HEADER type
-        ConfigStageProvider headerConfig = new HTTPHeaderConfig(config);
+        // Test HEADER_VALUE type
+        ConfigStageProvider headerConfig = new HTTPHeaderValueConfig(config);
         HttpSecurityValidator headerValidator = new UnifiedValidationPipeline(
             headerConfig, new SecurityEventCounter());
         
@@ -779,7 +1032,7 @@ public class ValidationTypeTest {
             UrlSecurityException.class,
             () -> headerValidator.execute("Bearer\\r\\nX-Injected: true")
         );
-        assertEquals(ValidationType.HTTP_HEADER, headerException.getValidationType());
+        assertEquals(ValidationType.HEADER_VALUE, headerException.getValidationType());
     }
     
     @Test
@@ -830,13 +1083,13 @@ public class ComprehensiveSecurityTest {
     
     private HttpSecurityValidator createParameterValidator() {
         UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
-        ConfigStageProvider paramConfig = new URLParameterConfig(baseConfig);
+        ConfigStageProvider paramConfig = new URLParameterValueConfig(baseConfig);
         return new UnifiedValidationPipeline(paramConfig, new SecurityEventCounter());
     }
     
     private HttpSecurityValidator createHeaderValidator() {
         UrlSecurityConfig baseConfig = UrlSecurityConfig.builder().build();
-        ConfigStageProvider headerConfig = new HTTPHeaderConfig(baseConfig);
+        ConfigStageProvider headerConfig = new HTTPHeaderValueConfig(baseConfig);
         return new UnifiedValidationPipeline(headerConfig, new SecurityEventCounter());
     }
     
@@ -886,7 +1139,7 @@ public class ComprehensiveSecurityTest {
     @TypeGeneratorSource(value = ValidURLGenerator.class, count = 200)
     void testParameterValidation(String paramValue) {
         // Test parameter-specific validation
-        // URLParameterGenerator creates both attack and valid parameters
+        // URLParameterValueGenerator creates both attack and valid parameters
         try {
             String result = paramValidator.execute(paramValue);
             // Valid parameter passed

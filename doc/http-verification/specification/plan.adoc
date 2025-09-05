@@ -16,6 +16,33 @@ For HOW to test the system, see link:testing.adoc[Testing Framework].
 
 This implementation plan outlines the step-by-step tasks required to build a comprehensive URL security validation system that prevents path traversal attacks, encoding bypasses, and other URL-based security vulnerabilities in the `de.cuioss.tools.security.http` package.
 
+[CRITICAL]
+====
+**MANDATORY TASK COMPLETION STANDARDS**
+
+**Reference**: link:../../ai-rules.md#task-completion-standards-mandatory[AI Rules: Task Completion Standards]
+
+**ALWAYS ONE TASK AT A TIME**: Follow this exact sequence for EVERY task:
+
+1. **Implement** → Write the code/feature for ONE specific task
+2. **Test** → Create and run tests to verify the implementation works
+3. **Verify** → Run quality checks: `./mvnw -Ppre-commit clean verify`
+   - Fix ALL errors and warnings (mandatory)
+   - Address code quality, formatting, and linting issues
+   - Never commit markers - fix or suppress with justification
+4. **Document Status/Progress** → Update implementation status in this plan
+5. **Commit** → Create focused commit with proper message
+
+**DO NOT:**
+
+- Work on multiple tasks simultaneously
+- Skip the verification step
+- Commit without running pre-commit checks
+- Leave quality issues unresolved
+
+**This workflow ensures high quality, prevents technical debt, and maintains project standards.**
+====
+
 == Task Organization
 
 Tasks are categorized with specific prefixes for tracking:
@@ -45,6 +72,12 @@ Tasks are categorized with specific prefixes for tracking:
 == Implementation Phases
 
 === Phase 1: Test Infrastructure and Generators
+
+[CAUTION]
+====
+**Remember**: Follow the **Task Completion Standards** workflow for EVERY task below:
+Implement → Test → Verify → Document Progress → Commit
+====
 
 [%header,cols="1,4,1,1"]
 |===
@@ -102,6 +135,12 @@ Tasks are categorized with specific prefixes for tracking:
 |===
 
 === Phase 2: Base Structure and Core Components
+
+[CAUTION]
+====
+**Remember**: Follow the **Task Completion Standards** workflow for EVERY task below:
+Implement → Test → Verify → Document Progress → Commit
+====
 
 [%header,cols="1,4,1,1"]
 |===
@@ -164,6 +203,12 @@ Tasks are categorized with specific prefixes for tracking:
 
 === Phase 5: Validation Stages
 
+[CAUTION]
+====
+**Remember**: Follow the **Task Completion Standards** workflow for EVERY task below:
+Implement → Test → Verify → Document Progress → Commit
+====
+
 [%header,cols="1,4,1,1"]
 |===
 |Task ID |Description |Priority |Status
@@ -195,6 +240,12 @@ Tasks are categorized with specific prefixes for tracking:
 |===
 
 === Phase 6: Pipeline Implementation
+
+[CAUTION]
+====
+**Remember**: Follow the **Task Completion Standards** workflow for EVERY task below:
+Implement → Test → Verify → Document Progress → Commit
+====
 
 [%header,cols="1,4,1,1"]
 |===
@@ -502,7 +553,7 @@ Tasks are categorized with specific prefixes for tracking:
 |[ ]
 
 |I3
-|Implement performance benchmarking with JMH
+|Implement performance benchmarking with JMH - see link:testing.adoc#_performance_benchmarking[Test Harness §Performance Benchmarking]
 |Medium
 |[ ]
 
@@ -556,3 +607,34 @@ Each phase must meet these criteria before proceeding:
 * ✅ <1ms performance for 95% of validations
 * ✅ 100% OWASP Top 10 compliance
 * ✅ All CVE patterns from 2020-2024 blocked
+
+== Implementation Guidelines
+
+[IMPORTANT]
+====
+**CRITICAL REMINDER**: Every task must follow the **Task Completion Standards** workflow:
+
+1. **Implement** → Write code for ONE task only
+2. **Test** → Create and verify tests work  
+3. **Verify** → Run `./mvnw -Ppre-commit clean verify` and fix ALL issues
+4. **Document Progress** → Update status in this plan
+5. **Commit** → Single focused commit with proper message
+
+**Reference**: link:../../ai-rules.md#task-completion-standards-mandatory[AI Rules: Task Completion Standards]
+====
+
+Each task should be implemented following the architecture specified in link:specification.adoc[Architecture Specification] and tested according to link:testing.adoc[Testing Framework].
+
+The tasks are designed to build incrementally, with each phase depending on the components from previous phases.
+
+=== Quality Standards
+
+- **Pre-commit verification is MANDATORY** - never skip this step
+- **One task at a time** - avoid working on multiple tasks simultaneously  
+- **Complete documentation** - update progress and maintain traceability
+- **Test coverage** - ensure all new code is properly tested
+- **Code quality** - address all warnings and formatting issues
+
+=== Task Status Tracking
+
+Mark tasks as completed by changing `[ ]` to `[x]` in the Status column after successful completion of all 5 workflow steps.

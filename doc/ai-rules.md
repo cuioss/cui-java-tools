@@ -32,15 +32,6 @@ When conflicting information exists, AI systems must follow this priority order:
 
 These rules govern ALL development activities:
 
-### 🚨 PRE-1.0 PROJECT RULE (HIGHEST PRIORITY)
-**This project is PRE-1.0 and therefore:**
-- **NEVER deprecate code** - Remove it directly if not needed
-- **NEVER add transitional comments** like "TODO: Remove in v2.0"
-- **NEVER enforce backward compatibility** - Make breaking changes freely
-- **NEVER add @Deprecated annotations** - Delete unnecessary code immediately
-- **Clean APIs aggressively** - Remove unused methods, classes, and patterns
-- **Focus on final API design** - Design for post-1.0 stability, not pre-1.0 transitions
-
 ### General Process Rules
 1. **If in doubt, ask the user** - Never make assumptions
 2. **Always research topics** - Use available tools (WebSearch, WebFetch, etc.) to find the most recent best practices
@@ -78,26 +69,18 @@ Before any code implementation:
 ### Pre-Commit Checklist
 Execute in sequence before ANY commit:
 
-1. **Quality Verification**: `./mvnw -Ppre-commit clean verify -DskipTests`
+1. **Quality Verification**: `./mvnw -Ppre-commit clean verify`
     - Fix ALL errors and warnings (mandatory)
+    - Some recipes may add markers: Either fix them, or suppress them with proper justification. Never commit the markers.
     - Address code quality, formatting, and linting issues
 
-2. **Final Verification**: `./mvnw clean install`
-    - Must complete without errors or warnings
-    - All tests must pass
-    - Tasks are complete ONLY after this succeeds
-
-3. **Run Integration Tests**: `./mvnw clean verify -Pintegration-tests -pl cui-jwt-quarkus-parent/cui-jwt-quarkus-integration-tests`
-    - Ensure all integration tests pass
-    - Verify against the latest standards
-
-4. **Documentation**: Ensure all changes are documented
+2. **Documentation**: Ensure all changes are documented
     - Update Javadoc for public APIs
     - Update AsciiDoc documentation if necessary
 
-5. **Documentation**: Update if changes affect APIs, features, or configuration
+3. **Documentation**: Update if changes affect APIs, features, or configuration
 
-6. **Commit Message**: Follow Git Commit Standards
+4. **Commit Message**: Follow Git Commit Standards
 
 ### Quality Requirements
 - New code requires appropriate test coverage
@@ -108,10 +91,9 @@ Execute in sequence before ANY commit:
 ## Build Commands Template
 Common Maven commands for CUI projects:
 - Build project: `./mvnw clean install`
-- Build Single Module: `./mvnw clean install -pl <module-name>`
 - Run tests: `./mvnw test`
 - Run single test: `./mvnw test -Dtest=ClassName#methodName`
-- Clean-Up Code: `./mvnw -Ppre-commit clean install -DskipTests` -> Check the console after running the command and fix all errors and warnings, verify until they are all corrected
+- Clean-Up Code: `./mvnw -Ppre-commit clean install` -> Check the console after running the command and fix all errors and warnings, verify until they are all corrected
 
 ## Standards Overview
 **Base Reference**: `{STANDARDS_BASE_URL}/standards`
@@ -235,44 +217,6 @@ Common Maven commands for CUI projects:
 - Every package must have package-info.java
 - Use `{@link}` for references to classes, methods, and fields
 - Document Builder classes with complete usage examples
-
-## CDI and Quarkus Standards
-**References**: 
-- CDI Development Patterns: `{STANDARDS_BASE_URL}/standards/cdi-quarkus`
-- Quarkus Testing Standards: `{STANDARDS_BASE_URL}/standards/cdi-quarkus/testing-standards.adoc`
-- Container Standards: `{STANDARDS_BASE_URL}/standards/cdi-quarkus/container-standards.adoc`
-- Use constructor injection (mandatory over field injection)
-- Single constructor rule: No `@Inject` needed for single constructors
-- Use `final` fields for injected dependencies
-- Use `@ApplicationScoped` for stateless services
-- Use `@QuarkusTest` for CDI context testing
-- Use `@QuarkusIntegrationTest` for packaged app testing
-- Container: Use Quarkus distroless base image (91.9MB)
-- HTTPS required for all integration tests
-- OWASP Docker Top 10 compliance mandatory
-
-## CSS Standards
-**Reference**: `{STANDARDS_BASE_URL}/standards/css`
-- Use CSS custom properties (variables) for theming
-- Follow BEM methodology for class naming
-- Use Stylelint for code quality enforcement
-- Use Prettier for consistent formatting
-- Mobile-first responsive design approach
-- Semantic HTML with accessible CSS patterns
-- Performance optimization: minimize CSS bundle size
-- Support for modern browsers (last 2 versions)
-
-## JavaScript Standards
-**Reference**: `{STANDARDS_BASE_URL}/standards/javascript`
-- Use ES6+ modern JavaScript features
-- Use ESLint with strict configuration
-- Use Prettier for code formatting
-- Use Jest for unit testing framework
-- Follow functional programming patterns when appropriate
-- Use JSDoc for comprehensive documentation
-- Use Lit components for web components (Quarkus DevUI context)
-- Maven integration via frontend-maven-plugin
-- Cypress for E2E testing
 
 ### General Documentation Standards
 - Use AsciiDoc format with `.adoc` extension
