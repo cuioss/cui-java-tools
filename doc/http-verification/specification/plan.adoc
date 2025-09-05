@@ -226,7 +226,7 @@ Implement → Test → Verify → Document Progress → Commit
 |V3
 |Implement PatternMatchingStage - see link:specification.adoc#_patternmatchingstage[Architecture §Pattern]
 |High
-|[ ]
+|[x]
 
 |V4
 |Implement LengthValidationStage with configurable limits

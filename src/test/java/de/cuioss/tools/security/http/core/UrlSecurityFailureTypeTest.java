@@ -41,7 +41,11 @@ class UrlSecurityFailureTypeTest {
         assertNotNull(UrlSecurityFailureType.CONTROL_CHARACTERS);
         assertNotNull(UrlSecurityFailureType.PATH_TOO_LONG);
         assertNotNull(UrlSecurityFailureType.EXCESSIVE_NESTING);
-        assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PATTERN);
+        assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
+        assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PARAMETER_NAME);
+        assertNotNull(UrlSecurityFailureType.SQL_INJECTION_DETECTED);
+        assertNotNull(UrlSecurityFailureType.XSS_DETECTED);
+        assertNotNull(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED);
         assertNotNull(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE);
         assertNotNull(UrlSecurityFailureType.MALFORMED_INPUT);
         assertNotNull(UrlSecurityFailureType.INVALID_STRUCTURE);
@@ -50,10 +54,10 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldHave16FailureTypes() {
+    void shouldHave20FailureTypes() {
         // Verify we have the expected number of failure types
         UrlSecurityFailureType[] values = UrlSecurityFailureType.values();
-        assertEquals(16, values.length, "Should have 16 failure types");
+        assertEquals(20, values.length, "Should have 20 failure types");
     }
 
     @Test
@@ -122,13 +126,26 @@ class UrlSecurityFailureTypeTest {
 
     @Test
     void shouldCorrectlyIdentifyPatternBased() {
-        assertTrue(UrlSecurityFailureType.SUSPICIOUS_PATTERN.isPatternBased());
+        assertTrue(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED.isPatternBased());
+        assertTrue(UrlSecurityFailureType.SUSPICIOUS_PARAMETER_NAME.isPatternBased());
         assertTrue(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE.isPatternBased());
 
         // Non-pattern-based should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isPatternBased());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isPatternBased());
         assertFalse(UrlSecurityFailureType.NULL_BYTE_INJECTION.isPatternBased());
+    }
+
+    @Test
+    void shouldCorrectlyIdentifyInjectionAttacks() {
+        assertTrue(UrlSecurityFailureType.SQL_INJECTION_DETECTED.isInjectionAttack());
+        assertTrue(UrlSecurityFailureType.XSS_DETECTED.isInjectionAttack());
+        assertTrue(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED.isInjectionAttack());
+
+        // Non-injection attacks should return false
+        assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isInjectionAttack());
+        assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isInjectionAttack());
+        assertFalse(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED.isInjectionAttack());
     }
 
     @Test
@@ -164,6 +181,7 @@ class UrlSecurityFailureTypeTest {
             if (type.isCharacterAttack()) categoryCount++;
             if (type.isSizeViolation()) categoryCount++;
             if (type.isPatternBased()) categoryCount++;
+            if (type.isInjectionAttack()) categoryCount++;
             if (type.isStructuralIssue()) categoryCount++;
             if (type.isProtocolViolation()) categoryCount++;
 

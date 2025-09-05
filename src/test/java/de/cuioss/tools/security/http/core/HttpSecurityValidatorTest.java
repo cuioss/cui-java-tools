@@ -178,7 +178,7 @@ class HttpSecurityValidatorTest {
         HttpSecurityValidator badWordRejecter = input -> {
             if (input.contains("bad")) {
                 throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.SUSPICIOUS_PATTERN)
+                        .failureType(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED)
                         .validationType(ValidationType.URL_PATH)
                         .originalInput(input)
                         .build();

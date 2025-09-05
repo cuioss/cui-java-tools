@@ -85,10 +85,24 @@ public enum UrlSecurityFailureType {
     // === Pattern-Based Detection ===
     
     /** Suspicious patterns that match attack signatures */
-    SUSPICIOUS_PATTERN("Suspicious pattern detected"),
+    SUSPICIOUS_PATTERN_DETECTED("Suspicious pattern detected"),
+
+    /** Suspicious parameter name commonly used in attacks */
+    SUSPICIOUS_PARAMETER_NAME("Suspicious parameter name detected"),
 
     /** Known attack signatures from security databases */
     KNOWN_ATTACK_SIGNATURE("Known attack signature detected"),
+
+    // === Injection Attacks ===
+    
+    /** SQL injection patterns detected */
+    SQL_INJECTION_DETECTED("SQL injection pattern detected"),
+
+    /** Cross-site scripting (XSS) patterns detected */
+    XSS_DETECTED("XSS attack pattern detected"),
+
+    /** Command injection patterns detected */
+    COMMAND_INJECTION_DETECTED("Command injection pattern detected"),
 
     // === Structural Issues ===
     
@@ -174,8 +188,20 @@ public enum UrlSecurityFailureType {
      * @return true if this is a pattern-based failure type
      */
     public boolean isPatternBased() {
-        return this == SUSPICIOUS_PATTERN ||
+        return this == SUSPICIOUS_PATTERN_DETECTED ||
+                this == SUSPICIOUS_PARAMETER_NAME ||
                 this == KNOWN_ATTACK_SIGNATURE;
+    }
+
+    /**
+     * Indicates whether this failure type represents an injection attack.
+     * 
+     * @return true if this is an injection attack failure type
+     */
+    public boolean isInjectionAttack() {
+        return this == SQL_INJECTION_DETECTED ||
+                this == XSS_DETECTED ||
+                this == COMMAND_INJECTION_DETECTED;
     }
 
     /**
