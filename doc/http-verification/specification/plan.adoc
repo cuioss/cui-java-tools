@@ -86,7 +86,7 @@ Implement → Test → Verify → Document Progress → Commit
 |G1
 |Implement PathTraversalGenerator - see link:testing.adoc#_g1_pathtraversalgenerator[Test Harness §G1]
 |High
-|[ ]
+|[x]
 
 |G2
 |Implement EncodingCombinationGenerator - see link:testing.adoc#_g2_encodingcombinationgenerator[Test Harness §G2]
