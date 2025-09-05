@@ -231,12 +231,12 @@ Implement → Test → Verify → Document Progress → Commit
 |V4
 |Implement LengthValidationStage with configurable limits
 |Medium
-|[ ]
+|[x]
 
 |V5
 |Implement CharacterValidationStage for character set validation
 |Medium
-|[ ]
+|[x]
 |===
 
 === Phase 6: Pipeline Implementation
@@ -254,12 +254,12 @@ Implement → Test → Verify → Document Progress → Commit
 |P1
 |Implement URLPathValidationPipeline - see link:specification.adoc#_sequential_execution_model[Architecture §Pipeline]
 |High
-|[ ]
+|[x]
 
 |P2
 |Implement URLParameterValidationPipeline
 |High
-|[ ]
+|[x]
 
 |P3
 |Implement HTTPHeaderValidationPipeline
