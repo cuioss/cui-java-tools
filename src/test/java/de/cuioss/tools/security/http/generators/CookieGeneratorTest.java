@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.tools.security.http.data.Cookie;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

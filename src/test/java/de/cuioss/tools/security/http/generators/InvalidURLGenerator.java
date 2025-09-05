@@ -107,6 +107,11 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
         if (callCount % 100 == 6) return "http://example.com:-80/path"; // Negative port
         if (callCount % 100 == 7) return "http://example.com/path?param="; // Missing parameter value
         if (callCount % 100 == 8) return "http://example.com/path\\backslash"; // Backslash pattern
+        if (callCount % 100 == 9) return "http://example.com/path#"; // Empty fragment
+        if (callCount % 100 == 10) return "http://example.com/path##fragment"; // Double hash
+        if (callCount % 100 == 11) return "http://example.com/path|pipe"; // Pipe pattern
+        if (callCount % 100 == 12) return "://no-protocol"; // Malformed protocol pattern
+        if (callCount % 100 == 13) return "http://example.com/path?=value"; // Missing parameter name
         
         String malformedUrl = MALFORMED_URLS.next();
 

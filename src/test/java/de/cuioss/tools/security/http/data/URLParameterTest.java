@@ -52,16 +52,16 @@ class URLParameterTest {
     }
 
     @Test
-    void shouldRejectEmptyParameterName() {
-        // Empty string names should be rejected
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> new URLParameter("", PARAM_VALUE));
-        assertTrue(thrown.getMessage().contains("Parameter name cannot be empty string"));
+    void shouldAcceptEmptyParameterName() {
+        // Records are pure data holders - validation is done by consumers
+        URLParameter param1 = new URLParameter("", PARAM_VALUE);
+        assertEquals("", param1.name());
+        assertEquals(PARAM_VALUE, param1.value());
 
-        // Whitespace-only names should be rejected
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
-                () -> new URLParameter("   ", PARAM_VALUE));
-        assertTrue(thrown2.getMessage().contains("Parameter name cannot be empty string"));
+        // Whitespace-only names should also be accepted
+        URLParameter param2 = new URLParameter("   ", PARAM_VALUE);
+        assertEquals("   ", param2.name());
+        assertEquals(PARAM_VALUE, param2.value());
     }
 
     @Test

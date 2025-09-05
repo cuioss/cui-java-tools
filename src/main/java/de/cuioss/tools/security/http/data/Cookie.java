@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 
 /**
  * Immutable record representing an HTTP cookie with name, value, and attributes.
- * 
+ *
  * <p>This record encapsulates the structure of HTTP cookies as defined in RFC 6265,
  * providing a type-safe way to handle cookie data in HTTP security validation.</p>
- * 
+ *
  * <h3>Design Principles</h3>
  * <ul>
  *   <li><strong>Immutability</strong> - All fields are final and the record cannot be modified</li>
@@ -36,81 +36,57 @@ import java.util.stream.Collectors;
  *   <li><strong>Security Focus</strong> - Designed with security validation in mind</li>
  *   <li><strong>Flexibility</strong> - Supports various cookie attribute formats</li>
  * </ul>
- * 
+ *
  * <h3>Usage Examples</h3>
  * <pre>
  * // Simple cookie
  * Cookie sessionCookie = new Cookie("JSESSIONID", "ABC123", "");
- * 
+ *
  * // Cookie with attributes
  * Cookie secureCookie = new Cookie(
- *     "auth_token", 
- *     "xyz789", 
+ *     "auth_token",
+ *     "xyz789",
  *     "Domain=example.com; Path=/; Secure; HttpOnly"
  * );
- * 
+ *
  * // Access components
  * String name = cookie.name();         // "JSESSIONID"
  * String value = cookie.value();       // "ABC123"
  * String attrs = cookie.attributes();  // "Domain=..."
- * 
+ *
  * // Check for security attributes
  * boolean isSecure = cookie.isSecure();       // Check for Secure attribute
  * boolean isHttpOnly = cookie.isHttpOnly();   // Check for HttpOnly attribute
- * 
+ *
  * // Use in validation
  * validator.validate(cookie.name(), ValidationType.COOKIE_NAME);
  * validator.validate(cookie.value(), ValidationType.COOKIE_VALUE);
  * </pre>
- * 
+ *
  * <h3>Cookie Attributes</h3>
  * <p>The attributes field contains the semicolon-separated list of cookie attributes
  * such as Domain, Path, Secure, HttpOnly, SameSite, and Max-Age. This field can be
  * an empty string if no attributes are present.</p>
- * 
+ *
  * <h3>Security Considerations</h3>
  * <p>This record is a simple data container. Security validation should be applied
  * to the name, value, and attributes components separately using appropriate validators.</p>
- * 
+ *
  * Implements: Task B3 from HTTP verification specification
- * 
+ *
  * @param name The cookie name (e.g., "JSESSIONID", "auth_token")
  * @param value The cookie value (e.g., session ID, authentication token)
  * @param attributes Cookie attributes string (e.g., "Domain=example.com; Secure; HttpOnly")
- * 
+ *
  * @since 2.5
  * @see ValidationType#COOKIE_NAME
  * @see ValidationType#COOKIE_VALUE
  */
-public record Cookie(String name, @Nullable String value, @Nullable String attributes) {
-
-    /**
-     * Creates a Cookie with validation of basic constraints according to RFC 6265.
-     * 
-     * @param name The cookie name
-     * @param value The cookie value
-     * @param attributes The cookie attributes string
-     * @throws IllegalArgumentException if name is empty string or contains invalid characters
-     */
-    public Cookie {
-        // Validate cookie name according to RFC 6265
-        if (name != null) {
-            if (name.trim().isEmpty()) {
-                throw new IllegalArgumentException("Cookie name cannot be empty string");
-            }
-            // Cookie names must not contain: space, tab, control characters, separators
-            if (name.matches(".*[\\s\\t\\r\\n\\f;,=\\(\\)\\<\\>@\\\\\"/\\[\\]\\?{}].*")) {
-                throw new IllegalArgumentException("Cookie name contains invalid characters: " + name);
-            }
-        }
-
-        // Note: We allow null name/value for parsing edge cases in malformed HTTP headers
-        // We allow null attributes for cookies without attributes
-    }
+public record Cookie(@Nullable String name, @Nullable String value, @Nullable String attributes) {
 
     /**
      * Creates a simple cookie with no attributes.
-     * 
+     *
      * @param name The cookie name
      * @param value The cookie value
      * @return A Cookie with no attributes
@@ -121,7 +97,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Checks if this cookie has a non-null, non-empty name.
-     * 
+     *
      * @return true if the name is not null and not empty
      */
     public boolean hasName() {
@@ -130,7 +106,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Checks if this cookie has a non-null, non-empty value.
-     * 
+     *
      * @return true if the value is not null and not empty
      */
     public boolean hasValue() {
@@ -139,7 +115,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Checks if this cookie has any attributes.
-     * 
+     *
      * @return true if the attributes string is not null and not empty
      */
     public boolean hasAttributes() {
@@ -148,7 +124,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Checks if the cookie has the Secure attribute.
-     * 
+     *
      * @return true if the attributes contain "Secure"
      */
     public boolean isSecure() {
@@ -157,7 +133,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Checks if the cookie has the HttpOnly attribute.
-     * 
+     *
      * @return true if the attributes contain "HttpOnly"
      */
     public boolean isHttpOnly() {
@@ -166,7 +142,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Extracts the Domain attribute value if present.
-     * 
+     *
      * @return The domain value wrapped in Optional, or empty if not specified
      */
     public Optional<String> getDomain() {
@@ -175,7 +151,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Extracts the Path attribute value if present.
-     * 
+     *
      * @return The path value wrapped in Optional, or empty if not specified
      */
     public Optional<String> getPath() {
@@ -184,7 +160,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Extracts the SameSite attribute value if present.
-     * 
+     *
      * @return The SameSite value (e.g., "Strict", "Lax", "None") wrapped in Optional, or empty if not specified
      */
     public Optional<String> getSameSite() {
@@ -193,7 +169,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Extracts the Max-Age attribute value if present.
-     * 
+     *
      * @return The Max-Age value as a string wrapped in Optional, or empty if not specified
      */
     public Optional<String> getMaxAge() {
@@ -202,7 +178,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Extracts a specific attribute value from the attributes string.
-     * 
+     *
      * @param attributeName The name of the attribute (case-insensitive)
      * @return The attribute value or null if not found
      */
@@ -239,7 +215,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns all attribute names present in this cookie.
-     * 
+     *
      * @return A list of attribute names (may be empty)
      */
     public List<String> getAttributeNames() {
@@ -259,7 +235,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns the cookie name, or a default value if the name is null.
-     * 
+     *
      * @param defaultName The default name to return if name is null
      * @return The cookie name or the default
      */
@@ -269,7 +245,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns the cookie value, or a default value if the value is null.
-     * 
+     *
      * @param defaultValue The default value to return if value is null
      * @return The cookie value or the default
      */
@@ -281,7 +257,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
      * Returns a string representation suitable for HTTP Set-Cookie headers.
      * Note: This does not perform proper HTTP encoding - use appropriate
      * encoding utilities for actual HTTP header generation.
-     * 
+     *
      * @return A string in the format "name=value; attributes"
      */
     public String toCookieString() {
@@ -306,7 +282,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns a copy of this cookie with a new name.
-     * 
+     *
      * @param newName The new cookie name
      * @return A new Cookie with the specified name and same value/attributes
      */
@@ -316,7 +292,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns a copy of this cookie with a new value.
-     * 
+     *
      * @param newValue The new cookie value
      * @return A new Cookie with the same name/attributes and specified value
      */
@@ -326,7 +302,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
 
     /**
      * Returns a copy of this cookie with new attributes.
-     * 
+     *
      * @param newAttributes The new attributes string
      * @return A new Cookie with the same name/value and specified attributes
      */

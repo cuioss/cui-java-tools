@@ -83,24 +83,21 @@ class CookieTest {
     }
 
     @Test
-    void shouldRejectInvalidCookieNames() {
-        // Empty string names should be rejected
-        IllegalArgumentException thrown1 = assertThrows(IllegalArgumentException.class,
-                () -> new Cookie("", COOKIE_VALUE, ""));
-        assertTrue(thrown1.getMessage().contains("Cookie name cannot be empty string"));
+    void shouldAcceptAnyCookieNames() {
+        // Records are pure data holders - validation is done by consumers
+        Cookie cookie1 = new Cookie("", COOKIE_VALUE, "");
+        assertEquals("", cookie1.name());
 
-        // Names with invalid characters should be rejected
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
-                () -> new Cookie("name;invalid", COOKIE_VALUE, ""));
-        assertTrue(thrown2.getMessage().contains("Cookie name contains invalid characters"));
+        // Names with special characters should be accepted
+        Cookie cookie2 = new Cookie("name;invalid", COOKIE_VALUE, "");
+        assertEquals("name;invalid", cookie2.name());
 
-        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class,
-                () -> new Cookie("name=invalid", COOKIE_VALUE, ""));
-        assertTrue(thrown3.getMessage().contains("Cookie name contains invalid characters"));
+        Cookie cookie3 = new Cookie("name=invalid", COOKIE_VALUE, "");
+        assertEquals("name=invalid", cookie3.name());
 
-        IllegalArgumentException thrown4 = assertThrows(IllegalArgumentException.class,
-                () -> new Cookie("name invalid", COOKIE_VALUE, ""));
-        assertTrue(thrown4.getMessage().contains("Cookie name contains invalid characters"));
+        // Even names with spaces should be accepted  
+        Cookie cookie4 = new Cookie("name invalid", COOKIE_VALUE, "");
+        assertEquals("name invalid", cookie4.name());
     }
 
     @Test

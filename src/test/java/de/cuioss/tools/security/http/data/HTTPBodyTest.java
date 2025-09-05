@@ -351,27 +351,23 @@ class HTTPBodyTest {
     }
 
     @Test
-    void shouldRejectInvalidContentTypes() {
-        // Invalid MIME type format should be rejected
-        IllegalArgumentException thrown1 = assertThrows(IllegalArgumentException.class,
-                () -> new HTTPBody("content", "invalid-mime-type", ""));
-        assertTrue(thrown1.getMessage().contains("Invalid MIME type format"));
+    void shouldAcceptAnyContentTypes() {
+        // Records are pure data holders - validation is done by consumers
+        HTTPBody body1 = new HTTPBody("content", "invalid-mime-type", "");
+        assertEquals("invalid-mime-type", body1.contentType());
 
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class,
-                () -> new HTTPBody("content", "application/", ""));
-        assertTrue(thrown2.getMessage().contains("Invalid MIME type format"));
+        HTTPBody body2 = new HTTPBody("content", "application/", "");
+        assertEquals("application/", body2.contentType());
 
-        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class,
-                () -> new HTTPBody("content", "/json", ""));
-        assertTrue(thrown3.getMessage().contains("Invalid MIME type format"));
+        HTTPBody body3 = new HTTPBody("content", "/json", "");
+        assertEquals("/json", body3.contentType());
     }
 
     @Test
-    void shouldRejectInvalidEncodings() {
-        // Invalid content encoding should be rejected
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> new HTTPBody("content", "text/plain", "invalid-encoding"));
-        assertTrue(thrown.getMessage().contains("Unsupported content encoding"));
+    void shouldAcceptAnyEncodings() {
+        // Records are pure data holders - validation is done by consumers
+        HTTPBody body = new HTTPBody("content", "text/plain", "invalid-encoding");
+        assertEquals("invalid-encoding", body.encoding());
     }
 
     @Test

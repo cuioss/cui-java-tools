@@ -17,6 +17,7 @@ package de.cuioss.tools.security.http.generators;
 
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.tools.security.http.data.Cookie;
 
 /**
  * Generates Cookie records for testing purposes.
