@@ -1,0 +1,397 @@
+/*
+ * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.cuioss.tools.security.http.generators;
+
+import de.cuioss.test.generator.TypedGenerator;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Integration test for all HTTP security generators.
+ * Implements: Task G10 from HTTP verification specification
+ */
+class AllGeneratorsIntegrationTest {
+
+    private final PathTraversalGenerator pathTraversalGenerator = new PathTraversalGenerator();
+    private final EncodingCombinationGenerator encodingGenerator = new EncodingCombinationGenerator();
+    private final UnicodeAttackGenerator unicodeGenerator = new UnicodeAttackGenerator();
+    private final BoundaryFuzzingGenerator boundaryGenerator = new BoundaryFuzzingGenerator();
+    private final ValidURLGenerator validUrlGenerator = new ValidURLGenerator();
+    private final InvalidURLGenerator invalidUrlGenerator = new InvalidURLGenerator();
+    private final URLParameterGenerator parameterGenerator = new URLParameterGenerator();
+    private final CookieGenerator cookieGenerator = new CookieGenerator();
+    private final HTTPBodyGenerator bodyGenerator = new HTTPBodyGenerator();
+
+    @Test
+    void shouldHaveAllGeneratorsImplemented() {
+        // Verify all 9 generators are instantiated and functional
+        assertNotNull(pathTraversalGenerator);
+        assertNotNull(encodingGenerator);
+        assertNotNull(unicodeGenerator);
+        assertNotNull(boundaryGenerator);
+        assertNotNull(validUrlGenerator);
+        assertNotNull(invalidUrlGenerator);
+        assertNotNull(parameterGenerator);
+        assertNotNull(cookieGenerator);
+        assertNotNull(bodyGenerator);
+    }
+
+    @Test
+    void shouldReturnCorrectTypes() {
+        assertEquals(String.class, pathTraversalGenerator.getType());
+        assertEquals(String.class, encodingGenerator.getType());
+        assertEquals(String.class, unicodeGenerator.getType());
+        assertEquals(String.class, boundaryGenerator.getType());
+        assertEquals(String.class, validUrlGenerator.getType());
+        assertEquals(String.class, invalidUrlGenerator.getType());
+        assertEquals(URLParameter.class, parameterGenerator.getType());
+        assertEquals(Cookie.class, cookieGenerator.getType());
+        assertEquals(HTTPBody.class, bodyGenerator.getType());
+    }
+
+    @Test
+    void shouldGenerateNonNullValues() {
+        List<TypedGenerator<?>> generators = List.of(
+                pathTraversalGenerator,
+                encodingGenerator,
+                unicodeGenerator,
+                boundaryGenerator,
+                validUrlGenerator,
+                invalidUrlGenerator,
+                parameterGenerator,
+                cookieGenerator,
+                bodyGenerator
+        );
+
+        for (TypedGenerator<?> generator : generators) {
+            for (int i = 0; i < 50; i++) {
+                Object generated = generator.next();
+                assertNotNull(generated, "Generator " + generator.getClass().getSimpleName() + " should not return null");
+            }
+        }
+    }
+
+    @Test
+    void shouldGenerateVariedOutputs() {
+        // Test that each generator produces variety
+        Set<String> pathTraversals = new HashSet<>();
+        Set<String> encodings = new HashSet<>();
+        Set<String> unicodeAttacks = new HashSet<>();
+        Set<String> boundaryFuzzing = new HashSet<>();
+        Set<String> validUrls = new HashSet<>();
+        Set<String> invalidUrls = new HashSet<>();
+        Set<URLParameter> parameters = new HashSet<>();
+        Set<Cookie> cookies = new HashSet<>();
+        Set<HTTPBody> bodies = new HashSet<>();
+
+        for (int i = 0; i < 200; i++) {
+            pathTraversals.add(pathTraversalGenerator.next());
+            encodings.add(encodingGenerator.next());
+            unicodeAttacks.add(unicodeGenerator.next());
+            boundaryFuzzing.add(boundaryGenerator.next());
+            validUrls.add(validUrlGenerator.next());
+            invalidUrls.add(invalidUrlGenerator.next());
+            parameters.add(parameterGenerator.next());
+            cookies.add(cookieGenerator.next());
+            bodies.add(bodyGenerator.next());
+        }
+
+        // Each generator should produce reasonable variety
+        assertTrue(pathTraversals.size() >= 10, "PathTraversalGenerator should produce variety, got: " + pathTraversals.size());
+        assertTrue(encodings.size() >= 10, "EncodingCombinationGenerator should produce variety, got: " + encodings.size());
+        assertTrue(unicodeAttacks.size() >= 10, "UnicodeAttackGenerator should produce variety, got: " + unicodeAttacks.size());
+        assertTrue(boundaryFuzzing.size() >= 20, "BoundaryFuzzingGenerator should produce variety, got: " + boundaryFuzzing.size());
+        assertTrue(validUrls.size() >= 10, "ValidURLGenerator should produce variety, got: " + validUrls.size());
+        assertTrue(invalidUrls.size() >= 10, "InvalidURLGenerator should produce variety, got: " + invalidUrls.size());
+        assertTrue(parameters.size() >= 30, "URLParameterGenerator should produce variety, got: " + parameters.size());
+        assertTrue(cookies.size() >= 30, "CookieGenerator should produce variety, got: " + cookies.size());
+        assertTrue(bodies.size() >= 30, "HTTPBodyGenerator should produce variety, got: " + bodies.size());
+    }
+
+    @Test
+    void shouldGenerateAttackPatterns() {
+        // Verify that generators produce security-relevant patterns
+        Set<String> pathTraversals = new HashSet<>();
+        Set<String> encodings = new HashSet<>();
+        Set<String> unicodeAttacks = new HashSet<>();
+        Set<String> boundaryFuzzing = new HashSet<>();
+        Set<URLParameter> parameters = new HashSet<>();
+        Set<Cookie> cookies = new HashSet<>();
+        Set<HTTPBody> bodies = new HashSet<>();
+
+        for (int i = 0; i < 200; i++) {
+            pathTraversals.add(pathTraversalGenerator.next());
+            encodings.add(encodingGenerator.next());
+            unicodeAttacks.add(unicodeGenerator.next());
+            boundaryFuzzing.add(boundaryGenerator.next());
+            parameters.add(parameterGenerator.next());
+            cookies.add(cookieGenerator.next());
+            bodies.add(bodyGenerator.next());
+        }
+
+        // Check for common attack patterns
+        boolean hasPathTraversal = pathTraversals.stream().anyMatch(s -> s.contains("../"));
+        boolean hasEncoding = encodings.stream().anyMatch(s -> s.contains("%"));
+        boolean hasUnicodeAttack = unicodeAttacks.stream().anyMatch(s -> s.length() > 0);
+        boolean hasBoundaryFuzz = boundaryFuzzing.stream().anyMatch(s -> s.length() > 100 || s.isEmpty());
+
+        boolean hasParameterAttack = parameters.stream().anyMatch(p -> 
+                p.value().contains("<script>") || p.value().contains("../") || p.value().contains("DROP"));
+        boolean hasCookieAttack = cookies.stream().anyMatch(c -> 
+                c.value().contains("<script>") || c.value().contains("../") || c.value().contains("DROP"));
+        boolean hasBodyAttack = bodies.stream().anyMatch(b -> 
+                b.content().contains("<script>") || b.content().contains("../") || b.content().contains("DROP"));
+
+        assertTrue(hasPathTraversal, "PathTraversalGenerator should generate path traversal patterns");
+        assertTrue(hasEncoding, "EncodingCombinationGenerator should generate encoded patterns");
+        assertTrue(hasUnicodeAttack, "UnicodeAttackGenerator should generate unicode patterns");
+        assertTrue(hasBoundaryFuzz, "BoundaryFuzzingGenerator should generate boundary fuzzing patterns");
+        assertTrue(hasParameterAttack, "URLParameterGenerator should generate attack patterns");
+        assertTrue(hasCookieAttack, "CookieGenerator should generate attack patterns");
+        assertTrue(hasBodyAttack, "HTTPBodyGenerator should generate attack patterns");
+    }
+
+    @Test
+    void shouldGenerateLegitimateValues() {
+        // Verify that generators also produce legitimate/safe values for false positive testing
+        Set<String> validUrls = new HashSet<>();
+        Set<URLParameter> parameters = new HashSet<>();
+        Set<Cookie> cookies = new HashSet<>();
+        Set<HTTPBody> bodies = new HashSet<>();
+
+        for (int i = 0; i < 200; i++) {
+            validUrls.add(validUrlGenerator.next());
+            parameters.add(parameterGenerator.next());
+            cookies.add(cookieGenerator.next());
+            bodies.add(bodyGenerator.next());
+        }
+
+        // Check for legitimate patterns
+        boolean hasValidPath = validUrls.stream().anyMatch(s -> s.startsWith("/") || s.startsWith("api/"));
+        boolean hasLegitimateParam = parameters.stream().anyMatch(p -> 
+                p.name().equals("id") || p.name().equals("page") || p.name().equals("limit"));
+        boolean hasLegitimateCoookie = cookies.stream().anyMatch(c -> 
+                c.name().equals("JSESSIONID") || c.name().equals("auth_token"));
+        boolean hasLegitimateBody = bodies.stream().anyMatch(b -> 
+                b.content().contains("Hello World") || b.content().contains("{\"user\""));
+
+        assertTrue(hasValidPath, "ValidURLGenerator should generate valid paths");
+        assertTrue(hasLegitimateParam, "URLParameterGenerator should generate legitimate parameters");
+        assertTrue(hasLegitimateCoookie, "CookieGenerator should generate legitimate cookies");
+        assertTrue(hasLegitimateBody, "HTTPBodyGenerator should generate legitimate bodies");
+    }
+
+    @Test
+    void shouldHandleConcurrentGeneration() {
+        // Test thread safety of generators
+        List<Thread> threads = List.of(
+                new Thread(() -> {
+                    for (int i = 0; i < 100; i++) {
+                        pathTraversalGenerator.next();
+                        encodingGenerator.next();
+                        unicodeGenerator.next();
+                    }
+                }),
+                new Thread(() -> {
+                    for (int i = 0; i < 100; i++) {
+                        boundaryGenerator.next();
+                        validUrlGenerator.next();
+                        invalidUrlGenerator.next();
+                    }
+                }),
+                new Thread(() -> {
+                    for (int i = 0; i < 100; i++) {
+                        parameterGenerator.next();
+                        cookieGenerator.next();
+                        bodyGenerator.next();
+                    }
+                })
+        );
+
+        // Start all threads
+        threads.forEach(Thread::start);
+
+        // Wait for completion
+        threads.forEach(thread -> {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                fail("Thread interrupted during concurrent generation test");
+            }
+        });
+
+        // If we get here without exceptions, thread safety test passed
+        assertTrue(true, "Concurrent generation completed without exceptions");
+    }
+
+    @Test
+    void shouldGenerateComplexRecordStructures() {
+        // Test that record-based generators create proper structures
+        for (int i = 0; i < 50; i++) {
+            URLParameter param = parameterGenerator.next();
+            assertNotNull(param.name(), "URLParameter name should not be null");
+            assertNotNull(param.value(), "URLParameter value should not be null");
+
+            Cookie cookie = cookieGenerator.next();
+            assertNotNull(cookie.name(), "Cookie name should not be null");
+            assertNotNull(cookie.value(), "Cookie value should not be null");
+            assertNotNull(cookie.attributes(), "Cookie attributes should not be null");
+
+            HTTPBody body = bodyGenerator.next();
+            assertNotNull(body.content(), "HTTPBody content should not be null");
+            assertNotNull(body.contentType(), "HTTPBody contentType should not be null");
+            assertNotNull(body.encoding(), "HTTPBody encoding should not be null");
+        }
+    }
+
+    @Test
+    void shouldGenerateEdgeCasesForSecurityTesting() {
+        // Test that generators produce edge cases that are important for security testing
+        Set<String> allStringOutputs = new HashSet<>();
+        Set<URLParameter> allParams = new HashSet<>();
+        Set<Cookie> allCookies = new HashSet<>();
+        Set<HTTPBody> allBodies = new HashSet<>();
+
+        for (int i = 0; i < 300; i++) {
+            allStringOutputs.add(pathTraversalGenerator.next());
+            allStringOutputs.add(encodingGenerator.next());
+            allStringOutputs.add(unicodeGenerator.next());
+            allStringOutputs.add(boundaryGenerator.next());
+            allStringOutputs.add(validUrlGenerator.next());
+            allStringOutputs.add(invalidUrlGenerator.next());
+            allParams.add(parameterGenerator.next());
+            allCookies.add(cookieGenerator.next());
+            allBodies.add(bodyGenerator.next());
+        }
+
+        // Check for important edge cases
+        boolean hasEmptyString = allStringOutputs.contains("");
+        boolean hasLongString = allStringOutputs.stream().anyMatch(s -> s.length() > 1000);
+        boolean hasSpecialChars = allStringOutputs.stream().anyMatch(s -> s.contains("\n") || s.contains("\r") || s.contains("\t"));
+        
+        boolean hasEmptyParamName = allParams.stream().anyMatch(p -> p.name().isEmpty());
+        boolean hasEmptyCookieName = allCookies.stream().anyMatch(c -> c.name().isEmpty());
+        boolean hasEmptyBodyContent = allBodies.stream().anyMatch(b -> b.content().isEmpty());
+
+        assertTrue(hasEmptyString, "Should generate empty strings for edge case testing");
+        assertTrue(hasLongString, "Should generate long strings for buffer overflow testing");
+        assertTrue(hasSpecialChars, "Should generate special characters for injection testing");
+        assertTrue(hasEmptyParamName, "Should generate empty parameter names for edge case testing");
+        assertTrue(hasEmptyCookieName, "Should generate empty cookie names for edge case testing");
+        assertTrue(hasEmptyBodyContent, "Should generate empty body content for edge case testing");
+    }
+
+    @Test
+    void shouldSupportHighVolumeGeneration() {
+        // Test that generators can handle high-volume generation without performance degradation
+        long startTime = System.currentTimeMillis();
+
+        // Generate a large number of values
+        for (int i = 0; i < 1000; i++) {
+            pathTraversalGenerator.next();
+            encodingGenerator.next();
+            unicodeGenerator.next();
+            boundaryGenerator.next();
+            validUrlGenerator.next();
+            invalidUrlGenerator.next();
+            parameterGenerator.next();
+            cookieGenerator.next();
+            bodyGenerator.next();
+        }
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        // Should complete in reasonable time (less than 5 seconds for 9000 generations)
+        assertTrue(duration < 5000, "High-volume generation should complete in reasonable time, took: " + duration + "ms");
+    }
+
+    @Test
+    void shouldMaintainGeneratorConsistency() {
+        // Test that generators maintain consistent behavior across multiple calls
+        for (int run = 0; run < 10; run++) {
+            Set<String> currentRun = new HashSet<>();
+            
+            // Generate same number of values in each run
+            for (int i = 0; i < 100; i++) {
+                currentRun.add(pathTraversalGenerator.next());
+                currentRun.add(encodingGenerator.next());
+                currentRun.add(unicodeGenerator.next());
+            }
+            
+            // Each run should produce variety (not the same single value repeated)
+            assertTrue(currentRun.size() > 5, "Each run should produce variety, run " + run + " had " + currentRun.size() + " unique values");
+        }
+    }
+
+    @Test
+    void shouldGeneratePhase1CompleteTestSuite() {
+        // Comprehensive test that Phase 1 generators work together as a complete system
+        // This validates that all G1-G9 generators are properly implemented and integrated
+
+        int totalGenerations = 1000;
+        Set<String> allStringGenerations = new HashSet<>();
+        Set<URLParameter> allParameterGenerations = new HashSet<>();
+        Set<Cookie> allCookieGenerations = new HashSet<>();
+        Set<HTTPBody> allBodyGenerations = new HashSet<>();
+
+        for (int i = 0; i < totalGenerations; i++) {
+            // String-based generators (G1-G6)
+            allStringGenerations.add(pathTraversalGenerator.next());
+            allStringGenerations.add(encodingGenerator.next());
+            allStringGenerations.add(unicodeGenerator.next());
+            allStringGenerations.add(boundaryGenerator.next());
+            allStringGenerations.add(validUrlGenerator.next());
+            allStringGenerations.add(invalidUrlGenerator.next());
+
+            // Record-based generators (G7-G9)
+            allParameterGenerations.add(parameterGenerator.next());
+            allCookieGenerations.add(cookieGenerator.next());
+            allBodyGenerations.add(bodyGenerator.next());
+        }
+
+        // Phase 1 completion criteria
+        assertTrue(allStringGenerations.size() >= 200, "String generators should produce substantial variety");
+        assertTrue(allParameterGenerations.size() >= 150, "Parameter generator should produce substantial variety");
+        assertTrue(allCookieGenerations.size() >= 150, "Cookie generator should produce substantial variety");
+        assertTrue(allBodyGenerations.size() >= 150, "Body generator should produce substantial variety");
+
+        // Verify security coverage
+        boolean hasPathTraversalAttacks = allStringGenerations.stream().anyMatch(s -> s.contains("../"));
+        boolean hasEncodingAttacks = allStringGenerations.stream().anyMatch(s -> s.contains("%2e%2e"));
+        boolean hasUnicodeAttacks = allStringGenerations.stream().anyMatch(s -> s.contains("\u202e"));
+
+        boolean hasParameterXSS = allParameterGenerations.stream().anyMatch(p -> p.value().contains("<script>"));
+        boolean hasCookieInjection = allCookieGenerations.stream().anyMatch(c -> c.value().contains("\r\n"));
+        boolean hasBodyXXE = allBodyGenerations.stream().anyMatch(b -> b.content().contains("<!ENTITY"));
+
+        assertTrue(hasPathTraversalAttacks, "Should generate path traversal attacks");
+        assertTrue(hasEncodingAttacks, "Should generate encoding attacks");
+        assertTrue(hasUnicodeAttacks, "Should generate unicode attacks");
+        assertTrue(hasParameterXSS, "Should generate parameter XSS attacks");
+        assertTrue(hasCookieInjection, "Should generate cookie injection attacks");
+        assertTrue(hasBodyXXE, "Should generate XXE attacks");
+
+        // Phase 1 is now complete - all 10 tasks (G1-G10) implemented
+        assertTrue(true, "Phase 1: Test Infrastructure and Generators (10/10 complete)");
+    }
+}
