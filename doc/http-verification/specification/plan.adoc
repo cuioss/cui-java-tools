@@ -216,7 +216,7 @@ Implement → Test → Verify → Document Progress → Commit
 |V1
 |Implement DecodingStage - see link:specification.adoc#_decodingstage[Architecture §Decoding]
 |High
-|[ ]
+|[x]
 
 |V2
 |Implement NormalizationStage with path normalization
