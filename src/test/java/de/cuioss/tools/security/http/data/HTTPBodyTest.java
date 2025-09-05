@@ -229,10 +229,10 @@ class HTTPBodyTest {
         HTTPBody bodyWithoutCharset = new HTTPBody("content", "text/html", "");
         HTTPBody bodyWithNullContentType = new HTTPBody("content", null, "");
 
-        assertEquals("utf-8", bodyWithCharset.getCharset());
-        assertEquals("ISO-8859-1", bodyWithCharsetUpper.getCharset());
-        assertNull(bodyWithoutCharset.getCharset());
-        assertNull(bodyWithNullContentType.getCharset());
+        assertEquals("utf-8", bodyWithCharset.getCharset().orElse(null));
+        assertEquals("ISO-8859-1", bodyWithCharsetUpper.getCharset().orElse(null));
+        assertTrue(bodyWithoutCharset.getCharset().isEmpty());
+        assertTrue(bodyWithNullContentType.getCharset().isEmpty());
     }
 
     @Test
@@ -241,9 +241,9 @@ class HTTPBodyTest {
         HTTPBody body2 = new HTTPBody("content", "text/html; charset=windows-1252;", "");
         HTTPBody body3 = new HTTPBody("content", "application/xml;charset=utf-16", ""); // No space
         
-        assertEquals("utf-8", body1.getCharset());
-        assertEquals("windows-1252", body2.getCharset());
-        assertEquals("utf-16", body3.getCharset());
+        assertEquals("utf-8", body1.getCharset().orElse(null));
+        assertEquals("windows-1252", body2.getCharset().orElse(null));
+        assertEquals("utf-16", body3.getCharset().orElse(null));
     }
 
     @Test
@@ -385,7 +385,7 @@ class HTTPBodyTest {
         HTTPBody body = new HTTPBody(specialContent, "text/plain; charset=utf-8", "br");
 
         assertEquals(specialContent, body.content());
-        assertEquals("utf-8", body.getCharset());
+        assertEquals("utf-8", body.getCharset().orElse(null));
         assertTrue(body.isCompressed());
     }
 
@@ -396,6 +396,6 @@ class HTTPBodyTest {
 
         assertEquals(unicodeContent, body.content());
         assertTrue(body.hasContent());
-        assertEquals("utf-8", body.getCharset());
+        assertEquals("utf-8", body.getCharset().orElse(null));
     }
 }

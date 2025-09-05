@@ -18,6 +18,8 @@ package de.cuioss.tools.security.http.data;
 import de.cuioss.tools.security.http.core.ValidationType;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Optional;
+
 /**
  * Immutable record representing an HTTP request or response body with content, content type, and encoding.
  * 
@@ -266,11 +268,11 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     /**
      * Extracts the charset from the content type if specified.
      * 
-     * @return The charset name or null if not specified
+     * @return The charset name wrapped in Optional, or empty if not specified
      */
-    public @Nullable String getCharset() {
+    public Optional<String> getCharset() {
         if (!hasContentType()) {
-            return null;
+            return Optional.empty();
         }
 
         String lowerContentType = contentType.toLowerCase();
@@ -278,12 +280,12 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
         int charsetIndex = lowerContentType.indexOf(charsetPrefix);
 
         if (charsetIndex == -1) {
-            return null;
+            return Optional.empty();
         }
 
         int startIndex = charsetIndex + charsetPrefix.length();
         if (startIndex >= contentType.length()) {
-            return null;
+            return Optional.empty();
         }
 
         // Find the end of charset value (semicolon or end of string)
@@ -292,7 +294,8 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
             endIndex = contentType.length();
         }
 
-        return contentType.substring(startIndex, endIndex).trim();
+        String charset = contentType.substring(startIndex, endIndex).trim();
+        return Optional.of(charset);
     }
 
     /**

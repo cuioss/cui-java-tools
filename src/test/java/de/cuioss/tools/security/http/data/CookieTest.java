@@ -136,8 +136,8 @@ class CookieTest {
         Cookie cookieWithDomain = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Domain=example.com; Secure");
         Cookie cookieWithoutDomain = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("example.com", cookieWithDomain.getDomain());
-        assertNull(cookieWithoutDomain.getDomain());
+        assertEquals("example.com", cookieWithDomain.getDomain().orElse(null));
+        assertTrue(cookieWithoutDomain.getDomain().isEmpty());
     }
 
     @Test
@@ -145,8 +145,8 @@ class CookieTest {
         Cookie cookieWithPath = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Path=/admin; Secure");
         Cookie cookieWithoutPath = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("/admin", cookieWithPath.getPath());
-        assertNull(cookieWithoutPath.getPath());
+        assertEquals("/admin", cookieWithPath.getPath().orElse(null));
+        assertTrue(cookieWithoutPath.getPath().isEmpty());
     }
 
     @Test
@@ -156,10 +156,10 @@ class CookieTest {
         Cookie noneCookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "SameSite=None");
         Cookie cookieWithoutSameSite = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure");
 
-        assertEquals("Strict", strictCookie.getSameSite());
-        assertEquals("Lax", laxCookie.getSameSite());
-        assertEquals("None", noneCookie.getSameSite());
-        assertNull(cookieWithoutSameSite.getSameSite());
+        assertEquals("Strict", strictCookie.getSameSite().orElse(null));
+        assertEquals("Lax", laxCookie.getSameSite().orElse(null));
+        assertEquals("None", noneCookie.getSameSite().orElse(null));
+        assertTrue(cookieWithoutSameSite.getSameSite().isEmpty());
     }
 
     @Test
@@ -167,8 +167,8 @@ class CookieTest {
         Cookie cookieWithMaxAge = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Max-Age=3600; Secure");
         Cookie cookieWithoutMaxAge = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("3600", cookieWithMaxAge.getMaxAge());
-        assertNull(cookieWithoutMaxAge.getMaxAge());
+        assertEquals("3600", cookieWithMaxAge.getMaxAge().orElse(null));
+        assertTrue(cookieWithoutMaxAge.getMaxAge().isEmpty());
     }
 
     @Test
@@ -279,8 +279,8 @@ class CookieTest {
 
         // The current implementation requires exact "attribute=" pattern without spaces around =
         // This is actually correct per RFC 6265, where spaces around = are not standard
-        assertNull(cookie.getDomain()); // "Domain = " is not the same as "Domain="
-        assertNull(cookie.getPath()); // "Path = " is not the same as "Path="
+        assertTrue(cookie.getDomain().isEmpty()); // "Domain = " is not the same as "Domain="
+        assertTrue(cookie.getPath().isEmpty()); // "Path = " is not the same as "Path="
     }
 
     @Test
@@ -288,9 +288,9 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE,
                 "Domain=sub.example.com; Path=/admin/dashboard; Max-Age=86400");
 
-        assertEquals("sub.example.com", cookie.getDomain());
-        assertEquals("/admin/dashboard", cookie.getPath());
-        assertEquals("86400", cookie.getMaxAge());
+        assertEquals("sub.example.com", cookie.getDomain().orElse(null));
+        assertEquals("/admin/dashboard", cookie.getPath().orElse(null));
+        assertEquals("86400", cookie.getMaxAge().orElse(null));
     }
 
     @Test
@@ -298,9 +298,9 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE,
                 "domain=example.com; PATH=/test; max-age=3600");
 
-        assertEquals("example.com", cookie.getDomain());
-        assertEquals("/test", cookie.getPath());
-        assertEquals("3600", cookie.getMaxAge());
+        assertEquals("example.com", cookie.getDomain().orElse(null));
+        assertEquals("/test", cookie.getPath().orElse(null));
+        assertEquals("3600", cookie.getMaxAge().orElse(null));
     }
 
     @Test
@@ -315,7 +315,7 @@ class CookieTest {
 
         assertTrue(cookie.isSecure());
         assertTrue(cookie.isHttpOnly());
-        assertNull(cookie.getSameSite()); // No value provided for SameSite
+        assertTrue(cookie.getSameSite().isEmpty()); // No value provided for SameSite
     }
 
     @Test
@@ -352,7 +352,7 @@ class CookieTest {
 
         assertEquals("special&name", cookie.name());
         assertEquals("value with spaces", cookie.value());
-        assertEquals("exam-ple.com", cookie.getDomain());
-        assertEquals("/path with spaces", cookie.getPath());
+        assertEquals("exam-ple.com", cookie.getDomain().orElse(null));
+        assertEquals("/path with spaces", cookie.getPath().orElse(null));
     }
 }

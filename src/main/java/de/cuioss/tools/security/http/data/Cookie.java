@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -154,37 +155,37 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     /**
      * Extracts the Domain attribute value if present.
      * 
-     * @return The domain value or null if not specified
+     * @return The domain value wrapped in Optional, or empty if not specified
      */
-    public @Nullable String getDomain() {
-        return extractAttributeValue("domain");
+    public Optional<String> getDomain() {
+        return Optional.ofNullable(extractAttributeValue("domain"));
     }
 
     /**
      * Extracts the Path attribute value if present.
      * 
-     * @return The path value or null if not specified
+     * @return The path value wrapped in Optional, or empty if not specified
      */
-    public @Nullable String getPath() {
-        return extractAttributeValue("path");
+    public Optional<String> getPath() {
+        return Optional.ofNullable(extractAttributeValue("path"));
     }
 
     /**
      * Extracts the SameSite attribute value if present.
      * 
-     * @return The SameSite value (e.g., "Strict", "Lax", "None") or null if not specified
+     * @return The SameSite value (e.g., "Strict", "Lax", "None") wrapped in Optional, or empty if not specified
      */
-    public @Nullable String getSameSite() {
-        return extractAttributeValue("samesite");
+    public Optional<String> getSameSite() {
+        return Optional.ofNullable(extractAttributeValue("samesite"));
     }
 
     /**
      * Extracts the Max-Age attribute value if present.
      * 
-     * @return The Max-Age value as a string or null if not specified
+     * @return The Max-Age value as a string wrapped in Optional, or empty if not specified
      */
-    public @Nullable String getMaxAge() {
-        return extractAttributeValue("max-age");
+    public Optional<String> getMaxAge() {
+        return Optional.ofNullable(extractAttributeValue("max-age"));
     }
 
     /**

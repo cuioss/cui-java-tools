@@ -21,6 +21,7 @@ import de.cuioss.tools.security.http.core.ValidationType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Main exception for HTTP security validation failures.
@@ -137,19 +138,19 @@ public class UrlSecurityException extends RuntimeException {
     /**
      * Gets the sanitized version of the input, if available.
      * 
-     * @return The sanitized input, or null if not provided
+     * @return The sanitized input wrapped in Optional, or empty if not provided
      */
-    public @Nullable String getSanitizedInput() {
-        return sanitizedInput;
+    public Optional<String> getSanitizedInput() {
+        return Optional.ofNullable(sanitizedInput);
     }
 
     /**
      * Gets additional detail about the security failure.
      * 
-     * @return Additional detail, or null if not provided
+     * @return Additional detail wrapped in Optional, or empty if not provided
      */
-    public @Nullable String getDetail() {
-        return detail;
+    public Optional<String> getDetail() {
+        return Optional.ofNullable(detail);
     }
 
     /**

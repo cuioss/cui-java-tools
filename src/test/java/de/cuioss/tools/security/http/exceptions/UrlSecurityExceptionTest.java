@@ -49,14 +49,14 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_FAILURE_TYPE, exception.getFailureType());
         assertEquals(TEST_VALIDATION_TYPE, exception.getValidationType());
         assertEquals(TEST_INPUT, exception.getOriginalInput());
-        assertNull(exception.getSanitizedInput());
-        assertNull(exception.getDetail());
+        assertTrue(exception.getSanitizedInput().isEmpty());
+        assertTrue(exception.getDetail().isEmpty());
         assertNull(exception.getCause());
     }
 
     @Test
     void shouldBuildFullException() {
-        Throwable cause = /*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+        Throwable cause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
 
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -70,8 +70,8 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_FAILURE_TYPE, exception.getFailureType());
         assertEquals(TEST_VALIDATION_TYPE, exception.getValidationType());
         assertEquals(TEST_INPUT, exception.getOriginalInput());
-        assertEquals(TEST_SANITIZED, exception.getSanitizedInput());
-        assertEquals(TEST_DETAIL, exception.getDetail());
+        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().orElse(null));
+        assertEquals(TEST_DETAIL, exception.getDetail().orElse(null));
         assertEquals(cause, exception.getCause());
     }
 
@@ -116,7 +116,7 @@ class UrlSecurityExceptionTest {
                 .originalInput(TEST_INPUT)
                 .sanitizedInput(TEST_SANITIZED)
                 .detail(TEST_DETAIL)
-                .cause(/*~~(Use specific not RuntimeException)~~>*/new RuntimeException())
+                .cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException())
                 .build();
 
         assertNotNull(exception);
@@ -288,7 +288,7 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldSupportCauseChaining() {
-        RuntimeException rootCause = /*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+        RuntimeException rootCause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
 
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -318,8 +318,8 @@ class UrlSecurityExceptionTest {
                 .build();
 
         assertEquals("", exception.getOriginalInput());
-        assertEquals("", exception.getSanitizedInput());
-        assertEquals("", exception.getDetail());
+        assertEquals("", exception.getSanitizedInput().orElse(null));
+        assertEquals("", exception.getDetail().orElse(null));
     }
 
     @Test
@@ -352,7 +352,7 @@ class UrlSecurityExceptionTest {
         assertSame(builder.getClass(),
                 builder.detail(TEST_DETAIL).getClass());
         assertSame(builder.getClass(),
-                builder.cause(/*~~(Use specific not RuntimeException)~~>*/new RuntimeException()).getClass());
+                builder.cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException()).getClass());
     }
 
     @Test
@@ -369,8 +369,8 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_FAILURE_TYPE, exception.getFailureType());
         assertEquals(TEST_VALIDATION_TYPE, exception.getValidationType());
         assertEquals(TEST_INPUT, exception.getOriginalInput());
-        assertEquals(TEST_SANITIZED, exception.getSanitizedInput());
-        assertEquals(TEST_DETAIL, exception.getDetail());
+        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().orElse(null));
+        assertEquals(TEST_DETAIL, exception.getDetail().orElse(null));
 
         // Values should be consistent across calls
         assertSame(exception.getFailureType(), exception.getFailureType());
