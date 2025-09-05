@@ -154,7 +154,7 @@ Implement → Test → Verify → Document Progress → Commit
 |B2
 |Implement UrlSecurityException with builder pattern
 |High
-|[ ]
+|[x]
 
 |B3
 |Define core interfaces and data records (HttpSecurityValidator, ValidationType, URLParameter, Cookie, HTTPBody)
