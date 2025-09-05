@@ -253,7 +253,7 @@ class SecurityEventCounterTest {
                     for (int j = 0; j < incrementsPerThread; j++) {
                         counter.increment(failureType);
                     }
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     error.set(e);
                 } finally {
                     completionLatch.countDown();

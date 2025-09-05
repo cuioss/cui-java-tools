@@ -40,6 +40,7 @@ class UrlSecurityFailureTypeTest {
         assertNotNull(UrlSecurityFailureType.NULL_BYTE_INJECTION);
         assertNotNull(UrlSecurityFailureType.CONTROL_CHARACTERS);
         assertNotNull(UrlSecurityFailureType.PATH_TOO_LONG);
+        assertNotNull(UrlSecurityFailureType.INPUT_TOO_LONG);
         assertNotNull(UrlSecurityFailureType.EXCESSIVE_NESTING);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PARAMETER_NAME);
@@ -54,10 +55,10 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldHave20FailureTypes() {
+    void shouldHave21FailureTypes() {
         // Verify we have the expected number of failure types
         UrlSecurityFailureType[] values = UrlSecurityFailureType.values();
-        assertEquals(20, values.length, "Should have 20 failure types");
+        assertEquals(21, values.length, "Should have 21 failure types");
     }
 
     @Test
@@ -116,6 +117,7 @@ class UrlSecurityFailureTypeTest {
     @Test
     void shouldCorrectlyIdentifySizeViolations() {
         assertTrue(UrlSecurityFailureType.PATH_TOO_LONG.isSizeViolation());
+        assertTrue(UrlSecurityFailureType.INPUT_TOO_LONG.isSizeViolation());
         assertTrue(UrlSecurityFailureType.EXCESSIVE_NESTING.isSizeViolation());
 
         // Non-size violations should return false

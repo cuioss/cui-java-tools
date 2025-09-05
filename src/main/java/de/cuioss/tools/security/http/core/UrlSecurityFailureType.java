@@ -79,6 +79,9 @@ public enum UrlSecurityFailureType {
     /** Path exceeds configured maximum length limits */
     PATH_TOO_LONG("Path exceeds maximum length"),
 
+    /** Input exceeds configured maximum length limits */
+    INPUT_TOO_LONG("Input exceeds maximum length"),
+
     /** Excessive directory nesting depth detected */
     EXCESSIVE_NESTING("Excessive directory nesting"),
 
@@ -179,6 +182,7 @@ public enum UrlSecurityFailureType {
      */
     public boolean isSizeViolation() {
         return this == PATH_TOO_LONG ||
+                this == INPUT_TOO_LONG ||
                 this == EXCESSIVE_NESTING;
     }
 
