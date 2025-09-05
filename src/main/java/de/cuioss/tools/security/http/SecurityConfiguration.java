@@ -364,10 +364,6 @@ public record SecurityConfiguration(
     public boolean isLenient() {
         return allowDoubleEncoding ||
                allowControlCharacters ||
-               allowHighBitCharacters ||
-               !requireSecureCookies ||
-               !requireHttpOnlyCookies ||
-               !failOnSuspiciousPatterns ||
                maxBodySize > 5 * 1024 * 1024;
     }
     

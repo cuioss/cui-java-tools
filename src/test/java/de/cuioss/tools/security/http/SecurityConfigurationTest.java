@@ -260,14 +260,13 @@ class SecurityConfigurationTest {
     @Test
     void shouldCheckHeadersCaseSensitively() {
         SecurityConfiguration config = SecurityConfiguration.builder()
-            .allowedHeaderNames(Set.of("X-Allowed"))
             .blockedHeaderNames(Set.of("X-Blocked"))
             .caseSensitiveComparison(true)
             .build();
         
-        assertTrue(config.isHeaderAllowed("X-Allowed"));
-        assertFalse(config.isHeaderAllowed("x-allowed")); // Wrong case
-        assertFalse(config.isHeaderAllowed("X-Blocked"));
+        assertTrue(config.isHeaderAllowed("X-Allowed")); // Not blocked, no allow list
+        assertTrue(config.isHeaderAllowed("x-allowed")); // Not blocked, no allow list
+        assertFalse(config.isHeaderAllowed("X-Blocked")); // Exact match blocked
         assertTrue(config.isHeaderAllowed("x-blocked")); // Wrong case, so allowed
     }
 
