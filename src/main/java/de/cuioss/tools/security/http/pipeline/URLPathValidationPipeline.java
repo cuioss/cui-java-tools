@@ -26,8 +26,8 @@ import de.cuioss.tools.security.http.validation.LengthValidationStage;
 import de.cuioss.tools.security.http.validation.NormalizationStage;
 import de.cuioss.tools.security.http.validation.PatternMatchingStage;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.ToString;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -76,9 +76,9 @@ import java.util.Objects;
 @ToString
 public final class URLPathValidationPipeline implements HttpSecurityValidator {
 
-    private final @NonNull List<HttpSecurityValidator> stages;
-    private final @NonNull SecurityEventCounter eventCounter;
-    private final @NonNull ValidationType validationType = ValidationType.URL_PATH;
+    private final List<HttpSecurityValidator> stages;
+    private final SecurityEventCounter eventCounter;
+    private final ValidationType validationType = ValidationType.URL_PATH;
 
     /**
      * Creates a new URL path validation pipeline with the specified configuration.
@@ -87,8 +87,8 @@ public final class URLPathValidationPipeline implements HttpSecurityValidator {
      * @param eventCounter The counter for tracking security events
      * @throws NullPointerException if config or eventCounter is null
      */
-    public URLPathValidationPipeline(@NonNull SecurityConfiguration config,
-            @NonNull SecurityEventCounter eventCounter) {
+    public URLPathValidationPipeline(SecurityConfiguration config,
+            SecurityEventCounter eventCounter) {
         this.eventCounter = Objects.requireNonNull(eventCounter, "EventCounter must not be null");
         Objects.requireNonNull(config, "Config must not be null");
 
@@ -103,7 +103,7 @@ public final class URLPathValidationPipeline implements HttpSecurityValidator {
     }
 
     @Override
-    public String validate(String value) throws UrlSecurityException {
+    public String validate(@Nullable String value) throws UrlSecurityException {
         String result = value;
 
         // Sequential execution with early termination

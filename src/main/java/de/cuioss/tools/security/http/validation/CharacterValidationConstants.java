@@ -16,7 +16,6 @@
 package de.cuioss.tools.security.http.validation;
 
 import de.cuioss.tools.security.http.core.ValidationType;
-import lombok.NonNull;
 
 import java.util.BitSet;
 
@@ -95,8 +94,7 @@ public final class CharacterValidationConstants {
      * Returns the character set for the given validation type.
      * Note: Returns the actual BitSet, not a copy. Do not modify!
      */
-    @NonNull
-    public static BitSet getCharacterSet(@NonNull ValidationType type) {
+    public static BitSet getCharacterSet(ValidationType type) {
         return switch (type) {
             case URL_PATH -> RFC3986_PATH_CHARS;
             case PARAMETER_NAME, PARAMETER_VALUE -> RFC3986_QUERY_CHARS;
