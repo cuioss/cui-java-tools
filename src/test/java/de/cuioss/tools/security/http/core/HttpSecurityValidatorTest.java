@@ -145,7 +145,8 @@ class HttpSecurityValidatorTest {
         assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, thrown.getFailureType());
         assertEquals(ValidationType.URL_PATH, thrown.getValidationType());
         assertEquals("anything", thrown.getOriginalInput());
-        assertTrue(thrown.getDetail().orElse("").contains("unconditionally rejected"));
+        assertTrue(thrown.getDetail().isPresent());
+        assertTrue(thrown.getDetail().get().contains("unconditionally rejected"));
     }
 
     @Test
@@ -235,7 +236,8 @@ class HttpSecurityValidatorTest {
                 () -> validator.validate(testInput));
 
         assertEquals(testInput, thrown.getOriginalInput());
-        assertEquals(testDetail, thrown.getDetail().orElse(null));
+        assertTrue(thrown.getDetail().isPresent());
+        assertEquals(testDetail, thrown.getDetail().get());
         assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, thrown.getFailureType());
         assertEquals(ValidationType.URL_PATH, thrown.getValidationType());
     }

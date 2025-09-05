@@ -92,7 +92,8 @@ class DecodingStageTest {
         assertEquals(UrlSecurityFailureType.DOUBLE_ENCODING, exception.getFailureType());
         assertEquals(ValidationType.URL_PATH, exception.getValidationType());
         assertEquals("/admin%252Fusers", exception.getOriginalInput());
-        assertTrue(exception.getDetail().map(detail -> detail.contains("Double encoding pattern")).orElse(false));
+        assertTrue(exception.getDetail().isPresent());
+        assertTrue(exception.getDetail().get().contains("Double encoding pattern"));
     }
 
     @ParameterizedTest
@@ -147,7 +148,8 @@ class DecodingStageTest {
             assertEquals(UrlSecurityFailureType.INVALID_ENCODING, exception.getFailureType());
             assertEquals(invalidInput, exception.getOriginalInput());
             assertNotNull(exception.getCause());
-            assertTrue(exception.getDetail().map(detail -> detail.contains("URL decoding failed")).orElse(false));
+            assertTrue(exception.getDetail().isPresent());
+            assertTrue(exception.getDetail().get().contains("URL decoding failed"));
         }
     }
 
@@ -192,7 +194,8 @@ class DecodingStageTest {
             assertEquals(UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED, exception.getFailureType());
             assertEquals(decomposed, exception.getOriginalInput());
             assertEquals(Optional.of(composed), exception.getSanitizedInput());
-            assertTrue(exception.getDetail().map(detail -> detail.contains("Unicode normalization changed")).orElse(false));
+            assertTrue(exception.getDetail().isPresent());
+            assertTrue(exception.getDetail().get().contains("Unicode normalization changed"));
         }
     }
 
@@ -259,7 +262,7 @@ class DecodingStageTest {
                     String input = "/api/path%2F" + threadIndex;
                     String result = decoder.validate(input);
                     results[threadIndex] = result.equals("/api/path/" + threadIndex);
-                } /*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     results[threadIndex] = false;
                 }
             });

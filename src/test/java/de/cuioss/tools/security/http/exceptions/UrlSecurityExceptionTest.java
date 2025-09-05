@@ -56,7 +56,7 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldBuildFullException() {
-        Throwable cause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+        Throwable cause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
 
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -70,8 +70,10 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_FAILURE_TYPE, exception.getFailureType());
         assertEquals(TEST_VALIDATION_TYPE, exception.getValidationType());
         assertEquals(TEST_INPUT, exception.getOriginalInput());
-        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().orElse(null));
-        assertEquals(TEST_DETAIL, exception.getDetail().orElse(null));
+        assertTrue(exception.getSanitizedInput().isPresent());
+        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().get());
+        assertTrue(exception.getDetail().isPresent());
+        assertEquals(TEST_DETAIL, exception.getDetail().get());
         assertEquals(cause, exception.getCause());
     }
 
@@ -116,7 +118,7 @@ class UrlSecurityExceptionTest {
                 .originalInput(TEST_INPUT)
                 .sanitizedInput(TEST_SANITIZED)
                 .detail(TEST_DETAIL)
-                .cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException())
+                .cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException())
                 .build();
 
         assertNotNull(exception);
@@ -288,7 +290,7 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldSupportCauseChaining() {
-        RuntimeException rootCause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+        RuntimeException rootCause = /*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
 
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -352,7 +354,7 @@ class UrlSecurityExceptionTest {
         assertSame(builder.getClass(),
                 builder.detail(TEST_DETAIL).getClass());
         assertSame(builder.getClass(),
-                builder.cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException()).getClass());
+                builder.cause(/*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*//*~~(Use specific not RuntimeException)~~>*/new RuntimeException()).getClass());
     }
 
     @Test
@@ -369,8 +371,10 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_FAILURE_TYPE, exception.getFailureType());
         assertEquals(TEST_VALIDATION_TYPE, exception.getValidationType());
         assertEquals(TEST_INPUT, exception.getOriginalInput());
-        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().orElse(null));
-        assertEquals(TEST_DETAIL, exception.getDetail().orElse(null));
+        assertTrue(exception.getSanitizedInput().isPresent());
+        assertEquals(TEST_SANITIZED, exception.getSanitizedInput().get());
+        assertTrue(exception.getDetail().isPresent());
+        assertEquals(TEST_DETAIL, exception.getDetail().get());
 
         // Values should be consistent across calls
         assertSame(exception.getFailureType(), exception.getFailureType());

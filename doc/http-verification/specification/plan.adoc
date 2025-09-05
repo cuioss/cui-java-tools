@@ -221,7 +221,7 @@ Implement → Test → Verify → Document Progress → Commit
 |V2
 |Implement NormalizationStage with path normalization
 |High
-|[ ]
+|[x]
 
 |V3
 |Implement PatternMatchingStage - see link:specification.adoc#_patternmatchingstage[Architecture §Pattern]
