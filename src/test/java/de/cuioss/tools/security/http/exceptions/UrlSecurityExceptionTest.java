@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.exceptions;
 
+import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
+import de.cuioss.tools.security.http.core.ValidationType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,8 +56,8 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldBuildFullException() {
-        Throwable cause = new RuntimeException("Root cause");
-        
+        Throwable cause = /*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
                 .validationType(TEST_VALIDATION_TYPE)
@@ -80,7 +82,7 @@ class UrlSecurityExceptionTest {
                         .validationType(TEST_VALIDATION_TYPE)
                         .originalInput(TEST_INPUT)
                         .build());
-        
+
         assertTrue(thrown.getMessage().contains("failureType must be set"));
     }
 
@@ -91,7 +93,7 @@ class UrlSecurityExceptionTest {
                         .failureType(TEST_FAILURE_TYPE)
                         .originalInput(TEST_INPUT)
                         .build());
-        
+
         assertTrue(thrown.getMessage().contains("validationType must be set"));
     }
 
@@ -102,7 +104,7 @@ class UrlSecurityExceptionTest {
                         .failureType(TEST_FAILURE_TYPE)
                         .validationType(TEST_VALIDATION_TYPE)
                         .build());
-        
+
         assertTrue(thrown.getMessage().contains("originalInput must be set"));
     }
 
@@ -114,7 +116,7 @@ class UrlSecurityExceptionTest {
                 .originalInput(TEST_INPUT)
                 .sanitizedInput(TEST_SANITIZED)
                 .detail(TEST_DETAIL)
-                .cause(new RuntimeException())
+                .cause(/*~~(Use specific not RuntimeException)~~>*/new RuntimeException())
                 .build();
 
         assertNotNull(exception);
@@ -167,7 +169,7 @@ class UrlSecurityExceptionTest {
     @Test
     void shouldSanitizeControlCharactersInMessage() {
         String inputWithControlChars = "test\r\n\ttab\u0000null";
-        
+
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(UrlSecurityFailureType.CONTROL_CHARACTERS)
                 .validationType(TEST_VALIDATION_TYPE)
@@ -187,14 +189,14 @@ class UrlSecurityExceptionTest {
     void shouldHandleNullInputSafely() {
         // This should not happen in normal usage, but test defensive behavior
         String nullInput = null;
-        
+
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
                 UrlSecurityException.builder()
                         .failureType(TEST_FAILURE_TYPE)
                         .validationType(TEST_VALIDATION_TYPE)
                         .originalInput(nullInput)
                         .build());
-        
+
         assertTrue(thrown.getMessage().contains("originalInput must be set"));
     }
 
@@ -259,7 +261,7 @@ class UrlSecurityExceptionTest {
     @Test
     void shouldTruncateInputInToString() {
         String longInput = "A".repeat(300);
-        
+
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
                 .validationType(TEST_VALIDATION_TYPE)
@@ -286,8 +288,8 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldSupportCauseChaining() {
-        RuntimeException rootCause = new RuntimeException("Root cause");
-        
+        RuntimeException rootCause = /*~~(Use specific not RuntimeException)~~>*/new RuntimeException("Root cause");
+
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
                 .validationType(TEST_VALIDATION_TYPE)
@@ -296,7 +298,7 @@ class UrlSecurityExceptionTest {
                 .build();
 
         assertEquals(rootCause, exception.getCause());
-        
+
         // Test chaining
         try {
             throw exception;
@@ -338,19 +340,19 @@ class UrlSecurityExceptionTest {
     void shouldSupportMethodChaining() {
         // Verify that all builder methods return the builder for chaining
         UrlSecurityException.Builder builder = UrlSecurityException.builder();
-        
-        assertSame(builder.getClass(), 
+
+        assertSame(builder.getClass(),
                 builder.failureType(TEST_FAILURE_TYPE).getClass());
-        assertSame(builder.getClass(), 
+        assertSame(builder.getClass(),
                 builder.validationType(TEST_VALIDATION_TYPE).getClass());
-        assertSame(builder.getClass(), 
+        assertSame(builder.getClass(),
                 builder.originalInput(TEST_INPUT).getClass());
-        assertSame(builder.getClass(), 
+        assertSame(builder.getClass(),
                 builder.sanitizedInput(TEST_SANITIZED).getClass());
-        assertSame(builder.getClass(), 
+        assertSame(builder.getClass(),
                 builder.detail(TEST_DETAIL).getClass());
-        assertSame(builder.getClass(), 
-                builder.cause(new RuntimeException()).getClass());
+        assertSame(builder.getClass(),
+                builder.cause(/*~~(Use specific not RuntimeException)~~>*/new RuntimeException()).getClass());
     }
 
     @Test
@@ -369,7 +371,7 @@ class UrlSecurityExceptionTest {
         assertEquals(TEST_INPUT, exception.getOriginalInput());
         assertEquals(TEST_SANITIZED, exception.getSanitizedInput());
         assertEquals(TEST_DETAIL, exception.getDetail());
-        
+
         // Values should be consistent across calls
         assertSame(exception.getFailureType(), exception.getFailureType());
         assertSame(exception.getValidationType(), exception.getValidationType());
@@ -387,7 +389,7 @@ class UrlSecurityExceptionTest {
 
         String message1 = exception.getMessage();
         String message2 = exception.getMessage();
-        
+
         assertEquals(message1, message2);
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.data;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class URLParameterTest {
     @Test
     void shouldCreateParameterWithNameAndValue() {
         URLParameter param = new URLParameter(PARAM_NAME, PARAM_VALUE);
-        
+
         assertEquals(PARAM_NAME, param.name());
         assertEquals(PARAM_VALUE, param.value());
     }
@@ -40,13 +40,13 @@ class URLParameterTest {
         URLParameter param1 = new URLParameter(null, PARAM_VALUE);
         URLParameter param2 = new URLParameter(PARAM_NAME, null);
         URLParameter param3 = new URLParameter(null, null);
-        
+
         assertNull(param1.name());
         assertEquals(PARAM_VALUE, param1.value());
-        
+
         assertEquals(PARAM_NAME, param2.name());
         assertNull(param2.value());
-        
+
         assertNull(param3.name());
         assertNull(param3.value());
     }
@@ -54,7 +54,7 @@ class URLParameterTest {
     @Test
     void shouldCreateParameterWithEmptyStrings() {
         URLParameter param = new URLParameter("", "");
-        
+
         assertEquals("", param.name());
         assertEquals("", param.value());
     }
@@ -62,7 +62,7 @@ class URLParameterTest {
     @Test
     void shouldCreateParameterWithEmptyValue() {
         URLParameter param = URLParameter.withEmptyValue("flag");
-        
+
         assertEquals("flag", param.name());
         assertEquals("", param.value());
     }
@@ -72,7 +72,7 @@ class URLParameterTest {
         URLParameter withName = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter withoutName = new URLParameter(null, PARAM_VALUE);
         URLParameter withEmptyName = new URLParameter("", PARAM_VALUE);
-        
+
         assertTrue(withName.hasName());
         assertFalse(withoutName.hasName());
         assertFalse(withEmptyName.hasName());
@@ -83,7 +83,7 @@ class URLParameterTest {
         URLParameter withValue = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter withoutValue = new URLParameter(PARAM_NAME, null);
         URLParameter withEmptyValue = new URLParameter(PARAM_NAME, "");
-        
+
         assertTrue(withValue.hasValue());
         assertFalse(withoutValue.hasValue());
         assertFalse(withEmptyValue.hasValue());
@@ -95,7 +95,7 @@ class URLParameterTest {
         URLParameter flagParam1 = new URLParameter("flag", "");
         URLParameter flagParam2 = new URLParameter("flag", null);
         URLParameter invalidFlag = new URLParameter(null, "");
-        
+
         assertFalse(normalParam.isFlag());
         assertTrue(flagParam1.isFlag());
         assertTrue(flagParam2.isFlag());
@@ -106,7 +106,7 @@ class URLParameterTest {
     void shouldReturnNameOrDefault() {
         URLParameter withName = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter withoutName = new URLParameter(null, PARAM_VALUE);
-        
+
         assertEquals(PARAM_NAME, withName.nameOrDefault("default"));
         assertEquals("default", withoutName.nameOrDefault("default"));
     }
@@ -115,7 +115,7 @@ class URLParameterTest {
     void shouldReturnValueOrDefault() {
         URLParameter withValue = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter withoutValue = new URLParameter(PARAM_NAME, null);
-        
+
         assertEquals(PARAM_VALUE, withValue.valueOrDefault("default"));
         assertEquals("default", withoutValue.valueOrDefault("default"));
     }
@@ -127,7 +127,7 @@ class URLParameterTest {
         URLParameter nullValueParam = new URLParameter("key", null);
         URLParameter nullNameParam = new URLParameter(null, "value");
         URLParameter nullBothParam = new URLParameter(null, null);
-        
+
         assertEquals("name=value", normalParam.toParameterString());
         assertEquals("flag", flagParam.toParameterString());
         assertEquals("key", nullValueParam.toParameterString());
@@ -139,7 +139,7 @@ class URLParameterTest {
     void shouldCreateParameterWithNewName() {
         URLParameter original = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter renamed = original.withName("newName");
-        
+
         assertEquals("newName", renamed.name());
         assertEquals(PARAM_VALUE, renamed.value());
         assertEquals(PARAM_NAME, original.name()); // Original unchanged
@@ -149,7 +149,7 @@ class URLParameterTest {
     void shouldCreateParameterWithNewValue() {
         URLParameter original = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter newValue = original.withValue("newValue");
-        
+
         assertEquals(PARAM_NAME, newValue.name());
         assertEquals("newValue", newValue.value());
         assertEquals(PARAM_VALUE, original.value()); // Original unchanged
@@ -160,7 +160,7 @@ class URLParameterTest {
         URLParameter param1 = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter param2 = new URLParameter(PARAM_NAME, PARAM_VALUE);
         URLParameter param3 = new URLParameter("other", PARAM_VALUE);
-        
+
         assertEquals(param1, param2);
         assertNotEquals(param1, param3);
         assertEquals(param1.hashCode(), param2.hashCode());
@@ -170,7 +170,7 @@ class URLParameterTest {
     void shouldSupportToString() {
         URLParameter param = new URLParameter(PARAM_NAME, PARAM_VALUE);
         String string = param.toString();
-        
+
         assertTrue(string.contains(PARAM_NAME));
         assertTrue(string.contains(PARAM_VALUE));
     }
@@ -178,7 +178,7 @@ class URLParameterTest {
     @Test
     void shouldHandleSpecialCharacters() {
         URLParameter param = new URLParameter("special&name", "value with spaces");
-        
+
         assertEquals("special&name", param.name());
         assertEquals("value with spaces", param.value());
         assertEquals("special&name=value with spaces", param.toParameterString());
@@ -187,7 +187,7 @@ class URLParameterTest {
     @Test
     void shouldHandleUnicodeCharacters() {
         URLParameter param = new URLParameter("名前", "値");
-        
+
         assertEquals("名前", param.name());
         assertEquals("値", param.value());
         assertTrue(param.hasName());
@@ -200,12 +200,12 @@ class URLParameterTest {
         URLParameter nullName = new URLParameter(null, "value");
         URLParameter emptyValue = new URLParameter("name", "");
         URLParameter nullValue = new URLParameter("name", null);
-        
+
         assertFalse(emptyName.hasName());
         assertFalse(nullName.hasName());
         assertFalse(emptyValue.hasValue());
         assertFalse(nullValue.hasValue());
-        
+
         assertEquals("", emptyName.nameOrDefault("default"));
         assertEquals("default", nullName.nameOrDefault("default"));
         assertEquals("", emptyValue.valueOrDefault("default"));
@@ -217,7 +217,7 @@ class URLParameterTest {
         String longName = "a".repeat(1000);
         String longValue = "b".repeat(1000);
         URLParameter param = new URLParameter(longName, longValue);
-        
+
         assertEquals(longName, param.name());
         assertEquals(longValue, param.value());
         assertTrue(param.hasName());
@@ -227,14 +227,14 @@ class URLParameterTest {
     @Test
     void shouldBeImmutable() {
         URLParameter original = new URLParameter(PARAM_NAME, PARAM_VALUE);
-        
+
         URLParameter withNewName = original.withName("new");
         URLParameter withNewValue = original.withValue("new");
-        
+
         // Original should be unchanged
         assertEquals(PARAM_NAME, original.name());
         assertEquals(PARAM_VALUE, original.value());
-        
+
         // New instances should have changes
         assertEquals("new", withNewName.name());
         assertEquals(PARAM_VALUE, withNewName.value());
@@ -246,7 +246,7 @@ class URLParameterTest {
     void shouldHandleEdgeCasesInParameterString() {
         URLParameter justEquals = new URLParameter("=", "=");
         URLParameter withEquals = new URLParameter("key=name", "value=data");
-        
+
         assertEquals("===", justEquals.toParameterString());
         assertEquals("key=name=value=data", withEquals.toParameterString());
     }

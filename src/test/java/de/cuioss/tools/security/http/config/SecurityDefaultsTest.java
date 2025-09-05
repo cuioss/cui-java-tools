@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.config;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,7 @@ class SecurityDefaultsTest {
         assertEquals(1024, SecurityDefaults.MAX_PATH_LENGTH_STRICT);
         assertEquals(4096, SecurityDefaults.MAX_PATH_LENGTH_DEFAULT);
         assertEquals(8192, SecurityDefaults.MAX_PATH_LENGTH_LENIENT);
-        
+
         assertTrue(SecurityDefaults.MAX_PATH_LENGTH_STRICT < SecurityDefaults.MAX_PATH_LENGTH_DEFAULT);
         assertTrue(SecurityDefaults.MAX_PATH_LENGTH_DEFAULT < SecurityDefaults.MAX_PATH_LENGTH_LENIENT);
     }
@@ -41,7 +41,7 @@ class SecurityDefaultsTest {
         assertEquals(20, SecurityDefaults.MAX_PARAMETER_COUNT_STRICT);
         assertEquals(100, SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT);
         assertEquals(500, SecurityDefaults.MAX_PARAMETER_COUNT_LENIENT);
-        
+
         assertTrue(SecurityDefaults.MAX_PARAMETER_COUNT_STRICT < SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT);
         assertTrue(SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT < SecurityDefaults.MAX_PARAMETER_COUNT_LENIENT);
     }
@@ -51,7 +51,7 @@ class SecurityDefaultsTest {
         assertEquals(64, SecurityDefaults.MAX_PARAMETER_NAME_LENGTH_STRICT);
         assertEquals(128, SecurityDefaults.MAX_PARAMETER_NAME_LENGTH_DEFAULT);
         assertEquals(256, SecurityDefaults.MAX_PARAMETER_NAME_LENGTH_LENIENT);
-        
+
         assertEquals(1024, SecurityDefaults.MAX_PARAMETER_VALUE_LENGTH_STRICT);
         assertEquals(2048, SecurityDefaults.MAX_PARAMETER_VALUE_LENGTH_DEFAULT);
         assertEquals(8192, SecurityDefaults.MAX_PARAMETER_VALUE_LENGTH_LENIENT);
@@ -62,11 +62,11 @@ class SecurityDefaultsTest {
         assertEquals(20, SecurityDefaults.MAX_HEADER_COUNT_STRICT);
         assertEquals(50, SecurityDefaults.MAX_HEADER_COUNT_DEFAULT);
         assertEquals(100, SecurityDefaults.MAX_HEADER_COUNT_LENIENT);
-        
+
         assertEquals(64, SecurityDefaults.MAX_HEADER_NAME_LENGTH_STRICT);
         assertEquals(128, SecurityDefaults.MAX_HEADER_NAME_LENGTH_DEFAULT);
         assertEquals(256, SecurityDefaults.MAX_HEADER_NAME_LENGTH_LENIENT);
-        
+
         assertEquals(1024, SecurityDefaults.MAX_HEADER_VALUE_LENGTH_STRICT);
         assertEquals(2048, SecurityDefaults.MAX_HEADER_VALUE_LENGTH_DEFAULT);
         assertEquals(8192, SecurityDefaults.MAX_HEADER_VALUE_LENGTH_LENIENT);
@@ -77,11 +77,11 @@ class SecurityDefaultsTest {
         assertEquals(10, SecurityDefaults.MAX_COOKIE_COUNT_STRICT);
         assertEquals(20, SecurityDefaults.MAX_COOKIE_COUNT_DEFAULT);
         assertEquals(50, SecurityDefaults.MAX_COOKIE_COUNT_LENIENT);
-        
+
         assertEquals(64, SecurityDefaults.MAX_COOKIE_NAME_LENGTH_STRICT);
         assertEquals(128, SecurityDefaults.MAX_COOKIE_NAME_LENGTH_DEFAULT);
         assertEquals(256, SecurityDefaults.MAX_COOKIE_NAME_LENGTH_LENIENT);
-        
+
         assertEquals(1024, SecurityDefaults.MAX_COOKIE_VALUE_LENGTH_STRICT);
         assertEquals(2048, SecurityDefaults.MAX_COOKIE_VALUE_LENGTH_DEFAULT);
         assertEquals(8192, SecurityDefaults.MAX_COOKIE_VALUE_LENGTH_LENIENT);
@@ -89,10 +89,10 @@ class SecurityDefaultsTest {
 
     @Test
     void shouldHaveCorrectBodySizeConstants() {
-        assertEquals(1024 * 1024, SecurityDefaults.MAX_BODY_SIZE_STRICT);
-        assertEquals(5 * 1024 * 1024, SecurityDefaults.MAX_BODY_SIZE_DEFAULT);
-        assertEquals(10 * 1024 * 1024, SecurityDefaults.MAX_BODY_SIZE_LENIENT);
-        
+        assertEquals(SecurityDefaults.MAX_BODY_SIZE_STRICT, 1024 * 1024);
+        assertEquals(SecurityDefaults.MAX_BODY_SIZE_DEFAULT, 5 * 1024 * 1024);
+        assertEquals(SecurityDefaults.MAX_BODY_SIZE_LENIENT, 10 * 1024 * 1024);
+
         assertTrue(SecurityDefaults.MAX_BODY_SIZE_STRICT < SecurityDefaults.MAX_BODY_SIZE_DEFAULT);
         assertTrue(SecurityDefaults.MAX_BODY_SIZE_DEFAULT < SecurityDefaults.MAX_BODY_SIZE_LENIENT);
     }
@@ -101,7 +101,7 @@ class SecurityDefaultsTest {
     void shouldHavePathTraversalPatterns() {
         assertNotNull(SecurityDefaults.PATH_TRAVERSAL_PATTERNS);
         assertFalse(SecurityDefaults.PATH_TRAVERSAL_PATTERNS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.PATH_TRAVERSAL_PATTERNS.contains("../"));
         assertTrue(SecurityDefaults.PATH_TRAVERSAL_PATTERNS.contains("..\\"));
         assertTrue(SecurityDefaults.PATH_TRAVERSAL_PATTERNS.contains("..%2F"));
@@ -112,7 +112,7 @@ class SecurityDefaultsTest {
     void shouldHaveSuspiciousPathPatterns() {
         assertNotNull(SecurityDefaults.SUSPICIOUS_PATH_PATTERNS);
         assertFalse(SecurityDefaults.SUSPICIOUS_PATH_PATTERNS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.SUSPICIOUS_PATH_PATTERNS.contains("/etc/"));
         assertTrue(SecurityDefaults.SUSPICIOUS_PATH_PATTERNS.contains("\\windows\\"));
         assertTrue(SecurityDefaults.SUSPICIOUS_PATH_PATTERNS.contains("web.xml"));
@@ -123,7 +123,7 @@ class SecurityDefaultsTest {
     void shouldHaveSuspiciousParameterNames() {
         assertNotNull(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES);
         assertFalse(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("cmd"));
         assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("exec"));
         assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("sql"));
@@ -134,7 +134,7 @@ class SecurityDefaultsTest {
     void shouldHaveDangerousHeaderNames() {
         assertNotNull(SecurityDefaults.DANGEROUS_HEADER_NAMES);
         assertFalse(SecurityDefaults.DANGEROUS_HEADER_NAMES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.DANGEROUS_HEADER_NAMES.contains("X-Debug"));
         assertTrue(SecurityDefaults.DANGEROUS_HEADER_NAMES.contains("X-Admin"));
         assertTrue(SecurityDefaults.DANGEROUS_HEADER_NAMES.contains("X-Execute"));
@@ -144,7 +144,7 @@ class SecurityDefaultsTest {
     void shouldHaveDebugHeaderNames() {
         assertNotNull(SecurityDefaults.DEBUG_HEADER_NAMES);
         assertFalse(SecurityDefaults.DEBUG_HEADER_NAMES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.DEBUG_HEADER_NAMES.contains("X-Debug"));
         assertTrue(SecurityDefaults.DEBUG_HEADER_NAMES.contains("X-Trace"));
         assertTrue(SecurityDefaults.DEBUG_HEADER_NAMES.contains("X-Development"));
@@ -154,7 +154,7 @@ class SecurityDefaultsTest {
     void shouldHaveSuspiciousCookieNames() {
         assertNotNull(SecurityDefaults.SUSPICIOUS_COOKIE_NAMES);
         assertFalse(SecurityDefaults.SUSPICIOUS_COOKIE_NAMES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.SUSPICIOUS_COOKIE_NAMES.contains("debug"));
         assertTrue(SecurityDefaults.SUSPICIOUS_COOKIE_NAMES.contains("admin"));
         assertTrue(SecurityDefaults.SUSPICIOUS_COOKIE_NAMES.contains("password"));
@@ -164,7 +164,7 @@ class SecurityDefaultsTest {
     void shouldHaveSafeContentTypes() {
         assertNotNull(SecurityDefaults.SAFE_CONTENT_TYPES);
         assertFalse(SecurityDefaults.SAFE_CONTENT_TYPES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.SAFE_CONTENT_TYPES.contains("application/json"));
         assertTrue(SecurityDefaults.SAFE_CONTENT_TYPES.contains("text/plain"));
         assertTrue(SecurityDefaults.SAFE_CONTENT_TYPES.contains("application/xml"));
@@ -174,7 +174,7 @@ class SecurityDefaultsTest {
     void shouldHaveDangerousContentTypes() {
         assertNotNull(SecurityDefaults.DANGEROUS_CONTENT_TYPES);
         assertFalse(SecurityDefaults.DANGEROUS_CONTENT_TYPES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.DANGEROUS_CONTENT_TYPES.contains("application/x-executable"));
         assertTrue(SecurityDefaults.DANGEROUS_CONTENT_TYPES.contains("application/x-msdownload"));
         assertTrue(SecurityDefaults.DANGEROUS_CONTENT_TYPES.contains("text/x-script"));
@@ -184,7 +184,7 @@ class SecurityDefaultsTest {
     void shouldHaveUploadContentTypes() {
         assertNotNull(SecurityDefaults.UPLOAD_CONTENT_TYPES);
         assertFalse(SecurityDefaults.UPLOAD_CONTENT_TYPES.isEmpty());
-        
+
         assertTrue(SecurityDefaults.UPLOAD_CONTENT_TYPES.contains("multipart/form-data"));
         assertTrue(SecurityDefaults.UPLOAD_CONTENT_TYPES.contains("image/jpeg"));
         assertTrue(SecurityDefaults.UPLOAD_CONTENT_TYPES.contains("application/pdf"));
@@ -193,11 +193,11 @@ class SecurityDefaultsTest {
     @Test
     void shouldHaveCharacterConstants() {
         assertEquals('\0', SecurityDefaults.NULL_BYTE);
-        
+
         assertNotNull(SecurityDefaults.PROBLEMATIC_CONTROL_CHARS);
         assertTrue(SecurityDefaults.PROBLEMATIC_CONTROL_CHARS.contains('\0'));
         assertTrue(SecurityDefaults.PROBLEMATIC_CONTROL_CHARS.contains('\b'));
-        
+
         assertNotNull(SecurityDefaults.INJECTION_CHARACTERS);
         assertTrue(SecurityDefaults.INJECTION_CHARACTERS.contains('<'));
         assertTrue(SecurityDefaults.INJECTION_CHARACTERS.contains('>'));
@@ -208,14 +208,14 @@ class SecurityDefaultsTest {
     void shouldHaveInjectionPatterns() {
         assertNotNull(SecurityDefaults.SQL_INJECTION_PATTERNS);
         assertFalse(SecurityDefaults.SQL_INJECTION_PATTERNS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("union select"));
         assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("or 1=1"));
         assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("drop table"));
-        
+
         assertNotNull(SecurityDefaults.XSS_PATTERNS);
         assertFalse(SecurityDefaults.XSS_PATTERNS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.XSS_PATTERNS.contains("<script"));
         assertTrue(SecurityDefaults.XSS_PATTERNS.contains("javascript:"));
         assertTrue(SecurityDefaults.XSS_PATTERNS.contains("alert("));
@@ -225,13 +225,13 @@ class SecurityDefaultsTest {
     void shouldHaveEncodingPatterns() {
         assertNotNull(SecurityDefaults.DOUBLE_ENCODING_PATTERNS);
         assertFalse(SecurityDefaults.DOUBLE_ENCODING_PATTERNS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.DOUBLE_ENCODING_PATTERNS.contains("%25"));
         assertTrue(SecurityDefaults.DOUBLE_ENCODING_PATTERNS.contains("%2525"));
-        
+
         assertNotNull(SecurityDefaults.UNICODE_NORMALIZATION_FORMS);
         assertFalse(SecurityDefaults.UNICODE_NORMALIZATION_FORMS.isEmpty());
-        
+
         assertTrue(SecurityDefaults.UNICODE_NORMALIZATION_FORMS.contains("NFC"));
         assertTrue(SecurityDefaults.UNICODE_NORMALIZATION_FORMS.contains("NFKD"));
     }
@@ -241,7 +241,7 @@ class SecurityDefaultsTest {
         assertNotNull(SecurityDefaults.STRICT_CONFIGURATION);
         assertNotNull(SecurityDefaults.DEFAULT_CONFIGURATION);
         assertNotNull(SecurityDefaults.LENIENT_CONFIGURATION);
-        
+
         assertTrue(SecurityDefaults.STRICT_CONFIGURATION.isStrict());
         assertFalse(SecurityDefaults.DEFAULT_CONFIGURATION.isStrict());
         assertFalse(SecurityDefaults.DEFAULT_CONFIGURATION.isLenient());
@@ -251,13 +251,13 @@ class SecurityDefaultsTest {
     @Test
     void shouldHaveConsistentStrictConfiguration() {
         SecurityConfiguration strict = SecurityDefaults.STRICT_CONFIGURATION;
-        
+
         assertEquals(SecurityDefaults.MAX_PATH_LENGTH_STRICT, strict.maxPathLength());
         assertEquals(SecurityDefaults.MAX_PARAMETER_COUNT_STRICT, strict.maxParameterCount());
         assertEquals(SecurityDefaults.MAX_HEADER_COUNT_STRICT, strict.maxHeaderCount());
         assertEquals(SecurityDefaults.MAX_COOKIE_COUNT_STRICT, strict.maxCookieCount());
         assertEquals(SecurityDefaults.MAX_BODY_SIZE_STRICT, strict.maxBodySize());
-        
+
         assertFalse(strict.allowPathTraversal());
         assertFalse(strict.allowDoubleEncoding());
         assertTrue(strict.requireSecureCookies());
@@ -267,13 +267,13 @@ class SecurityDefaultsTest {
     @Test
     void shouldHaveConsistentDefaultConfiguration() {
         SecurityConfiguration defaults = SecurityDefaults.DEFAULT_CONFIGURATION;
-        
+
         assertEquals(SecurityDefaults.MAX_PATH_LENGTH_DEFAULT, defaults.maxPathLength());
         assertEquals(SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT, defaults.maxParameterCount());
         assertEquals(SecurityDefaults.MAX_HEADER_COUNT_DEFAULT, defaults.maxHeaderCount());
         assertEquals(SecurityDefaults.MAX_COOKIE_COUNT_DEFAULT, defaults.maxCookieCount());
         assertEquals(SecurityDefaults.MAX_BODY_SIZE_DEFAULT, defaults.maxBodySize());
-        
+
         assertFalse(defaults.allowPathTraversal());
         assertFalse(defaults.allowDoubleEncoding());
         assertFalse(defaults.requireSecureCookies());
@@ -283,13 +283,13 @@ class SecurityDefaultsTest {
     @Test
     void shouldHaveConsistentLenientConfiguration() {
         SecurityConfiguration lenient = SecurityDefaults.LENIENT_CONFIGURATION;
-        
+
         assertEquals(SecurityDefaults.MAX_PATH_LENGTH_LENIENT, lenient.maxPathLength());
         assertEquals(SecurityDefaults.MAX_PARAMETER_COUNT_LENIENT, lenient.maxParameterCount());
         assertEquals(SecurityDefaults.MAX_HEADER_COUNT_LENIENT, lenient.maxHeaderCount());
         assertEquals(SecurityDefaults.MAX_COOKIE_COUNT_LENIENT, lenient.maxCookieCount());
         assertEquals(SecurityDefaults.MAX_BODY_SIZE_LENIENT, lenient.maxBodySize());
-        
+
         assertFalse(lenient.allowPathTraversal()); // Still not allowed
         assertTrue(lenient.allowDoubleEncoding());
         assertFalse(lenient.requireSecureCookies());
@@ -298,14 +298,14 @@ class SecurityDefaultsTest {
 
     @Test
     void shouldHaveImmutableSets() {
-        assertThrows(UnsupportedOperationException.class, () -> 
-            SecurityDefaults.PATH_TRAVERSAL_PATTERNS.add("test"));
-            
-        assertThrows(UnsupportedOperationException.class, () -> 
-            SecurityDefaults.DANGEROUS_HEADER_NAMES.add("test"));
-            
-        assertThrows(UnsupportedOperationException.class, () -> 
-            SecurityDefaults.SAFE_CONTENT_TYPES.add("test"));
+        assertThrows(UnsupportedOperationException.class, () ->
+                SecurityDefaults.PATH_TRAVERSAL_PATTERNS.add("test"));
+
+        assertThrows(UnsupportedOperationException.class, () ->
+                SecurityDefaults.DANGEROUS_HEADER_NAMES.add("test"));
+
+        assertThrows(UnsupportedOperationException.class, () ->
+                SecurityDefaults.SAFE_CONTENT_TYPES.add("test"));
     }
 
     @Test
@@ -326,10 +326,10 @@ class SecurityDefaultsTest {
     void shouldHaveLogicalProgression() {
         assertTrue(SecurityDefaults.MAX_PATH_LENGTH_STRICT < SecurityDefaults.MAX_PATH_LENGTH_DEFAULT);
         assertTrue(SecurityDefaults.MAX_PATH_LENGTH_DEFAULT < SecurityDefaults.MAX_PATH_LENGTH_LENIENT);
-        
+
         assertTrue(SecurityDefaults.MAX_BODY_SIZE_STRICT < SecurityDefaults.MAX_BODY_SIZE_DEFAULT);
         assertTrue(SecurityDefaults.MAX_BODY_SIZE_DEFAULT < SecurityDefaults.MAX_BODY_SIZE_LENIENT);
-        
+
         assertTrue(SecurityDefaults.MAX_PARAMETER_COUNT_STRICT < SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT);
         assertTrue(SecurityDefaults.MAX_PARAMETER_COUNT_DEFAULT < SecurityDefaults.MAX_PARAMETER_COUNT_LENIENT);
     }

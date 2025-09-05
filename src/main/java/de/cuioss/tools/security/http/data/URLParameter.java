@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.data;
 
+import de.cuioss.tools.security.http.core.ValidationType;
 import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
 
 /**
  * Immutable record representing a URL query parameter with name and value.
@@ -70,7 +69,7 @@ import java.util.Objects;
  * @see ValidationType#PARAMETER_VALUE
  */
 public record URLParameter(String name, @Nullable String value) {
-    
+
     /**
      * Creates a URLParameter with validation of basic constraints.
      * 
@@ -81,7 +80,7 @@ public record URLParameter(String name, @Nullable String value) {
         // Record constructor - no additional validation needed for this simple case
         // Security validation is handled by the appropriate validators
     }
-    
+
     /**
      * Creates a URLParameter with empty value.
      * Useful for parameters that appear without values (e.g., "?flag" instead of "?flag=value").
@@ -92,7 +91,7 @@ public record URLParameter(String name, @Nullable String value) {
     public static URLParameter withEmptyValue(String name) {
         return new URLParameter(name, "");
     }
-    
+
     /**
      * Checks if this parameter has a non-null, non-empty name.
      * 
@@ -101,7 +100,7 @@ public record URLParameter(String name, @Nullable String value) {
     public boolean hasName() {
         return name != null && !name.isEmpty();
     }
-    
+
     /**
      * Checks if this parameter has a non-null, non-empty value.
      * 
@@ -110,7 +109,7 @@ public record URLParameter(String name, @Nullable String value) {
     public boolean hasValue() {
         return value != null && !value.isEmpty();
     }
-    
+
     /**
      * Checks if this parameter represents a flag (has name but no meaningful value).
      * A parameter is considered a flag if it has a name but the value is null or empty.
@@ -120,7 +119,7 @@ public record URLParameter(String name, @Nullable String value) {
     public boolean isFlag() {
         return hasName() && (value == null || value.isEmpty());
     }
-    
+
     /**
      * Returns the parameter name, or a default value if the name is null.
      * 
@@ -130,7 +129,7 @@ public record URLParameter(String name, @Nullable String value) {
     public String nameOrDefault(String defaultName) {
         return name != null ? name : defaultName;
     }
-    
+
     /**
      * Returns the parameter value, or a default value if the value is null.
      * 
@@ -140,7 +139,7 @@ public record URLParameter(String name, @Nullable String value) {
     public String valueOrDefault(String defaultValue) {
         return value != null ? value : defaultValue;
     }
-    
+
     /**
      * Returns a string representation suitable for URL encoding.
      * Note: This does not perform actual URL encoding - use appropriate
@@ -157,7 +156,7 @@ public record URLParameter(String name, @Nullable String value) {
         }
         return name + "=" + value;
     }
-    
+
     /**
      * Returns a copy of this parameter with a new name.
      * 
@@ -167,7 +166,7 @@ public record URLParameter(String name, @Nullable String value) {
     public URLParameter withName(String newName) {
         return new URLParameter(newName, value);
     }
-    
+
     /**
      * Returns a copy of this parameter with a new value.
      * 

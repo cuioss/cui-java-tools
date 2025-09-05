@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.core;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ class ValidationTypeTest {
         assertTrue(ValidationType.URL_PATH.requiresDecoding());
         assertTrue(ValidationType.PARAMETER_NAME.requiresDecoding());
         assertTrue(ValidationType.PARAMETER_VALUE.requiresDecoding());
-        
+
         // Types that don't require decoding
         assertFalse(ValidationType.HEADER_NAME.requiresDecoding());
         assertFalse(ValidationType.HEADER_VALUE.requiresDecoding());
@@ -69,7 +69,7 @@ class ValidationTypeTest {
         assertTrue(ValidationType.PARAMETER_NAME.isKey());
         assertTrue(ValidationType.HEADER_NAME.isKey());
         assertTrue(ValidationType.COOKIE_NAME.isKey());
-        
+
         // Types that are not key components
         assertFalse(ValidationType.URL_PATH.isKey());
         assertFalse(ValidationType.PARAMETER_VALUE.isKey());
@@ -84,7 +84,7 @@ class ValidationTypeTest {
         assertTrue(ValidationType.PARAMETER_VALUE.isValue());
         assertTrue(ValidationType.HEADER_VALUE.isValue());
         assertTrue(ValidationType.COOKIE_VALUE.isValue());
-        
+
         // Types that are not value components
         assertFalse(ValidationType.URL_PATH.isValue());
         assertFalse(ValidationType.PARAMETER_NAME.isValue());
@@ -97,7 +97,7 @@ class ValidationTypeTest {
     void shouldCorrectlyIdentifyBodyComponents() {
         // Only BODY should be a body component
         assertTrue(ValidationType.BODY.isBody());
-        
+
         // All other types should not be body components
         assertFalse(ValidationType.URL_PATH.isBody());
         assertFalse(ValidationType.PARAMETER_NAME.isBody());
@@ -112,7 +112,7 @@ class ValidationTypeTest {
     void shouldCorrectlyIdentifyPathComponents() {
         // Only URL_PATH should be a path component
         assertTrue(ValidationType.URL_PATH.isPath());
-        
+
         // All other types should not be path components
         assertFalse(ValidationType.PARAMETER_NAME.isPath());
         assertFalse(ValidationType.PARAMETER_VALUE.isPath());
@@ -128,7 +128,7 @@ class ValidationTypeTest {
         // Header types should be identified as header components
         assertTrue(ValidationType.HEADER_NAME.isHeader());
         assertTrue(ValidationType.HEADER_VALUE.isHeader());
-        
+
         // Non-header types should not be header components
         assertFalse(ValidationType.URL_PATH.isHeader());
         assertFalse(ValidationType.PARAMETER_NAME.isHeader());
@@ -143,7 +143,7 @@ class ValidationTypeTest {
         // Cookie types should be identified as cookie components
         assertTrue(ValidationType.COOKIE_NAME.isCookie());
         assertTrue(ValidationType.COOKIE_VALUE.isCookie());
-        
+
         // Non-cookie types should not be cookie components
         assertFalse(ValidationType.URL_PATH.isCookie());
         assertFalse(ValidationType.PARAMETER_NAME.isCookie());
@@ -158,7 +158,7 @@ class ValidationTypeTest {
         // Parameter types should be identified as parameter components
         assertTrue(ValidationType.PARAMETER_NAME.isParameter());
         assertTrue(ValidationType.PARAMETER_VALUE.isParameter());
-        
+
         // Non-parameter types should not be parameter components
         assertFalse(ValidationType.URL_PATH.isParameter());
         assertFalse(ValidationType.HEADER_NAME.isParameter());
@@ -173,20 +173,20 @@ class ValidationTypeTest {
         // Verify that the type classifications don't overlap inappropriately
         for (ValidationType type : ValidationType.values()) {
             // A type should not be both key and value
-            assertFalse(type.isKey() && type.isValue(), 
-                       type + " should not be both key and value");
-            
+            assertFalse(type.isKey() && type.isValue(),
+                    type + " should not be both key and value");
+
             // Body should be distinct from other categories
             if (type.isBody()) {
-                assertFalse(type.isKey() || type.isValue() || type.isPath() || 
-                           type.isHeader() || type.isCookie() || type.isParameter(),
-                           type + " should not be body and another category");
+                assertFalse(type.isKey() || type.isValue() || type.isPath() ||
+                        type.isHeader() || type.isCookie() || type.isParameter(),
+                        type + " should not be body and another category");
             }
-            
+
             // Path should be distinct from key/value pairs
             if (type.isPath()) {
                 assertFalse(type.isKey() || type.isValue(),
-                           type + " should not be path and key/value");
+                        type + " should not be path and key/value");
             }
         }
     }
@@ -205,10 +205,10 @@ class ValidationTypeTest {
         // Verify enum names are descriptive and follow naming conventions
         for (ValidationType type : ValidationType.values()) {
             String name = type.name();
-            assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$|^[A-Z]+$"), 
-                      "Enum name should be uppercase with underscores: " + name);
-            assertTrue(name.length() > 3, 
-                      "Enum name should be descriptive (>3 chars): " + name);
+            assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$|^[A-Z]+$"),
+                    "Enum name should be uppercase with underscores: " + name);
+            assertTrue(name.length() > 3,
+                    "Enum name should be descriptive (>3 chars): " + name);
         }
     }
 
@@ -234,11 +234,11 @@ class ValidationTypeTest {
 
     @Test
     void shouldThrowExceptionForInvalidValueOf() {
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(IllegalArgumentException.class, () ->
                 ValidationType.valueOf("INVALID_TYPE"));
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(IllegalArgumentException.class, () ->
                 ValidationType.valueOf(""));
-        assertThrows(NullPointerException.class, () -> 
+        assertThrows(NullPointerException.class, () ->
                 ValidationType.valueOf(null));
     }
 
@@ -274,15 +274,15 @@ class ValidationTypeTest {
         Set<ValidationType> valueTypes = Arrays.stream(ValidationType.values())
                 .filter(ValidationType::isValue)
                 .collect(Collectors.toSet());
-        
+
         assertEquals(3, keyTypes.size(), "Should have exactly 3 key types");
         assertEquals(3, valueTypes.size(), "Should have exactly 3 value types");
-        
+
         // Key and value types should be disjoint
         assertTrue(keyTypes.stream().noneMatch(ValidationType::isValue),
-                  "Key types should not overlap with value types");
+                "Key types should not overlap with value types");
         assertTrue(valueTypes.stream().noneMatch(ValidationType::isKey),
-                  "Value types should not overlap with key types");
+                "Value types should not overlap with key types");
     }
 
     @Test
@@ -291,9 +291,9 @@ class ValidationTypeTest {
         long decodingTypes = Arrays.stream(ValidationType.values())
                 .filter(ValidationType::requiresDecoding)
                 .count();
-        
+
         assertEquals(3, decodingTypes, "Should have exactly 3 types requiring decoding");
-        
+
         // Verify the specific types that require decoding
         assertTrue(ValidationType.URL_PATH.requiresDecoding());
         assertTrue(ValidationType.PARAMETER_NAME.requiresDecoding());

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.core;
 
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +69,7 @@ class UrlSecurityFailureTypeTest {
         Set<String> descriptions = Arrays.stream(UrlSecurityFailureType.values())
                 .map(UrlSecurityFailureType::getDescription)
                 .collect(Collectors.toSet());
-        
+
         assertEquals(UrlSecurityFailureType.values().length, descriptions.size(),
                 "All failure types should have unique descriptions");
     }
@@ -79,7 +79,7 @@ class UrlSecurityFailureTypeTest {
         assertTrue(UrlSecurityFailureType.INVALID_ENCODING.isEncodingIssue());
         assertTrue(UrlSecurityFailureType.DOUBLE_ENCODING.isEncodingIssue());
         assertTrue(UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED.isEncodingIssue());
-        
+
         // Non-encoding issues should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isEncodingIssue());
         assertFalse(UrlSecurityFailureType.NULL_BYTE_INJECTION.isEncodingIssue());
@@ -90,7 +90,7 @@ class UrlSecurityFailureTypeTest {
     void shouldCorrectlyIdentifyPathTraversalAttacks() {
         assertTrue(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isPathTraversalAttack());
         assertTrue(UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT.isPathTraversalAttack());
-        
+
         // Non-path-traversal should return false
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isPathTraversalAttack());
         assertFalse(UrlSecurityFailureType.NULL_BYTE_INJECTION.isPathTraversalAttack());
@@ -102,7 +102,7 @@ class UrlSecurityFailureTypeTest {
         assertTrue(UrlSecurityFailureType.INVALID_CHARACTER.isCharacterAttack());
         assertTrue(UrlSecurityFailureType.NULL_BYTE_INJECTION.isCharacterAttack());
         assertTrue(UrlSecurityFailureType.CONTROL_CHARACTERS.isCharacterAttack());
-        
+
         // Non-character attacks should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isCharacterAttack());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isCharacterAttack());
@@ -113,7 +113,7 @@ class UrlSecurityFailureTypeTest {
     void shouldCorrectlyIdentifySizeViolations() {
         assertTrue(UrlSecurityFailureType.PATH_TOO_LONG.isSizeViolation());
         assertTrue(UrlSecurityFailureType.EXCESSIVE_NESTING.isSizeViolation());
-        
+
         // Non-size violations should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isSizeViolation());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isSizeViolation());
@@ -124,7 +124,7 @@ class UrlSecurityFailureTypeTest {
     void shouldCorrectlyIdentifyPatternBased() {
         assertTrue(UrlSecurityFailureType.SUSPICIOUS_PATTERN.isPatternBased());
         assertTrue(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE.isPatternBased());
-        
+
         // Non-pattern-based should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isPatternBased());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isPatternBased());
@@ -135,7 +135,7 @@ class UrlSecurityFailureTypeTest {
     void shouldCorrectlyIdentifyStructuralIssues() {
         assertTrue(UrlSecurityFailureType.MALFORMED_INPUT.isStructuralIssue());
         assertTrue(UrlSecurityFailureType.INVALID_STRUCTURE.isStructuralIssue());
-        
+
         // Non-structural issues should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isStructuralIssue());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isStructuralIssue());
@@ -146,7 +146,7 @@ class UrlSecurityFailureTypeTest {
     void shouldCorrectlyIdentifyProtocolViolations() {
         assertTrue(UrlSecurityFailureType.PROTOCOL_VIOLATION.isProtocolViolation());
         assertTrue(UrlSecurityFailureType.RFC_VIOLATION.isProtocolViolation());
-        
+
         // Non-protocol violations should return false
         assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isProtocolViolation());
         assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isProtocolViolation());
@@ -158,7 +158,7 @@ class UrlSecurityFailureTypeTest {
         // Each failure type should belong to exactly one category
         for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
             int categoryCount = 0;
-            
+
             if (type.isEncodingIssue()) categoryCount++;
             if (type.isPathTraversalAttack()) categoryCount++;
             if (type.isCharacterAttack()) categoryCount++;
@@ -166,8 +166,8 @@ class UrlSecurityFailureTypeTest {
             if (type.isPatternBased()) categoryCount++;
             if (type.isStructuralIssue()) categoryCount++;
             if (type.isProtocolViolation()) categoryCount++;
-            
-            assertEquals(1, categoryCount, 
+
+            assertEquals(1, categoryCount,
                     "Failure type " + type + " should belong to exactly one category, but belongs to " + categoryCount);
         }
     }
@@ -177,9 +177,9 @@ class UrlSecurityFailureTypeTest {
         // Verify enum names are descriptive and follow naming conventions
         for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
             String name = type.name();
-            assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$"), 
+            assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$"),
                     "Enum name should be uppercase with underscores: " + name);
-            assertTrue(name.length() > 3, 
+            assertTrue(name.length() > 3,
                     "Enum name should be descriptive (>3 chars): " + name);
         }
     }
@@ -206,11 +206,11 @@ class UrlSecurityFailureTypeTest {
 
     @Test
     void shouldThrowExceptionForInvalidValueOf() {
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(IllegalArgumentException.class, () ->
                 UrlSecurityFailureType.valueOf("INVALID_FAILURE_TYPE"));
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(IllegalArgumentException.class, () ->
                 UrlSecurityFailureType.valueOf(""));
-        assertThrows(NullPointerException.class, () -> 
+        assertThrows(NullPointerException.class, () ->
                 UrlSecurityFailureType.valueOf(null));
     }
 

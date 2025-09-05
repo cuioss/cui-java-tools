@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.core;
 
+import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import org.jspecify.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 /**
  * Core functional interface for HTTP security validation.
@@ -74,7 +77,7 @@ import org.jspecify.annotations.Nullable;
  */
 @FunctionalInterface
 public interface HttpSecurityValidator {
-    
+
     /**
      * Validates the input string and returns the sanitized/normalized version.
      * 
@@ -99,7 +102,7 @@ public interface HttpSecurityValidator {
      *         security analysis (distinct from security violations).
      */
     String validate(@Nullable String value) throws UrlSecurityException;
-    
+
     /**
      * Creates a composite validator that applies this validator followed by the given validator.
      * 
@@ -124,7 +127,7 @@ public interface HttpSecurityValidator {
         }
         return value -> after.validate(this.validate(value));
     }
-    
+
     /**
      * Creates a composite validator that applies the given validator followed by this validator.
      * 
@@ -146,7 +149,7 @@ public interface HttpSecurityValidator {
         }
         return value -> this.validate(before.validate(value));
     }
-    
+
     /**
      * Creates a validator that applies this validator only if the given predicate is true.
      * If the predicate is false, the input is returned unchanged.
@@ -165,13 +168,13 @@ public interface HttpSecurityValidator {
      * @throws NullPointerException if {@code predicate} is null
      * @since 2.5
      */
-    default HttpSecurityValidator when(java.util.function.Predicate<String> predicate) {
+    default HttpSecurityValidator when(Predicate<String> predicate) {
         if (predicate == null) {
             throw new NullPointerException("predicate must not be null");
         }
         return value -> predicate.test(value) ? this.validate(value) : value;
     }
-    
+
     /**
      * Creates an identity validator that always returns the input unchanged.
      * This is useful as a no-op validator or as a starting point for composition.
@@ -182,7 +185,7 @@ public interface HttpSecurityValidator {
     static HttpSecurityValidator identity() {
         return value -> value;
     }
-    
+
     /**
      * Creates a validator that always rejects input with the specified failure type.
      * This is useful for creating validators that unconditionally block certain inputs.
@@ -202,11 +205,11 @@ public interface HttpSecurityValidator {
         }
         return value -> {
             throw UrlSecurityException.builder()
-                .failureType(failureType)
-                .validationType(validationType)
-                .originalInput(value != null ? value : "null")
-                .detail("Input unconditionally rejected")
-                .build();
+                    .failureType(failureType)
+                    .validationType(validationType)
+                    .originalInput(value != null ? value : "null")
+                    .detail("Input unconditionally rejected")
+                    .build();
         };
     }
 }

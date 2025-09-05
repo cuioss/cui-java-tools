@@ -153,11 +153,11 @@ class AllGeneratorsIntegrationTest {
         boolean hasUnicodeAttack = unicodeAttacks.stream().anyMatch(s -> s.length() > 0);
         boolean hasBoundaryFuzz = boundaryFuzzing.stream().anyMatch(s -> s.length() > 100 || s.isEmpty());
 
-        boolean hasParameterAttack = parameters.stream().anyMatch(p -> 
+        boolean hasParameterAttack = parameters.stream().anyMatch(p ->
                 p.value().contains("<script>") || p.value().contains("../") || p.value().contains("DROP"));
-        boolean hasCookieAttack = cookies.stream().anyMatch(c -> 
+        boolean hasCookieAttack = cookies.stream().anyMatch(c ->
                 c.value().contains("<script>") || c.value().contains("../") || c.value().contains("DROP"));
-        boolean hasBodyAttack = bodies.stream().anyMatch(b -> 
+        boolean hasBodyAttack = bodies.stream().anyMatch(b ->
                 b.content().contains("<script>") || b.content().contains("../") || b.content().contains("DROP"));
 
         assertTrue(hasPathTraversal, "PathTraversalGenerator should generate path traversal patterns");
@@ -186,11 +186,11 @@ class AllGeneratorsIntegrationTest {
 
         // Check for legitimate patterns
         boolean hasValidPath = validUrls.stream().anyMatch(s -> s.startsWith("/") || s.startsWith("api/"));
-        boolean hasLegitimateParam = parameters.stream().anyMatch(p -> 
-                p.name().equals("id") || p.name().equals("page") || p.name().equals("limit"));
-        boolean hasLegitimateCoookie = cookies.stream().anyMatch(c -> 
-                c.name().equals("JSESSIONID") || c.name().equals("auth_token"));
-        boolean hasLegitimateBody = bodies.stream().anyMatch(b -> 
+        boolean hasLegitimateParam = parameters.stream().anyMatch(p ->
+                "id".equals(p.name()) || "page".equals(p.name()) || "limit".equals(p.name()));
+        boolean hasLegitimateCoookie = cookies.stream().anyMatch(c ->
+                "JSESSIONID".equals(c.name()) || "auth_token".equals(c.name()));
+        boolean hasLegitimateBody = bodies.stream().anyMatch(b ->
                 b.content().contains("Hello World") || b.content().contains("{\"user\""));
 
         assertTrue(hasValidPath, "ValidURLGenerator should generate valid paths");
@@ -287,7 +287,7 @@ class AllGeneratorsIntegrationTest {
         boolean hasEmptyString = allStringOutputs.contains("");
         boolean hasLongString = allStringOutputs.stream().anyMatch(s -> s.length() > 1000);
         boolean hasSpecialChars = allStringOutputs.stream().anyMatch(s -> s.contains("\n") || s.contains("\r") || s.contains("\t"));
-        
+
         boolean hasEmptyParamName = allParams.stream().anyMatch(p -> p.name().isEmpty());
         boolean hasEmptyCookieName = allCookies.stream().anyMatch(c -> c.name().isEmpty());
         boolean hasEmptyBodyContent = allBodies.stream().anyMatch(b -> b.content().isEmpty());
@@ -330,14 +330,14 @@ class AllGeneratorsIntegrationTest {
         // Test that generators maintain consistent behavior across multiple calls
         for (int run = 0; run < 10; run++) {
             Set<String> currentRun = new HashSet<>();
-            
+
             // Generate same number of values in each run
             for (int i = 0; i < 100; i++) {
                 currentRun.add(pathTraversalGenerator.next());
                 currentRun.add(encodingGenerator.next());
                 currentRun.add(unicodeGenerator.next());
             }
-            
+
             // Each run should produce variety (not the same single value repeated)
             assertTrue(currentRun.size() > 5, "Each run should produce variety, run " + run + " had " + currentRun.size() + " unique values");
         }

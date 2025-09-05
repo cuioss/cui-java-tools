@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.config;
 
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Immutable record representing comprehensive security configuration for HTTP validation.
@@ -102,47 +101,47 @@ import java.util.Objects;
  * @see SecurityConfigurationBuilder
  */
 public record SecurityConfiguration(
-    // Path Security
-    int maxPathLength,
-    boolean allowPathTraversal,
-    boolean allowDoubleEncoding,
-    
-    // Parameter Security  
-    int maxParameterCount,
-    int maxParameterNameLength,
-    int maxParameterValueLength,
-    
-    // Header Security
-    int maxHeaderCount,
-    int maxHeaderNameLength, 
-    int maxHeaderValueLength,
-    @Nullable Set<String> allowedHeaderNames,
-    Set<String> blockedHeaderNames,
-    
-    // Cookie Security
-    int maxCookieCount,
-    int maxCookieNameLength,
-    int maxCookieValueLength,
-    boolean requireSecureCookies,
-    boolean requireHttpOnlyCookies,
-    
-    // Body Security
-    long maxBodySize,
-    @Nullable Set<String> allowedContentTypes,
-    Set<String> blockedContentTypes,
-    
-    // Encoding Security
-    boolean allowNullBytes,
-    boolean allowControlCharacters,
-    boolean allowHighBitCharacters,
-    boolean normalizeUnicode,
-    
-    // General Policies
-    boolean caseSensitiveComparison,
-    boolean failOnSuspiciousPatterns,
-    boolean logSecurityViolations
+// Path Security
+int maxPathLength,
+boolean allowPathTraversal,
+boolean allowDoubleEncoding,
+
+// Parameter Security  
+int maxParameterCount,
+int maxParameterNameLength,
+int maxParameterValueLength,
+
+// Header Security
+int maxHeaderCount,
+int maxHeaderNameLength,
+int maxHeaderValueLength,
+@Nullable Set<String> allowedHeaderNames,
+Set<String> blockedHeaderNames,
+
+// Cookie Security
+int maxCookieCount,
+int maxCookieNameLength,
+int maxCookieValueLength,
+boolean requireSecureCookies,
+boolean requireHttpOnlyCookies,
+
+// Body Security
+long maxBodySize,
+@Nullable Set<String> allowedContentTypes,
+Set<String> blockedContentTypes,
+
+// Encoding Security
+boolean allowNullBytes,
+boolean allowControlCharacters,
+boolean allowHighBitCharacters,
+boolean normalizeUnicode,
+
+// General Policies
+boolean caseSensitiveComparison,
+boolean failOnSuspiciousPatterns,
+boolean logSecurityViolations
 ) {
-    
+
     /**
      * Creates a SecurityConfiguration with validation of constraints.
      */
@@ -181,18 +180,18 @@ public record SecurityConfiguration(
         if (maxBodySize < 0) {
             throw new IllegalArgumentException("maxBodySize must be non-negative, got: " + maxBodySize);
         }
-        
+
         // Ensure sets are immutable and non-null
-        allowedHeaderNames = allowedHeaderNames != null ? 
-            Set.copyOf(allowedHeaderNames) : null;
-        blockedHeaderNames = blockedHeaderNames != null ? 
-            Set.copyOf(blockedHeaderNames) : Set.of();
-        allowedContentTypes = allowedContentTypes != null ? 
-            Set.copyOf(allowedContentTypes) : null;
-        blockedContentTypes = blockedContentTypes != null ? 
-            Set.copyOf(blockedContentTypes) : Set.of();
+        allowedHeaderNames = allowedHeaderNames != null ?
+                Set.copyOf(allowedHeaderNames) : null;
+        blockedHeaderNames = blockedHeaderNames != null ?
+                Set.copyOf(blockedHeaderNames) : Set.of();
+        allowedContentTypes = allowedContentTypes != null ?
+                Set.copyOf(allowedContentTypes) : null;
+        blockedContentTypes = blockedContentTypes != null ?
+                Set.copyOf(blockedContentTypes) : Set.of();
     }
-    
+
     /**
      * Creates a builder for constructing SecurityConfiguration instances.
      * 
@@ -201,7 +200,7 @@ public record SecurityConfiguration(
     public static SecurityConfigurationBuilder builder() {
         return new SecurityConfigurationBuilder();
     }
-    
+
     /**
      * Creates a strict security configuration with tight restrictions.
      * This configuration prioritizes security over compatibility.
@@ -210,31 +209,31 @@ public record SecurityConfiguration(
      */
     public static SecurityConfiguration strict() {
         return builder()
-            .maxPathLength(1024)
-            .allowPathTraversal(false)
-            .allowDoubleEncoding(false)
-            .maxParameterCount(20)
-            .maxParameterNameLength(64)
-            .maxParameterValueLength(1024)
-            .maxHeaderCount(20)
-            .maxHeaderNameLength(64)
-            .maxHeaderValueLength(1024)
-            .maxCookieCount(10)
-            .maxCookieNameLength(64)
-            .maxCookieValueLength(1024)
-            .requireSecureCookies(true)
-            .requireHttpOnlyCookies(true)
-            .maxBodySize(1024 * 1024) // 1MB
-            .allowNullBytes(false)
-            .allowControlCharacters(false)
-            .allowHighBitCharacters(false)
-            .normalizeUnicode(true)
-            .caseSensitiveComparison(true)
-            .failOnSuspiciousPatterns(true)
-            .logSecurityViolations(true)
-            .build();
+                .maxPathLength(1024)
+                .allowPathTraversal(false)
+                .allowDoubleEncoding(false)
+                .maxParameterCount(20)
+                .maxParameterNameLength(64)
+                .maxParameterValueLength(1024)
+                .maxHeaderCount(20)
+                .maxHeaderNameLength(64)
+                .maxHeaderValueLength(1024)
+                .maxCookieCount(10)
+                .maxCookieNameLength(64)
+                .maxCookieValueLength(1024)
+                .requireSecureCookies(true)
+                .requireHttpOnlyCookies(true)
+                .maxBodySize(1024 * 1024) // 1MB
+                .allowNullBytes(false)
+                .allowControlCharacters(false)
+                .allowHighBitCharacters(false)
+                .normalizeUnicode(true)
+                .caseSensitiveComparison(true)
+                .failOnSuspiciousPatterns(true)
+                .logSecurityViolations(true)
+                .build();
     }
-    
+
     /**
      * Creates a lenient security configuration with relaxed restrictions.
      * This configuration prioritizes compatibility over strict security.
@@ -243,31 +242,31 @@ public record SecurityConfiguration(
      */
     public static SecurityConfiguration lenient() {
         return builder()
-            .maxPathLength(8192)
-            .allowPathTraversal(false) // Still don't allow this
-            .allowDoubleEncoding(true)
-            .maxParameterCount(500)
-            .maxParameterNameLength(256)
-            .maxParameterValueLength(8192)
-            .maxHeaderCount(100)
-            .maxHeaderNameLength(256)
-            .maxHeaderValueLength(8192)
-            .maxCookieCount(50)
-            .maxCookieNameLength(256)
-            .maxCookieValueLength(8192)
-            .requireSecureCookies(false)
-            .requireHttpOnlyCookies(false)
-            .maxBodySize(10 * 1024 * 1024) // 10MB
-            .allowNullBytes(false) // Still don't allow this
-            .allowControlCharacters(true)
-            .allowHighBitCharacters(true)
-            .normalizeUnicode(false)
-            .caseSensitiveComparison(false)
-            .failOnSuspiciousPatterns(false)
-            .logSecurityViolations(true)
-            .build();
+                .maxPathLength(8192)
+                .allowPathTraversal(false) // Still don't allow this
+                .allowDoubleEncoding(true)
+                .maxParameterCount(500)
+                .maxParameterNameLength(256)
+                .maxParameterValueLength(8192)
+                .maxHeaderCount(100)
+                .maxHeaderNameLength(256)
+                .maxHeaderValueLength(8192)
+                .maxCookieCount(50)
+                .maxCookieNameLength(256)
+                .maxCookieValueLength(8192)
+                .requireSecureCookies(false)
+                .requireHttpOnlyCookies(false)
+                .maxBodySize(10 * 1024 * 1024) // 10MB
+                .allowNullBytes(false) // Still don't allow this
+                .allowControlCharacters(true)
+                .allowHighBitCharacters(true)
+                .normalizeUnicode(false)
+                .caseSensitiveComparison(false)
+                .failOnSuspiciousPatterns(false)
+                .logSecurityViolations(true)
+                .build();
     }
-    
+
     /**
      * Creates a default security configuration with balanced security and compatibility.
      * 
@@ -276,7 +275,7 @@ public record SecurityConfiguration(
     public static SecurityConfiguration defaults() {
         return builder().build();
     }
-    
+
     /**
      * Checks if the configuration allows a specific header name.
      * 
@@ -287,27 +286,27 @@ public record SecurityConfiguration(
         if (headerName == null) {
             return false;
         }
-        
+
         // Check blocked list first
         String checkName = caseSensitiveComparison ? headerName : headerName.toLowerCase();
-        Set<String> blocked = caseSensitiveComparison ? blockedHeaderNames : 
-            blockedHeaderNames.stream().map(String::toLowerCase).collect(java.util.stream.Collectors.toSet());
-        
+        Set<String> blocked = caseSensitiveComparison ? blockedHeaderNames :
+                blockedHeaderNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
+
         if (blocked.contains(checkName)) {
             return false;
         }
-        
+
         // If there's an allow list, check it
         if (allowedHeaderNames != null) {
             Set<String> allowed = caseSensitiveComparison ? allowedHeaderNames :
-                allowedHeaderNames.stream().map(String::toLowerCase).collect(java.util.stream.Collectors.toSet());
+                    allowedHeaderNames.stream().map(String::toLowerCase).collect(Collectors.toSet());
             return allowed.contains(checkName);
         }
-        
+
         // No allow list means all headers are allowed (except blocked ones)
         return true;
     }
-    
+
     /**
      * Checks if the configuration allows a specific content type.
      * 
@@ -318,44 +317,44 @@ public record SecurityConfiguration(
         if (contentType == null) {
             return false;
         }
-        
+
         // Check blocked list first  
         String checkType = caseSensitiveComparison ? contentType : contentType.toLowerCase();
         Set<String> blocked = caseSensitiveComparison ? blockedContentTypes :
-            blockedContentTypes.stream().map(String::toLowerCase).collect(java.util.stream.Collectors.toSet());
-            
+                blockedContentTypes.stream().map(String::toLowerCase).collect(Collectors.toSet());
+
         if (blocked.contains(checkType)) {
             return false;
         }
-        
+
         // If there's an allow list, check it
         if (allowedContentTypes != null) {
             Set<String> allowed = caseSensitiveComparison ? allowedContentTypes :
-                allowedContentTypes.stream().map(String::toLowerCase).collect(java.util.stream.Collectors.toSet());
+                    allowedContentTypes.stream().map(String::toLowerCase).collect(Collectors.toSet());
             return allowed.contains(checkType);
         }
-        
+
         // No allow list means all content types are allowed (except blocked ones)
         return true;
     }
-    
+
     /**
      * Checks if this configuration is considered "strict" based on key security settings.
      * 
      * @return true if this configuration uses strict security policies
      */
     public boolean isStrict() {
-        return !allowPathTraversal && 
-               !allowDoubleEncoding && 
-               !allowNullBytes && 
-               !allowControlCharacters &&
-               requireSecureCookies &&
-               requireHttpOnlyCookies &&
-               failOnSuspiciousPatterns &&
-               maxPathLength <= 1024 &&
-               maxBodySize <= 1024 * 1024;
+        return !allowPathTraversal &&
+                !allowDoubleEncoding &&
+                !allowNullBytes &&
+                !allowControlCharacters &&
+                requireSecureCookies &&
+                requireHttpOnlyCookies &&
+                failOnSuspiciousPatterns &&
+                maxPathLength <= 1024 &&
+                maxBodySize <= 1024 * 1024;
     }
-    
+
     /**
      * Checks if this configuration is considered "lenient" based on key security settings.
      * 
@@ -363,10 +362,10 @@ public record SecurityConfiguration(
      */
     public boolean isLenient() {
         return allowDoubleEncoding ||
-               allowControlCharacters ||
-               maxBodySize > 5 * 1024 * 1024;
+                allowControlCharacters ||
+                maxBodySize > 5 * 1024 * 1024;
     }
-    
+
     /**
      * Returns a copy of this configuration with modified path security settings.
      * 
@@ -376,16 +375,16 @@ public record SecurityConfiguration(
      */
     public SecurityConfiguration withPathSecurity(int maxLength, boolean allowTraversal) {
         return new SecurityConfiguration(
-            maxLength, allowTraversal, allowDoubleEncoding,
-            maxParameterCount, maxParameterNameLength, maxParameterValueLength,
-            maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
-            maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecureCookies, requireHttpOnlyCookies,
-            maxBodySize, allowedContentTypes, blockedContentTypes,
-            allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
-            caseSensitiveComparison, failOnSuspiciousPatterns, logSecurityViolations
+                maxLength, allowTraversal, allowDoubleEncoding,
+                maxParameterCount, maxParameterNameLength, maxParameterValueLength,
+                maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
+                maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecureCookies, requireHttpOnlyCookies,
+                maxBodySize, allowedContentTypes, blockedContentTypes,
+                allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
+                caseSensitiveComparison, failOnSuspiciousPatterns, logSecurityViolations
         );
     }
-    
+
     /**
      * Returns a copy of this configuration with modified cookie security settings.
      * 
@@ -395,16 +394,16 @@ public record SecurityConfiguration(
      */
     public SecurityConfiguration withCookieSecurity(boolean requireSecure, boolean requireHttpOnly) {
         return new SecurityConfiguration(
-            maxPathLength, allowPathTraversal, allowDoubleEncoding,
-            maxParameterCount, maxParameterNameLength, maxParameterValueLength,
-            maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
-            maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecure, requireHttpOnly,
-            maxBodySize, allowedContentTypes, blockedContentTypes,
-            allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
-            caseSensitiveComparison, failOnSuspiciousPatterns, logSecurityViolations
+                maxPathLength, allowPathTraversal, allowDoubleEncoding,
+                maxParameterCount, maxParameterNameLength, maxParameterValueLength,
+                maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
+                maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecure, requireHttpOnly,
+                maxBodySize, allowedContentTypes, blockedContentTypes,
+                allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
+                caseSensitiveComparison, failOnSuspiciousPatterns, logSecurityViolations
         );
     }
-    
+
     /**
      * Returns a copy of this configuration with logging enabled or disabled.
      * 
@@ -413,13 +412,13 @@ public record SecurityConfiguration(
      */
     public SecurityConfiguration withLogging(boolean enableLogging) {
         return new SecurityConfiguration(
-            maxPathLength, allowPathTraversal, allowDoubleEncoding,
-            maxParameterCount, maxParameterNameLength, maxParameterValueLength,
-            maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
-            maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecureCookies, requireHttpOnlyCookies,
-            maxBodySize, allowedContentTypes, blockedContentTypes,
-            allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
-            caseSensitiveComparison, failOnSuspiciousPatterns, enableLogging
+                maxPathLength, allowPathTraversal, allowDoubleEncoding,
+                maxParameterCount, maxParameterNameLength, maxParameterValueLength,
+                maxHeaderCount, maxHeaderNameLength, maxHeaderValueLength, allowedHeaderNames, blockedHeaderNames,
+                maxCookieCount, maxCookieNameLength, maxCookieValueLength, requireSecureCookies, requireHttpOnlyCookies,
+                maxBodySize, allowedContentTypes, blockedContentTypes,
+                allowNullBytes, allowControlCharacters, allowHighBitCharacters, normalizeUnicode,
+                caseSensitiveComparison, failOnSuspiciousPatterns, enableLogging
         );
     }
 }

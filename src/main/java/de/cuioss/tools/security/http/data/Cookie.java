@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.data;
 
+import de.cuioss.tools.security.http.core.ValidationType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -82,7 +82,7 @@ import java.util.stream.Collectors;
  * @see ValidationType#COOKIE_VALUE
  */
 public record Cookie(String name, @Nullable String value, @Nullable String attributes) {
-    
+
     /**
      * Creates a Cookie with validation of basic constraints.
      * 
@@ -94,7 +94,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
         // Record constructor - basic null-safety, but allow null values for edge case testing
         // Security validation is handled by the appropriate validators
     }
-    
+
     /**
      * Creates a simple cookie with no attributes.
      * 
@@ -105,7 +105,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public static Cookie simple(String name, String value) {
         return new Cookie(name, value, "");
     }
-    
+
     /**
      * Checks if this cookie has a non-null, non-empty name.
      * 
@@ -114,7 +114,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public boolean hasName() {
         return name != null && !name.isEmpty();
     }
-    
+
     /**
      * Checks if this cookie has a non-null, non-empty value.
      * 
@@ -123,7 +123,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public boolean hasValue() {
         return value != null && !value.isEmpty();
     }
-    
+
     /**
      * Checks if this cookie has any attributes.
      * 
@@ -132,7 +132,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public boolean hasAttributes() {
         return attributes != null && !attributes.isEmpty();
     }
-    
+
     /**
      * Checks if the cookie has the Secure attribute.
      * 
@@ -141,7 +141,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public boolean isSecure() {
         return hasAttributes() && attributes.toLowerCase().contains("secure");
     }
-    
+
     /**
      * Checks if the cookie has the HttpOnly attribute.
      * 
@@ -150,7 +150,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public boolean isHttpOnly() {
         return hasAttributes() && attributes.toLowerCase().contains("httponly");
     }
-    
+
     /**
      * Extracts the Domain attribute value if present.
      * 
@@ -159,7 +159,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public @Nullable String getDomain() {
         return extractAttributeValue("domain");
     }
-    
+
     /**
      * Extracts the Path attribute value if present.
      * 
@@ -168,7 +168,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public @Nullable String getPath() {
         return extractAttributeValue("path");
     }
-    
+
     /**
      * Extracts the SameSite attribute value if present.
      * 
@@ -177,7 +177,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public @Nullable String getSameSite() {
         return extractAttributeValue("samesite");
     }
-    
+
     /**
      * Extracts the Max-Age attribute value if present.
      * 
@@ -186,7 +186,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public @Nullable String getMaxAge() {
         return extractAttributeValue("max-age");
     }
-    
+
     /**
      * Extracts a specific attribute value from the attributes string.
      * 
@@ -197,33 +197,33 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
         if (!hasAttributes()) {
             return null;
         }
-        
+
         String lowerAttrs = attributes.toLowerCase();
         String lowerAttrName = attributeName.toLowerCase();
-        
+
         // Look for "attributeName=" pattern
         String searchPattern = lowerAttrName + "=";
         int startIndex = lowerAttrs.indexOf(searchPattern);
-        
+
         if (startIndex == -1) {
             return null;
         }
-        
+
         // Find the start of the value
         int valueStart = startIndex + searchPattern.length();
         if (valueStart >= attributes.length()) {
             return null;
         }
-        
+
         // Find the end of the value (semicolon or end of string)
         int valueEnd = attributes.indexOf(';', valueStart);
         if (valueEnd == -1) {
             valueEnd = attributes.length();
         }
-        
+
         return attributes.substring(valueStart, valueEnd).trim();
     }
-    
+
     /**
      * Returns all attribute names present in this cookie.
      * 
@@ -233,7 +233,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
         if (!hasAttributes()) {
             return List.of();
         }
-        
+
         return Arrays.stream(attributes.split(";"))
                 .map(String::trim)
                 .filter(attr -> !attr.isEmpty())
@@ -243,7 +243,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
                 })
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Returns the cookie name, or a default value if the name is null.
      * 
@@ -253,7 +253,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public String nameOrDefault(String defaultName) {
         return name != null ? name : defaultName;
     }
-    
+
     /**
      * Returns the cookie value, or a default value if the value is null.
      * 
@@ -263,7 +263,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public String valueOrDefault(String defaultValue) {
         return value != null ? value : defaultValue;
     }
-    
+
     /**
      * Returns a string representation suitable for HTTP Set-Cookie headers.
      * Note: This does not perform proper HTTP encoding - use appropriate
@@ -273,24 +273,24 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
      */
     public String toCookieString() {
         StringBuilder sb = new StringBuilder();
-        
+
         if (name != null) {
             sb.append(name);
         }
-        
+
         sb.append("=");
-        
+
         if (value != null) {
             sb.append(value);
         }
-        
+
         if (hasAttributes()) {
             sb.append("; ").append(attributes);
         }
-        
+
         return sb.toString();
     }
-    
+
     /**
      * Returns a copy of this cookie with a new name.
      * 
@@ -300,7 +300,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public Cookie withName(String newName) {
         return new Cookie(newName, value, attributes);
     }
-    
+
     /**
      * Returns a copy of this cookie with a new value.
      * 
@@ -310,7 +310,7 @@ public record Cookie(String name, @Nullable String value, @Nullable String attri
     public Cookie withValue(String newValue) {
         return new Cookie(name, newValue, attributes);
     }
-    
+
     /**
      * Returns a copy of this cookie with new attributes.
      * 

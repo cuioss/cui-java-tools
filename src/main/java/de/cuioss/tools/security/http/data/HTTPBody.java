@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.data;
 
+import de.cuioss.tools.security.http.core.ValidationType;
 import org.jspecify.annotations.Nullable;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * Immutable record representing an HTTP request or response body with content, content type, and encoding.
@@ -97,7 +94,7 @@ import java.util.Objects;
  * @see ValidationType#BODY
  */
 public record HTTPBody(@Nullable String content, @Nullable String contentType, @Nullable String encoding) {
-    
+
     /**
      * Creates an HTTPBody with validation of basic constraints.
      * 
@@ -109,7 +106,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
         // Record constructor - allow null values for edge case testing
         // Security validation is handled by the appropriate validators
     }
-    
+
     /**
      * Creates an HTTPBody with just content and content type, no encoding.
      * 
@@ -120,7 +117,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public static HTTPBody of(String content, String contentType) {
         return new HTTPBody(content, contentType, "");
     }
-    
+
     /**
      * Creates a simple text HTTPBody.
      * 
@@ -130,7 +127,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public static HTTPBody text(String content) {
         return new HTTPBody(content, "text/plain", "");
     }
-    
+
     /**
      * Creates a JSON HTTPBody.
      * 
@@ -140,7 +137,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public static HTTPBody json(String jsonContent) {
         return new HTTPBody(jsonContent, "application/json", "");
     }
-    
+
     /**
      * Creates an HTML HTTPBody.
      * 
@@ -150,7 +147,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public static HTTPBody html(String htmlContent) {
         return new HTTPBody(htmlContent, "text/html", "");
     }
-    
+
     /**
      * Creates a form data HTTPBody.
      * 
@@ -160,7 +157,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public static HTTPBody form(String formContent) {
         return new HTTPBody(formContent, "application/x-www-form-urlencoded", "");
     }
-    
+
     /**
      * Checks if this body has non-null, non-empty content.
      * 
@@ -169,7 +166,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean hasContent() {
         return content != null && !content.isEmpty();
     }
-    
+
     /**
      * Checks if this body has a specified content type.
      * 
@@ -178,7 +175,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean hasContentType() {
         return contentType != null && !contentType.isEmpty();
     }
-    
+
     /**
      * Checks if this body has a specified encoding.
      * 
@@ -187,7 +184,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean hasEncoding() {
         return encoding != null && !encoding.isEmpty();
     }
-    
+
     /**
      * Checks if the content is compressed (has encoding specified).
      * 
@@ -196,7 +193,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean isCompressed() {
         return hasEncoding();
     }
-    
+
     /**
      * Checks if the content type indicates JSON content.
      * 
@@ -205,7 +202,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean isJson() {
         return hasContentType() && contentType.toLowerCase().contains("json");
     }
-    
+
     /**
      * Checks if the content type indicates XML content.
      * 
@@ -214,7 +211,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean isXml() {
         return hasContentType() && contentType.toLowerCase().contains("xml");
     }
-    
+
     /**
      * Checks if the content type indicates HTML content.
      * 
@@ -223,40 +220,40 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public boolean isHtml() {
         return hasContentType() && contentType.toLowerCase().contains("html");
     }
-    
+
     /**
      * Checks if the content type indicates plain text.
      * 
      * @return true if the content type is "text/plain"
      */
     public boolean isPlainText() {
-        return hasContentType() && contentType.toLowerCase().equals("text/plain");
+        return hasContentType() && "text/plain".equals(contentType.toLowerCase());
     }
-    
+
     /**
      * Checks if the content type indicates form data.
      * 
      * @return true if the content type is form-encoded
      */
     public boolean isFormData() {
-        return hasContentType() && 
-               (contentType.toLowerCase().contains("application/x-www-form-urlencoded") ||
-                contentType.toLowerCase().contains("multipart/form-data"));
+        return hasContentType() &&
+                (contentType.toLowerCase().contains("application/x-www-form-urlencoded") ||
+                        contentType.toLowerCase().contains("multipart/form-data"));
     }
-    
+
     /**
      * Checks if the content type indicates binary content.
      * 
      * @return true if the content type suggests binary data
      */
     public boolean isBinary() {
-        return hasContentType() && 
-               (contentType.toLowerCase().contains("application/octet-stream") ||
-                contentType.toLowerCase().contains("image/") ||
-                contentType.toLowerCase().contains("video/") ||
-                contentType.toLowerCase().contains("audio/"));
+        return hasContentType() &&
+                (contentType.toLowerCase().contains("application/octet-stream") ||
+                        contentType.toLowerCase().contains("image/") ||
+                        contentType.toLowerCase().contains("video/") ||
+                        contentType.toLowerCase().contains("audio/"));
     }
-    
+
     /**
      * Returns the content length in characters.
      * 
@@ -265,7 +262,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public int contentLength() {
         return content != null ? content.length() : 0;
     }
-    
+
     /**
      * Extracts the charset from the content type if specified.
      * 
@@ -275,29 +272,29 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
         if (!hasContentType()) {
             return null;
         }
-        
+
         String lowerContentType = contentType.toLowerCase();
         String charsetPrefix = "charset=";
         int charsetIndex = lowerContentType.indexOf(charsetPrefix);
-        
+
         if (charsetIndex == -1) {
             return null;
         }
-        
+
         int startIndex = charsetIndex + charsetPrefix.length();
         if (startIndex >= contentType.length()) {
             return null;
         }
-        
+
         // Find the end of charset value (semicolon or end of string)
         int endIndex = contentType.indexOf(';', startIndex);
         if (endIndex == -1) {
             endIndex = contentType.length();
         }
-        
+
         return contentType.substring(startIndex, endIndex).trim();
     }
-    
+
     /**
      * Returns the content or a default value if content is null.
      * 
@@ -307,7 +304,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public String contentOrDefault(String defaultContent) {
         return content != null ? content : defaultContent;
     }
-    
+
     /**
      * Returns the content type or a default value if content type is null.
      * 
@@ -317,7 +314,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public String contentTypeOrDefault(String defaultContentType) {
         return contentType != null ? contentType : defaultContentType;
     }
-    
+
     /**
      * Returns the encoding or a default value if encoding is null.
      * 
@@ -327,7 +324,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public String encodingOrDefault(String defaultEncoding) {
         return encoding != null ? encoding : defaultEncoding;
     }
-    
+
     /**
      * Returns a copy of this body with new content.
      * 
@@ -337,7 +334,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public HTTPBody withContent(String newContent) {
         return new HTTPBody(newContent, contentType, encoding);
     }
-    
+
     /**
      * Returns a copy of this body with a new content type.
      * 
@@ -347,7 +344,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public HTTPBody withContentType(String newContentType) {
         return new HTTPBody(content, newContentType, encoding);
     }
-    
+
     /**
      * Returns a copy of this body with a new encoding.
      * 
@@ -357,7 +354,7 @@ public record HTTPBody(@Nullable String content, @Nullable String contentType, @
     public HTTPBody withEncoding(String newEncoding) {
         return new HTTPBody(content, contentType, newEncoding);
     }
-    
+
     /**
      * Returns a truncated version of the content for safe logging.
      * 

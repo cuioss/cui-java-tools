@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.cuioss.tools.security.http;
+package de.cuioss.tools.security.http.core;
 
 /**
  * Enumeration of different types of HTTP components that require validation.
@@ -44,31 +44,31 @@ package de.cuioss.tools.security.http;
  * @since 2.5
  */
 public enum ValidationType {
-    
+
     /** URL path segments (e.g., "/api/users/123") */
     URL_PATH,
-    
+
     /** Query parameter names (e.g., "userId" in "?userId=123") */
     PARAMETER_NAME,
-    
+
     /** Query parameter values (e.g., "123" in "?userId=123") */
     PARAMETER_VALUE,
-    
+
     /** HTTP header names (e.g., "Authorization", "Content-Type") */
     HEADER_NAME,
-    
+
     /** HTTP header values (e.g., "Bearer token123", "application/json") */
     HEADER_VALUE,
-    
+
     /** Cookie names (e.g., "JSESSIONID", "auth_token") */
     COOKIE_NAME,
-    
+
     /** Cookie values (e.g., session identifiers, authentication tokens) */
     COOKIE_VALUE,
-    
+
     /** Request/response body content */
     BODY;
-    
+
     /**
      * Determines if this validation type requires URL decoding during processing.
      * URL decoding is typically needed for components that may contain percent-encoded sequences.
@@ -76,11 +76,11 @@ public enum ValidationType {
      * @return true if URL decoding should be applied before validation
      */
     public boolean requiresDecoding() {
-        return this == URL_PATH || 
-               this == PARAMETER_NAME || 
-               this == PARAMETER_VALUE;
+        return this == URL_PATH ||
+                this == PARAMETER_NAME ||
+                this == PARAMETER_VALUE;
     }
-    
+
     /**
      * Determines if this validation type represents a key/name component.
      * Key components typically have more restrictive character sets and length limits.
@@ -88,11 +88,11 @@ public enum ValidationType {
      * @return true if this type represents a key/name component
      */
     public boolean isKey() {
-        return this == PARAMETER_NAME || 
-               this == HEADER_NAME || 
-               this == COOKIE_NAME;
+        return this == PARAMETER_NAME ||
+                this == HEADER_NAME ||
+                this == COOKIE_NAME;
     }
-    
+
     /**
      * Determines if this validation type represents a value component.
      * Value components may allow a broader range of characters and content.
@@ -100,11 +100,11 @@ public enum ValidationType {
      * @return true if this type represents a value component
      */
     public boolean isValue() {
-        return this == PARAMETER_VALUE || 
-               this == HEADER_VALUE || 
-               this == COOKIE_VALUE;
+        return this == PARAMETER_VALUE ||
+                this == HEADER_VALUE ||
+                this == COOKIE_VALUE;
     }
-    
+
     /**
      * Determines if this validation type represents HTTP body content.
      * Body content has special handling for different content types and encodings.
@@ -114,7 +114,7 @@ public enum ValidationType {
     public boolean isBody() {
         return this == BODY;
     }
-    
+
     /**
      * Determines if this validation type represents a path component.
      * Path components have specific rules for traversal detection and normalization.
@@ -124,7 +124,7 @@ public enum ValidationType {
     public boolean isPath() {
         return this == URL_PATH;
     }
-    
+
     /**
      * Determines if this validation type represents HTTP header content.
      * Header components (names and values) have RFC-specific formatting rules.
@@ -134,7 +134,7 @@ public enum ValidationType {
     public boolean isHeader() {
         return this == HEADER_NAME || this == HEADER_VALUE;
     }
-    
+
     /**
      * Determines if this validation type represents cookie content.
      * Cookie components have specific encoding and security requirements.
@@ -144,7 +144,7 @@ public enum ValidationType {
     public boolean isCookie() {
         return this == COOKIE_NAME || this == COOKIE_VALUE;
     }
-    
+
     /**
      * Determines if this validation type represents parameter content.
      * Parameter components are commonly targeted in injection attacks.
