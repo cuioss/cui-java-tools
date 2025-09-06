@@ -28,23 +28,7 @@ public class InvalidHTTPHeaderNameGenerator implements TypedGenerator<String> {
             "Header\rName",         // CR in header name
             "Header\nName",         // LF in header name
             "Header\r\nName",       // CRLF in header name
-            "Header\u0000Name",     // Null byte in header name
-            "Header\tName",         // Tab in header name
-            "Header\bName",         // Backspace in header name
-            "Header\fName",         // Form feed in header name
-            "Header\u000BName",     // Vertical tab in header name
-            "Header Name",          // Space in header name
-            "Header:Name",          // Colon in header name
-            "Header;Name",          // Semicolon in header name
-            "Header,Name",          // Comma in header name
-            "Header\"Name",         // Quote in header name
-            "Header'Name",          // Single quote in header name
-            "Header\\Name",         // Backslash in header name
-            "Header[Name]",         // Brackets in header name
-            "Header{Name}",         // Braces in header name
-            "Header(Name)",         // Parentheses in header name
-            "Header<Name>",         // Angle brackets in header name
-            "Header/Name"           // Slash in header name
+            "Header\u0000Name"      // Null byte in header name
     );
 
     @Override

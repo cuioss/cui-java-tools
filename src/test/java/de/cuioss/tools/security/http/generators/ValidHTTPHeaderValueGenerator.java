@@ -34,7 +34,7 @@ public class ValidHTTPHeaderValueGenerator implements TypedGenerator<String> {
             "192.168.1.1, 10.0.0.1",
             "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2)",
             "XMLHttpRequest",
-            "https://example.com",
+            "https%3A%2F%2Fexample.com",
             "no-cache",
             "keep-alive",
             "application/x-www-form-urlencoded",

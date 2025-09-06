@@ -254,7 +254,7 @@ class PathTraversalAttackTest {
         for (int i = 0; i < 10; i++) {
             try {
                 pipeline.validate(complexPattern);
-            } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception ignored) {
+            } catch (RuntimeException ignored) {
             }
         }
 
@@ -263,7 +263,7 @@ class PathTraversalAttackTest {
         for (int i = 0; i < 100; i++) {
             try {
                 pipeline.validate(complexPattern);
-            } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception ignored) {
+            } catch (RuntimeException ignored) {
             }
         }
         long endTime = System.nanoTime();

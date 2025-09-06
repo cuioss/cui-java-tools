@@ -63,8 +63,8 @@ class URLParameterGeneratorTest {
     void shouldGenerateSafeParameters() {
         Set<URLParameter> generated = new HashSet<>();
 
-        // Generate parameters to test safe combinations
-        for (int i = 0; i < 200; i++) {
+        // Generate more parameters to increase probability of getting all expected values
+        for (int i = 0; i < 500; i++) {
             generated.add(generator.next());
         }
 

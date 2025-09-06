@@ -20,6 +20,7 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.ValidationType;
+import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import de.cuioss.tools.security.http.generators.SupportedValidationTypeGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
@@ -227,7 +228,7 @@ class PipelineFactoryTest {
         try {
             // This should trigger a null byte injection detection
             pipelineSet.bodyPipeline().validate("test\u0000content");
-        } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+        } catch (UrlSecurityException e) {
             // Expected - we're just testing that events are tracked
         }
 
@@ -357,7 +358,7 @@ class PipelineFactoryTest {
                 try {
                     results[index] = PipelineFactory.createUrlPathPipeline(config, eventCounter);
                     success[index] = results[index] != null;
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } catch (UrlSecurityException e) {
                     success[index] = false;
                 }
             });

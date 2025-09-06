@@ -190,7 +190,7 @@ class EncodedPathTraversalAttackTest {
             } catch (UrlSecurityException e) {
                 // Some legitimate patterns might be blocked by strict security rules
                 // This is acceptable for security-first approach
-                /*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*/System.out.println("Legitimately blocked (security-first): " + pattern + " - " + e.getMessage());
+                // Logging disabled for test performance
             }
         }
     }
@@ -252,7 +252,7 @@ class EncodedPathTraversalAttackTest {
                     results[threadIndex] = false; // Should not reach here
                 } catch (UrlSecurityException e) {
                     results[threadIndex] = true; // Expected exception
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } catch (RuntimeException e) {
                     results[threadIndex] = false; // Unexpected exception
                 }
             });
