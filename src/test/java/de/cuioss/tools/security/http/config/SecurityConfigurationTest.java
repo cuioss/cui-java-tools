@@ -15,7 +15,12 @@
  */
 package de.cuioss.tools.security.http.config;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Test for {@link SecurityConfiguration}
  */
+@EnableGeneratorController
 class SecurityConfigurationTest {
 
     @Test
@@ -90,94 +96,145 @@ class SecurityConfigurationTest {
         assertTrue(config.logSecurityViolations());
     }
 
-    @Test
-    void shouldValidatePositivePathLength() {
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 5)
+    void shouldValidatePositivePathLength(Integer invalidValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxPathLength(0).build());
+                SecurityConfiguration.builder().maxPathLength(invalidValue).build());
         assertTrue(thrown.getMessage().contains("maxPathLength must be positive"));
+    }
 
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxPathLength(-1).build());
-        assertTrue(thrown2.getMessage().contains("maxPathLength must be positive"));
+    static class InvalidPositiveIntegerGenerator implements TypedGenerator<Integer> {
+        private final TypedGenerator<Integer> gen = Generators.fixedValues(Integer.class, 0, -1, -100, -999, -1000000);
+
+        @Override
+        public Integer next() {
+            return gen.next();
+        }
+
+        @Override
+        public Class<Integer> getType() {
+            return Integer.class;
+        }
     }
 
     @Test
-    void shouldValidateNonNegativeParameterCount() {
-        // Zero is allowed
+    void shouldAllowZeroParameterCount() {
         SecurityConfiguration config = SecurityConfiguration.builder()
                 .maxParameterCount(0)
                 .build();
         assertEquals(0, config.maxParameterCount());
+    }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NegativeIntegerGenerator.class, count = 5)
+    void shouldValidateNonNegativeParameterCount(Integer negativeValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxParameterCount(-1).build());
+                SecurityConfiguration.builder().maxParameterCount(negativeValue).build());
         assertTrue(thrown.getMessage().contains("maxParameterCount must be non-negative"));
     }
 
-    @Test
-    void shouldValidatePositiveParameterNameLength() {
+    static class NegativeIntegerGenerator implements TypedGenerator<Integer> {
+        private final TypedGenerator<Integer> gen = Generators.fixedValues(Integer.class, -1, -10, -100, -999, -1000000);
+
+        @Override
+        public Integer next() {
+            return gen.next();
+        }
+
+        @Override
+        public Class<Integer> getType() {
+            return Integer.class;
+        }
+    }
+
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveParameterNameLength(Integer invalidValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxParameterNameLength(0).build());
+                SecurityConfiguration.builder().maxParameterNameLength(invalidValue).build());
         assertTrue(thrown.getMessage().contains("maxParameterNameLength must be positive"));
     }
 
-    @Test
-    void shouldValidatePositiveParameterValueLength() {
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveParameterValueLength(Integer invalidValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxParameterValueLength(0).build());
+                SecurityConfiguration.builder().maxParameterValueLength(invalidValue).build());
         assertTrue(thrown.getMessage().contains("maxParameterValueLength must be positive"));
     }
 
     @Test
-    void shouldValidateHeaderConstraints() {
-        // Non-negative header count
+    void shouldAllowZeroHeaderCount() {
         SecurityConfiguration.builder().maxHeaderCount(0).build(); // Should work
-        
+    }
+
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NegativeIntegerGenerator.class, count = 3)
+    void shouldValidateNonNegativeHeaderCount(Integer negativeValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxHeaderCount(-1).build());
+                SecurityConfiguration.builder().maxHeaderCount(negativeValue).build());
         assertTrue(thrown.getMessage().contains("maxHeaderCount must be non-negative"));
-
-        // Positive header name length
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxHeaderNameLength(0).build());
-        assertTrue(thrown2.getMessage().contains("maxHeaderNameLength must be positive"));
-
-        // Positive header value length
-        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxHeaderValueLength(0).build());
-        assertTrue(thrown3.getMessage().contains("maxHeaderValueLength must be positive"));
     }
 
-    @Test
-    void shouldValidateCookieConstraints() {
-        // Non-negative cookie count
-        SecurityConfiguration.builder().maxCookieCount(0).build(); // Should work
-        
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveHeaderNameLength(Integer invalidValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxCookieCount(-1).build());
-        assertTrue(thrown.getMessage().contains("maxCookieCount must be non-negative"));
+                SecurityConfiguration.builder().maxHeaderNameLength(invalidValue).build());
+        assertTrue(thrown.getMessage().contains("maxHeaderNameLength must be positive"));
+    }
 
-        // Positive cookie name length
-        IllegalArgumentException thrown2 = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxCookieNameLength(0).build());
-        assertTrue(thrown2.getMessage().contains("maxCookieNameLength must be positive"));
-
-        // Positive cookie value length
-        IllegalArgumentException thrown3 = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxCookieValueLength(0).build());
-        assertTrue(thrown3.getMessage().contains("maxCookieValueLength must be positive"));
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveHeaderValueLength(Integer invalidValue) {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
+                SecurityConfiguration.builder().maxHeaderValueLength(invalidValue).build());
+        assertTrue(thrown.getMessage().contains("maxHeaderValueLength must be positive"));
     }
 
     @Test
-    void shouldValidateNonNegativeBodySize() {
-        // Zero is allowed
+    void shouldAllowZeroCookieCount() {
+        SecurityConfiguration.builder().maxCookieCount(0).build(); // Should work
+    }
+
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NegativeIntegerGenerator.class, count = 3)
+    void shouldValidateNonNegativeCookieCount(Integer negativeValue) {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
+                SecurityConfiguration.builder().maxCookieCount(negativeValue).build());
+        assertTrue(thrown.getMessage().contains("maxCookieCount must be non-negative"));
+    }
+
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveCookieNameLength(Integer invalidValue) {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
+                SecurityConfiguration.builder().maxCookieNameLength(invalidValue).build());
+        assertTrue(thrown.getMessage().contains("maxCookieNameLength must be positive"));
+    }
+
+    @ParameterizedTest
+    @TypeGeneratorSource(value = InvalidPositiveIntegerGenerator.class, count = 3)
+    void shouldValidatePositiveCookieValueLength(Integer invalidValue) {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
+                SecurityConfiguration.builder().maxCookieValueLength(invalidValue).build());
+        assertTrue(thrown.getMessage().contains("maxCookieValueLength must be positive"));
+    }
+
+    @Test
+    void shouldAllowZeroBodySize() {
         SecurityConfiguration config = SecurityConfiguration.builder()
                 .maxBodySize(0)
                 .build();
         assertEquals(0, config.maxBodySize());
+    }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NegativeIntegerGenerator.class, count = 3)
+    void shouldValidateNonNegativeBodySize(Integer negativeValue) {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () ->
-                SecurityConfiguration.builder().maxBodySize(-1).build());
+                SecurityConfiguration.builder().maxBodySize(negativeValue).build());
         assertTrue(thrown.getMessage().contains("maxBodySize must be non-negative"));
     }
 

@@ -15,7 +15,12 @@
  */
 package de.cuioss.tools.security.http.core;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -26,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Test for {@link UrlSecurityFailureType}
  */
+@EnableGeneratorController
 class UrlSecurityFailureTypeTest {
 
     @Test
@@ -61,11 +67,25 @@ class UrlSecurityFailureTypeTest {
         assertEquals(21, values.length, "Should have 21 failure types");
     }
 
-    @Test
-    void shouldHaveNonNullDescriptions() {
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            assertNotNull(type.getDescription(), "Description should not be null for: " + type);
-            assertFalse(type.getDescription().trim().isEmpty(), "Description should not be empty for: " + type);
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldHaveNonNullDescriptions(UrlSecurityFailureType type) {
+        assertNotNull(type.getDescription(), "Description should not be null for: " + type);
+        assertFalse(type.getDescription().trim().isEmpty(), "Description should not be empty for: " + type);
+    }
+
+    static class UrlSecurityFailureTypeGenerator implements TypedGenerator<UrlSecurityFailureType> {
+        private final TypedGenerator<UrlSecurityFailureType> gen =
+                Generators.enumValues(UrlSecurityFailureType.class);
+
+        @Override
+        public UrlSecurityFailureType next() {
+            return gen.next();
+        }
+
+        @Override
+        public Class<UrlSecurityFailureType> getType() {
+            return UrlSecurityFailureType.class;
         }
     }
 
@@ -172,56 +192,48 @@ class UrlSecurityFailureTypeTest {
         assertFalse(UrlSecurityFailureType.NULL_BYTE_INJECTION.isProtocolViolation());
     }
 
-    @Test
-    void shouldHaveExactlyOneCategory() {
-        // Each failure type should belong to exactly one category
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            int categoryCount = 0;
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldHaveExactlyOneCategory(UrlSecurityFailureType type) {
+        int categoryCount = 0;
 
-            if (type.isEncodingIssue()) categoryCount++;
-            if (type.isPathTraversalAttack()) categoryCount++;
-            if (type.isCharacterAttack()) categoryCount++;
-            if (type.isSizeViolation()) categoryCount++;
-            if (type.isPatternBased()) categoryCount++;
-            if (type.isInjectionAttack()) categoryCount++;
-            if (type.isStructuralIssue()) categoryCount++;
-            if (type.isProtocolViolation()) categoryCount++;
+        if (type.isEncodingIssue()) categoryCount++;
+        if (type.isPathTraversalAttack()) categoryCount++;
+        if (type.isCharacterAttack()) categoryCount++;
+        if (type.isSizeViolation()) categoryCount++;
+        if (type.isPatternBased()) categoryCount++;
+        if (type.isInjectionAttack()) categoryCount++;
+        if (type.isStructuralIssue()) categoryCount++;
+        if (type.isProtocolViolation()) categoryCount++;
 
-            assertEquals(1, categoryCount,
-                    "Failure type " + type + " should belong to exactly one category, but belongs to " + categoryCount);
-        }
+        assertEquals(1, categoryCount,
+                "Failure type " + type + " should belong to exactly one category, but belongs to " + categoryCount);
     }
 
-    @Test
-    void shouldHaveDescriptiveNames() {
-        // Verify enum names are descriptive and follow naming conventions
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            String name = type.name();
-            assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$"),
-                    "Enum name should be uppercase with underscores: " + name);
-            assertTrue(name.length() > 3,
-                    "Enum name should be descriptive (>3 chars): " + name);
-        }
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldHaveDescriptiveNames(UrlSecurityFailureType type) {
+        String name = type.name();
+        assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$"),
+                "Enum name should be uppercase with underscores: " + name);
+        assertTrue(name.length() > 3,
+                "Enum name should be descriptive (>3 chars): " + name);
     }
 
-    @Test
-    void shouldSupportToString() {
-        // Verify toString works (should return enum name by default)
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            String toString = type.toString();
-            assertNotNull(toString);
-            assertFalse(toString.trim().isEmpty());
-            assertEquals(type.name(), toString);
-        }
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldSupportToString(UrlSecurityFailureType type) {
+        String toString = type.toString();
+        assertNotNull(toString);
+        assertFalse(toString.trim().isEmpty());
+        assertEquals(type.name(), toString);
     }
 
-    @Test
-    void shouldSupportValueOf() {
-        // Verify valueOf works for all enum constants
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            UrlSecurityFailureType parsed = UrlSecurityFailureType.valueOf(type.name());
-            assertEquals(type, parsed);
-        }
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldSupportValueOf(UrlSecurityFailureType type) {
+        UrlSecurityFailureType parsed = UrlSecurityFailureType.valueOf(type.name());
+        assertEquals(type, parsed);
     }
 
     @Test
@@ -234,15 +246,12 @@ class UrlSecurityFailureTypeTest {
                 UrlSecurityFailureType.valueOf(null));
     }
 
-    @Test
-    void shouldBeSerializable() {
-        // Enums are automatically serializable in Java
-        // Verify all failure types can be used in serialization contexts
-        for (UrlSecurityFailureType type : UrlSecurityFailureType.values()) {
-            // This would work in actual serialization
-            assertNotNull(type.name());
-            assertNotNull(type.ordinal());
-        }
+    @ParameterizedTest
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    void shouldBeSerializable(UrlSecurityFailureType type) {
+        // This would work in actual serialization
+        assertNotNull(type.name());
+        assertNotNull(type.ordinal());
     }
 
     @Test
