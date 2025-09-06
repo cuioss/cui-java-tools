@@ -15,11 +15,14 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.ValidHTTPBodyContentGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.validation.CharacterValidationStage;
 import de.cuioss.tools.security.http.validation.LengthValidationStage;
@@ -29,17 +32,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Comprehensive test for {@link HTTPBodyValidationPipeline}
  */
+@EnableGeneratorController
 class HTTPBodyValidationPipelineTest {
 
     private SecurityConfiguration defaultConfig;
@@ -365,7 +366,7 @@ class HTTPBodyValidationPipelineTest {
                     String input = "{\"data\": \"test" + threadIndex + "\"}";
                     String result = pipeline.validate(input);
                     results[threadIndex] = input.equals(result);
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     results[threadIndex] = false;
                 }
             });
@@ -417,31 +418,14 @@ class HTTPBodyValidationPipelineTest {
         assertEquals(mediumBody, largePipeline.validate(mediumBody));
     }
 
-    /**
-     * Test data provider for various body content formats
-     */
-    static Stream<Arguments> validBodyContentExamples() {
-        return Stream.of(
-                Arguments.of("{\"user\":{\"name\":\"John\",\"age\":30}}", "Nested JSON"),
-                Arguments.of("<root><user name=\"John\" age=\"30\"/></root>", "XML with attributes"),
-                Arguments.of("name=John&age=30&city=New+York", "URL-encoded form data"),
-                Arguments.of("Simple plain text content", "Plain text"),
-                Arguments.of("Content with\nnewlines\tand\ttabs", "Text with whitespace"),
-                Arguments.of("Content with UTF-8: café naïve résumé", "UTF-8 text"),
-                Arguments.of("123456789", "Numeric content"),
-                Arguments.of("", "Empty content"),
-                Arguments.of("a".repeat(1000), "Long content"),
-                Arguments.of("Mixed 123 content! @#$%^&*()", "Special characters")
-        );
-    }
 
     @ParameterizedTest
     @DisplayName("Should validate various valid body content formats")
-    @MethodSource("validBodyContentExamples")
-    void shouldValidateVariousValidBodyContent(String content, String description) {
+    @TypeGeneratorSource(value = ValidHTTPBodyContentGenerator.class, count = 10)
+    void shouldValidateVariousValidBodyContent(String content) {
         String result = pipeline.validate(content);
-        assertEquals(content, result, description);
-        assertFalse(eventCounter.hasAnyEvents(), "No security events should be triggered for: " + description);
+        assertEquals(content, result);
+        assertFalse(eventCounter.hasAnyEvents(), "No security events should be triggered for content: " + content);
     }
 
     @Test
