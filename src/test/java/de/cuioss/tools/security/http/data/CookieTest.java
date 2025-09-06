@@ -15,10 +15,9 @@
  */
 package de.cuioss.tools.security.http.data;
 
-import de.cuioss.test.generator.Generators;
-import de.cuioss.test.generator.TypedGenerator;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
+import de.cuioss.tools.security.http.generators.CookieGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -230,7 +229,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 20)
+    @TypeGeneratorSource(value = CookieGenerator.class, count = 20)
     void shouldGenerateValidCookieString(Cookie cookie) {
         String cookieString = cookie.toCookieString();
 
@@ -293,7 +292,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 10)
+    @TypeGeneratorSource(value = CookieGenerator.class, count = 10)
     void shouldSupportEquality(Cookie cookie) {
         Cookie sameCookie = new Cookie(cookie.name(), cookie.value(), cookie.attributes());
         Cookie differentCookie = new Cookie("different_name", cookie.value(), cookie.attributes());
@@ -315,7 +314,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 15)
+    @TypeGeneratorSource(value = CookieGenerator.class, count = 15)
     void shouldSupportToString(Cookie cookie) {
         String string = cookie.toString();
         assertNotNull(string);
@@ -393,7 +392,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 10)
+    @TypeGeneratorSource(value = CookieGenerator.class, count = 10)
     void shouldBeImmutable(Cookie original) {
         String originalName = original.name();
         String originalValue = original.value();
@@ -445,38 +444,4 @@ class CookieTest {
     }
 
 
-    static class TestCookieGenerator implements TypedGenerator<Cookie> {
-        private final TypedGenerator<String> cookieNames = Generators.fixedValues(
-                "JSESSIONID", "session_id", "auth_token", "csrf_token", "user_id", "preferences",
-                "language", "theme", "cart_id", "tracking_id", "remember_me", "login_token",
-                "access_token", "refresh_token", "device_id", null, "", "   ", "cookie with spaces",
-                "cookie=equals", "cookie;semicolon", "cookie,comma", "cookie\"quote", "cookie\ttab"
-        );
-
-        private final TypedGenerator<String> cookieValues = Generators.fixedValues(
-                "ABC123DEF456", "session_12345", "user_67890", "true", "false", "en_US",
-                "dark", "light", "cart_abc123", "track_xyz789", "remember_yes", "token_valid",
-                "device_mobile", "lang_de", "theme_blue", null, "", "value with spaces",
-                "<script>alert('xss')</script>", "'; DROP TABLE sessions; --", "../../../etc/passwd",
-                "%0d%0aSet-Cookie: evil=bad", "A".repeat(1000), "\u0000null_byte"
-        );
-
-        private final TypedGenerator<String> cookieAttributes = Generators.fixedValues(
-                "", "Domain=example.com", "Path=/admin", "Secure", "HttpOnly", "SameSite=Strict",
-                "Max-Age=3600", "Domain=example.com; Path=/; Secure",
-                "Domain=example.com; Path=/; HttpOnly; SameSite=Lax", "Domain=.evil.com",
-                "Path=../../../", "Max-Age=-1", "Domain=; Path=", "Invalid=Attribute; Bad=Value",
-                "Domain=example.com\r\nSet-Cookie: evil=bad", "Path=/\u0000/admin", null
-        );
-
-        @Override
-        public Cookie next() {
-            return new Cookie(cookieNames.next(), cookieValues.next(), cookieAttributes.next());
-        }
-
-        @Override
-        public Class<Cookie> getType() {
-            return Cookie.class;
-        }
-    }
 }
