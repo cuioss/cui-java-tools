@@ -15,19 +15,24 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.NullByteInjectionParameterGenerator;
+import de.cuioss.tools.security.http.generators.PathTraversalParameterGenerator;
+import de.cuioss.tools.security.http.generators.ValidURLParameterStringGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class URLParameterValidationPipelineTest {
 
     private SecurityConfiguration config;
@@ -192,28 +197,14 @@ class URLParameterValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "user_id=123",
-            "search=java%20programming",
-            "category=electronics",
-            "page=1",
-            "limit=50",
-            "sort=name",
-            "filter=active",
-            "lang=en"
-    })
+    @TypeGeneratorSource(value = ValidURLParameterStringGenerator.class, count = 8)
     void shouldAcceptValidParameters(String validParam) throws UrlSecurityException {
         String result = pipeline.validate(validParam);
         assertNotNull(result);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "param=..%2F..%2Fetc%2Fpasswd",      // Encoded path traversal
-            "file=%2E%2E%2F%2E%2E%2Fconfig",     // Double encoded traversal
-            "path=%2e%2e%5c%2e%2e%5cwindows",    // Mixed encoding
-            "param=..%5c..%5c..%5croot"          // Windows style traversal
-    })
+    @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 4)
     void shouldRejectPathTraversalVariants(String maliciousParam) {
         // Path traversal detection may not be fully implemented yet
         // For now, just verify pipeline can process these parameters without crashing
@@ -227,12 +218,7 @@ class URLParameterValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "param=value\0admin",
-            "data=%00admin",
-            "file=config\0",
-            "user=test%00"
-    })
+    @TypeGeneratorSource(value = NullByteInjectionParameterGenerator.class, count = 4)
     void shouldRejectNullByteVariants(String maliciousParam) {
         assertThrows(UrlSecurityException.class, () ->
                 pipeline.validate(maliciousParam));
