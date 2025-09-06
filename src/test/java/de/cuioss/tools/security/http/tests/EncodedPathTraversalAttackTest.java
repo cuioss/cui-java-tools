@@ -19,6 +19,7 @@ import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.ComplexEncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.EncodingCombinationGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -159,15 +159,7 @@ class EncodedPathTraversalAttackTest {
 
     @ParameterizedTest
     @DisplayName("Should reject complex encoding combinations")
-    @ValueSource(strings = {
-            "/api%2F%2E%2E%2F%2E%2E%2Fadmin%2Fconfig",           // /api/../..admin/config
-            "%2E%2E%2F%2E%2E%2F%2E%2E%2Fetc%2Fpasswd",           // ../../../etc/passwd
-            "/files%5C%2E%2E%5C%2E%2E%5Cadmin%5Cconfig",         // \files\..\..\admin\config
-            "%252E%252E%252F%252E%252E%252F%252E%252E%252F",     // ../../.. double encoded
-            "/path%2F%252E%252E%2F%2E%2E%2Fconfig",              // Mixed single/double encoding
-            "%c0%ae%c0%ae%c0%af%2E%2E%2F",                       // UTF-8 overlong + normal encoding
-            "/data%2F%2E%2E%2F%2E%2E%2F%2E%2E%2F%2E%2E%2Fadmin", // Deep traversal encoded
-    })
+    @TypeGeneratorSource(value = ComplexEncodingCombinationGenerator.class, count = 7)
     void shouldRejectComplexEncodingCombinations(String complexPattern) {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(complexPattern),
@@ -198,7 +190,7 @@ class EncodedPathTraversalAttackTest {
             } catch (UrlSecurityException e) {
                 // Some legitimate patterns might be blocked by strict security rules
                 // This is acceptable for security-first approach
-                /*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*/System.out.println("Legitimately blocked (security-first): " + pattern + " - " + e.getMessage());
+                /*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*//*~~(Use CuiLogger)~~>*/System.out.println("Legitimately blocked (security-first): " + pattern + " - " + e.getMessage());
             }
         }
     }
@@ -260,7 +252,7 @@ class EncodedPathTraversalAttackTest {
                     results[threadIndex] = false; // Should not reach here
                 } catch (UrlSecurityException e) {
                     results[threadIndex] = true; // Expected exception
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     results[threadIndex] = false; // Unexpected exception
                 }
             });
