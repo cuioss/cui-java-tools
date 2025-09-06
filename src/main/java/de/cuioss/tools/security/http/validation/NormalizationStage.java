@@ -295,15 +295,35 @@ public class NormalizationStage implements HttpSecurityValidator {
      * Checks if the normalized path contains internal path traversal patterns.
      * 
      * <p>After proper normalization, there should be no remaining .. segments
-     * except at the beginning for relative paths (which is handled by escapesRoot).</p>
+     * except at the beginning for relative paths (which is handled by escapesRoot).
+     * This method performs comprehensive checks for any remaining traversal patterns
+     * that could indicate incomplete normalization or sophisticated attacks.</p>
      * 
      * @param path The normalized path to check
      * @return true if path contains internal traversal patterns
      */
     private boolean containsInternalPathTraversal(String path) {
         // After normalization, check for .. segments that aren't at the start
-        return path.contains("/../") || path.contains("..\\") ||
-                ("..".equals(path) && !path.startsWith("../"));
+        if (path.contains("/../") || path.contains("..\\")) {
+            return true;
+        }
+
+        // Check for .. at end of path (without leading ../)
+        if (path.endsWith("/..") && !"..".equals(path) && !path.startsWith("../")) {
+            return true;
+        }
+
+        // Check for standalone .. that isn't at the beginning
+        if ("..".equals(path) && !path.startsWith("../")) {
+            return true;
+        }
+
+        // Additional security: check for any sequence that could be path traversal
+        // This catches cases where encoding or normalization didn't fully resolve patterns
+        String lowerPath = path.toLowerCase();
+        return lowerPath.contains("..") &&
+                (lowerPath.contains("/") || lowerPath.contains("\\")) &&
+                !path.startsWith("../") && !path.startsWith("..\\");
     }
 
     /**

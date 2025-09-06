@@ -288,12 +288,12 @@ Implement → Test → Verify → Document Progress → Commit
 |T1
 |Test basic path traversal patterns - see link:testing.adoc#_path_traversal_tests_t1_t4[Test Cases §T1]
 |High
-|[ ]
+|[x]
 
 |T2
 |Test encoded path traversal attacks
 |High
-|[ ]
+|[x]
 
 |T3
 |Test Unicode path traversal variants

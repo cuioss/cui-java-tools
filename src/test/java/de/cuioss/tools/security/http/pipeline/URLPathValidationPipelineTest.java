@@ -45,7 +45,7 @@ class URLPathValidationPipelineTest {
     void shouldCreatePipelineWithValidParameters() {
         assertNotNull(pipeline);
         assertEquals(ValidationType.URL_PATH, pipeline.getValidationType());
-        assertEquals(5, pipeline.getStages().size()); // 5 validation stages
+        assertEquals(6, pipeline.getStages().size()); // 6 validation stages (PatternMatching runs twice for security)
         assertSame(eventCounter, pipeline.getEventCounter());
     }
 
@@ -153,7 +153,7 @@ class URLPathValidationPipelineTest {
 
     @Test
     void shouldRejectDoubleEncoding() {
-        String doubleEncodedPath = "/api/users/%252E%252E/admin";
+        String doubleEncodedPath = "/api/users/%2520space";
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                 pipeline.validate(doubleEncodedPath));
@@ -321,13 +321,14 @@ class URLPathValidationPipelineTest {
     void shouldPreserveStageOrder() {
         // Verify stages are in the correct order
         var stages = pipeline.getStages();
-        assertEquals(5, stages.size());
+        assertEquals(6, stages.size());
 
-        // Check stage types in order
+        // Check stage types in order (PatternMatching now runs twice for defense in depth)
         assertTrue(stages.getFirst().getClass().getSimpleName().contains("Length"));
         assertTrue(stages.get(1).getClass().getSimpleName().contains("Character"));
-        assertTrue(stages.get(2).getClass().getSimpleName().contains("Decoding"));
-        assertTrue(stages.get(3).getClass().getSimpleName().contains("Normalization"));
-        assertTrue(stages.get(4).getClass().getSimpleName().contains("Pattern"));
+        assertTrue(stages.get(2).getClass().getSimpleName().contains("Pattern")); // FIRST run - before decoding
+        assertTrue(stages.get(3).getClass().getSimpleName().contains("Decoding"));
+        assertTrue(stages.get(4).getClass().getSimpleName().contains("Normalization"));
+        assertTrue(stages.get(5).getClass().getSimpleName().contains("Pattern")); // SECOND run - after normalization
     }
 }

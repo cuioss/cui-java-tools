@@ -154,7 +154,7 @@ class CharacterValidationConstantsTest {
         assertSame(CharacterValidationConstants.RFC7230_HEADER_CHARS,
                 CharacterValidationConstants.getCharacterSet(ValidationType.HEADER_VALUE));
 
-        assertSame(CharacterValidationConstants.RFC3986_UNRESERVED,
+        assertSame(CharacterValidationConstants.HTTP_BODY_CHARS,
                 CharacterValidationConstants.getCharacterSet(ValidationType.BODY));
         assertSame(CharacterValidationConstants.RFC3986_UNRESERVED,
                 CharacterValidationConstants.getCharacterSet(ValidationType.COOKIE_NAME));

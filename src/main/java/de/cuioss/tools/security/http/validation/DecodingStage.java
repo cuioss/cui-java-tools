@@ -106,6 +106,21 @@ public class DecodingStage implements HttpSecurityValidator {
     private static final Pattern DOUBLE_ENCODING_PATTERN = Pattern.compile("%25[0-9a-fA-F]{2}");
 
     /**
+     * Pre-compiled pattern for detecting UTF-8 overlong encoding attacks.
+     * Matches UTF-8 overlong encodings commonly used to bypass security filters.
+     * Includes common overlong encodings for ASCII characters and path separators.
+     */
+    private static final Pattern UTF8_OVERLONG_PATTERN = Pattern.compile(
+            """
+            (?i)\
+            %c[0-1][0-9a-f][0-9a-f]|\
+            %e0%[89][0-9a-f]%[89ab][0-9a-f]|\
+            %f0%80%[89][0-9a-f]%[89ab][0-9a-f]|\
+            %c0%[a-f][0-9a-f]|%c1%[0-9a-f][0-9a-f]|\
+            %c0%ae|%c0%af|%c1%9c|%c1%81"""
+    );
+
+    /**
      * Security configuration controlling validation behavior.
      */
     SecurityConfiguration config;
@@ -147,6 +162,16 @@ public class DecodingStage implements HttpSecurityValidator {
                     .validationType(validationType)
                     .originalInput(value)
                     .detail("Double encoding pattern %25XX detected in input")
+                    .build();
+        }
+
+        // Step 1.5: Detect UTF-8 overlong encoding attacks (always blocked - security critical)
+        if (UTF8_OVERLONG_PATTERN.matcher(value).find()) {
+            throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.INVALID_ENCODING)
+                    .validationType(validationType)
+                    .originalInput(value)
+                    .detail("UTF-8 overlong encoding attack detected")
                     .build();
         }
 

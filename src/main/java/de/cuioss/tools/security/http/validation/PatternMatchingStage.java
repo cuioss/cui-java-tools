@@ -122,10 +122,19 @@ public class PatternMatchingStage implements HttpSecurityValidator {
 
     /**
      * Pre-compiled regex pattern for detecting encoded path traversal sequences.
-     * Matches various URL-encoded representations of ../ and ..\ patterns.
+     * Matches various URL-encoded representations of ../ and ..\ patterns including
+     * double-encoded, UTF-8 overlong, and mixed encoding attempts.
      */
     private static final Pattern ENCODED_TRAVERSAL_PATTERN = Pattern.compile(
-            "(?i)%2e%2e[%2f%5c/\\\\]|%2f%2e%2e|%5c%2e%2e|\\.%2e[%2f%5c/\\\\]|%2e\\.[%2f%5c/\\\\]"
+            """
+            (?i)\
+            %2e%2e[%2f%5c/\\\\]|%2f%2e%2e|%5c%2e%2e|\
+            \\.%2e[%2f%5c/\\\\]|%2e\\.[%2f%5c/\\\\]|\
+            %252e%252e[%252f%255c/\\\\]|\
+            %c0%ae%c0%ae[%c0%af%c1%9c/\\\\]|%c1%9c%c1%9c|%c1%8s%c1%8s%c1%81|\
+            %c0%ae.*%c0%af|%c1%9c.*%c1%9c|\
+            %2e%2e[/\\\\]{2,}|[.]{2,}[%2f%5c]{1,2}[/\\\\]*|\
+            [.]{2}%2f[.]{2}|[.]{2}/%2e%2e"""
     );
 
     /**
@@ -221,12 +230,16 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     /**
      * Checks input for path traversal attack patterns.
      * 
+     * <p><strong>Security Critical:</strong> Path traversal patterns are ALWAYS blocked
+     * regardless of the failOnSuspiciousPatterns configuration, as they represent
+     * direct security threats, not merely suspicious behavior.</p>
+     * 
      * @param originalValue The original input value
      * @param testValue The value prepared for testing (case-normalized if needed)
      * @throws UrlSecurityException if path traversal patterns are detected
      */
     private void checkPathTraversalPatterns(String originalValue, String testValue) {
-        // Check simple string patterns
+        // Check simple string patterns - ALWAYS fail on path traversal (security critical)
         for (String pattern : SecurityDefaults.PATH_TRAVERSAL_PATTERNS) {
             String checkPattern = config.caseSensitiveComparison() ? pattern : pattern.toLowerCase();
             if (testValue.contains(checkPattern)) {
@@ -239,13 +252,35 @@ public class PatternMatchingStage implements HttpSecurityValidator {
             }
         }
 
-        // Check encoded patterns using regex
+        // Check encoded patterns using regex - ALWAYS fail on path traversal (security critical)
         if (ENCODED_TRAVERSAL_PATTERN.matcher(originalValue).find()) {
             throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
                     .validationType(validationType)
                     .originalInput(originalValue)
-                    .detail("Encoded path traversal pattern detected")
+                    .detail("Encoded path traversal pattern detected via regex")
+                    .build();
+        }
+
+        // Additional check: Look for any sequence of dots followed by path separators
+        // This catches edge cases like multiple dots or mixed separators
+        if (originalValue.matches("(?i).*[.]{2,}[/\\\\%2f%5c]+.*")) {
+            throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                    .validationType(validationType)
+                    .originalInput(originalValue)
+                    .detail("Path traversal pattern detected: multiple dots with separators")
+                    .build();
+        }
+
+        // Critical: Block ANY occurrence of ../  patterns regardless of context
+        // This ensures even patterns that would normalize safely are blocked (defense in depth)
+        if (originalValue.contains("../") || originalValue.contains("..\\")) {
+            throw UrlSecurityException.builder()
+                    .failureType(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED)
+                    .validationType(validationType)
+                    .originalInput(originalValue)
+                    .detail("Path traversal pattern detected: dot-dot-slash sequence found")
                     .build();
         }
     }

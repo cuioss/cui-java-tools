@@ -90,9 +90,22 @@ public final class SecurityDefaults {
 
     /** Common path traversal patterns to detect */
     public static final Set<String> PATH_TRAVERSAL_PATTERNS = Set.of(
-            "../", "..\\", "..\\/", "..%2F", "..%5C",
-            "%2E%2E/", "%2e%2e/", "%2E%2E%2F", "%2e%2e%2f",
-            "....//", "....\\\\", ".%2E/", ".%2e/"
+            // Basic patterns
+            "../", "..\\", "..\\/",
+
+            // URL encoded patterns
+            "..%2F", "..%5C", "%2E%2E/", "%2e%2e/", "%2E%2E%2F", "%2e%2e%2f",
+            "%2e%2e%5c", "%2E%2E%5C", "%2f%2e%2e", "%5c%2e%2e",
+
+            // Double encoded patterns
+            "%252e%252e%252f", "%252e%252e%255c", "%252e%252e/", "%252e%252e\\",
+
+            // Mixed patterns
+            "....//", "....\\\\", ".%2E/", ".%2e/", "..//", "..\\\\",
+            "%2e%2e//", "%2e%2e\\\\", "..%2f/", "..%5c\\", "..%2f", "..%5c", "/%2e%2e/",
+
+            // UTF-8 overlong encodings (common bypass attempts)
+            "..%c0%af", "..%c1%9c", "%c0%ae%c0%ae%c0%af", "%c1%8s%c1%8s%c1%81"
     );
 
     /** Patterns indicating potential directory traversal attempts */

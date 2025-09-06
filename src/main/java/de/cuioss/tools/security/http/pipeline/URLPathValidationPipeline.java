@@ -93,12 +93,14 @@ public final class URLPathValidationPipeline implements HttpSecurityValidator {
         Objects.requireNonNull(config, "Config must not be null");
 
         // Create validation stages in the correct order
+        // CRITICAL: PatternMatchingStage must run BEFORE normalization to catch all traversal patterns
         this.stages = List.of(
                 new LengthValidationStage(config, ValidationType.URL_PATH),
                 new CharacterValidationStage(config, ValidationType.URL_PATH),
+                new PatternMatchingStage(config, ValidationType.URL_PATH), // MOVED HERE - before decoding/normalization
                 new DecodingStage(config, ValidationType.URL_PATH),
                 new NormalizationStage(config, ValidationType.URL_PATH),
-                new PatternMatchingStage(config, ValidationType.URL_PATH)
+                new PatternMatchingStage(config, ValidationType.URL_PATH)  // DUPLICATE - after normalization for defense in depth
         );
     }
 

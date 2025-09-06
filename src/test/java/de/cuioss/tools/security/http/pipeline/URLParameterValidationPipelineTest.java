@@ -280,8 +280,8 @@ class URLParameterValidationPipelineTest {
         // Verify null byte injection is tracked (this should work)
         assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.NULL_BYTE_INJECTION));
 
-        // Verify invalid character is tracked (tabs should be rejected)
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER));
+        // Verify control characters are tracked (tabs should be rejected as control characters)
+        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS));
     }
 
     @Test

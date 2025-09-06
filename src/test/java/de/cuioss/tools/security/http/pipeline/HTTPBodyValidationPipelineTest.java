@@ -365,7 +365,7 @@ class HTTPBodyValidationPipelineTest {
                     String input = "{\"data\": \"test" + threadIndex + "\"}";
                     String result = pipeline.validate(input);
                     results[threadIndex] = input.equals(result);
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     results[threadIndex] = false;
                 }
             });
