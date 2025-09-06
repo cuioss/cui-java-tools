@@ -15,21 +15,24 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.ValidationType;
+import de.cuioss.tools.security.http.generators.SupportedValidationTypeGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Comprehensive test for {@link PipelineFactory}
  */
+@EnableGeneratorController
 class PipelineFactoryTest {
 
     private SecurityConfiguration config;
@@ -224,7 +227,7 @@ class PipelineFactoryTest {
         try {
             // This should trigger a null byte injection detection
             pipelineSet.bodyPipeline().validate("test\u0000content");
-        } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+        } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
             // Expected - we're just testing that events are tracked
         }
 
@@ -256,7 +259,7 @@ class PipelineFactoryTest {
 
     @ParameterizedTest
     @DisplayName("Should handle all supported validation types correctly")
-    @EnumSource(value = ValidationType.class, names = {"URL_PATH", "PARAMETER_VALUE", "HEADER_NAME", "HEADER_VALUE", "BODY"})
+    @TypeGeneratorSource(value = SupportedValidationTypeGenerator.class, count = 5)
     void shouldHandleSupportedValidationTypes(ValidationType validationType) {
         HttpSecurityValidator pipeline = PipelineFactory.createPipeline(validationType, config, eventCounter);
         assertNotNull(pipeline);
@@ -354,7 +357,7 @@ class PipelineFactoryTest {
                 try {
                     results[index] = PipelineFactory.createUrlPathPipeline(config, eventCounter);
                     success[index] = results[index] != null;
-                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+                } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                     success[index] = false;
                 }
             });
