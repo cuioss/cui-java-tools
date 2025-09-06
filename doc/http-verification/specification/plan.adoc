@@ -269,7 +269,7 @@ Implement → Test → Verify → Document Progress → Commit
 |P4
 |Implement HTTPBodyValidationPipeline
 |Medium
-|[ ]
+|[x]
 
 |P5
 |Create PipelineFactory for pipeline creation

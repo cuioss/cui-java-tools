@@ -42,6 +42,9 @@ public final class CharacterValidationConstants {
     // RFC 7230 header field characters (visible ASCII minus delimiters)
     public static final BitSet RFC7230_HEADER_CHARS;
 
+    // HTTP body content characters (very permissive for JSON, XML, text, etc.)
+    public static final BitSet HTTP_BODY_CHARS;
+
     static {
         // Initialize RFC3986_UNRESERVED
         BitSet unreserved = new BitSet(256);
@@ -88,6 +91,24 @@ public final class CharacterValidationConstants {
         // Only exclude characters that could break HTTP: CR, LF, NULL
         // Note: Other dangerous chars are handled at application level
         RFC7230_HEADER_CHARS = headerChars;
+
+        // Initialize HTTP_BODY_CHARS (very permissive for body content)
+        BitSet bodyChars = new BitSet(256);
+        // Allow all printable ASCII and extended characters
+        for (int i = 32; i <= 126; i++) { // ASCII printable characters
+            bodyChars.set(i);
+        }
+        // Allow common whitespace characters
+        bodyChars.set('\t');  // Tab (0x09)
+        bodyChars.set('\n');  // Line feed (0x0A) 
+        bodyChars.set('\r');  // Carriage return (0x0D)
+        // Allow extended ASCII and Unicode range (128-255)
+        for (int i = 128; i <= 255; i++) {
+            bodyChars.set(i);
+        }
+        // Note: Null bytes and other control chars (1-31) are excluded by default
+        // They can be allowed via configuration if needed
+        HTTP_BODY_CHARS = bodyChars;
     }
 
     /**
@@ -99,7 +120,8 @@ public final class CharacterValidationConstants {
             case URL_PATH -> RFC3986_PATH_CHARS;
             case PARAMETER_NAME, PARAMETER_VALUE -> RFC3986_QUERY_CHARS;
             case HEADER_NAME, HEADER_VALUE -> RFC7230_HEADER_CHARS;
-            case BODY, COOKIE_NAME, COOKIE_VALUE -> RFC3986_UNRESERVED;
+            case BODY -> HTTP_BODY_CHARS;
+            case COOKIE_NAME, COOKIE_VALUE -> RFC3986_UNRESERVED;
         };
     }
 }
