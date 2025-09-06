@@ -15,7 +15,12 @@
  */
 package de.cuioss.tools.security.http.data;
 
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.List;
 
@@ -24,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Test for {@link Cookie}
  */
+@EnableGeneratorController
 class CookieTest {
 
     private static final String COOKIE_NAME = "JSESSIONID";
@@ -223,8 +229,25 @@ class CookieTest {
         assertEquals("default", withoutValue.valueOrDefault("default"));
     }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 20)
+    void shouldGenerateValidCookieString(Cookie cookie) {
+        String cookieString = cookie.toCookieString();
+
+        // Cookie string should always be non-null
+        assertNotNull(cookieString);
+
+        // Should contain equals sign for name=value format
+        assertTrue(cookieString.contains("="));
+
+        // If cookie has attributes, they should be included
+        if (cookie.hasAttributes()) {
+            assertTrue(cookieString.length() > (cookie.nameOrDefault("") + "=" + cookie.valueOrDefault("")).length());
+        }
+    }
+
     @Test
-    void shouldGenerateCookieString() {
+    void shouldGenerateCookieStringWithKnownValues() {
         Cookie simpleCookie = new Cookie("name", "value", "");
         Cookie cookieWithAttributes = new Cookie("auth", "token123", "Secure; HttpOnly");
         Cookie cookieWithNullName = new Cookie(null, "value", "");
@@ -269,8 +292,19 @@ class CookieTest {
         assertEquals(COOKIE_ATTRIBUTES, original.attributes()); // Original unchanged
     }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 10)
+    void shouldSupportEquality(Cookie cookie) {
+        Cookie sameCookie = new Cookie(cookie.name(), cookie.value(), cookie.attributes());
+        Cookie differentCookie = new Cookie("different_name", cookie.value(), cookie.attributes());
+
+        assertEquals(cookie, sameCookie);
+        assertNotEquals(cookie, differentCookie);
+        assertEquals(cookie.hashCode(), sameCookie.hashCode());
+    }
+
     @Test
-    void shouldSupportEquality() {
+    void shouldSupportEqualityWithKnownValues() {
         Cookie cookie1 = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie cookie2 = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie cookie3 = new Cookie("other", COOKIE_VALUE, COOKIE_ATTRIBUTES);
@@ -280,8 +314,23 @@ class CookieTest {
         assertEquals(cookie1.hashCode(), cookie2.hashCode());
     }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 15)
+    void shouldSupportToString(Cookie cookie) {
+        String string = cookie.toString();
+        assertNotNull(string);
+
+        // String representation should contain the cookie name if present
+        if (cookie.name() != null && !cookie.name().isEmpty()) {
+            assertTrue(string.contains(cookie.name()) || string.contains("name"));
+        }
+
+        // String representation should contain some representation of the cookie
+        assertTrue(string.length() > 5);
+    }
+
     @Test
-    void shouldSupportToString() {
+    void shouldSupportToStringWithKnownValues() {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         String string = cookie.toString();
 
@@ -343,8 +392,30 @@ class CookieTest {
         assertTrue(cookie.isHttpOnly());
     }
 
+    @ParameterizedTest
+    @TypeGeneratorSource(value = TestCookieGenerator.class, count = 10)
+    void shouldBeImmutable(Cookie original) {
+        String originalName = original.name();
+        String originalValue = original.value();
+        String originalAttributes = original.attributes();
+
+        Cookie withNewName = original.withName("new");
+        Cookie withNewValue = original.withValue("new");
+        Cookie withNewAttributes = original.withAttributes("new");
+
+        // Original should be unchanged
+        assertEquals(originalName, original.name());
+        assertEquals(originalValue, original.value());
+        assertEquals(originalAttributes, original.attributes());
+
+        // New instances should have changes
+        assertEquals("new", withNewName.name());
+        assertEquals("new", withNewValue.value());
+        assertEquals("new", withNewAttributes.attributes());
+    }
+
     @Test
-    void shouldBeImmutable() {
+    void shouldBeImmutableWithKnownValues() {
         Cookie original = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
 
         Cookie withNewName = original.withName("new");
@@ -371,5 +442,41 @@ class CookieTest {
         assertEquals("value with spaces", cookie.value());
         assertEquals("exam-ple.com", cookie.getDomain().orElse(null));
         assertEquals("/path with spaces", cookie.getPath().orElse(null));
+    }
+
+
+    static class TestCookieGenerator implements TypedGenerator<Cookie> {
+        private final TypedGenerator<String> cookieNames = Generators.fixedValues(
+                "JSESSIONID", "session_id", "auth_token", "csrf_token", "user_id", "preferences",
+                "language", "theme", "cart_id", "tracking_id", "remember_me", "login_token",
+                "access_token", "refresh_token", "device_id", null, "", "   ", "cookie with spaces",
+                "cookie=equals", "cookie;semicolon", "cookie,comma", "cookie\"quote", "cookie\ttab"
+        );
+
+        private final TypedGenerator<String> cookieValues = Generators.fixedValues(
+                "ABC123DEF456", "session_12345", "user_67890", "true", "false", "en_US",
+                "dark", "light", "cart_abc123", "track_xyz789", "remember_yes", "token_valid",
+                "device_mobile", "lang_de", "theme_blue", null, "", "value with spaces",
+                "<script>alert('xss')</script>", "'; DROP TABLE sessions; --", "../../../etc/passwd",
+                "%0d%0aSet-Cookie: evil=bad", "A".repeat(1000), "\u0000null_byte"
+        );
+
+        private final TypedGenerator<String> cookieAttributes = Generators.fixedValues(
+                "", "Domain=example.com", "Path=/admin", "Secure", "HttpOnly", "SameSite=Strict",
+                "Max-Age=3600", "Domain=example.com; Path=/; Secure",
+                "Domain=example.com; Path=/; HttpOnly; SameSite=Lax", "Domain=.evil.com",
+                "Path=../../../", "Max-Age=-1", "Domain=; Path=", "Invalid=Attribute; Bad=Value",
+                "Domain=example.com\r\nSet-Cookie: evil=bad", "Path=/\u0000/admin", null
+        );
+
+        @Override
+        public Cookie next() {
+            return new Cookie(cookieNames.next(), cookieValues.next(), cookieAttributes.next());
+        }
+
+        @Override
+        public Class<Cookie> getType() {
+            return Cookie.class;
+        }
     }
 }
