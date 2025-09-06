@@ -15,19 +15,24 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.NullByteURLGenerator;
+import de.cuioss.tools.security.http.generators.PathTraversalURLGenerator;
+import de.cuioss.tools.security.http.generators.ValidURLPathGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class URLPathValidationPipelineTest {
 
     private SecurityConfiguration config;
@@ -209,28 +214,14 @@ class URLPathValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "/api/users",
-            "/api/v1/users/123",
-            "/api/users/search",
-            "/health",
-            "/metrics",
-            "/api/users/123/profile",
-            "/api/orders/456/items"
-    })
+    @TypeGeneratorSource(value = ValidURLPathGenerator.class, count = 7)
     void shouldAcceptValidPaths(String validPath) throws UrlSecurityException {
         String result = pipeline.validate(validPath);
         assertNotNull(result);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "/api/%2E%2E/admin",              // Encoded ..
-            "/api/users/%2E%2E/%2E%2E/%2E%2E/etc/passwd", // Multiple encoded traversal
-            "/api/users/%2E/%2E%2E/admin",    // Encoded ./../
-            "/api/users/%2E%2E%5Cadmin",      // Windows style encoded
-            "/api/users/%2e%2e/admin"         // Lowercase encoded traversal
-    })
+    @TypeGeneratorSource(value = PathTraversalURLGenerator.class, count = 5)
     void shouldRejectPathTraversalVariants(String maliciousPath) {
         // Path traversal detection may not be fully implemented yet
         // For now, just verify pipeline can process these paths without crashing
@@ -244,12 +235,7 @@ class URLPathValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "/api/users\0admin",
-            "/api/users%00admin",
-            "/api\0/users",
-            "/api/users/123\0"
-    })
+    @TypeGeneratorSource(value = NullByteURLGenerator.class, count = 4)
     void shouldRejectNullByteVariants(String maliciousPath) {
         assertThrows(UrlSecurityException.class, () ->
                 pipeline.validate(maliciousPath));
