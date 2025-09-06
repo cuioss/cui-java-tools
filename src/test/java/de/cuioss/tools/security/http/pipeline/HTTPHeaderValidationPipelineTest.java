@@ -15,18 +15,24 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.HTTPHeaderInjectionGenerator;
+import de.cuioss.tools.security.http.generators.InvalidHTTPHeaderNameGenerator;
+import de.cuioss.tools.security.http.generators.ValidHTTPHeaderNameGenerator;
+import de.cuioss.tools.security.http.generators.ValidHTTPHeaderValueGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableGeneratorController
 class HTTPHeaderValidationPipelineTest {
 
     private SecurityConfiguration config;
@@ -211,16 +217,7 @@ class HTTPHeaderValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Authorization",
-            "Content-Type",
-            "X-Forwarded-For",
-            "User-Agent",
-            "Accept",
-            "Accept-Language",
-            "Cache-Control",
-            "X-Custom-Header-Name"
-    })
+    @TypeGeneratorSource(value = ValidHTTPHeaderNameGenerator.class, count = 8)
     void shouldAcceptValidHeaderNames(String validHeaderName) throws UrlSecurityException {
         HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_NAME);
 
@@ -230,16 +227,7 @@ class HTTPHeaderValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
-            "application/json",
-            "text/html; charset=utf-8",
-            "gzip, deflate, br",
-            "en-US,en;q=0.9",
-            "max-age=3600, must-revalidate",
-            "192.168.1.1, 10.0.0.1",
-            "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2)"
-    })
+    @TypeGeneratorSource(value = ValidHTTPHeaderValueGenerator.class, count = 8)
     void shouldAcceptValidHeaderValues(String validHeaderValue) throws UrlSecurityException {
         HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_VALUE);
 
@@ -249,13 +237,7 @@ class HTTPHeaderValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Bearer token\r\nX-Injected: malicious",     // CRLF injection
-            "Bearer token\nX-Injected: malicious",       // LF injection  
-            "Bearer token\rX-Injected: malicious",       // CR injection
-            "Bearer token\r\n\r\nHTTP/1.1 200 OK",       // HTTP response splitting
-            "Bearer token\u0000admin"                     // Null byte injection
-    })
+    @TypeGeneratorSource(value = HTTPHeaderInjectionGenerator.class, count = 5)
     void shouldRejectHeaderInjectionVariants(String maliciousHeader) {
         HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_VALUE);
 
@@ -264,12 +246,7 @@ class HTTPHeaderValidationPipelineTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Header\rName",       // CR in header name
-            "Header\nName",       // LF in header name
-            "Header\r\nName",     // CRLF in header name
-            "Header\u0000Name"    // Null byte in header name
-    })
+    @TypeGeneratorSource(value = InvalidHTTPHeaderNameGenerator.class, count = 4)
     void shouldRejectInvalidHeaderNames(String maliciousHeaderName) {
         HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_NAME);
 
