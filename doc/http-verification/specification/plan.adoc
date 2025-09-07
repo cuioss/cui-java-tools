@@ -374,7 +374,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T14
 |Test LDAP injection patterns
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.5: HTTP-Specific Attack Tests
