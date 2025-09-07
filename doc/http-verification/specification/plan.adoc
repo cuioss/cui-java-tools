@@ -337,7 +337,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T8
 |Test Unicode normalization attacks
 |High
-|[ ]
+|[x]
 
 |T9
 |Test homograph attacks
