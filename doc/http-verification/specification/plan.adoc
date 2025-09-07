@@ -369,7 +369,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T13
 |Test command injection patterns
 |High
-|[ ]
+|[x]
 
 |T14
 |Test LDAP injection patterns
