@@ -252,8 +252,8 @@ class EncodedPathTraversalAttackTest {
                     results[threadIndex] = false; // Should not reach here
                 } catch (UrlSecurityException e) {
                     results[threadIndex] = true; // Expected exception
-                } catch (RuntimeException e) {
-                    results[threadIndex] = false; // Unexpected exception
+                } catch (IllegalArgumentException | NullPointerException | IllegalStateException e) {
+                    results[threadIndex] = false; // Unexpected exception: malformed input or internal error
                 }
             });
         }
