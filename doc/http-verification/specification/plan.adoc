@@ -364,7 +364,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T12
 |Test SQL injection patterns
 |High
-|[ ]
+|[x]
 
 |T13
 |Test command injection patterns
