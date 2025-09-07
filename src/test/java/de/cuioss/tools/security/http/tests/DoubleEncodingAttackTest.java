@@ -291,7 +291,8 @@ class DoubleEncodingAttackTest {
         for (int i = 0; i < 10; i++) {
             try {
                 pipeline.validate(complexDoubleEncodingPattern);
-            } catch (Exception ignored) {
+            } catch (UrlSecurityException ignored) {
+                // Expected for malicious pattern
             }
         }
 
@@ -300,7 +301,8 @@ class DoubleEncodingAttackTest {
         for (int i = 0; i < 100; i++) {
             try {
                 pipeline.validate(complexDoubleEncodingPattern);
-            } catch (Exception ignored) {
+            } catch (UrlSecurityException ignored) {
+                // Expected for malicious pattern
             }
         }
         long endTime = System.nanoTime();
