@@ -53,11 +53,11 @@ class DoubleEncodingAttackGeneratorTest {
         // Every pattern should contain double encoding indicators
         for (String pattern : generated) {
             boolean hasDoubleEncoding = pattern.contains("%252") ||  // Standard double encoding
-                pattern.contains("%%3") ||                           // CVE-style double encoding  
-                pattern.contains("%25252") ||                        // Triple encoding
-                pattern.contains("%255");                            // Double encoding of backslash
-            assertTrue(hasDoubleEncoding, 
-                "Pattern should contain double encoding: " + pattern);
+                    pattern.contains("%%3") ||                           // CVE-style double encoding  
+                    pattern.contains("%25252") ||                        // Triple encoding
+                    pattern.contains("%255");                            // Double encoding of backslash
+            assertTrue(hasDoubleEncoding,
+                    "Pattern should contain double encoding: " + pattern);
         }
 
         // Should have variety in patterns
@@ -75,9 +75,9 @@ class DoubleEncodingAttackGeneratorTest {
 
         // Should contain path traversal patterns (either in encoded form)
         boolean hasTraversalElements = generated.stream()
-            .anyMatch(s -> s.contains("252e") || s.contains("252f") || 
-                          s.contains("../") || s.contains("etc"));
-        
+                .anyMatch(s -> s.contains("252e") || s.contains("252f") ||
+                        s.contains("../") || s.contains("etc"));
+
         assertTrue(hasTraversalElements, "Should generate patterns with traversal elements");
     }
 
@@ -92,8 +92,8 @@ class DoubleEncodingAttackGeneratorTest {
 
         // Should contain CVE-2021-42013 patterns
         boolean hasCVEPatterns = generated.stream()
-            .anyMatch(s -> s.contains("%%32%65") || s.contains("%%32%66"));
-        
+                .anyMatch(s -> s.contains("%%32%65") || s.contains("%%32%66"));
+
         assertTrue(hasCVEPatterns, "Should generate CVE-related attack patterns");
     }
 

@@ -306,7 +306,7 @@ class UnicodeNormalizationAttackTest {
                 assertNotNull(e.getFailureType(),
                         "Exception should have failure type for: " + edgeCase);
 
-            } /*~~(Catch specific not Exception)~~>*/catch (Exception e) {
+            } /*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*//*~~(Catch specific not Exception)~~>*/catch (Exception e) {
                 // Some edge cases might cause other exceptions (e.g., encoding issues)
                 // This is acceptable - the system should handle them gracefully
                 assertNotNull(e, "Exception should be properly formed");

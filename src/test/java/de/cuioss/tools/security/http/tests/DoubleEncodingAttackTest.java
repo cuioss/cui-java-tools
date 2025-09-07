@@ -210,11 +210,11 @@ class DoubleEncodingAttackTest {
             String result = pipeline.validate(validPath);
             // Then: Should return validated result
             assertNotNull(result, "Valid path should return validated result: " + validPath);
-            
+
             // And: No security events should be recorded for valid paths
             assertEquals(initialEventCount, eventCounter.getTotalCount(),
                     "No security events should be recorded for valid path: " + validPath);
-                    
+
         } catch (UrlSecurityException e) {
             // Some paths might still be blocked by other security rules
             // This is acceptable for a security-first approach
@@ -252,19 +252,19 @@ class DoubleEncodingAttackTest {
 
         for (String edgeCase : edgeCases) {
             long initialEventCount = eventCounter.getTotalCount();
-            
+
             try {
                 String result = pipeline.validate(edgeCase);
                 // If validation passes, result should not be null
                 // Some edge cases might be legitimate patterns
                 assertNotNull(result, "Validated result should not be null for: " + edgeCase);
-                
+
             } catch (UrlSecurityException e) {
                 // Edge cases might be rejected for various reasons
                 // This is acceptable - either for security reasons or invalid encoding
                 assertTrue(eventCounter.getTotalCount() > initialEventCount,
                         "Security event should be recorded when rejecting: " + edgeCase);
-                        
+
                 // Should have a proper failure type
                 assertNotNull(e.getFailureType(),
                         "Exception should have failure type for: " + edgeCase);

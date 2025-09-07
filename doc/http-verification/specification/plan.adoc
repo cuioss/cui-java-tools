@@ -347,7 +347,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T10
 |Test Unicode control characters
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.4: Injection Attack Tests
