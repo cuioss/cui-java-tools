@@ -298,7 +298,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T3
 |Test Unicode path traversal variants
 |High
-|[ ]
+|[x]
 
 |T4
 |Test path traversal with null bytes
