@@ -109,14 +109,14 @@ class LdapInjectionAttackTest {
 
         assertTrue(
                 exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                        exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                        exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                 "LDAP injection should be detected with appropriate failure type, got: " + exception.getFailureType()
         );
 
         assertTrue(eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                   eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                   eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT) > 0,
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT) > 0,
                 "Security event counter should track LDAP injection detection");
     }
 
@@ -133,7 +133,7 @@ class LdapInjectionAttackTest {
         long milliseconds = duration / 1_000_000;
 
         assertTrue(milliseconds < 8,
-                String.format("LDAP injection validation took %dms, should be < 8ms for pattern: %s",
+                "LDAP injection validation took %dms, should be < 8ms for pattern: %s".formatted(
                         milliseconds, sanitizeForDisplay(ldapPattern)));
     }
 
@@ -141,21 +141,21 @@ class LdapInjectionAttackTest {
     @DisplayName("Known dangerous LDAP injection patterns should be rejected")
     void shouldRejectKnownLdapInjectionAttacks() {
         String[] knownAttacks = {
-            "http://example.com/auth?user=admin)(&(objectClass=*",
-            "https://site.org/login?username=*)|(uid=admin",
-            "http://app.com/search?query=test)(&(1=1",
-            "https://api.com/user?name=user)|(objectClass=person)(&(uid=*",
-            "http://test.com/ldap?filter=admin))%00",
-            "https://secure.com/dir?search=*)|(cn=*",
-            "http://domain.com/auth?login=*)(uid=*))(|(uid=*",
-            "https://web.org/users?param=admin)(&(password=*)",
-            "http://site.com/query?attr=*)|(objectClass=*",
-            "https://app.org/directory?dn=cn=admin,dc=domain,dc=com)(&(objectClass=*",
-            "http://example.org/search?name=admin\\29\\28uid=*",
-            "https://test.com/filter?value=user\\2A\\29\\28objectClass=*",
-            "http://app.com/ldap?base=../cn=admin,dc=domain,dc=com",
-            "https://site.org/auth?user=admin)(&(objectClass=subschema",
-            "http://domain.com/dir?query=a*)(&(objectClass=person)(uid=a*"
+                "http://example.com/auth?user=admin)(&(objectClass=*",
+                "https://site.org/login?username=*)|(uid=admin",
+                "http://app.com/search?query=test)(&(1=1",
+                "https://api.com/user?name=user)|(objectClass=person)(&(uid=*",
+                "http://test.com/ldap?filter=admin))%00",
+                "https://secure.com/dir?search=*)|(cn=*",
+                "http://domain.com/auth?login=*)(uid=*))(|(uid=*",
+                "https://web.org/users?param=admin)(&(password=*)",
+                "http://site.com/query?attr=*)|(objectClass=*",
+                "https://app.org/directory?dn=cn=admin,dc=domain,dc=com)(&(objectClass=*",
+                "http://example.org/search?name=admin\\29\\28uid=*",
+                "https://test.com/filter?value=user\\2A\\29\\28objectClass=*",
+                "http://app.com/ldap?base=../cn=admin,dc=domain,dc=com",
+                "https://site.org/auth?user=admin)(&(objectClass=subschema",
+                "http://domain.com/dir?query=a*)(&(objectClass=person)(uid=a*"
         };
 
         for (String attack : knownAttacks) {
@@ -165,8 +165,8 @@ class LdapInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "LDAP injection should be properly categorized for: " + sanitizeForDisplay(attack)
             );
         }
@@ -176,16 +176,16 @@ class LdapInjectionAttackTest {
     @DisplayName("LDAP injection detection should handle edge cases")
     void shouldHandleEdgeCasesInLdapInjection() {
         String[] edgeCases = {
-            "http://example.com/auth?user=admin%29%28%26%28objectClass%3D%2A",  // URL encoded )(&(objectClass=*
-            "https://site.org/login?name=user%2A%29%7C%28uid%3Dadmin",        // URL encoded *)|(uid=admin
-            "http://app.com/search?q=test%29%28%26%281%3D1",                  // URL encoded )(&(1=1
-            "https://secure.com/dir?filter=admin%29%29%2500",                 // URL encoded ))%00
-            "http://domain.com/ldap?param=user%5C29%5C28objectClass%3D%2A",   // URL encoded \29\28objectClass=*
-            "https://test.org/auth?login=admin%u0029%u0028uid%3D%2A",         // Unicode encoded )&(uid=*
-            "http://site.com/query?value=test%C0%A9%C0%A8objectClass%3D%2A",  // Overlong UTF-8 encoded )(
-            "https://app.org/directory?dn=cn%3Dadmin%2Cdc%3Ddomain",          // URL encoded DN
-            "http://web.com/search?attr=user%20%29%28%26%28mail%3D%2A",       // URL encoded space and )(
-            "https://domain.org/filter?name=admin%0A%29%28objectClass%3D%2A"  // URL encoded newline
+                "http://example.com/auth?user=admin%29%28%26%28objectClass%3D%2A",  // URL encoded )(&(objectClass=*
+                "https://site.org/login?name=user%2A%29%7C%28uid%3Dadmin",        // URL encoded *)|(uid=admin
+                "http://app.com/search?q=test%29%28%26%281%3D1",                  // URL encoded )(&(1=1
+                "https://secure.com/dir?filter=admin%29%29%2500",                 // URL encoded ))%00
+                "http://domain.com/ldap?param=user%5C29%5C28objectClass%3D%2A",   // URL encoded \29\28objectClass=*
+                "https://test.org/auth?login=admin%u0029%u0028uid%3D%2A",         // Unicode encoded )&(uid=*
+                "http://site.com/query?value=test%C0%A9%C0%A8objectClass%3D%2A",  // Overlong UTF-8 encoded )(
+                "https://app.org/directory?dn=cn%3Dadmin%2Cdc%3Ddomain",          // URL encoded DN
+                "http://web.com/search?attr=user%20%29%28%26%28mail%3D%2A",       // URL encoded space and )(
+                "https://domain.org/filter?name=admin%0A%29%28objectClass%3D%2A"  // URL encoded newline
         };
 
         for (String edgeCase : edgeCases) {
@@ -202,16 +202,16 @@ class LdapInjectionAttackTest {
     @DisplayName("Should validate authentication bypass LDAP attacks are blocked")
     void shouldValidateAuthenticationBypassBlocking() {
         String[] authBypassAttacks = {
-            "http://example.com/login?username=*)(uid=*))(|(uid=*",
-            "https://site.org/auth?user=admin)(&(password=*)",
-            "http://app.com/directory?login=*)|(objectClass=*",
-            "https://secure.com/ldap?name=*))%00(&(objectClass=user",
-            "http://domain.com/auth?user=admin))(|(cn=*",
-            "https://test.org/login?param=user*)(|(uid=*",
-            "http://site.com/directory?filter=*)(userPassword=*)",
-            "https://app.org/auth?query=admin)(&(objectClass=*)(cn=*",
-            "http://web.com/login?username=user)|(memberOf=*",
-            "https://domain.org/auth?name=*)(|(objectClass=person)(uid=*"
+                "http://example.com/login?username=*)(uid=*))(|(uid=*",
+                "https://site.org/auth?user=admin)(&(password=*)",
+                "http://app.com/directory?login=*)|(objectClass=*",
+                "https://secure.com/ldap?name=*))%00(&(objectClass=user",
+                "http://domain.com/auth?user=admin))(|(cn=*",
+                "https://test.org/login?param=user*)(|(uid=*",
+                "http://site.com/directory?filter=*)(userPassword=*)",
+                "https://app.org/auth?query=admin)(&(objectClass=*)(cn=*",
+                "http://web.com/login?username=user)|(memberOf=*",
+                "https://domain.org/auth?name=*)(|(objectClass=person)(uid=*"
         };
 
         for (String attack : authBypassAttacks) {
@@ -221,27 +221,27 @@ class LdapInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "Authentication bypass should be properly classified as dangerous"
             );
         }
     }
 
     @Test
-    @DisplayName("Should handle LDAP wildcard and enumeration attacks")  
+    @DisplayName("Should handle LDAP wildcard and enumeration attacks")
     void shouldHandleLdapWildcardEnumerationAttacks() {
         String[] wildcardAttacks = {
-            "http://example.com/search?query=a*",
-            "https://site.org/directory?name=*admin*",
-            "http://app.com/users?filter=user*",
-            "https://secure.com/ldap?search=*",
-            "http://domain.com/auth?username=t*st",
-            "https://test.org/directory?email=*@domain.com",
-            "http://site.com/search?attr=admin*)(objectClass=*",
-            "https://app.org/ldap?query=*)(|(uid=*",
-            "http://web.com/users?name=a*)(&(objectClass=person)(uid=a*",
-            "https://domain.org/directory?filter=user*)(&(cn=user*"
+                "http://example.com/search?query=a*",
+                "https://site.org/directory?name=*admin*",
+                "http://app.com/users?filter=user*",
+                "https://secure.com/ldap?search=*",
+                "http://domain.com/auth?username=t*st",
+                "https://test.org/directory?email=*@domain.com",
+                "http://site.com/search?attr=admin*)(objectClass=*",
+                "https://app.org/ldap?query=*)(|(uid=*",
+                "http://web.com/users?name=a*)(&(objectClass=person)(uid=a*",
+                "https://domain.org/directory?filter=user*)(&(cn=user*"
         };
 
         for (String attack : wildcardAttacks) {
@@ -258,17 +258,17 @@ class LdapInjectionAttackTest {
     @DisplayName("Should properly track LDAP injection security events")
     void shouldTrackLdapInjectionEvents() {
         long initialCount = eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                           eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                           eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
 
         String testAttack = "http://example.com/auth?user=admin)(&(objectClass=*";
-        
+
         assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(testAttack));
 
         long finalCount = eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                         eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                         eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
 
         assertTrue(finalCount > initialCount,
                 "LDAP injection detection should increment security event counter");
@@ -278,11 +278,11 @@ class LdapInjectionAttackTest {
     @DisplayName("Should maintain consistent detection across similar LDAP patterns")
     void shouldConsistentlyDetectSimilarLdapPatterns() {
         String[] similarPatterns = {
-            "http://example.com/auth?user=admin)(&(objectClass=*",
-            "http://example.com/auth?user=admin)|(uid=*", 
-            "http://example.com/auth?user=admin)(&(cn=*",
-            "http://example.com/auth?user=admin)|(objectClass=*",
-            "http://example.com/auth?user=admin)(&(mail=*"
+                "http://example.com/auth?user=admin)(&(objectClass=*",
+                "http://example.com/auth?user=admin)|(uid=*",
+                "http://example.com/auth?user=admin)(&(cn=*",
+                "http://example.com/auth?user=admin)|(objectClass=*",
+                "http://example.com/auth?user=admin)(&(mail=*"
         };
 
         int detectionCount = 0;
@@ -293,8 +293,8 @@ class LdapInjectionAttackTest {
                 detectionCount++;
                 assertTrue(
                         e.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                        e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                        e.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                                e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                                e.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                         "Similar pattern should have consistent detection: " + pattern
                 );
             }
@@ -308,14 +308,14 @@ class LdapInjectionAttackTest {
     @DisplayName("Should detect nested and complex LDAP filter injections")
     void shouldDetectComplexLdapFilterInjections() {
         String[] complexAttacks = {
-            "http://example.com/search?filter=admin)(&(objectClass=*)(&(uid=*",
-            "https://site.org/ldap?query=user)(&(cn=*)(&(mail=*",
-            "http://app.com/directory?param=test)(&(sn=*)(&(givenName=*",
-            "https://secure.com/auth?filter=admin)(|(objectClass=*)(&(uid=*",
-            "http://domain.com/ldap?search=user)(|(cn=*)(&(mail=*",
-            "https://test.org/directory?query=test)(&(objectClass=*)(|(uid=*",
-            "http://site.com/search?param=admin)(&(|(cn=*)(sn=*)",
-            "https://app.org/ldap?filter=user)(&(objectClass=person)(|(uid=*)(cn=*"
+                "http://example.com/search?filter=admin)(&(objectClass=*)(&(uid=*",
+                "https://site.org/ldap?query=user)(&(cn=*)(&(mail=*",
+                "http://app.com/directory?param=test)(&(sn=*)(&(givenName=*",
+                "https://secure.com/auth?filter=admin)(|(objectClass=*)(&(uid=*",
+                "http://domain.com/ldap?search=user)(|(cn=*)(&(mail=*",
+                "https://test.org/directory?query=test)(&(objectClass=*)(|(uid=*",
+                "http://site.com/search?param=admin)(&(|(cn=*)(sn=*)",
+                "https://app.org/ldap?filter=user)(&(objectClass=person)(|(uid=*)(cn=*"
         };
 
         for (String attack : complexAttacks) {
@@ -325,8 +325,8 @@ class LdapInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "Complex filter injection should be properly classified"
             );
         }
@@ -336,14 +336,14 @@ class LdapInjectionAttackTest {
     @DisplayName("Should handle LDAP DN manipulation and traversal attacks")
     void shouldHandleLdapDnManipulationAttacks() {
         String[] dnAttacks = {
-            "http://example.com/directory?dn=cn=admin,dc=domain,dc=com)(&(objectClass=*",
-            "https://site.org/ldap?base=uid=user,ou=people,dc=test)|(cn=*",
-            "http://app.com/search?dn=cn=test)(&(ou=*",
-            "https://secure.com/directory?base=../cn=admin,dc=domain,dc=com",
-            "http://domain.com/ldap?dn=../../ou=people,dc=test,dc=com",
-            "https://test.org/search?base=../../../dc=com",
-            "http://site.com/directory?dn=..\\cn=root,dc=admin",
-            "https://app.org/ldap?base=../ou=system,dc=directory"
+                "http://example.com/directory?dn=cn=admin,dc=domain,dc=com)(&(objectClass=*",
+                "https://site.org/ldap?base=uid=user,ou=people,dc=test)|(cn=*",
+                "http://app.com/search?dn=cn=test)(&(ou=*",
+                "https://secure.com/directory?base=../cn=admin,dc=domain,dc=com",
+                "http://domain.com/ldap?dn=../../ou=people,dc=test,dc=com",
+                "https://test.org/search?base=../../../dc=com",
+                "http://site.com/directory?dn=..\\cn=root,dc=admin",
+                "https://app.org/ldap?base=../ou=system,dc=directory"
         };
 
         for (String attack : dnAttacks) {
@@ -358,7 +358,7 @@ class LdapInjectionAttackTest {
 
     private String sanitizeForDisplay(String input) {
         if (input == null) return "null";
-        return input.length() > 100 ? 
+        return input.length() > 100 ?
                 input.substring(0, 100) + "..." : input;
     }
 }

