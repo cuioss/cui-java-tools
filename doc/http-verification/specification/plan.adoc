@@ -413,7 +413,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T19
 |Test URL length limit attacks
 |High
-|[ ]
+|[x]
 
 |T20
 |Test compression bomb patterns
