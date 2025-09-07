@@ -325,7 +325,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T7
 |Test HTML entity encoding attacks
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.3: Unicode and Homograph Attack Tests
