@@ -17,12 +17,7 @@ package de.cuioss.tools.property;
 
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
-import de.cuioss.tools.property.support.BeanWithBuilderStyleAccessor;
-import de.cuioss.tools.property.support.BeanWithMethodOverload;
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
-import de.cuioss.tools.property.support.ExplodingBean;
-import de.cuioss.tools.property.support.GenericTypeWithLowerBoundType;
-import de.cuioss.tools.property.support.StringTypedGenericType;
+import de.cuioss.tools.property.support.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;

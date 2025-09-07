@@ -39,9 +39,9 @@ class CookieTest {
     void shouldCreateCookieWithNameValueAndAttributes() {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
 
-        assertEquals(COOKIE_NAME, cookie.name());
-        assertEquals(COOKIE_VALUE, cookie.value());
-        assertEquals(COOKIE_ATTRIBUTES, cookie.attributes());
+        assertEquals(COOKIE_NAME, cookie.name(), "Cookie should preserve the provided name");
+        assertEquals(COOKIE_VALUE, cookie.value(), "Cookie should preserve the provided value");
+        assertEquals(COOKIE_ATTRIBUTES, cookie.attributes(), "Cookie should preserve the provided attributes");
     }
 
     @Test
@@ -51,30 +51,30 @@ class CookieTest {
         Cookie cookie3 = new Cookie(COOKIE_NAME, COOKIE_VALUE, null);
         Cookie cookie4 = new Cookie(null, null, null);
 
-        assertNull(cookie1.name());
-        assertEquals(COOKIE_VALUE, cookie1.value());
-        assertEquals(COOKIE_ATTRIBUTES, cookie1.attributes());
+        assertNull(cookie1.name(), "Cookie should accept null name");
+        assertEquals(COOKIE_VALUE, cookie1.value(), "Cookie with null name should preserve value");
+        assertEquals(COOKIE_ATTRIBUTES, cookie1.attributes(), "Cookie with null name should preserve attributes");
 
-        assertEquals(COOKIE_NAME, cookie2.name());
-        assertNull(cookie2.value());
-        assertEquals(COOKIE_ATTRIBUTES, cookie2.attributes());
+        assertEquals(COOKIE_NAME, cookie2.name(), "Cookie with null value should preserve name");
+        assertNull(cookie2.value(), "Cookie should accept null value");
+        assertEquals(COOKIE_ATTRIBUTES, cookie2.attributes(), "Cookie with null value should preserve attributes");
 
-        assertEquals(COOKIE_NAME, cookie3.name());
-        assertEquals(COOKIE_VALUE, cookie3.value());
-        assertNull(cookie3.attributes());
+        assertEquals(COOKIE_NAME, cookie3.name(), "Cookie with null attributes should preserve name");
+        assertEquals(COOKIE_VALUE, cookie3.value(), "Cookie with null attributes should preserve value");
+        assertNull(cookie3.attributes(), "Cookie should accept null attributes");
 
-        assertNull(cookie4.name());
-        assertNull(cookie4.value());
-        assertNull(cookie4.attributes());
+        assertNull(cookie4.name(), "Cookie should accept all null values for name");
+        assertNull(cookie4.value(), "Cookie should accept all null values for value");
+        assertNull(cookie4.attributes(), "Cookie should accept all null values for attributes");
     }
 
     @Test
     void shouldCreateSimpleCookie() {
         Cookie cookie = Cookie.simple("session", "token123");
 
-        assertEquals("session", cookie.name());
-        assertEquals("token123", cookie.value());
-        assertEquals("", cookie.attributes());
+        assertEquals("session", cookie.name(), "Simple cookie should use provided name");
+        assertEquals("token123", cookie.value(), "Simple cookie should use provided value");
+        assertEquals("", cookie.attributes(), "Simple cookie should have empty attributes");
     }
 
     @Test
@@ -82,8 +82,8 @@ class CookieTest {
         Cookie withName = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
         Cookie withoutName = new Cookie(null, COOKIE_VALUE, "");
 
-        assertTrue(withName.hasName());
-        assertFalse(withoutName.hasName());
+        assertTrue(withName.hasName(), "Cookie with non-null name should return true for hasName()");
+        assertFalse(withoutName.hasName(), "Cookie with null name should return false for hasName()");
         // Note: Empty name is now rejected by constructor validation
     }
 
@@ -91,18 +91,18 @@ class CookieTest {
     void shouldAcceptAnyCookieNames() {
         // Records are pure data holders - validation is done by consumers
         Cookie cookie1 = new Cookie("", COOKIE_VALUE, "");
-        assertEquals("", cookie1.name());
+        assertEquals("", cookie1.name(), "Cookie should accept empty string as name");
 
         // Names with special characters should be accepted
         Cookie cookie2 = new Cookie("name;invalid", COOKIE_VALUE, "");
-        assertEquals("name;invalid", cookie2.name());
+        assertEquals("name;invalid", cookie2.name(), "Cookie should accept names with semicolons");
 
         Cookie cookie3 = new Cookie("name=invalid", COOKIE_VALUE, "");
-        assertEquals("name=invalid", cookie3.name());
+        assertEquals("name=invalid", cookie3.name(), "Cookie should accept names with equals signs");
 
         // Even names with spaces should be accepted  
         Cookie cookie4 = new Cookie("name invalid", COOKIE_VALUE, "");
-        assertEquals("name invalid", cookie4.name());
+        assertEquals("name invalid", cookie4.name(), "Cookie should accept names with spaces");
     }
 
     @Test
@@ -111,9 +111,9 @@ class CookieTest {
         Cookie withoutValue = new Cookie(COOKIE_NAME, null, "");
         Cookie withEmptyValue = new Cookie(COOKIE_NAME, "", "");
 
-        assertTrue(withValue.hasValue());
-        assertFalse(withoutValue.hasValue());
-        assertFalse(withEmptyValue.hasValue());
+        assertTrue(withValue.hasValue(), "Cookie with non-null, non-empty value should return true for hasValue()");
+        assertFalse(withoutValue.hasValue(), "Cookie with null value should return false for hasValue()");
+        assertFalse(withEmptyValue.hasValue(), "Cookie with empty value should return false for hasValue()");
     }
 
     @Test
@@ -122,9 +122,9 @@ class CookieTest {
         Cookie withoutAttributes = new Cookie(COOKIE_NAME, COOKIE_VALUE, null);
         Cookie withEmptyAttributes = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
 
-        assertTrue(withAttributes.hasAttributes());
-        assertFalse(withoutAttributes.hasAttributes());
-        assertFalse(withEmptyAttributes.hasAttributes());
+        assertTrue(withAttributes.hasAttributes(), "Cookie with non-null, non-empty attributes should return true for hasAttributes()");
+        assertFalse(withoutAttributes.hasAttributes(), "Cookie with null attributes should return false for hasAttributes()");
+        assertFalse(withEmptyAttributes.hasAttributes(), "Cookie with empty attributes should return false for hasAttributes()");
     }
 
     @Test
@@ -134,10 +134,10 @@ class CookieTest {
         Cookie secureCookie3 = new Cookie(COOKIE_NAME, COOKIE_VALUE, "secure"); // Case insensitive
         Cookie nonSecureCookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "HttpOnly");
 
-        assertTrue(secureCookie1.isSecure());
-        assertTrue(secureCookie2.isSecure());
-        assertTrue(secureCookie3.isSecure());
-        assertFalse(nonSecureCookie.isSecure());
+        assertTrue(secureCookie1.isSecure(), "Cookie with 'Secure' attribute should return true for isSecure()");
+        assertTrue(secureCookie2.isSecure(), "Cookie with 'Secure' among other attributes should return true for isSecure()");
+        assertTrue(secureCookie3.isSecure(), "Cookie with case-insensitive 'secure' should return true for isSecure()");
+        assertFalse(nonSecureCookie.isSecure(), "Cookie without 'Secure' attribute should return false for isSecure()");
     }
 
     @Test
@@ -147,10 +147,10 @@ class CookieTest {
         Cookie httpOnlyCookie3 = new Cookie(COOKIE_NAME, COOKIE_VALUE, "httponly"); // Case insensitive
         Cookie nonHttpOnlyCookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure");
 
-        assertTrue(httpOnlyCookie1.isHttpOnly());
-        assertTrue(httpOnlyCookie2.isHttpOnly());
-        assertTrue(httpOnlyCookie3.isHttpOnly());
-        assertFalse(nonHttpOnlyCookie.isHttpOnly());
+        assertTrue(httpOnlyCookie1.isHttpOnly(), "Cookie with 'HttpOnly' attribute should return true for isHttpOnly()");
+        assertTrue(httpOnlyCookie2.isHttpOnly(), "Cookie with 'HttpOnly' among other attributes should return true for isHttpOnly()");
+        assertTrue(httpOnlyCookie3.isHttpOnly(), "Cookie with case-insensitive 'httponly' should return true for isHttpOnly()");
+        assertFalse(nonHttpOnlyCookie.isHttpOnly(), "Cookie without 'HttpOnly' attribute should return false for isHttpOnly()");
     }
 
     @Test
@@ -158,8 +158,8 @@ class CookieTest {
         Cookie cookieWithDomain = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Domain=example.com; Secure");
         Cookie cookieWithoutDomain = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("example.com", cookieWithDomain.getDomain().orElse(null));
-        assertTrue(cookieWithoutDomain.getDomain().isEmpty());
+        assertEquals("example.com", cookieWithDomain.getDomain().orElse(null), "Cookie should extract Domain attribute value correctly");
+        assertTrue(cookieWithoutDomain.getDomain().isEmpty(), "Cookie without Domain attribute should return empty Optional");
     }
 
     @Test
@@ -167,8 +167,8 @@ class CookieTest {
         Cookie cookieWithPath = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Path=/admin; Secure");
         Cookie cookieWithoutPath = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("/admin", cookieWithPath.getPath().orElse(null));
-        assertTrue(cookieWithoutPath.getPath().isEmpty());
+        assertEquals("/admin", cookieWithPath.getPath().orElse(null), "Cookie should extract Path attribute value correctly");
+        assertTrue(cookieWithoutPath.getPath().isEmpty(), "Cookie without Path attribute should return empty Optional");
     }
 
     @Test
@@ -178,10 +178,10 @@ class CookieTest {
         Cookie noneCookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "SameSite=None");
         Cookie cookieWithoutSameSite = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure");
 
-        assertEquals("Strict", strictCookie.getSameSite().orElse(null));
-        assertEquals("Lax", laxCookie.getSameSite().orElse(null));
-        assertEquals("None", noneCookie.getSameSite().orElse(null));
-        assertTrue(cookieWithoutSameSite.getSameSite().isEmpty());
+        assertEquals("Strict", strictCookie.getSameSite().orElse(null), "Cookie should extract SameSite=Strict value correctly");
+        assertEquals("Lax", laxCookie.getSameSite().orElse(null), "Cookie should extract SameSite=Lax value correctly");
+        assertEquals("None", noneCookie.getSameSite().orElse(null), "Cookie should extract SameSite=None value correctly");
+        assertTrue(cookieWithoutSameSite.getSameSite().isEmpty(), "Cookie without SameSite attribute should return empty Optional");
     }
 
     @Test
@@ -189,8 +189,8 @@ class CookieTest {
         Cookie cookieWithMaxAge = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Max-Age=3600; Secure");
         Cookie cookieWithoutMaxAge = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly");
 
-        assertEquals("3600", cookieWithMaxAge.getMaxAge().orElse(null));
-        assertTrue(cookieWithoutMaxAge.getMaxAge().isEmpty());
+        assertEquals("3600", cookieWithMaxAge.getMaxAge().orElse(null), "Cookie should extract Max-Age attribute value correctly");
+        assertTrue(cookieWithoutMaxAge.getMaxAge().isEmpty(), "Cookie without Max-Age attribute should return empty Optional");
     }
 
     @Test
@@ -200,14 +200,14 @@ class CookieTest {
         Cookie simpleCookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
 
         List<String> attributeNames = cookie.getAttributeNames();
-        assertEquals(5, attributeNames.size());
-        assertTrue(attributeNames.contains("Domain"));
-        assertTrue(attributeNames.contains("Path"));
-        assertTrue(attributeNames.contains("Secure"));
-        assertTrue(attributeNames.contains("HttpOnly"));
-        assertTrue(attributeNames.contains("SameSite"));
+        assertEquals(5, attributeNames.size(), "Cookie should extract all 5 attribute names correctly");
+        assertTrue(attributeNames.contains("Domain"), "Extracted attribute names should include Domain");
+        assertTrue(attributeNames.contains("Path"), "Extracted attribute names should include Path");
+        assertTrue(attributeNames.contains("Secure"), "Extracted attribute names should include Secure");
+        assertTrue(attributeNames.contains("HttpOnly"), "Extracted attribute names should include HttpOnly");
+        assertTrue(attributeNames.contains("SameSite"), "Extracted attribute names should include SameSite");
 
-        assertTrue(simpleCookie.getAttributeNames().isEmpty());
+        assertTrue(simpleCookie.getAttributeNames().isEmpty(), "Cookie with no attributes should return empty attribute names list");
     }
 
     @Test
@@ -215,8 +215,8 @@ class CookieTest {
         Cookie withName = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
         Cookie withoutName = new Cookie(null, COOKIE_VALUE, "");
 
-        assertEquals(COOKIE_NAME, withName.nameOrDefault("default"));
-        assertEquals("default", withoutName.nameOrDefault("default"));
+        assertEquals(COOKIE_NAME, withName.nameOrDefault("default"), "nameOrDefault should return actual name when name is not null");
+        assertEquals("default", withoutName.nameOrDefault("default"), "nameOrDefault should return default value when name is null");
     }
 
     @Test
@@ -224,8 +224,8 @@ class CookieTest {
         Cookie withValue = new Cookie(COOKIE_NAME, COOKIE_VALUE, "");
         Cookie withoutValue = new Cookie(COOKIE_NAME, null, "");
 
-        assertEquals(COOKIE_VALUE, withValue.valueOrDefault("default"));
-        assertEquals("default", withoutValue.valueOrDefault("default"));
+        assertEquals(COOKIE_VALUE, withValue.valueOrDefault("default"), "valueOrDefault should return actual value when value is not null");
+        assertEquals("default", withoutValue.valueOrDefault("default"), "valueOrDefault should return default value when value is null");
     }
 
     @ParameterizedTest
@@ -234,14 +234,14 @@ class CookieTest {
         String cookieString = cookie.toCookieString();
 
         // Cookie string should always be non-null
-        assertNotNull(cookieString);
+        assertNotNull(cookieString, "Generated cookie string should never be null");
 
         // Should contain equals sign for name=value format
-        assertTrue(cookieString.contains("="));
+        assertTrue(cookieString.contains("="), "Cookie string should contain equals sign for name=value format");
 
         // If cookie has attributes, they should be included
         if (cookie.hasAttributes()) {
-            assertTrue(cookieString.length() > (cookie.nameOrDefault("") + "=" + cookie.valueOrDefault("")).length());
+            assertTrue(cookieString.length() > (cookie.nameOrDefault("") + "=" + cookie.valueOrDefault("")).length(), "Cookie string with attributes should be longer than just name=value");
         }
     }
 
@@ -252,10 +252,10 @@ class CookieTest {
         Cookie cookieWithNullName = new Cookie(null, "value", "");
         Cookie cookieWithNullValue = new Cookie("name", null, "");
 
-        assertEquals("name=value", simpleCookie.toCookieString());
-        assertEquals("auth=token123; Secure; HttpOnly", cookieWithAttributes.toCookieString());
-        assertEquals("=value", cookieWithNullName.toCookieString());
-        assertEquals("name=", cookieWithNullValue.toCookieString());
+        assertEquals("name=value", simpleCookie.toCookieString(), "Simple cookie should generate correct cookie string");
+        assertEquals("auth=token123; Secure; HttpOnly", cookieWithAttributes.toCookieString(), "Cookie with attributes should generate correct cookie string");
+        assertEquals("=value", cookieWithNullName.toCookieString(), "Cookie with null name should generate cookie string with empty name");
+        assertEquals("name=", cookieWithNullValue.toCookieString(), "Cookie with null value should generate cookie string with empty value");
     }
 
     @Test
@@ -263,10 +263,10 @@ class CookieTest {
         Cookie original = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie renamed = original.withName("newName");
 
-        assertEquals("newName", renamed.name());
-        assertEquals(COOKIE_VALUE, renamed.value());
-        assertEquals(COOKIE_ATTRIBUTES, renamed.attributes());
-        assertEquals(COOKIE_NAME, original.name()); // Original unchanged
+        assertEquals("newName", renamed.name(), "New cookie should have the specified new name");
+        assertEquals(COOKIE_VALUE, renamed.value(), "New cookie should preserve original value");
+        assertEquals(COOKIE_ATTRIBUTES, renamed.attributes(), "New cookie should preserve original attributes");
+        assertEquals(COOKIE_NAME, original.name(), "Original cookie should remain unchanged after withName()");
     }
 
     @Test
@@ -274,10 +274,10 @@ class CookieTest {
         Cookie original = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie newValue = original.withValue("newValue");
 
-        assertEquals(COOKIE_NAME, newValue.name());
-        assertEquals("newValue", newValue.value());
-        assertEquals(COOKIE_ATTRIBUTES, newValue.attributes());
-        assertEquals(COOKIE_VALUE, original.value()); // Original unchanged
+        assertEquals(COOKIE_NAME, newValue.name(), "New cookie should preserve original name");
+        assertEquals("newValue", newValue.value(), "New cookie should have the specified new value");
+        assertEquals(COOKIE_ATTRIBUTES, newValue.attributes(), "New cookie should preserve original attributes");
+        assertEquals(COOKIE_VALUE, original.value(), "Original cookie should remain unchanged after withValue()");
     }
 
     @Test
@@ -285,10 +285,10 @@ class CookieTest {
         Cookie original = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie newAttributes = original.withAttributes("Secure");
 
-        assertEquals(COOKIE_NAME, newAttributes.name());
-        assertEquals(COOKIE_VALUE, newAttributes.value());
-        assertEquals("Secure", newAttributes.attributes());
-        assertEquals(COOKIE_ATTRIBUTES, original.attributes()); // Original unchanged
+        assertEquals(COOKIE_NAME, newAttributes.name(), "New cookie should preserve original name");
+        assertEquals(COOKIE_VALUE, newAttributes.value(), "New cookie should preserve original value");
+        assertEquals("Secure", newAttributes.attributes(), "New cookie should have the specified new attributes");
+        assertEquals(COOKIE_ATTRIBUTES, original.attributes(), "Original cookie should remain unchanged after withAttributes()");
     }
 
     @ParameterizedTest
@@ -297,9 +297,9 @@ class CookieTest {
         Cookie sameCookie = new Cookie(cookie.name(), cookie.value(), cookie.attributes());
         Cookie differentCookie = new Cookie("different_name", cookie.value(), cookie.attributes());
 
-        assertEquals(cookie, sameCookie);
-        assertNotEquals(cookie, differentCookie);
-        assertEquals(cookie.hashCode(), sameCookie.hashCode());
+        assertEquals(cookie, sameCookie, "Cookies with same content should be equal");
+        assertNotEquals(cookie, differentCookie, "Cookies with different content should not be equal");
+        assertEquals(cookie.hashCode(), sameCookie.hashCode(), "Equal cookies should have same hash code");
     }
 
     @Test
@@ -308,24 +308,24 @@ class CookieTest {
         Cookie cookie2 = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         Cookie cookie3 = new Cookie("other", COOKIE_VALUE, COOKIE_ATTRIBUTES);
 
-        assertEquals(cookie1, cookie2);
-        assertNotEquals(cookie1, cookie3);
-        assertEquals(cookie1.hashCode(), cookie2.hashCode());
+        assertEquals(cookie1, cookie2, "Cookies with identical values should be equal");
+        assertNotEquals(cookie1, cookie3, "Cookies with different names should not be equal");
+        assertEquals(cookie1.hashCode(), cookie2.hashCode(), "Identical cookies should have same hash code");
     }
 
     @ParameterizedTest
     @TypeGeneratorSource(value = CookieGenerator.class, count = 15)
     void shouldSupportToString(Cookie cookie) {
         String string = cookie.toString();
-        assertNotNull(string);
+        assertNotNull(string, "Cookie toString should never return null");
 
         // String representation should contain the cookie name if present
         if (cookie.name() != null && !cookie.name().isEmpty()) {
-            assertTrue(string.contains(cookie.name()) || string.contains("name"));
+            assertTrue(string.contains(cookie.name()) || string.contains("name"), "toString should include cookie name or 'name' keyword");
         }
 
         // String representation should contain some representation of the cookie
-        assertTrue(string.length() > 5);
+        assertTrue(string.length() > 5, "Cookie toString should produce meaningful string representation");
     }
 
     @Test
@@ -333,9 +333,9 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, COOKIE_ATTRIBUTES);
         String string = cookie.toString();
 
-        assertTrue(string.contains(COOKIE_NAME));
-        assertTrue(string.contains(COOKIE_VALUE));
-        assertTrue(string.contains(COOKIE_ATTRIBUTES));
+        assertTrue(string.contains(COOKIE_NAME), "toString should contain cookie name");
+        assertTrue(string.contains(COOKIE_VALUE), "toString should contain cookie value");
+        assertTrue(string.contains(COOKIE_ATTRIBUTES), "toString should contain cookie attributes");
     }
 
     @Test
@@ -344,8 +344,8 @@ class CookieTest {
 
         // The current implementation requires exact "attribute=" pattern without spaces around =
         // This is actually correct per RFC 6265, where spaces around = are not standard
-        assertTrue(cookie.getDomain().isEmpty()); // "Domain = " is not the same as "Domain="
-        assertTrue(cookie.getPath().isEmpty()); // "Path = " is not the same as "Path="
+        assertTrue(cookie.getDomain().isEmpty(), "Domain extraction should require exact 'Domain=' pattern without spaces");
+        assertTrue(cookie.getPath().isEmpty(), "Path extraction should require exact 'Path=' pattern without spaces");
     }
 
     @Test
@@ -353,9 +353,9 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE,
                 "Domain=sub.example.com; Path=/admin/dashboard; Max-Age=86400");
 
-        assertEquals("sub.example.com", cookie.getDomain().orElse(null));
-        assertEquals("/admin/dashboard", cookie.getPath().orElse(null));
-        assertEquals("86400", cookie.getMaxAge().orElse(null));
+        assertEquals("sub.example.com", cookie.getDomain().orElse(null), "Cookie should extract subdomain correctly");
+        assertEquals("/admin/dashboard", cookie.getPath().orElse(null), "Cookie should extract complex path correctly");
+        assertEquals("86400", cookie.getMaxAge().orElse(null), "Cookie should extract Max-Age value correctly");
     }
 
     @Test
@@ -363,9 +363,9 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE,
                 "domain=example.com; PATH=/test; max-age=3600");
 
-        assertEquals("example.com", cookie.getDomain().orElse(null));
-        assertEquals("/test", cookie.getPath().orElse(null));
-        assertEquals("3600", cookie.getMaxAge().orElse(null));
+        assertEquals("example.com", cookie.getDomain().orElse(null), "Cookie should extract domain from lowercase attribute");
+        assertEquals("/test", cookie.getPath().orElse(null), "Cookie should extract path from uppercase attribute");
+        assertEquals("3600", cookie.getMaxAge().orElse(null), "Cookie should extract max-age from lowercase attribute");
     }
 
     @Test
@@ -373,22 +373,22 @@ class CookieTest {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, "Secure; HttpOnly; SameSite");
 
         List<String> attributeNames = cookie.getAttributeNames();
-        assertEquals(3, attributeNames.size());
-        assertTrue(attributeNames.contains("Secure"));
-        assertTrue(attributeNames.contains("HttpOnly"));
-        assertTrue(attributeNames.contains("SameSite"));
+        assertEquals(3, attributeNames.size(), "Cookie should extract 3 attribute names from boolean-style attributes");
+        assertTrue(attributeNames.contains("Secure"), "Extracted attributes should include Secure");
+        assertTrue(attributeNames.contains("HttpOnly"), "Extracted attributes should include HttpOnly");
+        assertTrue(attributeNames.contains("SameSite"), "Extracted attributes should include SameSite");
 
-        assertTrue(cookie.isSecure());
-        assertTrue(cookie.isHttpOnly());
-        assertTrue(cookie.getSameSite().isEmpty()); // No value provided for SameSite
+        assertTrue(cookie.isSecure(), "Cookie with Secure attribute should return true for isSecure()");
+        assertTrue(cookie.isHttpOnly(), "Cookie with HttpOnly attribute should return true for isHttpOnly()");
+        assertTrue(cookie.getSameSite().isEmpty(), "SameSite without value should return empty Optional");
     }
 
     @Test
     void shouldHandleEmptyAttributeSegments() {
         Cookie cookie = new Cookie(COOKIE_NAME, COOKIE_VALUE, ";;Secure;;HttpOnly;;");
 
-        assertTrue(cookie.isSecure());
-        assertTrue(cookie.isHttpOnly());
+        assertTrue(cookie.isSecure(), "Cookie should detect Secure attribute despite empty segments");
+        assertTrue(cookie.isHttpOnly(), "Cookie should detect HttpOnly attribute despite empty segments");
     }
 
     @ParameterizedTest
@@ -403,14 +403,14 @@ class CookieTest {
         Cookie withNewAttributes = original.withAttributes("new");
 
         // Original should be unchanged
-        assertEquals(originalName, original.name());
-        assertEquals(originalValue, original.value());
-        assertEquals(originalAttributes, original.attributes());
+        assertEquals(originalName, original.name(), "Original cookie name should remain unchanged after creating new instances");
+        assertEquals(originalValue, original.value(), "Original cookie value should remain unchanged after creating new instances");
+        assertEquals(originalAttributes, original.attributes(), "Original cookie attributes should remain unchanged after creating new instances");
 
         // New instances should have changes
-        assertEquals("new", withNewName.name());
-        assertEquals("new", withNewValue.value());
-        assertEquals("new", withNewAttributes.attributes());
+        assertEquals("new", withNewName.name(), "New instance should have updated name");
+        assertEquals("new", withNewValue.value(), "New instance should have updated value");
+        assertEquals("new", withNewAttributes.attributes(), "New instance should have updated attributes");
     }
 
     @Test
@@ -422,14 +422,14 @@ class CookieTest {
         Cookie withNewAttributes = original.withAttributes("new");
 
         // Original should be unchanged
-        assertEquals(COOKIE_NAME, original.name());
-        assertEquals(COOKIE_VALUE, original.value());
-        assertEquals(COOKIE_ATTRIBUTES, original.attributes());
+        assertEquals(COOKIE_NAME, original.name(), "Original cookie name should be preserved with known values");
+        assertEquals(COOKIE_VALUE, original.value(), "Original cookie value should be preserved with known values");
+        assertEquals(COOKIE_ATTRIBUTES, original.attributes(), "Original cookie attributes should be preserved with known values");
 
         // New instances should have changes
-        assertEquals("new", withNewName.name());
-        assertEquals("new", withNewValue.value());
-        assertEquals("new", withNewAttributes.attributes());
+        assertEquals("new", withNewName.name(), "New instance should have new name with known values");
+        assertEquals("new", withNewValue.value(), "New instance should have new value with known values");
+        assertEquals("new", withNewAttributes.attributes(), "New instance should have new attributes with known values");
     }
 
     @Test
@@ -437,10 +437,10 @@ class CookieTest {
         Cookie cookie = new Cookie("special&name", "value with spaces",
                 "Domain=exam-ple.com; Path=/path with spaces");
 
-        assertEquals("special&name", cookie.name());
-        assertEquals("value with spaces", cookie.value());
-        assertEquals("exam-ple.com", cookie.getDomain().orElse(null));
-        assertEquals("/path with spaces", cookie.getPath().orElse(null));
+        assertEquals("special&name", cookie.name(), "Cookie should accept special characters in name");
+        assertEquals("value with spaces", cookie.value(), "Cookie should accept spaces in value");
+        assertEquals("exam-ple.com", cookie.getDomain().orElse(null), "Cookie should extract domain with hyphens");
+        assertEquals("/path with spaces", cookie.getPath().orElse(null), "Cookie should extract path with spaces");
     }
 
 

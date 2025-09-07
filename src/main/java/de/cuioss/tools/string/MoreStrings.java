@@ -18,11 +18,7 @@ package de.cuioss.tools.string;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;

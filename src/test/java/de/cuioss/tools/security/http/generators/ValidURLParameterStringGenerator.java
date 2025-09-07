@@ -19,32 +19,33 @@ import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
 /**
- * Generator for valid URL parameter strings in format "name=value".
- * Provides common valid parameter examples for testing.
+ * Generator for valid URL parameter values.
+ * Provides common valid parameter VALUES (not full "name=value" strings) for testing.
+ * These values should ALWAYS pass URLParameterValidationPipeline validation.
  */
 public class ValidURLParameterStringGenerator implements TypedGenerator<String> {
 
     private final TypedGenerator<String> validParameters = Generators.fixedValues(
-            "user_id=123",
-            "search=java%20programming",
-            "category=electronics",
-            "page=1",
-            "limit=50",
-            "sort=name",
-            "filter=active",
-            "lang=en",
-            "status=enabled",
-            "type=product",
-            "format=json",
-            "version=v2",
-            "order=asc",
-            "size=10",
-            "timestamp=1640995200",
-            "id=abc123",
-            "name=john%2Bdoe",
-            "email=test%40example.com",
-            "phone=555%2D1234",
-            "color=red"
+            "123",                    // Simple number
+            "java%20programming",     // URL encoded space
+            "electronics",           // Simple text
+            "1",                     // Single digit
+            "50",                    // Number
+            "name",                  // Simple text
+            "active",               // Status value
+            "en",                   // Language code
+            "enabled",              // Boolean-like
+            "product",              // Type value
+            "json",                 // Format
+            "v2",                   // Version
+            "asc",                  // Order direction
+            "10",                   // Size
+            "1640995200",          // Timestamp
+            "abc123",              // Alphanumeric ID
+            "john%2Bdoe",          // URL encoded plus
+            "test%40example.com",  // URL encoded email
+            "555-1234",            // Phone (no encoding - should be safe)
+            "red"                  // Color
     );
 
     @Override

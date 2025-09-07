@@ -112,6 +112,7 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
         if (callCount % 100 == 11) return "http://example.com/path|pipe"; // Pipe pattern
         if (callCount % 100 == 12) return "://no-protocol"; // Malformed protocol pattern
         if (callCount % 100 == 13) return "http://example.com/path?=value"; // Missing parameter name
+        if (callCount % 100 == 14) return "http://example.com/path?param=val&"; // Trailing ampersand
         
         String malformedUrl = MALFORMED_URLS.next();
 

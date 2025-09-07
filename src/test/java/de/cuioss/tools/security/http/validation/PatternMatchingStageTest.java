@@ -44,7 +44,7 @@ class PatternMatchingStageTest {
         String input = "/api/users/123";
         String result = stage.validate(input);
 
-        assertEquals(input, result);
+        assertEquals(input, result, "Pattern matching stage should return input unchanged when no patterns match");
     }
 
     @Test
@@ -52,7 +52,7 @@ class PatternMatchingStageTest {
         SecurityConfiguration config = SecurityConfiguration.defaults();
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.URL_PATH);
 
-        assertNull(stage.validate(null));
+        assertNull(stage.validate(null), "Pattern matching stage should return null for null input");
     }
 
     @Test
@@ -60,7 +60,7 @@ class PatternMatchingStageTest {
         SecurityConfiguration config = SecurityConfiguration.defaults();
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.URL_PATH);
 
-        assertEquals("", stage.validate(""));
+        assertEquals("", stage.validate(""), "Pattern matching stage should return empty string for empty input");
     }
 
     // ========== Path Traversal Detection Tests ==========
@@ -83,9 +83,9 @@ class PatternMatchingStageTest {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(maliciousPath));
 
-        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
-        assertEquals(ValidationType.URL_PATH, exception.getValidationType());
-        assertEquals(maliciousPath, exception.getOriginalInput());
+        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType(), "Exception should indicate path traversal detection");
+        assertEquals(ValidationType.URL_PATH, exception.getValidationType(), "Exception should indicate URL path validation type");
+        assertEquals(maliciousPath, exception.getOriginalInput(), "Exception should preserve original malicious input");
     }
 
     @ParameterizedTest
@@ -106,8 +106,8 @@ class PatternMatchingStageTest {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate("/api" + encodedPath + "passwd"));
 
-        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
-        assertTrue(exception.getDetail().orElse("").contains("traversal"));
+        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType(), "Exception should indicate path traversal detection for encoded patterns");
+        assertTrue(exception.getDetail().orElse("").contains("traversal"), "Exception detail should mention traversal");
     }
 
     // ========== SQL Injection Detection Tests ==========
@@ -129,9 +129,9 @@ class PatternMatchingStageTest {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(sqlInjection));
 
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertTrue(exception.getDetail().orElse("").contains("SQL"));
+        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType(), "Exception should indicate SQL injection detection");
+        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType(), "Exception should indicate parameter value validation type");
+        assertTrue(exception.getDetail().orElse("").contains("SQL"), "Exception detail should mention SQL");
     }
 
     @ParameterizedTest

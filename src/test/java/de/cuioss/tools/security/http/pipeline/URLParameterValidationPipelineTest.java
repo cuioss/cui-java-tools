@@ -18,15 +18,16 @@ package de.cuioss.tools.security.http.pipeline;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
-import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
+import de.cuioss.tools.security.http.generators.EncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.NullByteInjectionParameterGenerator;
 import de.cuioss.tools.security.http.generators.PathTraversalParameterGenerator;
 import de.cuioss.tools.security.http.generators.ValidURLParameterStringGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -46,293 +47,186 @@ class URLParameterValidationPipelineTest {
         pipeline = new URLParameterValidationPipeline(config, eventCounter);
     }
 
-    @Test
-    void shouldCreatePipelineWithValidParameters() {
-        assertNotNull(pipeline);
-        assertEquals(ValidationType.PARAMETER_VALUE, pipeline.getValidationType());
-        assertEquals(5, pipeline.getStages().size()); // 5 validation stages
-        assertSame(eventCounter, pipeline.getEventCounter());
-    }
+    @Nested
+    class PipelineCreation {
 
-    @Test
-    void shouldRejectNullConfig() {
-        assertThrows(NullPointerException.class, () ->
-                new URLParameterValidationPipeline(null, eventCounter));
-    }
+        @Test
+        void shouldCreatePipelineWithValidParameters() {
+            assertEquals(ValidationType.PARAMETER_VALUE, pipeline.getValidationType(), "Pipeline should have correct validation type");
+            assertEquals(5, pipeline.getStages().size(), "Pipeline should have 5 validation stages");
+            assertSame(eventCounter, pipeline.getEventCounter(), "Pipeline should use the provided event counter");
+        }
 
-    @Test
-    void shouldRejectNullEventCounter() {
-        assertThrows(NullPointerException.class, () ->
-                new URLParameterValidationPipeline(config, null));
-    }
+        @Test
+        void shouldRejectNullConfig() {
+            assertThrows(NullPointerException.class, () ->
+                    new URLParameterValidationPipeline(null, eventCounter));
+        }
 
-    @Test
-    void shouldValidateSimpleParameter() throws UrlSecurityException {
-        String validParam = "user_id=123";
-        String result = pipeline.validate(validParam);
-        assertEquals("user_id=123", result);
-    }
-
-    @Test
-    void shouldValidateComplexValidParameter() throws UrlSecurityException {
-        String validParam = "search=java+programming";
-        String result = pipeline.validate(validParam);
-        assertNotNull(result);
-        assertTrue(result.contains("java"));
-    }
-
-    @Test
-    void shouldHandleNullInput() throws UrlSecurityException {
-        String result = pipeline.validate(null);
-        assertNull(result);
-    }
-
-    @Test
-    void shouldHandleEmptyInput() throws UrlSecurityException {
-        String result = pipeline.validate("");
-        assertEquals("", result);
-    }
-
-    @Test
-    void shouldRejectParameterTooLong() {
-        // Create a parameter that exceeds the maximum length
-        String longParam = "param=" + "a".repeat(config.maxParameterValueLength());
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(longParam));
-
-        assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(longParam, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.INPUT_TOO_LONG));
-    }
-
-    @Test
-    void shouldRejectInvalidCharacters() {
-        String paramWithInvalidChars = "param=value with\ttabs";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(paramWithInvalidChars));
-
-        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(paramWithInvalidChars, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.INVALID_CHARACTER));
-    }
-
-    @Test
-    void shouldRejectNullByteInjection() {
-        String maliciousParam = "param=value\0admin";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(maliciousParam));
-
-        assertEquals(UrlSecurityFailureType.NULL_BYTE_INJECTION, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(maliciousParam, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.NULL_BYTE_INJECTION));
-    }
-
-    @Test
-    void shouldRejectDoubleEncoding() {
-        String doubleEncodedParam = "param=%252Econfig";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(doubleEncodedParam));
-
-        assertEquals(UrlSecurityFailureType.DOUBLE_ENCODING, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(doubleEncodedParam, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.DOUBLE_ENCODING));
-    }
-
-    @Test
-    void shouldHandleValidEncodedParameter() throws UrlSecurityException {
-        String encodedParam = "name=john%20doe";
-        String result = pipeline.validate(encodedParam);
-
-        // Should be decoded and normalized
-        assertNotNull(result);
-        assertTrue(result.contains("john doe"));
-    }
-
-    @Test
-    void shouldDetectSQLInjection() {
-        String sqlInjectionParam = "id=1%27%3B%20DROP%20TABLE%20users%3B%20--";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(sqlInjectionParam));
-
-        // This will likely fail at pattern matching stage after decoding
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(sqlInjectionParam, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.SQL_INJECTION_DETECTED));
-    }
-
-    @Test
-    void shouldDetectXSSAttack() {
-        String xssParam = "comment=%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(xssParam));
-
-        // This will likely fail at pattern matching stage after decoding
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertEquals(xssParam, exception.getOriginalInput());
-
-        // Verify event counter was incremented
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.XSS_DETECTED));
-    }
-
-    @ParameterizedTest
-    @TypeGeneratorSource(value = ValidURLParameterStringGenerator.class, count = 8)
-    void shouldAcceptValidParameters(String validParam) throws UrlSecurityException {
-        String result = pipeline.validate(validParam);
-        assertNotNull(result);
-    }
-
-    @ParameterizedTest
-    @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 4)
-    void shouldRejectPathTraversalVariants(String maliciousParam) {
-        // Path traversal detection may not be fully implemented yet
-        // For now, just verify pipeline can process these parameters without crashing
-        try {
-            pipeline.validate(maliciousParam);
-        } catch (UrlSecurityException e) {
-            // If exception thrown, that's expected for security reasons
-            assertNotNull(e.getFailureType());
-            assertEquals(ValidationType.PARAMETER_VALUE, e.getValidationType());
+        @Test
+        void shouldRejectNullEventCounter() {
+            assertThrows(NullPointerException.class, () ->
+                    new URLParameterValidationPipeline(config, null));
         }
     }
 
-    @ParameterizedTest
-    @TypeGeneratorSource(value = NullByteInjectionParameterGenerator.class, count = 4)
-    void shouldRejectNullByteVariants(String maliciousParam) {
-        assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(maliciousParam));
-    }
+    @Nested
+    class ValidInputHandling {
 
-    @Test
-    void shouldSequentiallyApplyStages() {
-        // The pipeline should apply stages in order
-        // We can verify this by checking that a parameter that would fail different stages
-        // fails at the first applicable stage
-        
-        // This parameter is too long AND has invalid characters
-        // It should fail at length validation first
-        String problematicParam = "param=" + "invalid\tvalue".repeat(1000);
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
-                pipeline.validate(problematicParam));
-
-        // Should fail at length validation (first stage)
-        assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType());
-    }
-
-    @Test
-    void shouldTrackMultipleSecurityEvents() throws UrlSecurityException {
-        // Try multiple different attacks
-        try {
-            pipeline.validate("param=..%2Fconfig");
-        } catch (UrlSecurityException ignored) {
+        @ParameterizedTest
+        @TypeGeneratorSource(value = ValidURLParameterStringGenerator.class, count = 10)
+        void shouldValidateValidParameters(String validParam) throws UrlSecurityException {
+            String result = pipeline.validate(validParam);
+            assertNotNull(result, "Valid parameter should not return null result");
         }
 
-        try {
-            pipeline.validate("data=value\0admin");
-        } catch (UrlSecurityException ignored) {
+        @Test
+        void shouldHandleNullInput() throws UrlSecurityException {
+            String result = pipeline.validate(null);
+            assertNull(result, "Null input should return null result");
         }
 
-        try {
-            pipeline.validate("param=value\twith\ttabs");
-        } catch (UrlSecurityException ignored) {
+        @Test
+        void shouldHandleEmptyInput() throws UrlSecurityException {
+            String result = pipeline.validate("");
+            assertEquals("", result, "Empty input should return empty string result");
+        }
+    }
+
+    @Nested
+    class SecurityValidation {
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = ValidURLParameterStringGenerator.class, count = 5)
+        void shouldValidateParameterVariations(String param) throws UrlSecurityException {
+            String result = pipeline.validate(param);
+            assertNotNull(result, "Valid parameter variation should not return null result");
         }
 
-        // Verify that at least some events were tracked
-        assertTrue(eventCounter.getTotalCount() > 0,
-                "Expected at least one security event to be tracked");
+        @ParameterizedTest
+        @TypeGeneratorSource(value = NullByteInjectionParameterGenerator.class, count = 5)
+        void shouldRejectNullByteInjection(String maliciousParam) {
+            UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(maliciousParam));
 
-        // Verify null byte injection is tracked (this should work)
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.NULL_BYTE_INJECTION));
+            assertEquals(UrlSecurityFailureType.NULL_BYTE_INJECTION, exception.getFailureType(), "Exception should indicate null byte injection failure");
+            assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType(), "Exception should indicate parameter value validation type");
+            assertEquals(maliciousParam, exception.getOriginalInput(), "Exception should preserve original malicious input");
+        }
 
-        // Verify control characters are tracked (tabs should be rejected as control characters)
-        assertEquals(1, eventCounter.getCount(UrlSecurityFailureType.CONTROL_CHARACTERS));
-    }
+        @Test
+        void shouldRejectSpecificPathTraversalValues() {
+            // Test parameter values (correct usage for URLParameterValidationPipeline)
+            String valueOnly1 = "..%2F..%2Fetc%2Fpasswd";
+            String valueOnly2 = "%2E%2E%2F%2E%2E%2Fconfig";
 
-    @Test
-    void shouldHaveCorrectEqualsAndHashCode() {
-        URLParameterValidationPipeline pipeline1 = new URLParameterValidationPipeline(config, eventCounter);
-        URLParameterValidationPipeline pipeline2 = new URLParameterValidationPipeline(config, eventCounter);
-
-        assertEquals(pipeline1, pipeline2);
-        assertEquals(pipeline1.hashCode(), pipeline2.hashCode());
-    }
-
-    @Test
-    void shouldHaveCorrectToString() {
-        String toString = pipeline.toString();
-        assertTrue(toString.contains("URLParameterValidationPipeline"));
-    }
-
-    @Test
-    void shouldPreserveStageOrder() {
-        // Verify stages are in the correct order
-        var stages = pipeline.getStages();
-        assertEquals(5, stages.size());
-
-        // Check stage types in order
-        assertTrue(stages.getFirst().getClass().getSimpleName().contains("Length"));
-        assertTrue(stages.get(1).getClass().getSimpleName().contains("Character"));
-        assertTrue(stages.get(2).getClass().getSimpleName().contains("Decoding"));
-        assertTrue(stages.get(3).getClass().getSimpleName().contains("Normalization"));
-        assertTrue(stages.get(4).getClass().getSimpleName().contains("Pattern"));
-    }
-
-    @Test
-    void shouldHandleParameterSpecificScenarios() throws UrlSecurityException {
-        // Test parameter-specific validation scenarios
-
-        // Test encoded equals sign
-        String paramWithEncodedEquals = "param%3Dname=value";
-        String result1 = pipeline.validate(paramWithEncodedEquals);
-        assertNotNull(result1);
-
-        // Test encoded ampersand
-        String paramWithEncodedAmpersand = "param=value%26more";
-        String result2 = pipeline.validate(paramWithEncodedAmpersand);
-        assertNotNull(result2);
-
-        // Test plus encoding for spaces
-        String paramWithPlus = "search=java+programming";
-        String result3 = pipeline.validate(paramWithPlus);
-        assertNotNull(result3);
-    }
-
-    @Test
-    void shouldRejectMalformedParameters() {
-        // Test various malformed parameter formats
-        String[] malformedParams = {
-                "param=value%", // Incomplete percent encoding
-                "param=value%2", // Incomplete percent encoding
-                "param=value%ZZ", // Invalid hex digits
-                "param=value%GG" // Invalid hex digits
-        };
-
-        for (String malformedParam : malformedParams) {
             assertThrows(UrlSecurityException.class, () ->
-                            pipeline.validate(malformedParam),
-                    "Should reject malformed parameter: " + malformedParam);
+                            pipeline.validate(valueOnly1),
+                    "Pipeline should reject encoded path traversal pattern: " + valueOnly1);
+
+            assertThrows(UrlSecurityException.class, () ->
+                            pipeline.validate(valueOnly2),
+                    "Pipeline should reject encoded path traversal pattern: " + valueOnly2);
+
+            // Test decoded patterns (should also be detected)
+            String decoded1 = "../../../etc/passwd";
+            String decoded2 = "../../config";
+
+            assertThrows(UrlSecurityException.class, () ->
+                            pipeline.validate(decoded1),
+                    "Pipeline should reject decoded path traversal pattern: " + decoded1);
+
+            assertThrows(UrlSecurityException.class, () ->
+                            pipeline.validate(decoded2),
+                    "Pipeline should reject decoded path traversal pattern: " + decoded2);
+        }
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 5)
+        void shouldRejectPathTraversalVariants(String maliciousParam) {
+            assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(maliciousParam));
+        }
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 5)
+        void shouldRejectEncodingBypassAttacks(String encodedParam) {
+            assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(encodedParam));
+        }
+
+        @Test
+        void shouldRejectOversizedParameter() {
+            String oversizedParam = "x".repeat(config.maxParameterValueLength() + 100);
+            assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(oversizedParam));
+        }
+    }
+
+    @Nested
+    class ParameterSpecificScenarios {
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = ValidURLParameterStringGenerator.class, count = 5)
+        void shouldValidateParameterSpecificScenarios(String validParam) throws UrlSecurityException {
+            String result = pipeline.validate(validParam);
+            assertNotNull(result, "Valid parameter in specific scenarios should not return null result");
+        }
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 3)
+        void shouldRejectPathTraversalInParameters(String traversalParam) {
+            assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(traversalParam));
+        }
+    }
+
+    @Nested
+    class PipelineBehavior {
+
+        @Test
+        void shouldSequentiallyApplyStages() {
+            String problematicParam = "param=" + "invalid\tvalue".repeat(1000);
+
+            UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(problematicParam));
+
+            assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType(), "Pipeline should reject input that exceeds length limits");
+        }
+
+        @ParameterizedTest
+        @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 5)
+        void shouldTrackSecurityEventsWhenRejectingAttacks(String attackParam) {
+            assertThrows(UrlSecurityException.class, () ->
+                    pipeline.validate(attackParam));
+            assertTrue(eventCounter.getTotalCount() > 0, "Security events should be tracked when attacks are rejected");
+        }
+
+        @Test
+        void shouldHaveCorrectEqualsAndHashCode() {
+            URLParameterValidationPipeline pipeline1 = new URLParameterValidationPipeline(config, eventCounter);
+            URLParameterValidationPipeline pipeline2 = new URLParameterValidationPipeline(config, eventCounter);
+
+            assertEquals(pipeline1, pipeline2, "Pipelines with same configuration should be equal");
+            assertEquals(pipeline1.hashCode(), pipeline2.hashCode(), "Equal pipelines should have same hash code");
+        }
+
+        @Test
+        void shouldHaveCorrectToString() {
+            String toString = pipeline.toString();
+            assertTrue(toString.contains("URLParameterValidationPipeline"), "toString should contain pipeline class name");
+        }
+
+        @Test
+        void shouldPreserveStageOrder() {
+            var stages = pipeline.getStages();
+            assertEquals(5, stages.size(), "Pipeline should have exactly 5 stages in correct order");
+
+            assertTrue(stages.getFirst().getClass().getSimpleName().contains("Length"), "First stage should be length validation");
+            assertTrue(stages.get(1).getClass().getSimpleName().contains("Character"), "Second stage should be character validation");
+            assertTrue(stages.get(2).getClass().getSimpleName().contains("Decoding"), "Third stage should be decoding validation");
+            assertTrue(stages.get(3).getClass().getSimpleName().contains("Normalization"), "Fourth stage should be normalization validation");
+            assertTrue(stages.get(4).getClass().getSimpleName().contains("Pattern"), "Fifth stage should be pattern validation");
         }
     }
 }

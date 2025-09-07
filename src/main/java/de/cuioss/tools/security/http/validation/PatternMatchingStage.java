@@ -150,7 +150,7 @@ public class PatternMatchingStage implements HttpSecurityValidator {
      * Matches script tags and JavaScript event handlers.
      */
     private static final Pattern XSS_SCRIPT_PATTERN = Pattern.compile(
-            "(?i)<script[^>]*>|</script>|javascript\\s*:|vbscript\\s*:|on\\w+\\s*="
+            "(?i)<script[^>]*>|</script>|javascript\\s*:|vbscript\\s*:|\\bon\\w+\\s*="
     );
 
     /**

@@ -15,28 +15,12 @@
  */
 package de.cuioss.tools.io;
 
-import de.cuioss.tools.io.support.NullInputStream;
-import de.cuioss.tools.io.support.NullOutputStream;
-import de.cuioss.tools.io.support.NullReader;
-import de.cuioss.tools.io.support.NullWriter;
-import de.cuioss.tools.io.support.YellOnCloseInputStream;
-import de.cuioss.tools.io.support.YellOnFlushAndCloseOutputStream;
+import de.cuioss.tools.io.support.*;
 import de.cuioss.tools.support.TestDataGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
