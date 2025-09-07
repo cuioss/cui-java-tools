@@ -18,7 +18,7 @@ This implementation plan outlines the step-by-step tasks required to build a com
 
 [CRITICAL]
 ====
-**MANDATORY TASK COMPLETION STANDARDS**
+**/cl**
 
 **Reference**: link:../../ai-rules.md#task-completion-standards-mandatory[AI Rules: Task Completion Standards]
 
@@ -320,7 +320,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T6
 |Test mixed encoding attacks
 |High
-|[ ]
+|[x]
 
 |T7
 |Test HTML entity encoding attacks
