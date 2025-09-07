@@ -359,7 +359,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T11
 |Test XSS injection patterns
 |High
-|[ ]
+|[x]
 
 |T12
 |Test SQL injection patterns

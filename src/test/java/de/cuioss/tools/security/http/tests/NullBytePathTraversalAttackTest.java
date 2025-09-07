@@ -358,7 +358,7 @@ class NullBytePathTraversalAttackTest {
         for (int i = 0; i < 10; i++) {
             try {
                 pipeline.validate(complexNullBytePattern);
-            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
+            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
             }
         }
 
@@ -367,7 +367,7 @@ class NullBytePathTraversalAttackTest {
         for (int i = 0; i < 100; i++) {
             try {
                 pipeline.validate(complexNullBytePattern);
-            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
+            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
             }
         }
         long endTime = System.nanoTime();
