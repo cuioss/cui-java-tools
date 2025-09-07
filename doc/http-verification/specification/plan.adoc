@@ -315,7 +315,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T5
 |Test double encoding attacks
 |High
-|[ ]
+|[x]
 
 |T6
 |Test mixed encoding attacks

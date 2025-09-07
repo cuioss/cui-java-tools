@@ -252,7 +252,7 @@ class EncodedPathTraversalAttackTest {
                     results[threadIndex] = false; // Should not reach here
                 } catch (UrlSecurityException e) {
                     results[threadIndex] = true; // Expected exception
-                } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException e) {
+                } catch (Exception e) {
                     results[threadIndex] = false; // Unexpected exception
                 }
             });
