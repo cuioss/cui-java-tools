@@ -386,7 +386,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T15
 |Test HTTP header injection
 |High
-|[ ]
+|[x]
 
 |T16
 |Test HTTP request smuggling patterns
