@@ -396,7 +396,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T17
 |Test cookie injection attacks
 |High
-|[ ]
+|[x]
 
 |T18
 |Test multipart form boundary attacks
