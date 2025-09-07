@@ -517,7 +517,7 @@ class UnicodeControlCharacterAttackTest {
         for (int i = 0; i < 10; i++) {
             try {
                 pipeline.validate(complexControlPattern);
-            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
+            } catch (UrlSecurityException ignored) {
             }
         }
 
@@ -526,7 +526,7 @@ class UnicodeControlCharacterAttackTest {
         for (int i = 0; i < 100; i++) {
             try {
                 pipeline.validate(complexControlPattern);
-            } /*~~(Catch specific not RuntimeException)~~>*//*~~(Catch specific not RuntimeException)~~>*/catch (RuntimeException ignored) {
+            } catch (UrlSecurityException ignored) {
             }
         }
         long endTime = System.nanoTime();
