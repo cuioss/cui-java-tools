@@ -467,7 +467,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T27
 |Test nginx/other server CVEs
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.9: OWASP Compliance Tests
