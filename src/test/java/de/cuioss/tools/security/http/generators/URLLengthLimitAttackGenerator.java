@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
 import java.util.Arrays;
@@ -120,256 +121,272 @@ public class URLLengthLimitAttackGenerator implements TypedGenerator<String> {
      * Creates basic URL length overflow attacks exceeding standard limits.
      */
     private String createBasicLengthOverflow(String pattern) {
-        // Standard URL length limits: IE (2083), Chrome (2MB), but servers typically limit to 8KB
-        String[] lengthOverflows = {
-                pattern + "?" + "A".repeat(8192), // 8KB limit test
-                pattern + "?" + "B".repeat(16384), // 16KB limit test
-                pattern + "/" + "C".repeat(4096), // Long path
-                pattern + "?" + "param=" + "D".repeat(10000), // Long parameter value
-                pattern + "/" + "E".repeat(2048) + "?data=" + "F".repeat(2048), // Mixed long components
-                pattern + "?" + "G".repeat(32768), // 32KB attack
-                pattern + "/" + "H".repeat(1024) + "/" + "I".repeat(1024) + "/" + "J".repeat(1024), // Multiple long segments
-                pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter
+        // Test realistic length limits: STRICT=1024, DEFAULT=4096, LENIENT=8192
+        // Generate URLs just over these limits to test actual validation logic
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.letterStrings(1030, 1050).next(); // Just over STRICT limit
+            case 1 -> pattern + "/" + Generators.letterStrings(1025, 1040).next(); // Barely over STRICT
+            case 2 -> pattern + "?" + "param=" + Generators.letterStrings(4100, 4150).next(); // Just over DEFAULT limit
+            case 3 -> pattern + "/" + Generators.letterStrings(4097, 4120).next(); // Barely over DEFAULT
+            case 4 -> pattern + "?" + Generators.letterStrings(8200, 8250).next(); // Just over LENIENT limit
+            case 5 -> pattern + "/" + Generators.letterStrings(8193, 8210).next(); // Barely over LENIENT
+            case 6 -> pattern + "/" + Generators.letterStrings(512, 512).next() + "/" + Generators.letterStrings(512, 512).next() + "?" + Generators.letterStrings(512, 512).next(); // Distributed length
+            case 7 -> pattern + "?" + "field=" + Generators.letterStrings(2050, 2100).next(); // Medium overflow
+            default -> pattern + "?" + Generators.letterStrings(1030, 1050).next(); // Default just over STRICT
         };
-        return lengthOverflows[hashBasedSelection(lengthOverflows.length)];
     }
 
     /**
      * Creates path component overflow attacks with extremely long path segments.
      */
     private String createPathComponentOverflow(String pattern) {
-        String[] pathOverflows = {
-                pattern + "/" + "segment".repeat(1000), // Repeated segment names
-                pattern + "/" + "A".repeat(4096) + "/normal", // One very long segment
-                pattern + "/" + "path_" + "B".repeat(2048) + "/data", // Long segment with prefix
-                "/" + "C".repeat(8192) + pattern, // Long prefix path
-                pattern + "/" + "dir_" + "D".repeat(1024) + "/file_" + "E".repeat(1024), // Multiple long segments
-                pattern + "/" + "very_long_directory_name_" + "F".repeat(3000), // Descriptive long segment
-                pattern + "/" + "component" + "G".repeat(512) + "/subdir" + "H".repeat(512) + "/file", // Nested long paths
-                pattern + "/" + "I".repeat(16384) // Single massive segment
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "/" + Generators.strings("segment/", 150, 180).next() + "file"; // Repeated segments to reach limits
+            case 1 -> pattern + "/" + Generators.letterStrings(1030, 1050).next() + "/normal"; // Single long segment over STRICT
+            case 2 -> pattern + "/" + "path_" + Generators.letterStrings(1000, 1020).next() + "/data"; // Long segment with prefix
+            case 3 -> "/" + Generators.letterStrings(800, 850).next() + pattern + "/file"; // Long prefix path  
+            case 4 -> pattern + "/" + "dir_" + Generators.letterStrings(500, 520).next() + "/file_" + Generators.letterStrings(500, 520).next(); // Multiple segments
+            case 5 -> pattern + "/" + "very_long_directory_name_" + Generators.letterStrings(950, 980).next(); // Descriptive long segment
+            case 6 -> pattern + "/" + "component" + Generators.letterStrings(400, 420).next() + "/subdir" + Generators.letterStrings(400, 420).next() + "/file"; // Nested paths
+            case 7 -> pattern + "/" + Generators.letterStrings(4100, 4150).next() + "/end"; // Just over DEFAULT limit
+            default -> pattern + "/" + Generators.letterStrings(1030, 1050).next(); // Default just over STRICT
         };
-        return pathOverflows[hashBasedSelection(pathOverflows.length)];
     }
 
     /**
      * Creates query parameter overflow attacks with long query strings.
      */
     private String createQueryParameterOverflow(String pattern) {
-        String[] queryOverflows = {
-                pattern + "?" + "param=" + "A".repeat(10000), // Single long parameter
-                pattern + "?" + "data=" + "B".repeat(5000) + "&info=" + "C".repeat(5000), // Multiple long parameters
-                pattern + "?" + "query=" + "D".repeat(20000), // Very long single parameter
-                pattern + "?" + "search=" + "term ".repeat(2000), // Repeated terms
-                pattern + "?" + "content=" + "E".repeat(8192) + "&type=json", // Long parameter with normal parameter
-                pattern + "?" + "input=" + ("value" + "F".repeat(100) + "&").repeat(50), // Many medium-length parameters
-                pattern + "?" + "buffer=" + "G".repeat(32768), // 32KB parameter value
-                pattern + "?" + "payload=" + "H".repeat(65536) // 64KB parameter value
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + "param=" + Generators.letterStrings(900, 950).next(); // Parameter value near STRICT limit
+            case 1 -> pattern + "?" + "data=" + Generators.letterStrings(500, 520).next() + "&info=" + Generators.letterStrings(500, 520).next(); // Multiple parameters
+            case 2 -> pattern + "?" + "query=" + Generators.letterStrings(3800, 3900).next(); // Parameter near DEFAULT limit
+            case 3 -> pattern + "?" + "search=" + Generators.strings("term ", 200, 250).next(); // Repeated terms to reach limit
+            case 4 -> pattern + "?" + "content=" + Generators.letterStrings(900, 950).next() + "&type=json"; // Long parameter with normal
+            case 5 -> pattern + "?" + Generators.strings("input=value123&", 50, 80).next(); // Many small parameters
+            case 6 -> pattern + "?" + "buffer=" + Generators.letterStrings(7800, 7900).next(); // Near LENIENT limit
+            case 7 -> pattern + "?" + "payload=" + Generators.letterStrings(1030, 1080).next() + "&extra=data"; // Just over STRICT with extra
+            default -> pattern + "?" + "param=" + Generators.letterStrings(1030, 1050).next(); // Default just over STRICT
         };
-        return queryOverflows[hashBasedSelection(queryOverflows.length)];
     }
 
     /**
      * Creates fragment overflow attacks with long URL fragments.
      */
     private String createFragmentOverflow(String pattern) {
-        String[] fragmentOverflows = {
-                pattern + "#" + "A".repeat(4096), // Long fragment
-                pattern + "?param=value#" + "B".repeat(8192), // Long fragment with query
-                pattern + "/path#" + "section" + "C".repeat(2000), // Long named fragment
-                pattern + "#" + "anchor_" + "D".repeat(5000), // Long fragment with prefix
-                pattern + "?data=test#" + "E".repeat(16384), // Very long fragment
-                pattern + "#" + ("part" + "F".repeat(50) + "_").repeat(100), // Repeated fragment parts
-                pattern + "#" + "G".repeat(32768), // 32KB fragment
-                pattern + "/resource?id=123#" + "content_" + "H".repeat(10000) // Mixed with long fragment
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "#" + Generators.letterStrings(500, 550).next(); // Fragment within reasonable limits
+            case 1 -> pattern + "?param=value#" + Generators.letterStrings(800, 850).next(); // Long fragment with query
+            case 2 -> pattern + "/path#" + "section" + Generators.letterStrings(400, 450).next(); // Named fragment
+            case 3 -> pattern + "#" + "anchor_" + Generators.letterStrings(600, 650).next(); // Fragment with prefix
+            case 4 -> pattern + "?data=test#" + Generators.letterStrings(900, 950).next(); // Long fragment near STRICT
+            case 5 -> pattern + "#" + Generators.strings("part_", 60, 80).next(); // Repeated fragment parts
+            case 6 -> pattern + "#" + Generators.letterStrings(3800, 3900).next(); // Fragment near DEFAULT limit
+            case 7 -> pattern + "/resource?id=123#" + "content_" + Generators.letterStrings(700, 750).next(); // Mixed with fragment
+            default -> pattern + "#" + Generators.letterStrings(500, 550).next(); // Default fragment
         };
-        return fragmentOverflows[hashBasedSelection(fragmentOverflows.length)];
     }
 
     /**
      * Creates hostname overflow attacks with long hostname components.
      */
     private String createHostnameOverflow(String pattern) {
-        String[] hostnameOverflows = {
-                "http://" + "A".repeat(253) + ".com" + pattern, // Max hostname length
-                "https://" + "B".repeat(63) + "." + "C".repeat(63) + ".com" + pattern, // Max label length
-                "http://" + "subdomain".repeat(30) + ".example.com" + pattern, // Many subdomains
-                "https://" + "D".repeat(1000) + ".evil.com" + pattern, // Excessive hostname
-                "http://" + ("sub" + "E".repeat(20) + ".").repeat(10) + "domain.com" + pattern, // Nested long subdomains
-                "https://" + "F".repeat(512) + ".attacker.org" + pattern, // Very long subdomain
-                "http://" + "G".repeat(2048) + ".malicious.net" + pattern, // Extremely long hostname part
-                "https://" + ("long" + "H".repeat(50)).repeat(5) + ".test.com" + pattern // Multiple long parts
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> "https://" + Generators.letterStrings(250, 253).next() + ".com" + pattern; // Near DNS max hostname (253)
+            case 1 -> "https://" + Generators.letterStrings(60, 63).next() + "." + Generators.letterStrings(60, 63).next() + ".com" + pattern; // Near DNS max label (63)
+            case 2 -> "https://" + Generators.strings("subdomain.", 15, 25).next() + "example.com" + pattern; // Many subdomains within reason
+            case 3 -> "https://" + Generators.letterStrings(100, 120).next() + ".evil.com" + pattern; // Long but reasonable subdomain
+            case 4 -> "https://" + Generators.strings("sub", 50, 80).next() + ".domain.com" + pattern; // Repeated subdomain parts
+            case 5 -> "https://" + Generators.letterStrings(80, 100).next() + ".attacker.org" + pattern; // Long subdomain
+            case 6 -> "https://" + Generators.letterStrings(150, 200).next() + ".malicious.net" + pattern; // Very long hostname part
+            case 7 -> "https://" + Generators.strings("long", 30, 50).next() + ".test.com" + pattern; // Multiple long parts
+            default -> "https://" + Generators.letterStrings(100, 120).next() + ".com" + pattern; // Default long hostname
         };
-        return hostnameOverflows[hashBasedSelection(hostnameOverflows.length)];
     }
 
     /**
      * Creates repeated parameter attacks with many identical parameters.
      */
     private String createRepeatedParameterAttack(String pattern) {
-        String[] repeatedParams = {
-                pattern + "?" + "param=value&".repeat(1000), // 1000 identical parameters
-                pattern + "?" + "data=test&".repeat(2000), // 2000 parameters
-                pattern + "?" + "field=info&".repeat(5000), // 5000 parameters
-                pattern + "?" + ("item=" + "A".repeat(100) + "&").repeat(500), // 500 parameters with long values
-                pattern + "?" + "query=search&".repeat(10000), // 10000 parameters
-                pattern + "?" + ("param" + "B".repeat(50) + "=value&").repeat(200), // Long parameter names
-                pattern + "?" + "test=data&".repeat(50000), // 50000 parameters
-                pattern + "?" + ("key=value" + "C".repeat(10) + "&").repeat(1000) // Mixed repeated parameters
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.strings("param=value&", 30, 50).next(); // Many small parameters to reach limit
+            case 1 -> pattern + "?" + Generators.strings("data=test&", 40, 60).next(); // Repeated parameters
+            case 2 -> pattern + "?" + Generators.strings("field=info&", 25, 35).next(); // Parameter repetition
+            case 3 -> pattern + "?" + Generators.strings("item=" + Generators.letterStrings(20, 30).next() + "&", 15, 25).next(); // Parameters with medium values
+            case 4 -> pattern + "?" + Generators.strings("query=search&", 35, 55).next(); // Many search parameters
+            case 5 -> pattern + "?" + Generators.strings("param" + Generators.letterStrings(10, 15).next() + "=value&", 20, 30).next(); // Varied parameter names
+            case 6 -> pattern + "?" + Generators.strings("test=data&", 60, 90).next(); // Many test parameters
+            case 7 -> pattern + "?" + Generators.strings("key=value" + Generators.letterStrings(5, 10).next() + "&", 25, 40).next(); // Mixed parameters
+            default -> pattern + "?" + Generators.strings("param=value&", 30, 50).next(); // Default repeated parameters
         };
-        return repeatedParams[hashBasedSelection(repeatedParams.length)];
     }
 
     /**
      * Creates deep path nesting attacks with many directory levels.
      */
     private String createDeepPathNesting(String pattern) {
-        String[] deepPaths = {
-                "/" + "dir/".repeat(1000) + pattern.substring(1), // 1000 directory levels
-                "/" + "level/".repeat(2000) + "file", // 2000 levels deep
-                pattern + "/" + "sub/".repeat(5000) + "resource", // 5000 nested levels
-                "/" + ("path" + "/").repeat(10000) + "endpoint", // 10000 path segments
-                "/" + "deep/".repeat(500) + "very/".repeat(500) + "nested/".repeat(500) + pattern.substring(1), // Mixed depths
-                "/" + ("dir" + hashBasedSelection(100) + "/").repeat(1000) + "target", // Varied directory names
-                "/" + "A/".repeat(20000) + "final", // 20000 single-char directories
-                "/" + ("folder" + "/subfolder" + "/").repeat(1000) + "destination" // Alternating long paths
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> "/" + Generators.strings("dir/", 40, 60).next() + pattern.substring(1); // Many directory levels to reach limits
+            case 1 -> "/" + Generators.strings("level/", 50, 70).next() + "file"; // Deep levels
+            case 2 -> pattern + "/" + Generators.strings("sub/", 30, 50).next() + "resource"; // Nested levels
+            case 3 -> "/" + Generators.strings("path/", 45, 65).next() + "endpoint"; // Many path segments
+            case 4 -> "/" + Generators.strings("deep/", 20, 30).next() + Generators.strings("very/", 20, 30).next() + "nested/" + pattern.substring(1); // Mixed depths
+            case 5 -> "/" + Generators.strings("dir" + hashBasedSelection(100) + "/", 35, 55).next() + "target"; // Varied directory names
+            case 6 -> "/" + Generators.strings("A/", 80, 120).next() + "final"; // Single-char directories
+            case 7 -> "/" + Generators.strings("folder/subfolder/", 25, 35).next() + "destination"; // Alternating paths
+            default -> "/" + Generators.strings("dir/", 40, 60).next() + pattern.substring(1); // Default deep nesting
         };
-        return deepPaths[hashBasedSelection(deepPaths.length)];
     }
 
     /**
      * Creates attacks with extremely long parameter names.
      */
     private String createLongParameterNames(String pattern) {
-        String[] longNames = {
-                pattern + "?" + "A".repeat(4096) + "=value", // 4KB parameter name
-                pattern + "?" + "param_" + "B".repeat(2000) + "=data", // Long name with prefix
-                pattern + "?" + "C".repeat(8192) + "=test&normal=ok", // Long name with normal parameter
-                pattern + "?" + "field_name_" + "D".repeat(5000) + "=content", // Descriptive long name
-                pattern + "?" + "E".repeat(16384) + "=info", // 16KB parameter name
-                pattern + "?" + ("parameter_" + "F".repeat(100) + "=value&").repeat(10), // Multiple long names
-                pattern + "?" + "G".repeat(32768) + "=result", // 32KB parameter name
-                pattern + "?" + "query_string_parameter_name_" + "H".repeat(10000) + "=search" // Very descriptive long name
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.letterStrings(900, 950).next() + "=value"; // Long parameter name near STRICT
+            case 1 -> pattern + "?" + "param_" + Generators.letterStrings(800, 850).next() + "=data"; // Long name with prefix
+            case 2 -> pattern + "?" + Generators.letterStrings(700, 750).next() + "=test&normal=ok"; // Long name with normal parameter
+            case 3 -> pattern + "?" + "field_name_" + Generators.letterStrings(600, 650).next() + "=content"; // Descriptive long name
+            case 4 -> pattern + "?" + Generators.letterStrings(3800, 3900).next() + "=info"; // Parameter name near DEFAULT limit
+            case 5 -> pattern + "?" + Generators.strings("parameter_" + Generators.letterStrings(20, 30).next() + "=value&", 10, 15).next(); // Multiple medium names
+            case 6 -> pattern + "?" + Generators.letterStrings(1030, 1080).next() + "=result"; // Just over STRICT limit
+            case 7 -> pattern + "?" + "query_string_parameter_name_" + Generators.letterStrings(500, 550).next() + "=search"; // Very descriptive name
+            default -> pattern + "?" + Generators.letterStrings(900, 950).next() + "=value"; // Default long name
         };
-        return longNames[hashBasedSelection(longNames.length)];
     }
 
     /**
      * Creates attacks with extremely long parameter values.
      */
     private String createLongParameterValues(String pattern) {
-        String[] longValues = {
-                pattern + "?data=" + "A".repeat(10000), // 10KB parameter value
-                pattern + "?content=" + "B".repeat(20000), // 20KB parameter value
-                pattern + "?payload=" + "C".repeat(50000), // 50KB parameter value
-                pattern + "?info=" + "D".repeat(100000), // 100KB parameter value
-                pattern + "?search=" + ("query " + "E".repeat(500) + " ").repeat(100), // Repeated long terms
-                pattern + "?input=" + "F".repeat(200000), // 200KB parameter value
-                pattern + "?field=" + "value_" + "G".repeat(80000), // Long value with prefix
-                pattern + "?buffer=" + "H".repeat(500000) // 500KB parameter value
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?data=" + Generators.letterStrings(1030, 1080).next(); // Just over STRICT limit
+            case 1 -> pattern + "?content=" + Generators.letterStrings(4100, 4150).next(); // Just over DEFAULT limit
+            case 2 -> pattern + "?payload=" + Generators.letterStrings(8200, 8250).next(); // Just over LENIENT limit
+            case 3 -> pattern + "?info=" + Generators.letterStrings(2000, 2100).next(); // Medium length value
+            case 4 -> pattern + "?search=" + Generators.strings("query ", 150, 200).next(); // Repeated search terms
+            case 5 -> pattern + "?input=" + Generators.letterStrings(3000, 3200).next(); // Large but reasonable value
+            case 6 -> pattern + "?field=" + "value_" + Generators.letterStrings(900, 950).next(); // Long value with prefix
+            case 7 -> pattern + "?buffer=" + Generators.letterStrings(7800, 7900).next(); // Near LENIENT limit
+            default -> pattern + "?data=" + Generators.letterStrings(1030, 1080).next(); // Default just over STRICT
         };
-        return longValues[hashBasedSelection(longValues.length)];
     }
 
     /**
      * Creates mixed length attacks combining multiple long components.
      */
     private String createMixedLengthAttacks(String pattern) {
-        String[] mixedAttacks = {
-                "/" + "A".repeat(1000) + pattern + "?" + "param=" + "B".repeat(1000) + "#" + "C".repeat(1000), // Long path, query, fragment
-                pattern + "/" + "D".repeat(2000) + "?" + "E".repeat(1000) + "=value", // Long path segment and parameter name
-                "/" + "path/".repeat(500) + pattern.substring(1) + "?" + "data=" + "F".repeat(5000), // Deep path with long parameter
-                pattern + "/" + "G".repeat(1500) + "/" + "H".repeat(1500) + "?" + "query=" + "I".repeat(3000), // Multiple long components
-                "/" + "J".repeat(4000) + "?" + ("param" + "K".repeat(200) + "=" + "L".repeat(200) + "&").repeat(10), // Very long path with multiple long parameters
-                pattern + "/" + "segment_" + "M".repeat(2500) + "?" + "field_" + "N".repeat(1000) + "=" + "O".repeat(2000) + "#anchor_" + "P".repeat(1000), // All components long
-                "/" + "dir/".repeat(1000) + "resource" + "?" + "buffer=" + "Q".repeat(10000), // Deep nesting with long parameter
-                "https://" + "R".repeat(200) + ".example.com" + pattern + "/" + "S".repeat(1000) + "?" + "data=" + "T".repeat(2000) // Long hostname, path, and parameter
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> "/" + Generators.letterStrings(300, 350).next() + pattern + "?" + "param=" + Generators.letterStrings(300, 350).next() + "#" + Generators.letterStrings(300, 350).next(); // Distributed length components
+            case 1 -> pattern + "/" + Generators.letterStrings(500, 550).next() + "?" + Generators.letterStrings(400, 450).next() + "=value"; // Long path segment and parameter name
+            case 2 -> "/" + Generators.strings("path/", 15, 25).next() + pattern.substring(1) + "?" + "data=" + Generators.letterStrings(800, 850).next(); // Deep path with long parameter
+            case 3 -> pattern + "/" + Generators.letterStrings(400, 450).next() + "/" + Generators.letterStrings(400, 450).next() + "?" + "query=" + Generators.letterStrings(600, 650).next(); // Multiple medium components
+            case 4 -> "/" + Generators.letterStrings(800, 850).next() + "?" + Generators.strings("param" + Generators.letterStrings(15, 20).next() + "=" + Generators.letterStrings(15, 20).next() + "&", 8, 12).next(); // Long path with parameters
+            case 5 -> pattern + "/" + "segment_" + Generators.letterStrings(400, 450).next() + "?" + "field_" + Generators.letterStrings(200, 250).next() + "=" + Generators.letterStrings(400, 450).next() + "#anchor_" + Generators.letterStrings(200, 250).next(); // All components reasonable
+            case 6 -> "/" + Generators.strings("dir/", 30, 50).next() + "resource" + "?" + "buffer=" + Generators.letterStrings(600, 650).next(); // Deep nesting with parameter
+            case 7 -> "https://" + Generators.letterStrings(80, 100).next() + ".example.com" + pattern + "/" + Generators.letterStrings(300, 350).next() + "?" + "data=" + Generators.letterStrings(400, 450).next(); // Long hostname, path, and parameter
+            default -> pattern + "/" + Generators.letterStrings(400, 450).next() + "?" + "param=" + Generators.letterStrings(400, 450).next(); // Default mixed length
         };
-        return mixedAttacks[hashBasedSelection(mixedAttacks.length)];
     }
 
     /**
      * Creates buffer overflow patterns designed to trigger memory issues.
      */
     private String createBufferOverflowPatterns(String pattern) {
-        String[] bufferOverflows = {
-                pattern + "?" + "A".repeat(65536), // 64KB buffer overflow attempt
-                pattern + "/" + "B".repeat(32768) + "?" + "data=" + "C".repeat(32768), // 32KB path + 32KB parameter
-                pattern + "?" + "buffer=" + "D".repeat(131072), // 128KB parameter
-                "/" + "E".repeat(16384) + pattern + "?" + "payload=" + "F".repeat(49152), // 16KB path + 48KB parameter = 64KB total
-                pattern + "?" + ("overflow" + "G".repeat(1000) + "=data&").repeat(50), // Many parameters with buffer patterns
-                pattern + "/" + "H".repeat(65536), // 64KB path component
-                pattern + "?" + "input=" + "I".repeat(262144), // 256KB parameter value
-                pattern + "#" + "J".repeat(131072) // 128KB fragment
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.letterStrings(8200, 8300).next(); // Just over LENIENT limit (testing buffer boundaries)
+            case 1 -> pattern + "/" + Generators.letterStrings(4100, 4200).next() + "?" + "data=" + Generators.letterStrings(4100, 4200).next(); // DEFAULT limit overflow in both components
+            case 2 -> pattern + "?" + "buffer=" + Generators.letterStrings(9000, 9500).next(); // Moderate buffer test
+            case 3 -> "/" + Generators.letterStrings(2000, 2100).next() + pattern + "?" + "payload=" + Generators.letterStrings(6000, 6500).next(); // Distributed length test
+            case 4 -> pattern + "?" + Generators.strings("overflow" + Generators.letterStrings(20, 30).next() + "=data&", 30, 50).next(); // Many parameters with patterns
+            case 5 -> pattern + "/" + Generators.letterStrings(8300, 8400).next(); // Path component just over LENIENT
+            case 6 -> pattern + "?" + "input=" + Generators.letterStrings(10000, 12000).next(); // Large but not extreme parameter
+            case 7 -> pattern + "#" + Generators.letterStrings(7000, 7500).next(); // Large fragment
+            default -> pattern + "?" + Generators.letterStrings(8200, 8300).next(); // Default buffer test
         };
-        return bufferOverflows[hashBasedSelection(bufferOverflows.length)];
     }
 
     /**
      * Creates memory exhaustion attacks designed to consume server memory.
      */
     private String createMemoryExhaustionAttack(String pattern) {
-        String[] memoryAttacks = {
-                pattern + "?" + "memory=" + "A".repeat(1000000), // 1MB parameter
-                pattern + "/" + "B".repeat(500000) + "?" + "data=" + "C".repeat(500000), // 1MB total
-                pattern + "?" + ("param" + hashBasedSelection(10000) + "=" + "D".repeat(1000) + "&").repeat(500), // 500KB in varied parameters
-                pattern + "?" + "exhaustion=" + "E".repeat(2000000), // 2MB parameter
-                "/" + "F".repeat(1000000) + pattern, // 1MB path prefix
-                pattern + "?" + "large_data=" + ("chunk" + "G".repeat(1000)).repeat(200), // Structured large data
-                pattern + "#" + "H".repeat(1000000), // 1MB fragment
-                pattern + "?" + "payload=" + "I".repeat(5000000) // 5MB parameter
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + "memory=" + Generators.letterStrings(12000, 15000).next(); // Large but reasonable parameter
+            case 1 -> pattern + "/" + Generators.letterStrings(4000, 4500).next() + "?" + "data=" + Generators.letterStrings(4000, 4500).next(); // Distributed large components
+            case 2 -> pattern + "?" + Generators.strings("param" + hashBasedSelection(100) + "=" + Generators.letterStrings(20, 30).next() + "&", 100, 200).next(); // Many parameters with varied data
+            case 3 -> pattern + "?" + "exhaustion=" + Generators.letterStrings(20000, 25000).next(); // Large parameter test
+            case 4 -> "/" + Generators.letterStrings(6000, 8000).next() + pattern; // Large path prefix
+            case 5 -> pattern + "?" + "large_data=" + Generators.strings("chunk" + Generators.letterStrings(50, 100).next(), 50, 100).next(); // Structured data within limits
+            case 6 -> pattern + "#" + Generators.letterStrings(10000, 15000).next(); // Large fragment
+            case 7 -> pattern + "?" + "payload=" + Generators.letterStrings(30000, 35000).next(); // Large payload test
+            default -> pattern + "?" + "memory=" + Generators.letterStrings(12000, 15000).next(); // Default memory test
         };
-        return memoryAttacks[hashBasedSelection(memoryAttacks.length)];
     }
 
     /**
      * Creates parser confusion attacks with challenging parsing scenarios.
      */
     private String createParserConfusion(String pattern) {
-        String[] parserConfusions = {
-                pattern + "?" + "A".repeat(10000) + "=" + "B".repeat(10000) + "&" + "C".repeat(5000) + "=" + "D".repeat(5000), // Multiple long parameters
-                pattern + "/" + ("segment" + "E".repeat(500) + "/").repeat(20) + "?" + "query=" + "F".repeat(10000), // Mixed long segments and parameters
-                "/" + "G".repeat(8000) + "/" + "H".repeat(8000) + pattern + "?" + "data=" + "I".repeat(8000), // Long prefix and suffix
-                pattern + "?" + ("key" + "J".repeat(200) + "=value" + "K".repeat(200) + "&").repeat(100), // Many medium-long parameters
-                pattern + "/" + "L".repeat(16000) + "#" + "M".repeat(16000), // Long path and fragment
-                pattern + "?" + "complex=" + ("part" + "N".repeat(100) + "_").repeat(500), // Structured long parameter
-                "/" + ("dir" + "O".repeat(50) + "/").repeat(200) + pattern + "?" + ("param" + "P".repeat(50) + "=val&").repeat(200), // Many structured components
-                pattern + "?" + "test=" + "Q".repeat(20000) + "&verify=" + "R".repeat(20000) + "#section=" + "S".repeat(20000) // All components very long
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.letterStrings(800, 900).next() + "=" + Generators.letterStrings(800, 900).next() + "&" + Generators.letterStrings(400, 500).next() + "=" + Generators.letterStrings(400, 500).next(); // Multiple medium parameters
+            case 1 -> pattern + "/" + Generators.strings("segment" + Generators.letterStrings(30, 50).next() + "/", 20, 30).next() + "?" + "query=" + Generators.letterStrings(600, 700).next(); // Mixed segments and parameters
+            case 2 -> "/" + Generators.letterStrings(1500, 2000).next() + "/" + Generators.letterStrings(1500, 2000).next() + pattern + "?" + "data=" + Generators.letterStrings(1000, 1200).next(); // Long prefix and suffix
+            case 3 -> pattern + "?" + Generators.strings("key" + Generators.letterStrings(15, 25).next() + "=value" + Generators.letterStrings(15, 25).next() + "&", 20, 40).next(); // Many medium-long parameters
+            case 4 -> pattern + "/" + Generators.letterStrings(3000, 3500).next() + "#" + Generators.letterStrings(3000, 3500).next(); // Long path and fragment within reason
+            case 5 -> pattern + "?" + "complex=" + Generators.strings("part" + Generators.letterStrings(20, 30).next() + "_", 40, 60).next(); // Structured parameter
+            case 6 -> "/" + Generators.strings("dir" + Generators.letterStrings(10, 20).next() + "/", 30, 50).next() + pattern + "?" + Generators.strings("param" + Generators.letterStrings(10, 20).next() + "=val&", 20, 35).next(); // Structured components
+            case 7 -> pattern + "?" + "test=" + Generators.letterStrings(2000, 2500).next() + "&verify=" + Generators.letterStrings(2000, 2500).next() + "#section=" + Generators.letterStrings(1500, 2000).next(); // Multiple reasonable components
+            default -> pattern + "?" + Generators.letterStrings(1000, 1200).next() + "=" + Generators.letterStrings(1000, 1200).next(); // Default parser confusion
         };
-        return parserConfusions[hashBasedSelection(parserConfusions.length)];
     }
 
     /**
      * Creates encoding length attacks that amplify length through encoding.
      */
     private String createEncodingLengthAttacks(String pattern) {
-        String[] encodingAttacks = {
-                pattern + "?" + "data=" + "%41".repeat(5000), // URL encoding amplification
-                pattern + "/" + "%2E".repeat(10000), // Encoded dots
-                pattern + "?" + "param=" + "%20".repeat(10000), // Encoded spaces
-                pattern + "/" + ("%2F" + "A".repeat(100)).repeat(200), // Mixed encoding
-                pattern + "?" + "query=" + "%3C%3E".repeat(5000), // Encoded angle brackets
-                pattern + "/" + "%2E%2E%2F".repeat(2000), // Encoded path traversal patterns
-                pattern + "?" + "field=" + "%41%42%43".repeat(10000), // Encoded ABC pattern
-                pattern + "#" + "%23".repeat(15000) // Encoded hash symbols
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + "data=" + Generators.strings("%41", 300, 500).next(); // URL encoding amplification within limits
+            case 1 -> pattern + "/" + Generators.strings("%2E", 400, 600).next(); // Encoded dots
+            case 2 -> pattern + "?" + "param=" + Generators.strings("%20", 350, 550).next(); // Encoded spaces
+            case 3 -> pattern + "/" + Generators.strings("%2F" + Generators.letterStrings(20, 30).next(), 15, 25).next(); // Mixed encoding
+            case 4 -> pattern + "?" + "query=" + Generators.strings("%3C%3E", 200, 350).next(); // Encoded angle brackets
+            case 5 -> pattern + "/" + Generators.strings("%2E%2E%2F", 100, 200).next(); // Encoded path traversal patterns
+            case 6 -> pattern + "?" + "field=" + Generators.strings("%41%42%43", 250, 400).next(); // Encoded ABC pattern
+            case 7 -> pattern + "#" + Generators.strings("%23", 300, 500).next(); // Encoded hash symbols
+            default -> pattern + "?" + "data=" + Generators.strings("%41", 300, 500).next(); // Default encoding attack
         };
-        return encodingAttacks[hashBasedSelection(encodingAttacks.length)];
     }
 
     /**
      * Creates algorithmic complexity attacks causing processing slowdown.
      */
     private String createAlgorithmicComplexity(String pattern) {
-        String[] complexityAttacks = {
-                pattern + "?" + ("a" + "=b&").repeat(10000), // Many small parameters (parsing complexity)
-                pattern + "/" + "x/".repeat(5000) + "target", // Many small path segments
-                "/" + "../".repeat(10000) + pattern, // Many traversal attempts
-                pattern + "?" + ("param" + hashBasedSelection(1000) + "=value" + hashBasedSelection(1000) + "&").repeat(1000), // Varied parameter names
-                pattern + "/" + ("segment" + hashBasedSelection(100)).repeat(1000), // Varied path segments
-                pattern + "?" + "regex=" + "(a+)+".repeat(1000), // Regex complexity pattern
-                pattern + "/" + ("a" + "/b".repeat(100)).repeat(100), // Nested pattern complexity
-                pattern + "?" + ("key=value" + "&").repeat(20000) // Simple but numerous parameters
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?" + Generators.strings("a=b&", 200, 400).next(); // Many small parameters within reason
+            case 1 -> pattern + "/" + Generators.strings("x/", 150, 300).next() + "target"; // Many small path segments
+            case 2 -> "/" + Generators.strings("../", 100, 200).next() + pattern; // Path traversal attempts within limits
+            case 3 -> pattern + "?" + Generators.strings("param" + hashBasedSelection(100) + "=value" + hashBasedSelection(100) + "&", 50, 100).next(); // Varied parameter names
+            case 4 -> pattern + "/" + Generators.strings("segment" + hashBasedSelection(50), 80, 150).next(); // Varied path segments
+            case 5 -> pattern + "?" + "regex=" + Generators.strings("(a+)+", 30, 60).next(); // Regex complexity pattern
+            case 6 -> pattern + "/" + Generators.strings("a" + Generators.strings("/b", 20, 40).next(), 15, 30).next(); // Nested pattern complexity
+            case 7 -> pattern + "?" + Generators.strings("key=value&", 150, 300).next(); // Numerous but reasonable parameters
+            default -> pattern + "?" + Generators.strings("a=b&", 200, 400).next(); // Default complexity attack
         };
-        return complexityAttacks[hashBasedSelection(complexityAttacks.length)];
     }
 
     @Override

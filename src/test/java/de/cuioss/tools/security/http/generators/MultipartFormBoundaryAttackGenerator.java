@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
 import java.util.Arrays;
@@ -172,9 +173,9 @@ public class MultipartFormBoundaryAttackGenerator implements TypedGenerator<Stri
      * Creates boundary buffer overflow attacks with extremely long boundaries.
      */
     private String createBoundaryBufferOverflow(String pattern) {
-        String longBoundary = "A".repeat(8192);
-        String veryLongBoundary = "B".repeat(16384);
-        String extremeBoundary = "C".repeat(32768);
+        String longBoundary = Generators.letterStrings(1030, 1080).next(); // Just over STRICT limit
+        String veryLongBoundary = Generators.letterStrings(4100, 4150).next(); // Just over DEFAULT limit  
+        String extremeBoundary = Generators.letterStrings(8200, 8250).next(); // Just over LENIENT limit
 
         String[] overflowAttacks = {
                 pattern + "?boundary=" + longBoundary,
@@ -218,7 +219,7 @@ public class MultipartFormBoundaryAttackGenerator implements TypedGenerator<Stri
                 pattern + "?file=post%0d%0a--boundary123%0d%0aContent-Disposition: attachment; filename=\"normal.txt%00.jsp\"%0d%0a%0d%0a<%@ page import=\"java.io.*\" %><% Runtime.getRuntime().exec(request.getParameter(\"cmd\")); %>",
                 pattern + "?upload=data%0a%0a--WebForm%0a%0aContent-Disposition: form-data; name=\"file\"; filename=\"CON\"%0a%0a%0a%0awindows_device_attack",
                 pattern + "?submit=form%0d%0a--Boundary%0d%0aContent-Disposition: inline; filename=\"script.js%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert(1)</script>%0d%0a\"%0d%0a%0d%0ajavascript_content",
-                pattern + "?data=multipart%0d%0a--FormBoundary%0d%0aContent-Disposition: form-data; name=\"attachment\"; filename=\"very_long_filename_" + "A".repeat(1000) + ".txt\"%0d%0a%0d%0abuffer_overflow_filename"
+                pattern + "?data=multipart%0d%0a--FormBoundary%0d%0aContent-Disposition: form-data; name=\"attachment\"; filename=\"very_long_filename_" + Generators.letterStrings(200, 300).next() + ".txt\"%0d%0a%0d%0abuffer_overflow_filename"
         };
         return filenameInjections[hashBasedSelection(filenameInjections.length)];
     }
@@ -363,18 +364,19 @@ public class MultipartFormBoundaryAttackGenerator implements TypedGenerator<Stri
      * Creates multipart DoS attacks that cause resource exhaustion.
      */
     private String createMultipartDosAttack(String pattern) {
-        String longContent = "A".repeat(10000);
-        String[] dosAttacks = {
-                pattern + "?parts=" + "part1&".repeat(1000) + "admin=true",
-                pattern + "?fields=" + longContent,
-                pattern + "?data=" + "field=value&".repeat(500) + "role=admin",
-                pattern + "?content=" + longContent + "%0d%0a--boundary" + "--boundary".repeat(100),
-                pattern + "?multipart=" + "A".repeat(50000),
-                pattern + "?form=" + "input" + "X".repeat(20000) + "=value",
-                pattern + "?upload=" + longContent + "&file=" + longContent,
-                pattern + "?boundary=" + "--boundary".repeat(1000) + longContent
+        // Create DoS attack patterns within realistic URL length limits
+        int attackType = hashBasedSelection(8);
+        return switch (attackType) {
+            case 0 -> pattern + "?parts=" + Generators.strings("part1&", 80, 120).next() + "admin=true";
+            case 1 -> pattern + "?fields=" + Generators.letterStrings(1500, 2000).next();
+            case 2 -> pattern + "?data=" + Generators.strings("field=value&", 40, 80).next() + "role=admin";
+            case 3 -> pattern + "?content=" + Generators.letterStrings(800, 1000).next() + "%0d%0a--boundary" + Generators.strings("--boundary", 20, 40).next();
+            case 4 -> pattern + "?multipart=" + Generators.letterStrings(8000, 8200).next(); // Near LENIENT limit
+            case 5 -> pattern + "?form=" + "input" + Generators.letterStrings(1000, 1500).next() + "=value";
+            case 6 -> pattern + "?upload=" + Generators.letterStrings(1000, 1200).next() + "&file=" + Generators.letterStrings(1000, 1200).next();
+            case 7 -> pattern + "?boundary=" + Generators.strings("--boundary", 50, 100).next() + Generators.letterStrings(500, 800).next();
+            default -> pattern + "?parts=" + Generators.strings("part1&", 80, 120).next() + "admin=true";
         };
-        return dosAttacks[hashBasedSelection(dosAttacks.length)];
     }
 
     @Override

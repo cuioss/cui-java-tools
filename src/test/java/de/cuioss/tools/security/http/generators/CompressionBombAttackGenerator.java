@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
 /**
@@ -82,15 +83,16 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     }
 
     private String createBasicCompressionBomb(String pattern) {
-        // Basic compression bomb patterns with high expansion ratio
-        String[] compressionBombs = {
-                pattern + "?data=" + "A".repeat(1024) + "&compress=gzip",
-                pattern + "?payload=" + "0".repeat(2048) + "&encoding=deflate",
-                pattern + "?content=" + "X".repeat(4096) + "&type=compressed",
-                pattern + "?bomb=" + generateRepeatedPattern("AAAA", 256),
-                pattern + "?expand=" + generateRepeatedPattern("1234", 512),
+        // Basic compression bomb patterns with realistic expansion indicators
+        int attackType = hashBasedSelection(5);
+        return switch (attackType) {
+            case 0 -> pattern + "?data=" + Generators.letterStrings(800, 1000).next() + "&compress=gzip";
+            case 1 -> pattern + "?payload=" + Generators.strings("0", 500, 700).next() + "&encoding=deflate";
+            case 2 -> pattern + "?content=" + Generators.strings("X", 600, 800).next() + "&type=compressed";
+            case 3 -> pattern + "?bomb=" + Generators.strings("AAAA", 200, 300).next();
+            case 4 -> pattern + "?expand=" + Generators.strings("1234", 250, 350).next();
+            default -> pattern + "?data=" + Generators.letterStrings(800, 1000).next() + "&compress=gzip";
         };
-        return compressionBombs[hashBasedSelection(compressionBombs.length)];
     }
 
     private String createNestedCompressionAttack(String pattern) {
@@ -178,15 +180,16 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     }
 
     private String createMixedContentTypeBomb(String pattern) {
-        // Mixed content type compression bombs
-        String[] mixedBombs = {
-                pattern + "?mixed=text/html;gzip+" + "HTML".repeat(500),
-                pattern + "?content=application/json;deflate+" + "JSON".repeat(700),
-                pattern + "?type=image/png;compress+" + "IMAGE".repeat(300),
-                pattern + "?format=video/mp4;gzip+" + "VIDEO".repeat(200),
-                pattern + "?media=audio/mpeg;deflate+" + "AUDIO".repeat(400),
+        // Mixed content type compression bombs with realistic patterns
+        int attackType = hashBasedSelection(5);
+        return switch (attackType) {
+            case 0 -> pattern + "?mixed=text/html;gzip+" + Generators.strings("HTML", 100, 200).next();
+            case 1 -> pattern + "?content=application/json;deflate+" + Generators.strings("JSON", 150, 250).next();
+            case 2 -> pattern + "?type=image/png;compress+" + Generators.strings("IMAGE", 80, 150).next();
+            case 3 -> pattern + "?format=video/mp4;gzip+" + Generators.strings("VIDEO", 60, 120).next();
+            case 4 -> pattern + "?media=audio/mpeg;deflate+" + Generators.strings("AUDIO", 100, 180).next();
+            default -> pattern + "?mixed=text/html;gzip+" + Generators.strings("HTML", 100, 200).next();
         };
-        return mixedBombs[hashBasedSelection(mixedBombs.length)];
     }
 
     private String createHeaderCompressionAttack(String pattern) {
@@ -264,7 +267,9 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     // Helper methods for creating various compression bomb patterns
 
     private String generateRepeatedPattern(String base, int repetitions) {
-        return base.repeat(repetitions);
+        // Generate realistic repeated patterns within URL limits
+        int safeRepetitions = Math.min(repetitions, 200); // Cap at reasonable limit
+        return Generators.strings(base, safeRepetitions / base.length(), safeRepetitions / base.length() + 50).next();
     }
 
     private String createNestedData(String base, int depth) {
@@ -305,7 +310,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     }
 
     private String compressParameter(String base, int repetitions) {
-        return "PARAM:COMPRESSED:%s:%d".formatted(base.repeat(Math.min(repetitions, 100)), repetitions);
+        // Create compression parameter indicator with realistic size
+        return "PARAM:COMPRESSED:%s:%d".formatted(Generators.strings(base, 50, 100).next(), repetitions);
     }
 
     private String createCompressedCookie(String name, String base, int size) {
@@ -329,11 +335,11 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     }
 
     private String createJsonBomb(String type, int size) {
-        return "JSON:{\"type\":\"%s\",\"bomb\":\"%s\"}".formatted(type, "X".repeat(Math.min(size, 100)));
+        return "JSON:{\"type\":\"%s\",\"bomb\":\"%s\"}".formatted(type, Generators.strings("X", Math.min(size, 100), Math.min(size, 100)).next());
     }
 
     private String createBinaryBomb(int size) {
-        return "BINARY:SIZE:%d:DATA:%s".formatted(size, "\\x00".repeat(Math.min(size / 4, 100)));
+        return "BINARY:SIZE:%d:DATA:%s".formatted(size, Generators.strings("\\x00", Math.min(size / 4, 25), Math.min(size / 4, 25)).next());
     }
 
     private int hashBasedSelection(int arrayLength) {
