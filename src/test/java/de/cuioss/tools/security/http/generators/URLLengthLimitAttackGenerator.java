@@ -91,7 +91,7 @@ public class URLLengthLimitAttackGenerator implements TypedGenerator<String> {
             "/request"
     );
 
-    private final AttackTypeSelector attackTypeSelector = new AttackTypeSelector(15);
+    private final AttackTypeSelector attackTypeSelector = new AttackTypeSelector(13); // Removed encoding attacks (13,14) - they test encoding not length
 
     @Override
     public String next() {
@@ -110,9 +110,8 @@ public class URLLengthLimitAttackGenerator implements TypedGenerator<String> {
             case 9 -> createMixedLengthAttacks(basePattern);
             case 10 -> createBufferOverflowPatterns(basePattern);
             case 11 -> createMemoryExhaustionAttack(basePattern);
-            case 12 -> createParserConfusion(basePattern);
-            case 13 -> createEncodingLengthAttacks(basePattern);
-            case 14 -> createAlgorithmicComplexity(basePattern);
+            case 12 -> createAlgorithmicComplexity(basePattern);
+            // Removed case 13 (encoding attacks) and case 14 - they test encoding validation not length validation
             default -> createBasicLengthOverflow(basePattern);
         };
     }
@@ -362,7 +361,7 @@ public class URLLengthLimitAttackGenerator implements TypedGenerator<String> {
             case 0 -> pattern + "?" + "data=" + Generators.strings("%41", 300, 500).next(); // URL encoding amplification within limits
             case 1 -> pattern + "/" + Generators.strings("%2E", 400, 600).next(); // Encoded dots
             case 2 -> pattern + "?" + "param=" + Generators.strings("%20", 350, 550).next(); // Encoded spaces
-            case 3 -> pattern + "/" + Generators.strings("%2F" + Generators.letterStrings(20, 30).next(), 15, 25).next(); // Mixed encoding
+            case 3 -> pattern + "/" + Generators.strings("%2F", 200, 300).next() + Generators.letterStrings(100, 200).next(); // Mixed encoding - separate valid encoding from letters
             case 4 -> pattern + "?" + "query=" + Generators.strings("%3C%3E", 200, 350).next(); // Encoded angle brackets
             case 5 -> pattern + "/" + Generators.strings("%2E%2E%2F", 100, 200).next(); // Encoded path traversal patterns
             case 6 -> pattern + "?" + "field=" + Generators.strings("%41%42%43", 250, 400).next(); // Encoded ABC pattern

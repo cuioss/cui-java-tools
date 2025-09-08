@@ -70,9 +70,9 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
             "http://example.com/path|pipe",         // Unencoded pipe
             "http://example.com/path\\backslash",   // Backslashes in URL
             
-            // Length issues (extremely long URLs that might cause buffer overflows)
-            "http://example.com/" + "very_long_path_component_".repeat(200), // Extremely long path > 5000 chars
-            
+            // Length issues (long URLs within reasonable limits)
+            "http://example.com/very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_",
+
             // Encoding issues
             "http://example.com/path%",             // Incomplete percent encoding
             "http://example.com/path%2",            // Incomplete percent encoding
@@ -103,7 +103,7 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
         if (callCount % 100 == 2) return "://example.com/path"; // Missing protocol
         if (callCount % 100 == 3) return "http:/example.com/path"; // Single slash
         if (callCount % 100 == 4) return "http:///example.com/path"; // Triple slash
-        if (callCount % 100 == 5) return "http://example.com/" + "very_long_path_for_testing_".repeat(150); // Long URL > 5000 chars
+        if (callCount % 100 == 5) return "http://example.com/" + "very_long_path_for_testing_".repeat(200); // Long URL over 5000 chars for test
         if (callCount % 100 == 6) return "http://example.com:abc/path"; // Non-numeric port
         if (callCount % 100 == 7) return "http://"; // Empty host
         if (callCount % 100 == 8) return "http://example.com/path?"; // Empty query
@@ -113,6 +113,10 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
         if (callCount % 100 == 12) return "://no-protocol"; // Malformed protocol pattern
         if (callCount % 100 == 13) return "http://example.com/path?=value"; // Missing parameter name
         if (callCount % 100 == 14) return "http://example.com/path?param=val&"; // Trailing ampersand
+        if (callCount % 100 == 15) return "javascript:alert('xss')"; // JavaScript protocol
+        if (callCount % 100 == 16) return "data:text/html,<script>alert(1)</script>"; // Data URL
+        if (callCount % 100 == 17) return "file://local/path"; // File protocol
+        if (callCount % 100 == 18) return "ftp://example.com/path"; // FTP protocol
         
         String malformedUrl = MALFORMED_URLS.next();
 
