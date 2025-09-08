@@ -67,62 +67,39 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class XssInjectionAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "/admin",
-            "/config",
-            "/user",
-            "/search",
-            "/login",
-            "/profile",
-            "/comments",
-            "/upload",
-            "/api/data",
-            "/dashboard",
-            "/settings",
-            "../",
-            "../../",
-            "/etc/passwd",
-            "/proc/self/environ"
-    );
-
-    private final TypedGenerator<String> attackTypeGen = Generators.fixedValues(
-            "basic_script_tags",           // <script> injections
-            "event_handler_injection",     // onload, onclick, etc.
-            "javascript_protocol",         // javascript: URLs
-            "html_attribute_injection",    // Breaking out of attributes
-            "css_expression_injection",    // CSS-based attacks
-            "svg_xss_injection",           // SVG-based XSS
-            "data_uri_injection",          // data: URI attacks
-            "filter_bypass_techniques",    // Encoding obfuscation
-            "context_specific_injection",  // JSON, XML contexts
-            "polyglot_payloads",          // Multi-context attacks
-            "mutation_xss",               // Browser parsing issues
-            "template_injection",         // Template engine attacks
-            "dom_based_xss",              // Client-side manipulation
-            "stored_xss_patterns"         // Persistent injection
-    );
+    // Core generation parameters
+    private final TypedGenerator<String> pathCategories = Generators.fixedValues("/admin", "/user", "/api", "/config");
+    private final TypedGenerator<String> functionCategories = Generators.fixedValues("search", "login", "upload", "comments");
+    private final TypedGenerator<String> traversalCategories = Generators.fixedValues("../", "../../", "/etc", "/proc");
+    private final TypedGenerator<String> systemCategories = Generators.fixedValues("passwd", "environ", "shadow", "config");
+    private final TypedGenerator<String> attackCategories = Generators.fixedValues("script", "event", "protocol", "attribute");
+    private final TypedGenerator<String> technicalCategories = Generators.fixedValues("css", "svg", "uri", "bypass");
+    private final TypedGenerator<String> contextCategories = Generators.fixedValues("polyglot", "mutation", "template", "dom");
+    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
+    private final TypedGenerator<Integer> stringSize = Generators.integers(3, 10);
+    private final TypedGenerator<Integer> attackTypeSelector = Generators.integers(0, 13);
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String attackType = attackTypeGen.next();
+        String basePattern = generateBasePattern();
+        int attackType = attackTypeSelector.next();
 
         return switch (attackType) {
-            case "basic_script_tags" -> createBasicScriptTagAttack(basePattern);
-            case "event_handler_injection" -> createEventHandlerInjection(basePattern);
-            case "javascript_protocol" -> createJavaScriptProtocolAttack(basePattern);
-            case "html_attribute_injection" -> createHtmlAttributeInjection(basePattern);
-            case "css_expression_injection" -> createCssExpressionInjection(basePattern);
-            case "svg_xss_injection" -> createSvgXssInjection(basePattern);
-            case "data_uri_injection" -> createDataUriInjection(basePattern);
-            case "filter_bypass_techniques" -> createFilterBypassTechniques(basePattern);
-            case "context_specific_injection" -> createContextSpecificInjection(basePattern);
-            case "polyglot_payloads" -> createPolyglotPayload(basePattern);
-            case "mutation_xss" -> createMutationXss(basePattern);
-            case "template_injection" -> createTemplateInjection(basePattern);
-            case "dom_based_xss" -> createDomBasedXss(basePattern);
-            case "stored_xss_patterns" -> createStoredXssPatterns(basePattern);
-            default -> basePattern;
+            case 0 -> createBasicScriptTagAttack(basePattern);
+            case 1 -> createEventHandlerInjection(basePattern);
+            case 2 -> createJavaScriptProtocolAttack(basePattern);
+            case 3 -> createHtmlAttributeInjection(basePattern);
+            case 4 -> createCssExpressionInjection(basePattern);
+            case 5 -> createSvgXssInjection(basePattern);
+            case 6 -> createDataUriInjection(basePattern);
+            case 7 -> createFilterBypassTechniques(basePattern);
+            case 8 -> createContextSpecificInjection(basePattern);
+            case 9 -> createPolyglotPayload(basePattern);
+            case 10 -> createMutationXss(basePattern);
+            case 11 -> createTemplateInjection(basePattern);
+            case 12 -> createDomBasedXss(basePattern);
+            case 13 -> createStoredXssPatterns(basePattern);
+            default -> createBasicScriptTagAttack(basePattern);
         };
     }
 
@@ -566,6 +543,57 @@ public class XssInjectionAttackGenerator implements TypedGenerator<String> {
         }
 
         return false;
+    }
+
+    private String generateBasePattern() {
+        int patternType = Generators.integers(0, 4).next();
+        return switch (patternType) {
+            case 0 -> generatePathPattern();
+            case 1 -> generateFunctionPattern();
+            case 2 -> generateTraversalPattern();
+            case 3 -> generateSystemPattern();
+            case 4 -> generateCustomPattern();
+            default -> generatePathPattern();
+        };
+    }
+
+    private String generatePathPattern() {
+        String basePath = pathCategories.next();
+        if (contextSelector.next()) {
+            String function = functionCategories.next();
+            return basePath + "/" + function;
+        }
+        return basePath;
+    }
+
+    private String generateFunctionPattern() {
+        String function = functionCategories.next();
+        if (contextSelector.next()) {
+            String path = pathCategories.next();
+            return path + "/" + function;
+        }
+        return "/" + function;
+    }
+
+    private String generateTraversalPattern() {
+        String traversal = traversalCategories.next();
+        if (contextSelector.next()) {
+            String system = systemCategories.next();
+            return traversal + system;
+        }
+        return traversal;
+    }
+
+    private String generateSystemPattern() {
+        String system = systemCategories.next();
+        String prefix = contextSelector.next() ? "/etc/" : "/proc/self/";
+        return prefix + system;
+    }
+
+    private String generateCustomPattern() {
+        String category = Generators.fixedValues("dashboard", "settings", "profile").next();
+        String suffix = contextSelector.next() ? "/" + Generators.letterStrings(3, 8).next() : "";
+        return "/" + category + suffix;
     }
 
     @Override
