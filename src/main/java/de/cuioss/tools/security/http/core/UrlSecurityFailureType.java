@@ -121,7 +121,21 @@ public enum UrlSecurityFailureType {
     PROTOCOL_VIOLATION("Protocol specification violation"),
 
     /** RFC specification violation (HTTP, URI, etc.) */
-    RFC_VIOLATION("RFC specification violation");
+    RFC_VIOLATION("RFC specification violation"),
+
+    // === IPv6 and Host-Based Attacks ===
+    
+    /** Invalid IPv6 address format detected */
+    INVALID_IPV6_FORMAT("Invalid IPv6 address format"),
+
+    /** Malformed URL structure detected */
+    MALFORMED_URL("Malformed URL structure"),
+
+    /** Invalid host format detected */
+    INVALID_HOST_FORMAT("Invalid host format"),
+
+    /** Invalid URL format detected */
+    INVALID_URL_FORMAT("Invalid URL format");
 
     private final String description;
 
@@ -226,5 +240,17 @@ public enum UrlSecurityFailureType {
     public boolean isProtocolViolation() {
         return this == PROTOCOL_VIOLATION ||
                 this == RFC_VIOLATION;
+    }
+
+    /**
+     * Indicates whether this failure type represents an IPv6 or host-based attack.
+     * 
+     * @return true if this is an IPv6/host-related failure type
+     */
+    public boolean isIPv6HostAttack() {
+        return this == INVALID_IPV6_FORMAT ||
+                this == MALFORMED_URL ||
+                this == INVALID_HOST_FORMAT ||
+                this == INVALID_URL_FORMAT;
     }
 }

@@ -435,7 +435,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T22
 |Test IPv6 address attacks
 |High
-|[ ]
+|[x]
 
 |T23
 |Test Internationalized Domain Names (IDN)
