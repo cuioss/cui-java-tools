@@ -457,7 +457,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T25
 |Test Apache path traversal CVEs
 |High
-|[ ]
+|[x]
 
 |T26
 |Test IIS/Windows specific CVEs
