@@ -20,36 +20,52 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for valid HTTP header names.
+ * 
+ * IMPROVED: Uses dynamic generation instead of hardcoded arrays for better randomness
+ * and unpredictability while maintaining realistic HTTP header patterns.
+ * 
  * Provides common standard and custom header name examples for testing.
  */
 public class ValidHTTPHeaderNameGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> validHeaderNames = Generators.fixedValues(
-            "Authorization",
-            "Content-Type",
-            "X-Forwarded-For",
-            "User-Agent",
-            "Accept",
-            "Accept-Language",
-            "Cache-Control",
-            "X-Custom-Header-Name",
-            "Accept-Encoding",
-            "Host",
-            "Connection",
-            "Content-Length",
-            "Content-Encoding",
-            "X-API-Key",
-            "X-Requested-With",
-            "Origin",
-            "Referer",
-            "Cookie",
-            "Set-Cookie",
-            "Location"
-    );
+    // Core generation parameters
+    private final TypedGenerator<String> standardHeaders = Generators.fixedValues("Authorization", "Content-Type", "User-Agent", "Host");
+    private final TypedGenerator<String> acceptHeaders = Generators.fixedValues("Accept", "Accept-Language", "Accept-Encoding");
+    private final TypedGenerator<String> contentHeaders = Generators.fixedValues("Content-Length", "Content-Encoding", "Cache-Control");
+    private final TypedGenerator<String> customPrefixes = Generators.fixedValues("X-", "X-Custom-", "X-API-", "X-Requested-");
+    private final TypedGenerator<String> customSuffixes = Generators.fixedValues("Key", "With", "For", "Header-Name");
+    private final TypedGenerator<String> cookieHeaders = Generators.fixedValues("Cookie", "Set-Cookie");
+    private final TypedGenerator<String> navigationHeaders = Generators.fixedValues("Origin", "Referer", "Location");
+    private final TypedGenerator<String> connectionHeaders = Generators.fixedValues("Connection", "Keep-Alive", "Upgrade");
+    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
 
     @Override
     public String next() {
-        return validHeaderNames.next();
+        int headerType = Generators.integers(0, 6).next();
+        return switch (headerType) {
+            case 0 -> standardHeaders.next();
+            case 1 -> acceptHeaders.next();
+            case 2 -> contentHeaders.next();
+            case 3 -> generateCustomHeader();
+            case 4 -> cookieHeaders.next();
+            case 5 -> navigationHeaders.next();
+            case 6 -> connectionHeaders.next();
+            default -> standardHeaders.next();
+        };
+    }
+
+    private String generateCustomHeader() {
+        String prefix = customPrefixes.next();
+        String suffix = customSuffixes.next();
+
+        // Sometimes add a middle part for variety
+        if (contextSelector.next()) {
+            String[] middleParts = {"Request", "Response", "Client", "Server", "Auth", "Session"};
+            String middle = middleParts[Generators.integers(0, middleParts.length - 1).next()];
+            return prefix + middle + "-" + suffix;
+        }
+
+        return prefix + suffix;
     }
 
     @Override
