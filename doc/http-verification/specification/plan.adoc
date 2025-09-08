@@ -440,7 +440,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T23
 |Test Internationalized Domain Names (IDN)
 |High
-|[ ]
+|[x]
 
 |T24
 |Test protocol handler attacks
