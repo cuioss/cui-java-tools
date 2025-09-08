@@ -93,12 +93,15 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 - [x] **Audit generator architecture**:
   - [x] Identify generators using only `fixedValues()` - **Found 66 instances across 36+ generators**
   - [x] Document generators lacking dynamic generation
-- [x] **Implement dynamic generators** *(In Progress - 4/36 generators completed)*:
+- [x] **Implement dynamic generators** *(In Progress - 7/36 generators completed)*:
   - [x] **PathTraversalGenerator**: Converted 9 fixedValues to dynamic algorithmic generation with 7 attack pattern types
-  - [x] **HTTPBodyGenerator**: Converted 5 fixedValues to dynamic generation with 15+ generation methods
+  - [x] **HTTPBodyGenerator**: Re-converted 19 fixedValues to dynamic generation with 18+ specialized generation methods
   - [x] **CookieGenerator**: Converted 5 fixedValues to dynamic generation with 20+ specialized generation methods
   - [x] **URLParameterGenerator**: Converted 4 fixedValues to dynamic generation with 15+ generation methods
-  - [ ] **Remaining 32 generators**: Various fixedValues usage patterns *(Next Priority)*
+  - [x] **ValidHTTPHeaderNameGenerator**: Converted 20-item fixedValues array to dynamic header name generation
+  - [x] **ValidHTTPHeaderValueGenerator**: Converted 20-item fixedValues array to dynamic header value generation
+  - [x] **HTTPBodyGenerator Phase 4**: Eliminated remaining 19 fixedValues calls with proper algorithmic generation
+  - [ ] **Remaining 29 generators**: Various fixedValues usage patterns *(Next Priority)*
 - [x] **Test generator diversity**:
   - [x] Verify generators produce varied output across runs - PathTraversalGenerator diversity test passes
   - [x] Fixed anti-pattern: HTTPBodyGenerator `Generators.letterStrings(100, 500).next()` in fixedValues() 
