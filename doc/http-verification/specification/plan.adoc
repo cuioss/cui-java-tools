@@ -479,7 +479,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T28
 |Test OWASP Top 10 patterns
 |High
-|[ ]
+|[x]
 
 |T29
 |Test OWASP ZAP active scan rules
@@ -634,6 +634,41 @@ The tasks are designed to build incrementally, with each phase depending on the 
 - **Complete documentation** - update progress and maintain traceability
 - **Test coverage** - ensure all new code is properly tested
 - **Code quality** - address all warnings and formatting issues
+
+=== Known Quality Issues
+
+==== QI-1: Imprecise Test Assertions with OR Conditions
+
+**Issue**: Multiple test classes use imprecise OR conditions in assertions that make tests less specific and harder to debug.
+
+**Problem Pattern**:
+```java
+// Poor: Generic OR condition makes test imprecise
+assertTrue(exception.getFailureType().isPathTraversalAttack() || 
+          exception.getFailureType().isCharacterAttack() ||
+          exception.getFailureType().isEncodingIssue(),
+          "Should be classified as path traversal, character, or encoding attack: " + pattern);
+```
+
+**Affected Tests**:
+- OWASPTop10AttackTest.java (line 162-165)
+- NginxCVEAttackTest.java (similar patterns)
+- IISCVEAttackTest.java (similar patterns)  
+- Other CVE and attack pattern tests
+
+**Solution Required**:
+1. **Separate test methods** for each expected failure type
+2. **Specific assertions** per pattern type with single expected failure
+3. **Pipeline consistency** - ensure similar patterns get consistent classification
+4. **Pattern-specific expectations** - each attack pattern should have one expected failure type
+
+**Priority**: Medium - affects test maintainability and debugging precision
+
+**Implementation Strategy**:
+- Create separate test methods: `shouldBlockWindowsPathTraversal()`, `shouldBlockUnixPathTraversal()`, etc.
+- Use specific assertions: `assertTrue(exception.getFailureType().isPathTraversalAttack())`
+- Group patterns by expected failure type in generators
+- Document expected failure type for each pattern category
 
 === Task Status Tracking
 
