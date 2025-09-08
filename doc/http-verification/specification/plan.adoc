@@ -423,7 +423,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T21
 |Test algorithmic complexity attacks
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.7: Protocol and Encoding Edge Cases
