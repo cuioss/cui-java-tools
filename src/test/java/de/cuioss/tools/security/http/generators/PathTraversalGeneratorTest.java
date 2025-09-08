@@ -106,7 +106,9 @@ class PathTraversalGeneratorTest {
                             pattern.contains("..;/") ||
                             pattern.contains("%c0%af") ||
                             pattern.contains("%c1%8s") ||
-                            pattern.contains("%c1%9c");
+                            pattern.contains("%c1%9c") ||
+                            pattern.contains("\\ufe0e\\ufe0e\\u2044") ||  // Unicode overlong sequences
+                            pattern.contains("%c0%ae%c0%ae%c0%af");
 
             assertTrue(hasTraversalIndicator,
                     "Pattern should contain traversal indicators: " + pattern);

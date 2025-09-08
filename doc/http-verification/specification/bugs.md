@@ -77,22 +77,32 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 ## QI-6: Generator Reliability Issues (Hardcoded Arrays)
 **Status**: 🟡 Major - Generators use hardcoded arrays instead of dynamic generation  
 **Impact**: Non-random, predictable test data  
-**Files**: 15-20 generators affected
+**Files**: 36+ generators affected (66 total instances)
 
 **Problem**: Generators use fixed arrays with `Generators.fixedValues()` instead of dynamic generation, creating predictable test patterns.
 
+**Evidence**: **Top offenders**:
+- **PathTraversalGenerator**: 9 fixedValues arrays (basic patterns, encoded patterns, unicode patterns, etc.)
+- **HTTPBodyGenerator**: 5 fixedValues arrays (SAFE_CONTENT, ATTACK_CONTENT, etc.)
+- **CookieGenerator**: 5 fixedValues arrays
+- **URLParameterGenerator**: 4 fixedValues arrays  
+
+**Anti-Pattern Discovered**: HTTPBodyGenerator line 56 calls `Generators.letterStrings(100, 500).next()` inside `fixedValues()` - evaluated once at initialization, creating single hardcoded string instead of dynamic generation.
+
 ### Action Items:
-- [ ] **Audit generator architecture**:
-  - [ ] Identify generators using only `fixedValues()`
-  - [ ] Document generators lacking dynamic generation
-- [ ] **Implement dynamic generators**:
-  - [ ] Replace `fixedValues()` with algorithmic generation where appropriate
-  - [ ] Maintain pattern diversity while adding randomness
-  - [ ] Preserve attack realism and effectiveness
-- [ ] **Test generator diversity**:
-  - [ ] Verify generators produce varied output across runs
-  - [ ] Measure pattern distribution and uniqueness
-- [ ] **Update generator tests** to verify dynamic behavior
+- [x] **Audit generator architecture**:
+  - [x] Identify generators using only `fixedValues()` - **Found 66 instances across 36+ generators**
+  - [x] Document generators lacking dynamic generation
+- [x] **Implement dynamic generators** *(In Progress - 2/36 generators completed)*:
+  - [x] **PathTraversalGenerator**: Converted 9 fixedValues to dynamic algorithmic generation with 7 attack pattern types
+  - [x] **HTTPBodyGenerator**: Converted 5 fixedValues to dynamic generation with 15+ generation methods
+  - [ ] **CookieGenerator**: 5 fixedValues arrays *(Next Priority)*
+  - [ ] **URLParameterGenerator**: 4 fixedValues arrays
+  - [ ] **Remaining 32 generators**: Various fixedValues usage patterns
+- [x] **Test generator diversity**:
+  - [x] Verify generators produce varied output across runs - PathTraversalGenerator diversity test passes
+  - [x] Fixed anti-pattern: HTTPBodyGenerator `Generators.letterStrings(100, 500).next()` in fixedValues() 
+- [x] **Update generator tests** to verify dynamic behavior - PathTraversalGeneratorTest updated for new Unicode patterns
 
 **Dependencies**: Complete after QI-17 (.repeat() elimination)
 
