@@ -200,6 +200,13 @@ public class NormalizationStage implements HttpSecurityValidator {
      * @throws UrlSecurityException if processing limits are exceeded
      */
     private String normalizePath(String path) {
+        // Check if this is a URL with protocol - don't normalize protocol portion
+        if (path.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
+            // This is a URL with protocol (like https://example.com)
+            // Don't normalize the protocol portion, return as-is
+            return path;
+        }
+
         // RFC 3986 path segment normalization with recursion protection
         String[] segments = path.split("/", -1);
         List<String> outputSegments = new ArrayList<>();
