@@ -418,7 +418,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T20
 |Test compression bomb patterns
 |High
-|[ ]
+|[x]
 
 |T21
 |Test algorithmic complexity attacks
