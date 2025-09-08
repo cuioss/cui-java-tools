@@ -185,9 +185,9 @@ public class OWASPTop10AttackGenerator implements TypedGenerator<String> {
             "../../../../windows/system32/config/sam",
 
             // Integer Overflow in Path Length
-            "/" + "A".repeat(20) + "/../../../etc/passwd",
-            "/" + "B".repeat(20) + "/..\\..\\..\\windows\\win.ini",
-            "/" + "C".repeat(20) + "/../../../../etc/shadow",
+            "/long_path_segment/../../../etc/passwd",
+            "/extended_directory/..\\..\\..\\windows\\win.ini",
+            "/long_component/../../../../etc/shadow",
 
             // Zip Slip / Archive Traversal
             "../../../etc/passwd",

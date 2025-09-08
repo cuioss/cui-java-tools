@@ -71,7 +71,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
             "\r\nSet-Cookie: injected=value",
             "\r\n\r\nHTTP/1.1 200 OK",
             "%0d%0aSet-Cookie: evil=bad",
-            "A".repeat(10000),  // Very long value
+            "A".repeat(6000),  // Very long value > 5000 characters
             "\u202e\u202d",     // Unicode direction override
             "\t\r\n injected",  // Control characters
             "admin'; --",       // SQL injection
@@ -93,7 +93,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
             "cookie{brace}",          // Braces in name
             "cookie|pipe",            // Pipe in name
             "cookie\\backslash",      // Backslash in name
-            "very_long_cookie_" + "name".repeat(100) // Very long name
+            "very_long_cookie_name_" + "A".repeat(150) // Very long name > 100 characters
     );
 
     private static final TypedGenerator<String> ATTRIBUTES = Generators.fixedValues(

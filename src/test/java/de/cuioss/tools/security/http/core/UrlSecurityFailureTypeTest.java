@@ -61,14 +61,14 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldHave21FailureTypes() {
+    void shouldHave25FailureTypes() {
         // Verify we have the expected number of failure types
         UrlSecurityFailureType[] values = UrlSecurityFailureType.values();
-        assertEquals(21, values.length, "Should have 21 failure types");
+        assertEquals(25, values.length, "Should have 25 failure types");
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 25)
     void shouldHaveNonNullDescriptions(UrlSecurityFailureType type) {
         assertNotNull(type.getDescription(), "Description should not be null for: " + type);
         assertFalse(type.getDescription().trim().isEmpty(), "Description should not be empty for: " + type);
@@ -193,7 +193,7 @@ class UrlSecurityFailureTypeTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 25)
     void shouldHaveExactlyOneCategory(UrlSecurityFailureType type) {
         int categoryCount = 0;
 
@@ -205,17 +205,18 @@ class UrlSecurityFailureTypeTest {
         if (type.isInjectionAttack()) categoryCount++;
         if (type.isStructuralIssue()) categoryCount++;
         if (type.isProtocolViolation()) categoryCount++;
+        if (type.isIPv6HostAttack()) categoryCount++;
 
         assertEquals(1, categoryCount,
                 "Failure type " + type + " should belong to exactly one category, but belongs to " + categoryCount);
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 21)
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 25)
     void shouldHaveDescriptiveNames(UrlSecurityFailureType type) {
         String name = type.name();
-        assertTrue(name.matches("^[A-Z][A-Z_]*[A-Z]$"),
-                "Enum name should be uppercase with underscores: " + name);
+        assertTrue(name.matches("^[A-Z][A-Z0-9_]*[A-Z0-9]$"),
+                "Enum name should be uppercase with underscores and numbers: " + name);
         assertTrue(name.length() > 3,
                 "Enum name should be descriptive (>3 chars): " + name);
     }

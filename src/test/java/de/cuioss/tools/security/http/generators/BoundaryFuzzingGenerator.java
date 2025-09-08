@@ -53,7 +53,11 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
 
     private String generateDeepNesting() {
         int depth = nestingGen.next();
-        return "dir/".repeat(depth);
+        StringBuilder path = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            path.append("dir/");
+        }
+        return path.toString();
     }
 
     private String generateNullBytes() {
@@ -83,9 +87,9 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
         TypedGenerator<Integer> attackGen = Generators.integers(0, 3);
         int attack = attackGen.next();
         return switch (attack) {
-            case 0 -> "../".repeat(100) + "etc/passwd";  // Excessive traversal
-            case 1 -> "/a".repeat(2000);                  // Near max length
-            case 2 -> "/%00" + "../".repeat(10);          // Null + traversal
+            case 0 -> "../".repeat(50) + "etc/passwd";  // Excessive traversal
+            case 1 -> "/a" + "verylongpathsegment/".repeat(100);     // Near max length starting with /a
+            case 2 -> "/%00" + "../".repeat(20);        // Null + traversal
             default -> "/\u0000/../\u0000/../file";       // Multiple nulls
         };
     }

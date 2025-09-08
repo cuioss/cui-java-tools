@@ -615,7 +615,7 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
     private String createTruncationAttacks(String pattern) {
         String[] truncationAttacks = {
                 // Basic truncation
-                "admin" + "A".repeat(100) + "' OR 1=1--",
+                "admin" + Generators.letterStrings(20, 50).next() + "' OR 1=1--",
 
                 // Unicode truncation
                 "admin\u0000' OR 1=1--",
@@ -624,7 +624,7 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
                 "adminÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ' OR 1=1--",
 
                 // Space padding truncation
-                "admin" + " ".repeat(200) + "' OR 1=1--",
+                "admin" + Generators.strings(" ", 50, 200).next() + "' OR 1=1--",
 
                 // Character encoding truncation
                 "admin%00%00%00%00%00' OR 1=1--"

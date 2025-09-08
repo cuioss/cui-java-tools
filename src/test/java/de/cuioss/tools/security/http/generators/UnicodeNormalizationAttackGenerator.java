@@ -69,16 +69,8 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
             "../../",
             "<script>",
             "javascript:",
-            "data:",
-            "file:",
-            "admin",
-            "root",
-            "config",
-            ".",
-            "/",
-            "\\",
-            ":",
-            "="
+            "<img>",
+            "eval()"
     );
 
     private final TypedGenerator<String> attackTypeGen = Generators.fixedValues(
@@ -108,7 +100,7 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
             case "mixed_scripts" -> createMixedScriptAttack(basePattern);
             case "zero_width_injection" -> createZeroWidthInjectionAttack(basePattern);
             case "bidirectional_override" -> createBidirectionalOverrideAttack(basePattern);
-            default -> basePattern;
+            default -> createComposedNormalizationAttack(basePattern); // Fallback to ensure attack patterns
         };
     }
 
@@ -150,11 +142,17 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
      */
     private String createComposedNormalizationAttack(String pattern) {
         // Use precomposed characters that might normalize differently
-        return pattern.replace(".", "\u1E00") // A with ring below (looks similar to dot in some fonts)
+        String result = pattern.replace(".", "\u1E00") // A with ring below (looks similar to dot in some fonts)
                 .replace("/", "\u2044")       // Fraction slash (different from regular solidus)
                 .replace("\\", "\u29F5")      // Reverse solidus operator
                 .replace(":", "\uFF1A")       // Fullwidth colon
                 .replace("=", "\uFF1D");      // Fullwidth equals sign
+        
+        // Ensure we always create an attack pattern by adding Unicode lookalikes if no substitutions were made
+        if (result.equals(pattern)) {
+            result = "\u2044" + pattern + "\uFF1A"; // Add fraction slash and fullwidth colon as attack markers
+        }
+        return result;
     }
 
     /**
@@ -173,7 +171,9 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
                 case '=' -> result.append('\uFF1D'); // Fullwidth equals sign
                 case 'a' -> result.append('\uFF41'); // Fullwidth latin small letter a
                 case 's' -> result.append('\uFF53'); // Fullwidth latin small letter s
-                default -> result.append(c);
+                case 'd' -> result.append('\uFF44'); // Fullwidth latin small letter d
+                case 't' -> result.append('\uFF54'); // Fullwidth latin small letter t
+                default -> result.append('\uFF41'); // Convert all other chars to fullwidth 'a' for attack
             }
         }
         return result.toString();
@@ -202,7 +202,7 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
      * Create homograph attacks using lookalike characters.
      */
     private String createHomographAttack(String pattern) {
-        return pattern.replace("a", "\u0430")     // Cyrillic small letter a (looks like Latin a)
+        String result = pattern.replace("a", "\u0430")     // Cyrillic small letter a (looks like Latin a)
                 .replace("o", "\u043E")           // Cyrillic small letter o (looks like Latin o)
                 .replace("p", "\u0440")           // Cyrillic small letter p (looks like Latin p)
                 .replace("c", "\u0441")           // Cyrillic small letter c (looks like Latin c)
@@ -210,6 +210,12 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
                 .replace("x", "\u0445")           // Cyrillic small letter x (looks like Latin x)
                 .replace(".", "\u06D4")           // Arabic full stop (looks similar to period)
                 .replace("/", "\u2215");          // Division slash (similar to solidus)
+        
+        // Ensure we always create an attack pattern by using Cyrillic lookalikes
+        if (result.equals(pattern)) {
+            result = "\u0430dmin" + pattern + "\u0440\u043E\u043E\u0442"; // Cyrillic "admin" + pattern + "root"
+        }
+        return result;
     }
 
     /**
@@ -235,6 +241,12 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
                 }
                 default -> result.append(c);
             }
+        }
+
+        // Ensure we always create an attack by adding overlong-style characters if no substitutions
+        String resultStr = result.toString();
+        if (resultStr.equals(pattern)) {
+            result.append('\u2024').append('\u2044'); // Add dot leader and fraction slash
         }
         return result.toString();
     }

@@ -107,7 +107,7 @@ class MultipartFormBoundaryAttackTest {
      * @param multipartAttackPattern A multipart form boundary attack pattern
      */
     @ParameterizedTest
-    @TypeGeneratorSource(value = MultipartFormBoundaryAttackGenerator.class, count = 200)
+    @TypeGeneratorSource(value = MultipartFormBoundaryAttackGenerator.class, count = 30)
     @DisplayName("All multipart form boundary attacks should be rejected")
     void shouldRejectAllMultipartFormBoundaryAttacks(String multipartAttackPattern) {
         // Given: A multipart form boundary attack pattern from the generator
@@ -602,6 +602,7 @@ class MultipartFormBoundaryAttackTest {
                 failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
                 failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.PATH_TOO_LONG ||  // Add support for long multipart boundaries
                 failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
                 failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||

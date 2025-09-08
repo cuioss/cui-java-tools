@@ -82,7 +82,11 @@ class UnicodeControlCharacterAttackTest {
 
     @BeforeEach
     void setUp() {
-        config = SecurityConfiguration.defaults();
+        config = SecurityConfiguration.builder()
+                .allowControlCharacters(false)  // Reject control characters
+                .allowHighBitCharacters(false)  // Reject high-bit characters too
+                .failOnSuspiciousPatterns(true)
+                .build();
         eventCounter = new SecurityEventCounter();
         pipeline = new URLPathValidationPipeline(config, eventCounter);
     }

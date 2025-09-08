@@ -84,7 +84,12 @@ class UnicodeNormalizationAttackTest {
 
     @BeforeEach
     void setUp() {
-        config = SecurityConfiguration.defaults();
+        config = SecurityConfiguration.builder()
+                .normalizeUnicode(true)
+                .failOnSuspiciousPatterns(true)
+                .allowHighBitCharacters(false)  // Reject high-bit Unicode
+                .allowControlCharacters(false)
+                .build();
         eventCounter = new SecurityEventCounter();
         pipeline = new URLPathValidationPipeline(config, eventCounter);
         attackGenerator = new UnicodeNormalizationAttackGenerator();
@@ -507,4 +512,5 @@ class UnicodeNormalizationAttackTest {
                 failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE;
     }
+
 }

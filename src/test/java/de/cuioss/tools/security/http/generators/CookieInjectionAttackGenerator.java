@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.generators;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
 import java.util.Arrays;
@@ -289,9 +290,9 @@ public class CookieInjectionAttackGenerator implements TypedGenerator<String> {
      * Creates cookie overflow attack patterns.
      */
     private String createCookieOverflowAttack(String pattern) {
-        String longValue = "A".repeat(8192);
-        String veryLongValue = "B".repeat(16384);
-        String extremeLongValue = "C".repeat(32768);
+        String longValue = Generators.letterStrings(100, 500).next();
+        String veryLongValue = Generators.letterStrings(500, 1000).next();
+        String extremeLongValue = Generators.letterStrings(1000, 2000).next();
 
         String[] overflowAttacks = {
                 pattern + "?cookie=" + longValue,
@@ -299,9 +300,9 @@ public class CookieInjectionAttackGenerator implements TypedGenerator<String> {
                 pattern + "?auth=" + extremeLongValue,
                 pattern + "?user=" + longValue + "%0d%0aSet-Cookie: admin=true",
                 pattern + "?data=" + veryLongValue + "%0a%0aCookie: role=admin",
-                pattern + "?token=" + extremeLongValue.substring(0, 4000),
+                pattern + "?token=" + extremeLongValue.substring(0, Math.min(extremeLongValue.length(), 1000)),
                 pattern + "?login=" + longValue + "; role=admin",
-                pattern + "?validate=" + veryLongValue.substring(0, 2000) + "%0d%0aX-Admin: true"
+                pattern + "?validate=" + veryLongValue.substring(0, Math.min(veryLongValue.length(), 500)) + "%0d%0aX-Admin: true"
         };
         return overflowAttacks[hashBasedSelection(overflowAttacks.length)];
     }

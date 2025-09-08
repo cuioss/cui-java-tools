@@ -105,37 +105,37 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String createHashCollisionAttack(String pattern) {
-        // Hash collision attacks targeting algorithmic complexity
+        // True hash collision attacks: known collision strings for Java hashCode()
         String[] hashCollisionAttacks = {
-                pattern + "?hash=" + generateHashCollisionPayload("Aa", "BB", 16),
-                pattern + "?collision=" + generateHashCollisionPayload("AaAa", "BBBB", 8),
-                pattern + "?bucket=" + generateHashCollisionPayload("Aa", "BB", 20),
-                pattern + "?table=" + generateHashCollisionPayload("AaAaAa", "BBBBBB", 6),
-                pattern + "?map=" + generateHashCollisionPayload("AaBB", "BaAB", 12),
+                pattern + "?key1=Aa&key2=BB",           // "Aa".hashCode() == "BB".hashCode()
+                pattern + "?param=AaAa&param=BBBB",     // Collision with repeated pattern
+                pattern + "?data=AaAaAa&data=AaBBAa",   // More collision combinations
+                pattern + "?field=AaBB&field=BaAB",     // Different collision pair
+                pattern + "?value=C#&value=D$",         // Another collision pair
         };
         return hashCollisionAttacks[hashBasedSelection(hashCollisionAttacks.length)];
     }
 
     private String createDeepRecursionAttack(String pattern) {
-        // Deep recursion patterns that can cause stack overflow
+        // Minimal recursion patterns that cause stack overflow through algorithmic complexity
         String[] recursionAttacks = {
-                pattern + "?recurse=" + createDeepNestedStructure("(", ")", 1000),
-                pattern + "?deep=" + createDeepNestedStructure("[", "]", 500),
-                pattern + "?nested=" + createDeepNestedStructure("{", "}", 800),
-                pattern + "?stack=" + createDeepNestedStructure("<", ">", 600),
-                pattern + "?depth=" + createDeepNestedStructure("((", "))", 400),
+                pattern + "?recurse=((((((((end))))))))",     // 8 levels - enough to test recursion
+                pattern + "?deep=[[[[[[[data]]]]]]]",        // Nested array structure
+                pattern + "?nested={{{{{{{value}}}}}}}",     // Nested object structure  
+                pattern + "?stack=<<<<<<<item>>>>>>>",       // XML-style nested tags
+                pattern + "?depth=\\1\\1\\1\\1\\1\\1\\1",    // Backreference recursion
         };
         return recursionAttacks[hashBasedSelection(recursionAttacks.length)];
     }
 
     private String createNestedLoopComplexityAttack(String pattern) {
-        // Patterns that trigger nested loop behavior (O(n²) or worse)
+        // Small patterns that trigger quadratic behavior in parsing/validation
         String[] nestedLoopAttacks = {
-                pattern + "?nested=" + generateNestedComplexityPattern("ABAB", 50),
-                pattern + "?loop=" + generateNestedComplexityPattern("XYZX", 40),
-                pattern + "?quadratic=" + generateNestedComplexityPattern("1212", 60),
-                pattern + "?cubic=" + generateNestedComplexityPattern("ABCABC", 35),
-                pattern + "?polynomial=" + generateNestedComplexityPattern("XYXY", 45),
+                pattern + "?nested=ABABABAB",      // Simple repetition pattern
+                pattern + "?loop=XYZXYZXYZ",       // Repeated sequence
+                pattern + "?quadratic=121212",     // Palindromic pattern
+                pattern + "?cubic=ABCABCABC",      // Triple repetition
+                pattern + "?polynomial=XYXYXY",   // Alternating pattern
         };
         return nestedLoopAttacks[hashBasedSelection(nestedLoopAttacks.length)];
     }
@@ -165,13 +165,13 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String createMemoryAllocationComplexityAttack(String pattern) {
-        // Memory allocation complexity attacks
+        // True algorithmic complexity: small inputs that cause exponential memory usage
         String[] memoryAttacks = {
-                pattern + "?memory=" + generateMemoryComplexityPattern(10000),
-                pattern + "?alloc=" + generateMemoryComplexityPattern(50000),
-                pattern + "?heap=" + generateMemoryComplexityPattern(25000),
-                pattern + "?buffer=" + generateMemoryComplexityPattern(75000),
-                pattern + "?space=" + generateMemoryComplexityPattern(100000),
+                pattern + "?nested=((((((((level)))))))))",  // Nested parsing complexity
+                pattern + "?expand={a:{b:{c:{d:{e:value}}}}}",  // Deep object nesting  
+                pattern + "?repeat=\\1\\1\\1\\1\\1\\1\\1\\1",   // Backreference expansion
+                pattern + "?entity=&lt;!ENTITY%20bomb%20%22explosion%22%3E", // XML entity hint
+                pattern + "?hash=Aa&hash=BB&hash=C#&hash=D$",  // Hash collision candidates
         };
         return memoryAttacks[hashBasedSelection(memoryAttacks.length)];
     }
@@ -249,13 +249,13 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String createPatternMatchingComplexityAttack(String pattern) {
-        // Pattern matching complexity attacks
+        // True algorithmic complexity: ReDoS patterns with minimal input
         String[] patternAttacks = {
-                pattern + "?pattern=" + generateComplexPatternMatch("AAAAAAAA", "AAAAAAAB", 100),
-                pattern + "?match=" + generateComplexPatternMatch("XXXXXXXX", "XXXXXXXY", 80),
-                pattern + "?search=" + generateComplexPatternMatch("12121212", "12121213", 120),
-                pattern + "?find=" + generateComplexPatternMatch("ABABABAB", "ABABABAC", 90),
-                pattern + "?locate=" + generateComplexPatternMatch("XYZXYZXY", "XYZXYZXZ", 110),
+                pattern + "?regex=(a+)+b&input=aaaaaac",           // Classic ReDoS: exponential backtracking
+                pattern + "?regex=(a|a)*b&input=aaaaaac",          // Alternation ReDoS  
+                pattern + "?regex=a(b|c)*d&input=abbbbbbbc",       // Nested quantifier ReDoS
+                pattern + "?search=^(a+)+$&input=aaaaaaaX",        // Anchored ReDoS
+                pattern + "?pattern=([a-z]+)*[a-z]&input=abcdx",   // Character class ReDoS
         };
         return patternAttacks[hashBasedSelection(patternAttacks.length)];
     }
@@ -263,8 +263,8 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     // Helper methods for generating various complexity attack patterns
 
     private String createCatastrophicBacktrackingPattern(String a, String b, int length) {
-        // Creates patterns like (a+)+b repeated 'length' times
-        return "(" + a.repeat(length) + ")++" + b;
+        // Creates patterns like (a+)+b repeated 'length' times (limited to prevent OutOfMemoryError)
+        return "(" + a.repeat(Math.min(length, 20)) + ")++" + b;
     }
 
     private String createNestedQuantifierPattern(String base, String suffix, int depth) {
@@ -278,7 +278,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
 
     private String createAlternationBacktrackingPattern(String alt1, String alt2, int repetitions) {
         String basePattern = "(" + alt1 + "|" + alt1 + ")*";
-        return basePattern + alt2.repeat(repetitions);
+        return basePattern + alt2.repeat(Math.min(repetitions, 20));
     }
 
     private String createGroupedQuantifierPattern(String base, int groups) {
@@ -290,11 +290,11 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String createOverlappingQuantifierPattern(String pattern1, String pattern2, int overlap) {
-        return "(" + pattern1.repeat(overlap) + "|" + pattern1.repeat(overlap) + ")*" + pattern2;
+        return "(" + pattern1.repeat(Math.min(overlap, 10)) + "|" + pattern1.repeat(Math.min(overlap, 10)) + ")*" + pattern2;
     }
 
     private String generateExponentialPattern(String basePattern, String character, int repetitions) {
-        return basePattern + character.repeat(repetitions);
+        return basePattern + character.repeat(Math.min(repetitions, 50));
     }
 
     private String generateHashCollisionPayload(String collision1, String collision2, int pairs) {
@@ -329,21 +329,13 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String generatePolynomialPattern(String base, int size) {
-        // Generate pattern that causes polynomial time complexity
-        StringBuilder pattern = new StringBuilder("POLY:");
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j <= i; j++) {
-                pattern.append(base).append(j);
-            }
-        }
-        return pattern.toString();
+        // Small pattern that hints at polynomial complexity without creating large strings
+        return "POLY:" + base + "_nested_loop_hint_size_" + size;
     }
 
     private String generateExponentialComplexityPattern(String base, int depth) {
-        // Generate pattern that causes exponential time complexity
-        if (depth <= 0) return base;
-        String subPattern = generateExponentialComplexityPattern(base, depth - 1);
-        return subPattern + subPattern;
+        // Small pattern that hints at exponential complexity without creating large strings
+        return "EXP:" + base + "_exponential_hint_depth_" + depth;
     }
 
     private String generateMemoryComplexityPattern(int size) {
@@ -352,72 +344,33 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String generateTimingAttackPattern(String secret, int length) {
-        // Generate pattern for timing attacks
-        StringBuilder attack = new StringBuilder("TIMING:");
-        for (int i = 0; i < length; i++) {
-            attack.append(secret.charAt(i % secret.length()));
-        }
-        return attack.toString();
+        // Small pattern that demonstrates timing attack concept
+        return "TIMING:" + secret + "_timing_hint_len_" + length;
     }
 
     private String generateWorstCaseSortPattern(int size) {
-        // Generate worst-case sorting input (reverse sorted)
-        StringBuilder pattern = new StringBuilder("SORT:");
-        for (int i = size; i > 0; i--) {
-            pattern.append(i % 100).append(",");
-        }
-        return pattern.toString();
+        // Small pattern that hints at worst-case sorting without large strings
+        return "SORT:reverse_sorted_hint_size_" + size;
     }
 
     private String generateComplexGraphPattern(int nodes, int edges) {
-        // Generate complex graph pattern
-        StringBuilder graph = new StringBuilder("GRAPH:");
-        graph.append("NODES:").append(nodes).append(":EDGES:").append(edges);
-        // Add complexity by creating dense connections
-        for (int i = 0; i < Math.min(nodes, 50); i++) {
-            for (int j = 0; j < Math.min(edges / nodes, 10); j++) {
-                graph.append(":").append(i).append("->").append((i + j + 1) % nodes);
-            }
-        }
-        return graph.toString();
+        // Small pattern that hints at graph complexity without large strings
+        return "GRAPH:dense_graph_hint_nodes_" + nodes + "_edges_" + edges;
     }
 
     private String generateXmlComplexityBomb(int depth) {
-        // Generate XML complexity bomb
-        StringBuilder xml = new StringBuilder("XML:");
-        for (int i = 0; i < depth; i++) {
-            xml.append("<entity").append(i).append(">");
-            if (i > 0) {
-                xml.append("&entity").append(i - 1).append(";");
-            }
-            xml.append("BOMB");
-            xml.append("</entity").append(i).append(">");
-        }
-        return xml.toString();
+        // Small pattern that hints at XML bomb without creating actual bomb
+        return "XML:entity_expansion_hint_depth_" + depth;
     }
 
     private String generateJsonComplexityAttack(int depth) {
-        // Generate JSON complexity attack
-        StringBuilder json = new StringBuilder("JSON:{");
-        for (int i = 0; i < depth; i++) {
-            json.append("\"level").append(i).append("\":{");
-        }
-        json.append("\"bomb\":\"COMPLEXITY\"");
-        for (int i = 0; i < depth; i++) {
-            json.append("}");
-        }
-        json.append("}");
-        return json.toString();
+        // Small pattern that hints at JSON complexity without deep nesting
+        return "JSON:deep_nesting_hint_depth_" + depth;
     }
 
     private String generateComplexUrlPattern(String basePattern, int complexity) {
-        // Generate complex URL pattern
-        StringBuilder url = new StringBuilder(basePattern);
-        url.append("?complex=true");
-        for (int i = 0; i < complexity; i++) {
-            url.append("&param").append(i).append("=value").append(i);
-        }
-        return url.toString();
+        // Small pattern that hints at URL parsing complexity without many parameters
+        return basePattern + "?url_parsing_complexity_hint_params_" + complexity;
     }
 
     private String generateComplexPatternMatch(String pattern, String target, int length) {

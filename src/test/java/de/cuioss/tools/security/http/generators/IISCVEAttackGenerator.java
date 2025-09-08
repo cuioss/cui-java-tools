@@ -48,14 +48,14 @@ public class IISCVEAttackGenerator implements TypedGenerator<String> {
 
     private final TypedGenerator<String> iisCVEPatterns = Generators.fixedValues(
             // CVE-2017-7269: IIS 6.0 WebDAV ScStoragePathFromUrl buffer overflow
-            "/webdav/" + "A".repeat(10) + "/../../../windows/win.ini",
-            "/dav/" + "B".repeat(10) + "/../../../windows/system32/config/sam",
-            "/webdav/test.txt" + "C".repeat(10) + "/../../../boot.ini",
+            "/webdav/long_filename/../../../windows/win.ini",
+            "/dav/buffer_overflow/../../../windows/system32/config/sam",
+            "/webdav/test.txt_extended/../../../boot.ini",
 
             // CVE-2015-1635: IIS HTTP.sys remote code execution (HTTP Range header)
-            "/default.aspx/../../../windows/win.ini HTTP/1.1\r\nRange: bytes=" + "0-".repeat(2),
-            "/index.html/../../../windows/system32/drivers/etc/hosts HTTP/1.1\r\nRange: bytes=" + "1-".repeat(2),
-            "/app/../../../windows/system32/config/system HTTP/1.1\r\nRange: bytes=" + "2-".repeat(2),
+            "/default.aspx/../../../windows/win.ini HTTP/1.1\\r\\nRange: bytes=0-0-",
+            "/index.html/../../../windows/system32/drivers/etc/hosts HTTP/1.1\\r\\nRange: bytes=1-1-",
+            "/app/../../../windows/system32/config/system HTTP/1.1\\r\\nRange: bytes=2-2-",
 
             // CVE-2010-2730: IIS ASP.NET request validation bypass
             "/default.aspx?input=<script>alert(1)</script>/../../../windows/win.ini",

@@ -56,9 +56,9 @@ public class NginxCVEAttackGenerator implements TypedGenerator<String> {
             "/index.php /../../windows/system32/config/sam",
 
             // CVE-2017-7529: nginx range filter integer overflow
-            "/large.file/../../../etc/passwd HTTP/1.1\r\nRange: bytes=0-" + "9".repeat(10),
-            "/video.mp4/../../../etc/shadow HTTP/1.1\r\nRange: bytes=1-" + "8".repeat(10),
-            "/download.zip/../../../etc/hosts HTTP/1.1\r\nRange: bytes=2-" + "7".repeat(10),
+            "/large.file/../../../etc/passwd HTTP/1.1\r\nRange: bytes=0-999999999",
+            "/video.mp4/../../../etc/shadow HTTP/1.1\r\nRange: bytes=1-888888888",
+            "/download.zip/../../../etc/hosts HTTP/1.1\r\nRange: bytes=2-777777777",
 
             // CVE-2019-20372: nginx HTTP/2 request smuggling with path traversal
             "/api/v1/../../../etc/passwd HTTP/2.0",
@@ -67,9 +67,9 @@ public class NginxCVEAttackGenerator implements TypedGenerator<String> {
             "/rest/config/../../../windows/win.ini HTTP/2.0",
 
             // CVE-2021-23017: nginx resolver off-by-one buffer overflow
-            "/resolver/" + "A".repeat(10) + "/../../../etc/passwd",
-            "/dns/" + "B".repeat(10) + "/../../../etc/shadow",
-            "/lookup/" + "C".repeat(10) + "/../../../etc/hosts",
+            "/resolver/buffer_overflow/../../../etc/passwd",
+            "/dns/long_hostname/../../../etc/shadow",
+            "/lookup/malformed_query/../../../etc/hosts",
 
             // CVE-2016-4450: nginx CRLF injection
             "/redirect?url=http://evil.com\r\nSet-Cookie: admin=true\r\n\r\n/../../../etc/passwd",
@@ -126,9 +126,9 @@ public class NginxCVEAttackGenerator implements TypedGenerator<String> {
             "/lshttpd/../../../windows/win.ini",
 
             // CVE-2019-12544: LiteSpeed buffer overflow
-            "/cgi-bin/" + "D".repeat(10) + "/../../../etc/passwd",
-            "/fcgi-bin/" + "E".repeat(10) + "/../../../etc/shadow",
-            "/php/" + "F".repeat(10) + "/../../../etc/hosts",
+            "/cgi-bin/long_script_name/../../../etc/passwd",
+            "/fcgi-bin/malformed_handler/../../../etc/shadow",
+            "/php/buffer_overflow/../../../etc/hosts",
 
             // Caddy Web Server vulnerabilities
             "/caddy/../../../etc/passwd",

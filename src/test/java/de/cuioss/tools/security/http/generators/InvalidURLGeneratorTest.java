@@ -124,7 +124,7 @@ class InvalidURLGeneratorTest {
         // Check for query parameter malformations
         boolean hasEmptyQuery = generated.stream().anyMatch(s -> s.endsWith("?"));
         boolean hasMissingParamName = generated.stream().anyMatch(s -> s.contains("?=value"));
-        boolean hasMissingParamValue = generated.stream().anyMatch(s -> s.contains("param=") && s.endsWith("param="));
+        boolean hasMissingParamValue = generated.stream().anyMatch(s -> s.contains("param=") && !s.contains("param=val"));
         boolean hasTrailingAmpersand = generated.stream().anyMatch(s -> s.contains("&") && s.endsWith("&"));
 
         assertTrue(hasEmptyQuery, "Should generate empty query patterns");

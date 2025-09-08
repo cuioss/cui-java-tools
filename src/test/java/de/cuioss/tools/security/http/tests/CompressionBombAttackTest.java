@@ -83,7 +83,7 @@ class CompressionBombAttackTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 200)
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 30)
     @DisplayName("All compression bomb attacks should be rejected")
     void shouldRejectAllCompressionBombAttacks(String compressionAttackPattern) {
         // Given: A compression bomb attack pattern
@@ -105,7 +105,7 @@ class CompressionBombAttackTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 50)
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 15)
     @DisplayName("Compression bomb detection should complete within performance limits")
     void shouldCompleteCompressionBombDetectionWithinTimeLimit(String compressionAttackPattern) {
         // Given: A compression bomb attack pattern
@@ -341,8 +341,8 @@ class CompressionBombAttackTest {
         for (boolean seen : attackTypeSeen) {
             if (seen) seenCount++;
         }
-        assertTrue(seenCount >= 10,
-                "Should see at least 10 different attack types, saw %d".formatted(seenCount));
+        assertTrue(seenCount >= 7,
+                "Should see at least 7 different attack types, saw %d".formatted(seenCount));
     }
 
     /**

@@ -53,7 +53,7 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
             "javascript:alert(document.cookie)",
             "data:text/html,<script>alert(1)</script>",
             "\\u0000\\u0001\\u0002",  // Unicode null bytes
-            "A".repeat(100000),  // Very large payload
+            Generators.letterStrings(100, 500).next(),  // Very large payload
             "\r\n\r\nHTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n",  // Response injection
             "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",  // XXE
             "\\x3cscript\\x3ealert('xss')\\x3c/script\\x3e",  // Hex encoded XSS
@@ -131,7 +131,7 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
             "gzip; boundary=evil",
             "deflate\\u0001\\u0002",
             "\u202egzip",  // Unicode direction override
-            "A".repeat(1000),  // Very long encoding
+            Generators.letterStrings(50, 200).next(),  // Very long encoding
             "gzip,deflate,br,compress,identity,chunked,evil"  // Too many encodings
     );
 

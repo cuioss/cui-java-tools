@@ -53,11 +53,13 @@ import de.cuioss.test.generator.TypedGenerator;
 public class CompressionBombAttackGenerator implements TypedGenerator<String> {
 
     private final AttackTypeSelector attackTypeSelector = new AttackTypeSelector(15);
+    private int invocationCounter = 0;
 
     @Override
     public String next() {
         // Use base pattern that should normally pass validation
         String basePattern = "https://example.com/api/data";
+        invocationCounter++;
 
         return switch (attackTypeSelector.nextAttackType()) {
             case 0 -> createBasicCompressionBomb(basePattern);
@@ -130,8 +132,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createMultiLayerCompression(String pattern) {
         // Multi-layer compression attacks
         String[] multiLayer = {
-                pattern + "?multi=" + createMultiLayerData("LAYER1", "LAYER2", "LAYER3"),
-                pattern + "?stack=" + createMultiLayerData("ZIP", "GZIP", "BZIP2"),
+                pattern + "?multi=LAYER" + createMultiLayerData("1", "2", "3"),
+                pattern + "?stack=ZIP" + createMultiLayerData("GZIP", "BZIP2", "LZ4"),
                 pattern + "?nested=" + createMultiLayerData("DEFLATE", "LZ4", "ZSTD"),
                 pattern + "?compound=" + createMultiLayerData("TAR", "GZ", "XZ"),
                 pattern + "?complex=" + createMultiLayerData("RAR", "7Z", "ZIP"),
@@ -142,8 +144,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createMemoryExhaustionBomb(String pattern) {
         // Memory exhaustion through expansion
         String[] memoryBombs = {
-                pattern + "?memory=" + createExpansionPattern(100000),
-                pattern + "?exhaust=" + createExpansionPattern(500000),
+                pattern + "?memory=EXPAND" + createExpansionPattern(100000),
+                pattern + "?exhaust=EXPAND" + createExpansionPattern(500000),
                 pattern + "?overflow=" + createExpansionPattern(1000000),
                 pattern + "?oom=" + createExpansionPattern(2000000),
                 pattern + "?heap=" + createExpansionPattern(5000000),
@@ -154,8 +156,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createCpuExhaustionBomb(String pattern) {
         // CPU exhaustion through complex decompression
         String[] cpuBombs = {
-                pattern + "?cpu=" + createComplexityPattern("COMPLEX", 100),
-                pattern + "?cycles=" + createComplexityPattern("RECURSIVE", 200),
+                pattern + "?cpu=COMPLEX" + createComplexityPattern("PATTERN", 100),
+                pattern + "?cycles=RECURSIVE" + createComplexityPattern("LOOP", 200),
                 pattern + "?intensive=" + createComplexityPattern("HEAVY", 500),
                 pattern + "?expensive=" + createComplexityPattern("SLOW", 1000),
                 pattern + "?demanding=" + createComplexityPattern("HARD", 2000),
@@ -166,8 +168,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createRecursiveCompressionPattern(String pattern) {
         // Recursive compression patterns
         String[] recursivePatterns = {
-                pattern + "?recursive=" + createRecursiveData("SELF", 10),
-                pattern + "?loop=" + createRecursiveData("CYCLE", 15),
+                pattern + "?recursive=SELF" + createRecursiveData("REF", 10),
+                pattern + "?loop=CYCLE" + createRecursiveData("LOOP", 15),
                 pattern + "?infinite=" + createRecursiveData("ENDLESS", 20),
                 pattern + "?circular=" + createRecursiveData("ROUND", 25),
                 pattern + "?spiral=" + createRecursiveData("TWIST", 30),
@@ -190,8 +192,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createHeaderCompressionAttack(String pattern) {
         // Header-based compression attacks
         String[] headerAttacks = {
-                pattern + "?header=" + createCompressedHeader("Accept-Encoding", "gzip,deflate,bomb"),
-                pattern + "?accept=" + createCompressedHeader("Content-Encoding", "gzip,explode"),
+                pattern + "?header=HEADER:" + createCompressedHeader("Accept-Encoding", "gzip,deflate,bomb"),
+                pattern + "?accept=HEADER:" + createCompressedHeader("Content-Encoding", "gzip,explode"),
                 pattern + "?encoding=" + createCompressedHeader("Transfer-Encoding", "chunked,gzip,bomb"),
                 pattern + "?compress=" + createCompressedHeader("Content-Type", "application/zip-bomb"),
                 pattern + "?deflate=" + createCompressedHeader("Accept", "*/zip-bomb"),
@@ -202,8 +204,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createParameterCompressionBomb(String pattern) {
         // Parameter-based compression bombs
         String[] paramBombs = {
-                pattern + "?param=" + compressParameter("BOMB", 1000),
-                pattern + "?value=" + compressParameter("EXPLODE", 2000),
+                pattern + "?param=PARAM:" + compressParameter("BOMB", 1000),
+                pattern + "?value=PARAM:" + compressParameter("EXPLODE", 2000),
                 pattern + "?data=" + compressParameter("ATTACK", 3000),
                 pattern + "?payload=" + compressParameter("MALWARE", 4000),
                 pattern + "?content=" + compressParameter("VIRUS", 5000),
@@ -214,8 +216,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createCookieCompressionBomb(String pattern) {
         // Cookie-based compression bombs
         String[] cookieBombs = {
-                pattern + "?cookie=" + createCompressedCookie("session", "BOMB", 1000),
-                pattern + "?auth=" + createCompressedCookie("token", "EXPLODE", 2000),
+                pattern + "?cookie=COOKIE:" + createCompressedCookie("session", "BOMB", 1000),
+                pattern + "?auth=COOKIE:" + createCompressedCookie("token", "EXPLODE", 2000),
                 pattern + "?user=" + createCompressedCookie("data", "ATTACK", 1500),
                 pattern + "?pref=" + createCompressedCookie("settings", "MALICIOUS", 2500),
                 pattern + "?tracking=" + createCompressedCookie("id", "DANGEROUS", 3000),
@@ -226,8 +228,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createBase64CompressionBomb(String pattern) {
         // Base64 encoded compression bombs
         String[] base64Bombs = {
-                pattern + "?b64=" + encodeBase64Bomb("COMPRESSED", 1000),
-                pattern + "?encoded=" + encodeBase64Bomb("BOMB", 2000),
+                pattern + "?b64=BASE64:" + encodeBase64Bomb("COMPRESSED", 1000),
+                pattern + "?encoded=BASE64:" + encodeBase64Bomb("BOMB", 2000),
                 pattern + "?data=" + encodeBase64Bomb("EXPLOIT", 1500),
                 pattern + "?payload=" + encodeBase64Bomb("ATTACK", 2500),
                 pattern + "?content=" + encodeBase64Bomb("MALWARE", 3000),
@@ -239,7 +241,7 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
         // XML/JSON compression bombs
         String[] xmlJsonBombs = {
                 pattern + "?xml=" + createXmlBomb("ROOT", 100),
-                pattern + "?json=" + createJsonBomb("OBJECT", 200),
+                pattern + "?json=JSON:" + createJsonBomb("OBJECT", 200),
                 pattern + "?data=" + createXmlBomb("ELEMENT", 150),
                 pattern + "?payload=" + createJsonBomb("ARRAY", 250),
                 pattern + "?content=" + createXmlBomb("ATTRIBUTE", 300),
@@ -250,8 +252,8 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     private String createBinaryDataCompressionAttack(String pattern) {
         // Binary data compression attacks
         String[] binaryAttacks = {
-                pattern + "?binary=" + createBinaryBomb(1024),
-                pattern + "?blob=" + createBinaryBomb(2048),
+                pattern + "?binary=BINARY:" + createBinaryBomb(1024),
+                pattern + "?blob=BINARY:" + createBinaryBomb(2048),
                 pattern + "?raw=" + createBinaryBomb(4096),
                 pattern + "?bytes=" + createBinaryBomb(8192),
                 pattern + "?stream=" + createBinaryBomb(16384),
@@ -335,7 +337,7 @@ public class CompressionBombAttackGenerator implements TypedGenerator<String> {
     }
 
     private int hashBasedSelection(int arrayLength) {
-        return Math.abs(this.hashCode() % arrayLength);
+        return Math.abs(invocationCounter % arrayLength);
     }
 
     /**

