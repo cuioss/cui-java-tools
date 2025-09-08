@@ -445,7 +445,7 @@ Implement → Test → Verify → Document Progress → Commit
 |T24
 |Test protocol handler attacks
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.8: Known CVE Tests
