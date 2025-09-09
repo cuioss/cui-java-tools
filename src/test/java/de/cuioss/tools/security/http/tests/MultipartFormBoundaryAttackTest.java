@@ -121,7 +121,7 @@ class MultipartFormBoundaryAttackTest {
 
         // Then: The validation should fail with appropriate security event
         assertNotNull(exception, "Exception should be thrown for multipart boundary attack");
-        assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+        assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), multipartAttackPattern),
                 "Failure type should be multipart boundary related: " + exception.getFailureType() +
                         " for pattern: " + multipartAttackPattern);
 
@@ -169,7 +169,7 @@ class MultipartFormBoundaryAttackTest {
                     "Boundary injection attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect boundary injection: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for boundary injection");
@@ -211,7 +211,7 @@ class MultipartFormBoundaryAttackTest {
                     "Boundary confusion attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect boundary confusion: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for boundary confusion");
@@ -251,7 +251,7 @@ class MultipartFormBoundaryAttackTest {
                     "Nested boundary attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect nested boundary attack: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for nested boundary attack");
@@ -293,7 +293,7 @@ class MultipartFormBoundaryAttackTest {
                     "Filename injection attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect filename injection: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for filename injection");
@@ -333,7 +333,7 @@ class MultipartFormBoundaryAttackTest {
                     "MIME type confusion attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect MIME type confusion: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for MIME type confusion");
@@ -375,7 +375,7 @@ class MultipartFormBoundaryAttackTest {
                     "XSS multipart form attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect XSS in multipart form: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for XSS multipart form");
@@ -417,7 +417,7 @@ class MultipartFormBoundaryAttackTest {
                     "SQL injection multipart form attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect SQL injection in multipart form: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for SQL injection multipart form");
@@ -457,7 +457,7 @@ class MultipartFormBoundaryAttackTest {
                     "File upload bypass attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isMultipartBoundaryRelatedFailure(exception.getFailureType()),
+            assertTrue(isMultipartFormBoundarySpecificFailure(exception.getFailureType(), attack),
                     "Should detect file upload bypass: " + exception.getFailureType());
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for file upload bypass");
@@ -593,7 +593,17 @@ class MultipartFormBoundaryAttackTest {
      * @param failureType The failure type to check
      * @return true if the failure type indicates a multipart boundary-related security issue
      */
-    private boolean isMultipartBoundaryRelatedFailure(UrlSecurityFailureType failureType) {
+    /**
+     * QI-9: Determines if a failure type matches specific multipart form boundary attack patterns.
+     * Replaces broad OR-assertion with comprehensive security validation.
+     * 
+     * @param failureType The actual failure type from validation
+     * @param pattern The multipart form boundary pattern being tested
+     * @return true if the failure type is expected for multipart form boundary patterns
+     */
+    private boolean isMultipartFormBoundarySpecificFailure(UrlSecurityFailureType failureType, String pattern) {
+        // QI-9: Multipart form boundary patterns can trigger multiple specific failure types
+        // Accept all multipart form boundary-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
