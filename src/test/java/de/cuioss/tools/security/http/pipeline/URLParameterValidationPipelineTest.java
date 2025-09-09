@@ -158,7 +158,7 @@ class URLParameterValidationPipelineTest {
 
         @Test
         void shouldRejectOversizedParameter() {
-            String oversizedParam = "x".repeat(config.maxParameterValueLength() + 100);
+            String oversizedParam = generateParameterValue(config.maxParameterValueLength() + 100);
             assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(oversizedParam));
         }
@@ -232,5 +232,27 @@ class URLParameterValidationPipelineTest {
             assertTrue(stages.get(3).getClass().getSimpleName().contains("Normalization"), "Fourth stage should be normalization validation");
             assertTrue(stages.get(4).getClass().getSimpleName().contains("Pattern"), "Fifth stage should be pattern validation");
         }
+    }
+
+    /**
+     * QI-17: Generate realistic parameter values instead of using .repeat().
+     * Creates varied parameter content for URL parameter validation testing.
+     */
+    private String generateParameterValue(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] values = {"value", "param", "data", "user", "id", "name"};
+        
+        for (int i = 0; i < length; i++) {
+            if (i % 30 == 0 && i > 0) {
+                result.append("_").append(values[i / 30 % values.length]).append("_");
+                i += values[i / 30 % values.length].length() + 2;
+                if (i >= length) break;
+            }
+            result.append((char)('a' + (i % 26)));
+        }
+        
+        // Ensure exact length
+        String generated = result.toString();
+        return generated.length() > length ? generated.substring(0, length) : generated;
     }
 }

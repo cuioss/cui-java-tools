@@ -143,7 +143,7 @@ class URLPathValidationPipelineTest {
 
         @Test
         void shouldRejectOversizedPath() {
-            String oversizedPath = "/" + "x".repeat(config.maxPathLength());
+            String oversizedPath = "/" + generatePathContent(config.maxPathLength());
             assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(oversizedPath));
         }
@@ -154,7 +154,7 @@ class URLPathValidationPipelineTest {
 
         @Test
         void shouldSequentiallyApplyStages() {
-            String problematicPath = "/" + "invalid path with spaces".repeat(1000);
+            String problematicPath = "/" + generateRepeatedPattern("invalid path with spaces", 1000);
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(problematicPath));
@@ -197,5 +197,41 @@ class URLPathValidationPipelineTest {
             assertTrue(stages.get(4).getClass().getSimpleName().contains("Normalization"));
             assertTrue(stages.get(5).getClass().getSimpleName().contains("Pattern"));
         }
+    }
+
+    /**
+     * QI-17: Generate realistic path content instead of using .repeat().
+     * Creates varied path content for URL validation testing.
+     */
+    private String generatePathContent(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] segments = {"api", "data", "user", "admin", "config", "test"};
+        
+        for (int i = 0; i < length; i++) {
+            if (i % 20 == 0 && i > 0) {
+                result.append("/").append(segments[i / 20 % segments.length]);
+                i += segments[i / 20 % segments.length].length() + 1;
+                if (i >= length) break;
+            }
+            result.append((char)('a' + (i % 26)));
+        }
+        
+        // Ensure exact length
+        String generated = result.toString();
+        return generated.length() > length ? generated.substring(0, length) : generated;
+    }
+
+    /**
+     * QI-17: Generate realistic repeated patterns instead of using .repeat().
+     */
+    private String generateRepeatedPattern(String pattern, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(pattern);
+            if (i % 10 == 9) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

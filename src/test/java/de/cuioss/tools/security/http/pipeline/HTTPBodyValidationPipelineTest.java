@@ -138,7 +138,7 @@ class HTTPBodyValidationPipelineTest {
 
         @Test
         void shouldRejectOversizedContent() {
-            String oversizedContent = "x".repeat((int) (defaultConfig.maxBodySize() + 1000));
+            String oversizedContent = generateBodyContent((int) (defaultConfig.maxBodySize() + 1000));
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(oversizedContent));
             assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType());
@@ -151,7 +151,7 @@ class HTTPBodyValidationPipelineTest {
                     .build();
             HTTPBodyValidationPipeline smallPipeline = new HTTPBodyValidationPipeline(smallBodyConfig, eventCounter);
 
-            String largeBody = "x".repeat(200);
+            String largeBody = generateBodyContent(200);
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                     () -> smallPipeline.validate(largeBody));
@@ -163,7 +163,7 @@ class HTTPBodyValidationPipelineTest {
 
         @Test
         void shouldHandleLargeButValidBodyContent() {
-            String largeBody = "A".repeat(1024 * 1024 - 1);
+            String largeBody = generateBodyContent(1024 * 1024 - 1);
 
             String result = pipeline.validate(largeBody);
             assertEquals(largeBody, result);
@@ -398,5 +398,62 @@ class HTTPBodyValidationPipelineTest {
             assertEquals(originalInput, exception.getOriginalInput());
             assertEquals(ValidationType.BODY, exception.getValidationType());
         }
+    }
+
+    /**
+     * QI-17: Generate realistic body content instead of using .repeat().
+     * Creates varied content for HTTP body validation testing.
+     */
+    private String generateBodyContent(int length) {
+        if (length <= 0) return "";
+        
+        StringBuilder result = new StringBuilder();
+        String[] patterns = {"data", "json", "xml", "text", "content"};
+        String[] chars = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+        
+        // For very large content, use a more efficient approach
+        if (length > 10000) {
+            int patternLength = 100;
+            String basePattern = "content_data_";
+            for (int i = 0; i < patternLength - basePattern.length(); i++) {
+                basePattern += chars[i % chars.length];
+            }
+            
+            int fullPatterns = length / patternLength;
+            int remainder = length % patternLength;
+            
+            for (int i = 0; i < fullPatterns; i++) {
+                result.append(basePattern);
+                if (i % 10 == 9) {
+                    result.append(i % 10); // Add variation
+                }
+            }
+            if (remainder > 0) {
+                result.append(basePattern, 0, remainder);
+            }
+        } else {
+            // For smaller content, use more variation
+            for (int i = 0; i < length; i++) {
+                if (i % 50 == 0 && i > 0) {
+                    result.append("_").append(patterns[i / 50 % patterns.length]).append("_");
+                    i += patterns[i / 50 % patterns.length].length() + 2;
+                    if (i >= length) break;
+                }
+                result.append(chars[i % chars.length]);
+            }
+        }
+        
+        // Ensure exact length
+        String generated = result.toString();
+        if (generated.length() > length) {
+            return generated.substring(0, length);
+        } else if (generated.length() < length) {
+            int remaining = length - generated.length();
+            for (int i = 0; i < remaining; i++) {
+                generated += "x";
+            }
+            return generated;
+        }
+        return generated;
     }
 }

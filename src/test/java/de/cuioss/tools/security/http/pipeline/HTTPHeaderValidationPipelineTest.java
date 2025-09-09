@@ -162,7 +162,7 @@ class HTTPHeaderValidationPipelineTest {
         void shouldRejectOversizedHeaderValue() {
             HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_VALUE);
 
-            String oversizedHeader = "x".repeat(config.maxHeaderValueLength() + 100);
+            String oversizedHeader = generateLongValue(config.maxHeaderValueLength() + 100);
             assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(oversizedHeader));
         }
@@ -171,7 +171,7 @@ class HTTPHeaderValidationPipelineTest {
         void shouldRejectHeaderValueTooLong() {
             HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_VALUE);
 
-            String longHeaderValue = "Bearer " + "a".repeat(config.maxHeaderValueLength());
+            String longHeaderValue = "Bearer " + generateLongValue(config.maxHeaderValueLength());
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(longHeaderValue));
@@ -185,7 +185,7 @@ class HTTPHeaderValidationPipelineTest {
         void shouldRejectHeaderNameTooLong() {
             HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_NAME);
 
-            String longHeaderName = "X-Custom-" + "Header".repeat(config.maxHeaderNameLength() / 6);
+            String longHeaderName = "X-Custom-" + generateRepeatedPattern("Header", config.maxHeaderNameLength() / 6);
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(longHeaderName));
@@ -203,7 +203,7 @@ class HTTPHeaderValidationPipelineTest {
         void shouldSequentiallyApplyStages() {
             HTTPHeaderValidationPipeline pipeline = new HTTPHeaderValidationPipeline(config, eventCounter, ValidationType.HEADER_VALUE);
 
-            String problematicHeader = "Bearer " + "token with\r\ninjection".repeat(1000);
+            String problematicHeader = "Bearer " + generateRepeatedPattern("token with\r\ninjection", 1000);
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(problematicHeader));
@@ -268,5 +268,39 @@ class HTTPHeaderValidationPipelineTest {
             assertEquals(ValidationType.HEADER_NAME, namesPipeline.getValidationType());
             assertEquals(ValidationType.HEADER_VALUE, valuesPipeline.getValidationType());
         }
+    }
+
+    /**
+     * QI-17: Generate realistic long values instead of using .repeat().
+     * Creates varied content for header validation testing.
+     */
+    private String generateLongValue(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] chars = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+        
+        for (int i = 0; i < length; i++) {
+            result.append(chars[i % chars.length]);
+            // Add variation every 10 characters
+            if (i % 10 == 9) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * QI-17: Generate realistic repeated patterns instead of using .repeat().
+     * Creates varied repeated patterns for header testing.
+     */
+    private String generateRepeatedPattern(String pattern, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(pattern);
+            // Add slight variation every few repetitions
+            if (i % 5 == 4) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }
