@@ -706,15 +706,15 @@ class SqlInjectionAttackTest {
         // QI-9: SQL injection patterns can trigger multiple specific failure types
         // Accept all SQL injection-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-               failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
-               failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-               failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
-               failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
-               failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
-               failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-               failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
-               failureType == UrlSecurityFailureType.INVALID_ENCODING;
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
+                failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
+                failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
+                failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
+                failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING;
     }
 
     /**

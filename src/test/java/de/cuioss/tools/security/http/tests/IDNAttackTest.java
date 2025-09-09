@@ -388,13 +388,13 @@ class IDNAttackTest {
         // QI-9: IDN attack patterns can trigger multiple specific failure types
         // Accept all IDN-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-               failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-               failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-               failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
-               failureType == UrlSecurityFailureType.RFC_VIOLATION ||
-               failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-               failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-               failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
-               failureType == UrlSecurityFailureType.INVALID_ENCODING;
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
+                failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
+                failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
+                failureType == UrlSecurityFailureType.RFC_VIOLATION ||
+                failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
+                failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING;
     }
 }

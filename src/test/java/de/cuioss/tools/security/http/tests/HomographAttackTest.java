@@ -506,18 +506,18 @@ class HomographAttackTest {
         // QI-9: Homograph attack patterns can trigger multiple specific failure types
         // Accept all homograph-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-               failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-               failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-               failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-               failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-               failureType == UrlSecurityFailureType.XSS_DETECTED ||
-               failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
-               failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
-               failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
-               failureType == UrlSecurityFailureType.INVALID_ENCODING ||
-               failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
-               failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION;
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
+                failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
+                failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
+                failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING ||
+                failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
+                failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION;
     }
 }

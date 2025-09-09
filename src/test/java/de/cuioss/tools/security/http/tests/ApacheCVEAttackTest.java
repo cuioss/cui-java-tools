@@ -370,18 +370,18 @@ class ApacheCVEAttackTest {
         // QI-9: Apache CVE patterns can trigger multiple specific failure types
         // Accept all Apache CVE-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-               failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-               failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
-               failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-               failureType == UrlSecurityFailureType.INVALID_ENCODING ||
-               failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
-               failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-               failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-               failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
-               failureType == UrlSecurityFailureType.RFC_VIOLATION ||
-               failureType == UrlSecurityFailureType.XSS_DETECTED ||
-               failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED;
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING ||
+                failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
+                failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
+                failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
+                failureType == UrlSecurityFailureType.RFC_VIOLATION ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED;
     }
 
     // QI-17: Helper method for realistic boundary testing instead of massive .repeat() patterns

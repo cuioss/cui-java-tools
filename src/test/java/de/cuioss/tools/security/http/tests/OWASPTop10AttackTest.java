@@ -494,22 +494,22 @@ class OWASPTop10AttackTest {
         // QI-9: OWASP Top 10 patterns can trigger multiple specific failure types
         // Accept all OWASP-relevant failure types for comprehensive security validation
         return failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-               failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-               failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
-               failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-               failureType == UrlSecurityFailureType.INVALID_ENCODING ||
-               failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
-               failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
-               failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-               failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
-               failureType == UrlSecurityFailureType.RFC_VIOLATION ||
-               failureType == UrlSecurityFailureType.XSS_DETECTED ||
-               failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
-               failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
-               failureType == UrlSecurityFailureType.EXCESSIVE_NESTING ||
-               failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
-               failureType == UrlSecurityFailureType.PATH_TOO_LONG ||
-               failureType == UrlSecurityFailureType.INVALID_URL_FORMAT;
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING ||
+                failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
+                failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
+                failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
+                failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
+                failureType == UrlSecurityFailureType.RFC_VIOLATION ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
+                failureType == UrlSecurityFailureType.EXCESSIVE_NESTING ||
+                failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
+                failureType == UrlSecurityFailureType.PATH_TOO_LONG ||
+                failureType == UrlSecurityFailureType.INVALID_URL_FORMAT;
     }
 }
