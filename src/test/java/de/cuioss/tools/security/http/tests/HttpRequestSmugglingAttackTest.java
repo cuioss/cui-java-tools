@@ -450,7 +450,7 @@ class HttpRequestSmugglingAttackTest {
                 "/api/endpoint%0a%0aGET /backdoor HTTP/1.1%0aHost: target%0a%0a",
 
                 // Extremely long smuggled request
-                "/normal" + "%0d%0a%0d%0aGET /" + "A".repeat(1000) + " HTTP/1.1%0d%0aHost: evil%0d%0a%0d%0a"
+                "/normal" + "%0d%0a%0d%0aGET /" + generateLongPath(1000) + " HTTP/1.1%0d%0aHost: evil%0d%0a%0d%0a"
         };
 
         for (String attack : edgeCaseAttacks) {
@@ -490,5 +490,29 @@ class HttpRequestSmugglingAttackTest {
                 failureType == UrlSecurityFailureType.INVALID_ENCODING ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED;
+    }
+
+    /**
+     * QI-17: Generate realistic long path instead of using .repeat().
+     * Creates varied path content for HTTP request smuggling testing.
+     */
+    private String generateLongPath(int length) {
+        StringBuilder path = new StringBuilder();
+        String[] segments = {"admin", "data", "secret", "config", "api", "user"};
+        
+        while (path.length() < length - 10) { // Leave room for final segment
+            String segment = segments[path.length() % segments.length];
+            path.append(segment);
+            if (path.length() < length - 10) {
+                path.append("/");
+            }
+        }
+        
+        // Fill remaining length with varied characters
+        while (path.length() < length) {
+            path.append("x");
+        }
+        
+        return path.toString();
     }
 }

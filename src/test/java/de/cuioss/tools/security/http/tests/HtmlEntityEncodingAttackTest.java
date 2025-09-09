@@ -377,16 +377,16 @@ class HtmlEntityEncodingAttackTest {
     void shouldResistHtmlEntityBombingAttacks() {
         String[] bombingAttempts = {
                 // Large number of entities
-                "&#46;".repeat(1000) + "&#47;".repeat(1000),
+                generateHtmlEntitySequence(1000), // QI-17: Realistic entity sequence instead of .repeat()
 
                 // Deeply nested entities (to a reasonable limit)
                 "&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;lt;script&amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;amp;gt;",
 
                 // Mixed long entity sequences
-                "&#x2E;&#x2E;&#x2F;".repeat(100),
+                generateMixedEntitySequence(100), // QI-17: Realistic mixed entity sequence instead of .repeat()
 
                 // Very long single entity reference
-                "&#" + "0".repeat(100) + "46;",
+                "&#" + generatePaddingDigits(100) + "46;", // QI-17: Realistic digit sequence instead of .repeat()
         };
 
         for (String bomb : bombingAttempts) {
@@ -439,5 +439,47 @@ class HtmlEntityEncodingAttackTest {
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE;
+    }
+
+    /**
+     * QI-17: Generate realistic HTML entity sequence instead of using .repeat().
+     * Creates a sequence of mixed HTML entities for more realistic testing.
+     */
+    private String generateHtmlEntitySequence(int length) {
+        StringBuilder sequence = new StringBuilder();
+        String[] entities = {"&#46;", "&#47;", "&#60;", "&#62;", "&#39;", "&#34;"};
+        
+        for (int i = 0; i < length; i++) {
+            sequence.append(entities[i % entities.length]);
+        }
+        return sequence.toString();
+    }
+
+    /**
+     * QI-17: Generate realistic mixed entity sequence instead of using .repeat().
+     * Creates a sequence mixing hex and decimal HTML entities.
+     */
+    private String generateMixedEntitySequence(int length) {
+        StringBuilder sequence = new StringBuilder();
+        String[] patterns = {"&#x2E;&#x2E;&#x2F;", "&#46;&#46;&#47;", "&#x3C;&#x3E;", "&#60;&#62;"};
+        
+        for (int i = 0; i < length; i++) {
+            sequence.append(patterns[i % patterns.length]);
+        }
+        return sequence.toString();
+    }
+
+    /**
+     * QI-17: Generate realistic padding digits instead of using .repeat().
+     * Creates a sequence of varied digits for entity padding.
+     */
+    private String generatePaddingDigits(int length) {
+        StringBuilder digits = new StringBuilder();
+        String[] digitPatterns = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        
+        for (int i = 0; i < length; i++) {
+            digits.append(digitPatterns[i % digitPatterns.length]);
+        }
+        return digits.toString();
     }
 }

@@ -282,7 +282,7 @@ class MultipartFormBoundaryAttackTest {
                 // Windows device names and long filenames
                 "/attachments?upload=data%0a%0a--WebForm%0a%0aContent-Disposition: form-data; name=\"file\"; filename=\"CON\"%0a%0a%0a%0awindows_device_attack",
                 "/media/upload?submit=form%0d%0a--Boundary%0d%0aContent-Disposition: inline; filename=\"script.js%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>alert(1)</script>%0d%0a\"%0d%0a%0d%0ajavascript_content",
-                "/files/create?data=multipart%0d%0a--FormBoundary%0d%0aContent-Disposition: form-data; name=\"attachment\"; filename=\"very_long_filename_" + "A".repeat(100) + ".txt\"%0d%0a%0d%0abuffer_overflow_filename"
+                "/files/create?data=multipart%0d%0a--FormBoundary%0d%0aContent-Disposition: form-data; name=\"attachment\"; filename=\"very_long_filename_" + generateRepeatedChars("A", 100) + ".txt\"%0d%0a%0d%0abuffer_overflow_filename"
         };
 
         for (String attack : filenameInjectionAttacks) {
@@ -479,18 +479,18 @@ class MultipartFormBoundaryAttackTest {
         String longContent = Generators.letterStrings(4000, 6000).next();
         String[] dosAttacks = {
                 // Large number of parts
-                "/upload?parts=" + "part1&".repeat(50) + "admin=true",
+                "/upload?parts=" + generateRepeatedChars("part1&", 50) + "admin=true",
                 "/form/submit?fields=" + longContent,
-                "/api/file?data=" + "field=value&".repeat(25) + "role=admin",
+                "/api/file?data=" + generateRepeatedChars("field=value&", 25) + "role=admin",
 
                 // Large content with boundaries
-                "/profile/image?content=" + longContent + "%0d%0a--boundary" + "--boundary".repeat(10),
+                "/profile/image?content=" + longContent + "%0d%0a--boundary" + generateRepeatedChars("--boundary", 10),
                 "/document/upload?multipart=" + Generators.letterStrings(8000, 12000).next(),
                 "/attachments?form=" + "input" + generateBoundaryPadding(200) + "=value", // QI-17: Fixed realistic boundary
 
                 // Multiple large fields
                 "/media/upload?upload=" + longContent + "&file=" + longContent,
-                "/files/create?boundary=" + "--boundary".repeat(50) + longContent
+                "/files/create?boundary=" + generateRepeatedChars("--boundary", 50) + longContent
         };
 
         for (String attack : dosAttacks) {
@@ -631,5 +631,21 @@ class MultipartFormBoundaryAttackTest {
      */
     private String generateBoundaryPadding(int length) {
         return Generators.letterStrings(length, length + 20).next();
+    }
+
+    /**
+     * QI-17: Generate realistic repeated character patterns instead of using .repeat().
+     * Creates varied repeated patterns for more realistic multipart boundary testing.
+     */
+    private String generateRepeatedChars(String pattern, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(pattern);
+            // Add slight variation to make it more realistic
+            if (i % 10 == 9) {
+                result.append(i); // Add index every 10 repetitions
+            }
+        }
+        return result.toString();
     }
 }

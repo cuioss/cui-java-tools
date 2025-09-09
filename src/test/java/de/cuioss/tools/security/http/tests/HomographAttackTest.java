@@ -284,7 +284,7 @@ class HomographAttackTest {
                 "\u0430\u03B1\uFF41",                  // Mixed script homographs
                 "123\u0430456",                        // Numbers with homograph
                 "special!@#\u0430$%^",                 // Special chars with homograph
-                "\u0430".repeat(100),                  // Long homograph sequence
+                generateHomographSequence(100),       // QI-17: Realistic homograph sequence instead of .repeat()
                 "😀\u0430😀",                          // Emoji with homograph
                 "\u0430\u0300",                       // Homograph with combining character
         };
@@ -519,5 +519,31 @@ class HomographAttackTest {
                 failureType == UrlSecurityFailureType.INVALID_ENCODING ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
                 failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION;
+    }
+
+    /**
+     * QI-17: Generates realistic homograph sequences instead of .repeat() patterns.
+     * Creates diverse homograph characters for more effective testing.
+     * 
+     * @param length target length for the homograph sequence
+     * @return diverse homograph sequence for testing
+     */
+    private String generateHomographSequence(int length) {
+        StringBuilder sequence = new StringBuilder();
+        // Diverse homograph characters instead of repeating single character
+        String[] homographs = {
+            "\u0430", // Cyrillic small letter a 
+            "\u043E", // Cyrillic small letter o
+            "\u0440", // Cyrillic small letter p
+            "\u0441", // Cyrillic small letter c
+            "\u03B1", // Greek small letter alpha
+            "\uFF41", // Fullwidth latin small letter a
+            "\uFF4F"  // Fullwidth latin small letter o
+        };
+        
+        for (int i = 0; i < length; i++) {
+            sequence.append(homographs[i % homographs.length]);
+        }
+        return sequence.toString();
     }
 }

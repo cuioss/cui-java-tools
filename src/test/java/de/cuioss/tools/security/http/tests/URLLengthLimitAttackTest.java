@@ -783,7 +783,7 @@ class URLLengthLimitAttackTest {
         if (generated.length() > length) {
             return generated.substring(0, length);
         } else if (generated.length() < length) {
-            return generated + "x".repeat(length - generated.length());
+            return generated + generatePaddingChars(length - generated.length());
         }
         return generated;
     }
@@ -1208,5 +1208,21 @@ class URLLengthLimitAttackTest {
         static String multipleOverLimitParams() {
             return "param1=" + overParameterLimit() + "&param2=" + overParameterLimit();
         }
+    }
+
+    /**
+     * QI-17: Generate realistic padding characters instead of using .repeat().
+     * Creates varied padding for parameter names and values.
+     */
+    private String generatePaddingChars(int length) {
+        if (length <= 0) return "";
+        
+        StringBuilder padding = new StringBuilder();
+        String[] chars = {"x", "y", "z", "a", "b", "c", "1", "2", "3"};
+        
+        for (int i = 0; i < length; i++) {
+            padding.append(chars[i % chars.length]);
+        }
+        return padding.toString();
     }
 }
