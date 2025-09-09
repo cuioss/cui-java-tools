@@ -16,7 +16,6 @@
 package de.cuioss.tools.property.support;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
@@ -32,10 +31,8 @@ public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Ser
     @Serial
     private static final long serialVersionUID = -6403178000941411123L;
 
-    @Getter
     private final K key;
 
-    @Getter
     private V value;
 
     /**
@@ -55,9 +52,20 @@ public class GenericTypeWithLowerBoundType<K extends Serializable, V extends Ser
     }
 
     @Override
-    public V setValue(V value) {
-        this.value = value;
+    public K getKey() {
+        return this.key;
+    }
+
+    @Override
+    public V getValue() {
         return this.value;
+    }
+
+    @Override
+    public V setValue(V value) {
+        V oldValue = this.value;
+        this.value = value;
+        return oldValue;
     }
 
 }

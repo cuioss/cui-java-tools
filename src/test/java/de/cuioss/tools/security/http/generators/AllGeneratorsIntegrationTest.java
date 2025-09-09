@@ -19,6 +19,17 @@ import de.cuioss.test.generator.TypedGenerator;
 import de.cuioss.tools.security.http.data.Cookie;
 import de.cuioss.tools.security.http.data.HTTPBody;
 import de.cuioss.tools.security.http.data.URLParameter;
+import de.cuioss.tools.security.http.generators.body.HTTPBodyGenerator;
+import de.cuioss.tools.security.http.generators.cookie.AttackCookieGenerator;
+import de.cuioss.tools.security.http.generators.cookie.ValidCookieGenerator;
+import de.cuioss.tools.security.http.generators.encoding.BoundaryFuzzingGenerator;
+import de.cuioss.tools.security.http.generators.encoding.EncodingCombinationGenerator;
+import de.cuioss.tools.security.http.generators.encoding.PathTraversalGenerator;
+import de.cuioss.tools.security.http.generators.encoding.UnicodeAttackGenerator;
+import de.cuioss.tools.security.http.generators.url.AttackURLParameterGenerator;
+import de.cuioss.tools.security.http.generators.url.InvalidURLGenerator;
+import de.cuioss.tools.security.http.generators.url.ValidURLGenerator;
+import de.cuioss.tools.security.http.generators.url.ValidURLParameterGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -39,21 +50,25 @@ class AllGeneratorsIntegrationTest {
     private final BoundaryFuzzingGenerator boundaryGenerator = new BoundaryFuzzingGenerator();
     private final ValidURLGenerator validUrlGenerator = new ValidURLGenerator();
     private final InvalidURLGenerator invalidUrlGenerator = new InvalidURLGenerator();
-    private final URLParameterGenerator parameterGenerator = new URLParameterGenerator();
-    private final CookieGenerator cookieGenerator = new CookieGenerator();
+    private final ValidURLParameterGenerator validParameterGenerator = new ValidURLParameterGenerator();
+    private final AttackURLParameterGenerator attackParameterGenerator = new AttackURLParameterGenerator();
+    private final ValidCookieGenerator validCookieGenerator = new ValidCookieGenerator();
+    private final AttackCookieGenerator attackCookieGenerator = new AttackCookieGenerator();
     private final HTTPBodyGenerator bodyGenerator = new HTTPBodyGenerator();
 
     @Test
     void shouldHaveAllGeneratorsImplemented() {
-        // Verify all 9 generators are instantiated and functional
+        // Verify all generators are instantiated and functional (now using framework-compliant variants)
         assertNotNull(pathTraversalGenerator);
         assertNotNull(encodingGenerator);
         assertNotNull(unicodeGenerator);
         assertNotNull(boundaryGenerator);
         assertNotNull(validUrlGenerator);
         assertNotNull(invalidUrlGenerator);
-        assertNotNull(parameterGenerator);
-        assertNotNull(cookieGenerator);
+        assertNotNull(validParameterGenerator);
+        assertNotNull(attackParameterGenerator);
+        assertNotNull(validCookieGenerator);
+        assertNotNull(attackCookieGenerator);
         assertNotNull(bodyGenerator);
     }
 
@@ -65,8 +80,10 @@ class AllGeneratorsIntegrationTest {
         assertEquals(String.class, boundaryGenerator.getType());
         assertEquals(String.class, validUrlGenerator.getType());
         assertEquals(String.class, invalidUrlGenerator.getType());
-        assertEquals(URLParameter.class, parameterGenerator.getType());
-        assertEquals(Cookie.class, cookieGenerator.getType());
+        assertEquals(URLParameter.class, validParameterGenerator.getType());
+        assertEquals(URLParameter.class, attackParameterGenerator.getType());
+        assertEquals(Cookie.class, validCookieGenerator.getType());
+        assertEquals(Cookie.class, attackCookieGenerator.getType());
         assertEquals(HTTPBody.class, bodyGenerator.getType());
     }
 
@@ -79,8 +96,10 @@ class AllGeneratorsIntegrationTest {
                 boundaryGenerator,
                 validUrlGenerator,
                 invalidUrlGenerator,
-                parameterGenerator,
-                cookieGenerator,
+                validParameterGenerator,
+                attackParameterGenerator,
+                validCookieGenerator,
+                attackCookieGenerator,
                 bodyGenerator
         );
 
@@ -112,8 +131,10 @@ class AllGeneratorsIntegrationTest {
             boundaryFuzzing.add(boundaryGenerator.next());
             validUrls.add(validUrlGenerator.next());
             invalidUrls.add(invalidUrlGenerator.next());
-            parameters.add(parameterGenerator.next());
-            cookies.add(cookieGenerator.next());
+            parameters.add(validParameterGenerator.next());
+            parameters.add(attackParameterGenerator.next());
+            cookies.add(validCookieGenerator.next());
+            cookies.add(attackCookieGenerator.next());
             bodies.add(bodyGenerator.next());
         }
 
@@ -124,8 +145,8 @@ class AllGeneratorsIntegrationTest {
         assertTrue(boundaryFuzzing.size() >= 20, "BoundaryFuzzingGenerator should produce variety, got: " + boundaryFuzzing.size());
         assertTrue(validUrls.size() >= 10, "ValidURLGenerator should produce variety, got: " + validUrls.size());
         assertTrue(invalidUrls.size() >= 10, "InvalidURLGenerator should produce variety, got: " + invalidUrls.size());
-        assertTrue(parameters.size() >= 30, "URLParameterGenerator should produce variety, got: " + parameters.size());
-        assertTrue(cookies.size() >= 30, "CookieGenerator should produce variety, got: " + cookies.size());
+        assertTrue(parameters.size() >= 30, "URL Parameter generators should produce variety, got: " + parameters.size());
+        assertTrue(cookies.size() >= 30, "Cookie generators should produce variety, got: " + cookies.size());
         assertTrue(bodies.size() >= 30, "HTTPBodyGenerator should produce variety, got: " + bodies.size());
     }
 
@@ -145,8 +166,8 @@ class AllGeneratorsIntegrationTest {
             encodings.add(encodingGenerator.next());
             unicodeAttacks.add(unicodeGenerator.next());
             boundaryFuzzing.add(boundaryGenerator.next());
-            parameters.add(parameterGenerator.next());
-            cookies.add(cookieGenerator.next());
+            parameters.add(attackParameterGenerator.next()); // Use attack generator for attack pattern test
+            cookies.add(attackCookieGenerator.next()); // Use attack generator for attack pattern test
             bodies.add(bodyGenerator.next());
         }
 
@@ -167,8 +188,8 @@ class AllGeneratorsIntegrationTest {
         assertTrue(hasEncoding, "EncodingCombinationGenerator should generate encoded patterns");
         assertTrue(hasUnicodeAttack, "UnicodeAttackGenerator should generate unicode patterns");
         assertTrue(hasBoundaryFuzz, "BoundaryFuzzingGenerator should generate boundary fuzzing patterns");
-        assertTrue(hasParameterAttack, "URLParameterGenerator should generate attack patterns");
-        assertTrue(hasCookieAttack, "CookieGenerator should generate attack patterns");
+        assertTrue(hasParameterAttack, "Attack URL Parameter generator should generate attack patterns");
+        assertTrue(hasCookieAttack, "Attack Cookie generator should generate attack patterns");
         assertTrue(hasBodyAttack, "HTTPBodyGenerator should generate attack patterns");
     }
 
@@ -182,8 +203,8 @@ class AllGeneratorsIntegrationTest {
 
         for (int i = 0; i < 200; i++) {
             validUrls.add(validUrlGenerator.next());
-            parameters.add(parameterGenerator.next());
-            cookies.add(cookieGenerator.next());
+            parameters.add(validParameterGenerator.next()); // Use valid generator for legitimate value test
+            cookies.add(validCookieGenerator.next()); // Use valid generator for legitimate value test
             bodies.add(bodyGenerator.next());
         }
 
@@ -197,8 +218,8 @@ class AllGeneratorsIntegrationTest {
                 b.content().contains("Hello World") || b.content().contains("{\"user\""));
 
         assertTrue(hasValidPath, "ValidURLGenerator should generate valid paths");
-        assertTrue(hasLegitimateParam, "URLParameterGenerator should generate legitimate parameters");
-        assertTrue(hasLegitimateCoookie, "CookieGenerator should generate legitimate cookies");
+        assertTrue(hasLegitimateParam, "Valid URL Parameter generator should generate legitimate parameters");
+        assertTrue(hasLegitimateCoookie, "Valid Cookie generator should generate legitimate cookies");
         assertTrue(hasLegitimateBody, "HTTPBodyGenerator should generate legitimate bodies");
     }
 
@@ -222,8 +243,10 @@ class AllGeneratorsIntegrationTest {
                 }),
                 new Thread(() -> {
                     for (int i = 0; i < 100; i++) {
-                        parameterGenerator.next();
-                        cookieGenerator.next();
+                        validParameterGenerator.next();
+                        attackParameterGenerator.next();
+                        validCookieGenerator.next();
+                        attackCookieGenerator.next();
                         bodyGenerator.next();
                     }
                 })
@@ -250,11 +273,11 @@ class AllGeneratorsIntegrationTest {
     void shouldGenerateComplexRecordStructures() {
         // Test that record-based generators create proper structures
         for (int i = 0; i < 50; i++) {
-            URLParameter param = parameterGenerator.next();
+            URLParameter param = validParameterGenerator.next(); // Test with valid generator
             assertNotNull(param.name(), "URLParameter name should not be null");
             assertNotNull(param.value(), "URLParameter value should not be null");
 
-            Cookie cookie = cookieGenerator.next();
+            Cookie cookie = validCookieGenerator.next(); // Test with valid generator
             assertNotNull(cookie.name(), "Cookie name should not be null");
             assertNotNull(cookie.value(), "Cookie value should not be null");
             assertNotNull(cookie.attributes(), "Cookie attributes should not be null");
@@ -281,8 +304,10 @@ class AllGeneratorsIntegrationTest {
             allStringOutputs.add(boundaryGenerator.next());
             allStringOutputs.add(validUrlGenerator.next());
             allStringOutputs.add(invalidUrlGenerator.next());
-            allParams.add(parameterGenerator.next());
-            allCookies.add(cookieGenerator.next());
+            allParams.add(validParameterGenerator.next());
+            allParams.add(attackParameterGenerator.next());
+            allCookies.add(validCookieGenerator.next());
+            allCookies.add(attackCookieGenerator.next());
             allBodies.add(bodyGenerator.next());
         }
 
@@ -316,8 +341,10 @@ class AllGeneratorsIntegrationTest {
             boundaryGenerator.next();
             validUrlGenerator.next();
             invalidUrlGenerator.next();
-            parameterGenerator.next();
-            cookieGenerator.next();
+            validParameterGenerator.next();
+            attackParameterGenerator.next();
+            validCookieGenerator.next();
+            attackCookieGenerator.next();
             bodyGenerator.next();
         }
 
@@ -367,8 +394,10 @@ class AllGeneratorsIntegrationTest {
             allStringGenerations.add(invalidUrlGenerator.next());
 
             // Record-based generators (G7-G9)
-            allParameterGenerations.add(parameterGenerator.next());
-            allCookieGenerations.add(cookieGenerator.next());
+            allParameterGenerations.add(validParameterGenerator.next());
+            allParameterGenerations.add(attackParameterGenerator.next());
+            allCookieGenerations.add(validCookieGenerator.next());
+            allCookieGenerations.add(attackCookieGenerator.next());
             allBodyGenerations.add(bodyGenerator.next());
         }
 

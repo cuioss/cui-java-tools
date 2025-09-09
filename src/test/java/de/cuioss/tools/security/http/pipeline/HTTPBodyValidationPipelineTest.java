@@ -22,7 +22,7 @@ import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.core.ValidationType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
-import de.cuioss.tools.security.http.generators.ValidHTTPBodyContentGenerator;
+import de.cuioss.tools.security.http.generators.body.ValidHTTPBodyContentGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.validation.CharacterValidationStage;
 import de.cuioss.tools.security.http.validation.LengthValidationStage;

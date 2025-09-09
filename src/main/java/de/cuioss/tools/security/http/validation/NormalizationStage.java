@@ -25,6 +25,7 @@ import lombok.Value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  * Path normalization validation stage with security checks.
@@ -123,6 +124,13 @@ public class NormalizationStage implements HttpSecurityValidator {
     private static final int MAX_DIRECTORY_DEPTH = 100;
 
     /**
+     * Precompiled pattern to detect URLs with protocol schemes.
+     * Matches RFC 3986 scheme format: scheme://authority/path
+     * Used to prevent normalization of protocol portions in URLs.
+     */
+    private static final Pattern URL_WITH_PROTOCOL_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9+.-]*://.*");
+
+    /**
      * Security configuration controlling validation behavior.
      */
     SecurityConfiguration config;
@@ -161,8 +169,8 @@ public class NormalizationStage implements HttpSecurityValidator {
         // Save original for comparison and error reporting
         String original = value;
 
-        // Normalize path segments (resolve . and ..)
-        String normalized = normalizePath(value);
+        // Normalize URI components (resolve . and .. in path segments)
+        String normalized = normalizeUriComponent(value);
 
         // Check if path escapes root after normalization (check first for proper precedence)
         if (escapesRoot(normalized)) {
@@ -190,27 +198,28 @@ public class NormalizationStage implements HttpSecurityValidator {
     }
 
     /**
-     * Normalizes path segments according to RFC 3986 with DoS protection.
+     * Normalizes URI components according to RFC 3986 with DoS protection.
      * 
      * <p>This method implements RFC 3986 Section 5.2.4 "Remove Dot Segments" algorithm
-     * with additional security measures to prevent resource exhaustion attacks.</p>
+     * for path components, while preserving complete URIs with protocol schemes.
+     * Includes additional security measures to prevent resource exhaustion attacks.</p>
      * 
-     * @param path The path to normalize
-     * @return The normalized path
+     * @param uriComponent The URI component to normalize (path segment or complete URI)
+     * @return The normalized URI component
      * @throws UrlSecurityException if processing limits are exceeded
      */
-    private String normalizePath(String path) {
-        // Check if this is a URL with protocol - don't normalize protocol portion
-        if (path.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
-            // This is a URL with protocol (like https://example.com)
+    private String normalizeUriComponent(String uriComponent) {
+        // Check if this is a complete URI with protocol - don't normalize protocol portion
+        if (URL_WITH_PROTOCOL_PATTERN.matcher(uriComponent).matches()) {
+            // This is a complete URI with protocol (like https://example.com)
             // Don't normalize the protocol portion, return as-is
-            return path;
+            return uriComponent;
         }
 
         // RFC 3986 path segment normalization with recursion protection
-        String[] segments = path.split("/", -1);
+        String[] segments = uriComponent.split("/", -1);
         List<String> outputSegments = new ArrayList<>();
-        boolean isAbsolute = path.startsWith("/");
+        boolean isAbsolute = uriComponent.startsWith("/");
         int totalSegments = 0;
 
         // Prevent stack overflow with excessive segments
@@ -218,7 +227,7 @@ public class NormalizationStage implements HttpSecurityValidator {
             throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
                     .validationType(validationType)
-                    .originalInput(path)
+                    .originalInput(uriComponent)
                     .detail("Path contains too many segments: " + segments.length + " (max: " + MAX_PATH_SEGMENTS + ")")
                     .build();
         }
@@ -231,7 +240,7 @@ public class NormalizationStage implements HttpSecurityValidator {
                 throw UrlSecurityException.builder()
                         .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
                         .validationType(validationType)
-                        .originalInput(path)
+                        .originalInput(uriComponent)
                         .detail("Processing exceeded maximum segment count: " + MAX_PATH_SEGMENTS)
                         .build();
             }
@@ -264,7 +273,7 @@ public class NormalizationStage implements HttpSecurityValidator {
                         throw UrlSecurityException.builder()
                                 .failureType(UrlSecurityFailureType.EXCESSIVE_NESTING)
                                 .validationType(validationType)
-                                .originalInput(path)
+                                .originalInput(uriComponent)
                                 .detail("Path depth " + outputSegments.size() + " exceeds maximum " + MAX_DIRECTORY_DEPTH)
                                 .build();
                     }
@@ -289,7 +298,7 @@ public class NormalizationStage implements HttpSecurityValidator {
         }
 
         // Preserve trailing slash if present and we have content, or for root path
-        if (path.endsWith("/") && !result.toString().endsWith("/")) {
+        if (uriComponent.endsWith("/") && !result.toString().endsWith("/")) {
             if (!outputSegments.isEmpty() || isAbsolute) {
                 result.append("/");
             }

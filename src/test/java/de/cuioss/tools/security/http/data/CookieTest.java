@@ -17,7 +17,7 @@ package de.cuioss.tools.security.http.data;
 
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
-import de.cuioss.tools.security.http.generators.CookieGenerator;
+import de.cuioss.tools.security.http.generators.cookie.ValidCookieGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -229,7 +229,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CookieGenerator.class, count = 20)
+    @TypeGeneratorSource(value = ValidCookieGenerator.class, count = 20)
     void shouldGenerateValidCookieString(Cookie cookie) {
         String cookieString = cookie.toCookieString();
 
@@ -292,7 +292,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CookieGenerator.class, count = 10)
+    @TypeGeneratorSource(value = ValidCookieGenerator.class, count = 10)
     void shouldSupportEquality(Cookie cookie) {
         Cookie sameCookie = new Cookie(cookie.name(), cookie.value(), cookie.attributes());
         Cookie differentCookie = new Cookie("different_name", cookie.value(), cookie.attributes());
@@ -314,7 +314,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CookieGenerator.class, count = 15)
+    @TypeGeneratorSource(value = ValidCookieGenerator.class, count = 15)
     void shouldSupportToString(Cookie cookie) {
         String string = cookie.toString();
         assertNotNull(string, "Cookie toString should never return null");
@@ -392,7 +392,7 @@ class CookieTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CookieGenerator.class, count = 10)
+    @TypeGeneratorSource(value = ValidCookieGenerator.class, count = 10)
     void shouldBeImmutable(Cookie original) {
         String originalName = original.name();
         String originalValue = original.value();

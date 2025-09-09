@@ -20,7 +20,7 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
-import de.cuioss.tools.security.http.generators.HttpRequestSmugglingAttackGenerator;
+import de.cuioss.tools.security.http.generators.injection.HttpRequestSmugglingAttackGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;

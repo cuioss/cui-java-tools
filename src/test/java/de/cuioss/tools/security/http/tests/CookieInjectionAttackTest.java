@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * T17: Test cookie injection attacks
- * 
+ *
  * <p>
  * This test class implements Task T17 from the HTTP security validation plan,
  * focusing on testing cookie injection attacks that attempt to manipulate
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * or perform session manipulation attacks using specialized generators and
  * comprehensive attack vectors.
  * </p>
- * 
+ *
  * <h3>Test Coverage</h3>
  * <ul>
  *   <li>CRLF injection in cookie values and parameters</li>
@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>Cookie smuggling attacks</li>
  *   <li>Domain and path manipulation in cookies</li>
  * </ul>
- * 
+ *
  * <h3>Security Standards</h3>
  * <ul>
  *   <li>RFC 6265 - HTTP State Management Mechanism (Cookies)</li>
@@ -72,9 +72,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>CWE-89 - SQL Injection</li>
  *   <li>CWE-78 - OS Command Injection</li>
  * </ul>
- * 
+ *
  * Implements: Task T17 from HTTP verification specification
- * 
+ *
  * @author Claude Code Generator
  * @since 2.5
  */
@@ -95,14 +95,14 @@ class CookieInjectionAttackTest {
 
     /**
      * Test comprehensive cookie injection attack patterns.
-     * 
+     *
      * <p>
      * Uses CookieInjectionAttackGenerator which provides 15 different types
      * of cookie injection attacks including CRLF injection, session fixation,
      * authentication bypass, XSS, SQL injection, and other cookie manipulation
      * techniques.
      * </p>
-     * 
+     *
      * @param cookieAttackPattern A cookie injection attack pattern
      */
     @ParameterizedTest
@@ -134,7 +134,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test specific CRLF injection attacks in cookie parameters.
-     * 
+     *
      * <p>
      * Tests attacks that inject CRLF sequences (\r\n) into cookie parameters
      * to manipulate HTTP headers and perform header injection attacks.
@@ -176,7 +176,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test cookie header injection attacks.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to inject additional Cookie headers
      * to manipulate authentication and session state.
@@ -218,7 +218,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test session fixation attack patterns.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to fix session identifiers to known values
      * to facilitate session hijacking.
@@ -258,7 +258,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test authentication bypass cookie attacks.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to bypass authentication by manipulating
      * authentication-related cookie values.
@@ -300,7 +300,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test cross-site cookie injection attacks.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to set cookies for different domains
      * to perform cross-site attacks.
@@ -342,7 +342,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test XSS injection via cookie parameters.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to inject JavaScript code through
      * cookie parameters for cross-site scripting attacks.
@@ -384,7 +384,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test SQL injection via cookie parameters.
-     * 
+     *
      * <p>
      * Tests attacks that attempt to inject SQL commands through
      * cookie parameters to manipulate database queries.
@@ -426,7 +426,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test cookie overflow attacks.
-     * 
+     *
      * <p>
      * Tests attacks using extremely long cookie values that might
      * cause buffer overflows or memory exhaustion.
@@ -468,7 +468,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test cookie parsing confusion attacks.
-     * 
+     *
      * <p>
      * Tests attacks that exploit cookie parsing differences and
      * malformed cookie structures.
@@ -510,7 +510,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test performance impact of cookie injection validation.
-     * 
+     *
      * <p>
      * Ensures that cookie injection detection doesn't significantly impact
      * validation performance, even with complex attack patterns.
@@ -549,7 +549,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Test comprehensive edge cases in cookie injection detection.
-     * 
+     *
      * <p>
      * Tests various edge cases and corner conditions that might be
      * exploited in cookie injection attacks.
@@ -563,7 +563,7 @@ class CookieInjectionAttackTest {
                 "/profile?cookie=\u0061\u0064\u006d\u0069\u006e", // "admin" in Unicode
                 "/auth?session=\u0000\u0061\u0064\u006d\u0069\u006e", // null byte + "admin"
                 "/secure?auth=\u202e\u0061\u0064\u006d\u0069\u006e", // Right-to-left override
-                
+
                 // Cookie smuggling
                 "/api?cookie=normal%0d%0a%0d%0aGET /admin HTTP/1.1%0d%0aCookie: admin=true",
                 "/login?session=user%0a%0aGET /secure HTTP/1.1%0a%0aCookie: role=administrator",
@@ -588,7 +588,7 @@ class CookieInjectionAttackTest {
 
     /**
      * Determines if a failure type is related to cookie injection attacks.
-     * 
+     *
      * @param failureType The failure type to check
      * @return true if the failure type indicates a cookie injection-related security issue
      */

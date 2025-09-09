@@ -14,6 +14,30 @@ During comprehensive analysis of the HTTP security test framework, systematic qu
 
 # PHASE 1: FOUNDATION (Critical Architecture)
 
+## QI-20: Generator Framework Design Violations ✅
+**Status**: 🟢 RESOLVED - All framework violations corrected and generators reorganized  
+**Action**: Fixed call-counter anti-patterns, split mixed-purpose generators, organized into sub-packages by category
+
+### Completed Actions:
+- [x] **Document framework violations** - Identified systematic design errors
+- [x] **Audit all converted generators** - Comprehensive audit completed
+- [x] **Split mixed-purpose generators**: Implemented "Option B: Separate Generators"
+  - [x] **CookieGenerator** → `ValidCookieGenerator` + `AttackCookieGenerator` 
+  - [x] **URLParameterGenerator** → `ValidURLParameterGenerator` + `AttackURLParameterGenerator`
+  - [x] **ValidHTTPHeaderValueGenerator** - Removed call-counter anti-pattern
+- [x] **Remove call-counter anti-pattern** - All generators now seed-based and stateless
+- [x] **Framework compliance verification** - All generators follow reproducibility = f(seed)
+- [x] **Mark original generators as deprecated** - All violating generators marked `@Deprecated(forRemoval = true)`
+- [x] **Sub-package reorganization** - **NEW**: Organized 63 generators into 6 categorical sub-packages:
+  - `cookie/` - Cookie-related generators and tests  
+  - `url/` - URL and parameter generators
+  - `header/` - HTTP header generators
+  - `body/` - HTTP body generators
+  - `encoding/` - Encoding and path traversal generators
+  - `injection/` - Injection attack generators
+
+**Design Principle Applied**: We now have BOTH legitimate data validation AND attack detection testing with proper separation.
+
 ## QI-17: Systematic Hardcoded .repeat() Anti-Pattern (CRITICAL)
 **Status**: 🔴 Critical - Complete generator architecture bypass AND fundamental testing logic flaw  
 **Impact**: Generators are not generating - they're using hardcoded repeated strings that create unrealistic test scenarios  
@@ -93,16 +117,17 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 - [x] **Audit generator architecture**:
   - [x] Identify generators using only `fixedValues()` - **Found 66 instances across 36+ generators**
   - [x] Document generators lacking dynamic generation
-- [x] **Implement dynamic generators** *(In Progress - 8/36 generators completed)*:
-  - [x] **PathTraversalGenerator**: Converted 9 fixedValues to dynamic algorithmic generation with 7 attack pattern types
+- [x] **Implement dynamic generators** *(In Progress - 11/36 generators completed)*:
+  - [x] **PathTraversalGenerator**: Converted 5→3 fixedValues to dynamic generation with 7+ specialized generation methods  
   - [x] **HTTPBodyGenerator**: Re-converted 19 fixedValues to dynamic generation with 18+ specialized generation methods
-  - [x] **CookieGenerator**: Converted 5 fixedValues to dynamic generation with 20+ specialized generation methods
+  - [x] **CookieGenerator**: Converted 23→5 fixedValues to dynamic generation with 25+ specialized generation methods
   - [x] **URLParameterGenerator**: Converted 4 fixedValues to dynamic generation with 15+ generation methods
   - [x] **ValidHTTPHeaderNameGenerator**: Converted 20-item fixedValues array to dynamic header name generation
   - [x] **ValidHTTPHeaderValueGenerator**: Converted 20-item fixedValues array to dynamic header value generation
   - [x] **HTTPBodyGenerator Phase 4**: Eliminated remaining 19 fixedValues calls with proper algorithmic generation
   - [x] **XssInjectionAttackGenerator**: Converted 2 large fixedValues arrays (15+14 items) to dynamic pattern generation with 5 pattern types
-  - [ ] **Remaining 28 generators**: Various fixedValues usage patterns *(Next Priority)*
+  - [x] **BoundaryFuzzingGenerator**: Converted 3→0 fixedValues to complete dynamic generation with boundary attack patterns
+  - [ ] **Remaining 27 generators**: Various fixedValues usage patterns *(Next Priority)*
 - [x] **Test generator diversity**:
   - [x] Verify generators produce varied output across runs - PathTraversalGenerator diversity test passes
   - [x] Fixed anti-pattern: HTTPBodyGenerator `Generators.letterStrings(100, 500).next()` in fixedValues() 
@@ -486,6 +511,7 @@ Each phase must be completed with:
 **Current Status**: 
 - ✅ QI-15: Sophisticated generators restored
 - ✅ QI-16: Correct architecture established  
+- ✅ QI-20: Framework violations resolved + sub-package reorganization completed
 - ✅ TODO tests disabled and documented
 - 🔴 QI-17: .repeat() patterns still present (next priority)
 
