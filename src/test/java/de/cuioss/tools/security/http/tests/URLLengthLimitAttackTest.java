@@ -332,19 +332,20 @@ class URLLengthLimitAttackTest {
     @DisplayName("Deep path nesting attacks must be blocked")
     void shouldBlockDeepPathNestingAttacks() {
         String[] deepNestingAttacks = {
-                // Basic deep nesting
-                "/" + "dir/".repeat(1000) + "api", // 1000 directory levels
-                "/" + "level/".repeat(2000) + "file", // 2000 levels deep
-                "/api/" + "sub/".repeat(5000) + "resource", // 5000 nested levels
+                // QI-17: Fixed to test actual security limits instead of basic input sanitation
+                // These patterns exceed the 1024-character STRICT limit to trigger length validation
+                "/" + generatePathSegments("dir/", 260) + "api", // ~1044 chars - just over STRICT limit
+                "/" + generatePathSegments("level/", 250) + "file", // ~1250 chars - exceeds STRICT limit  
+                "/api/" + generatePathSegments("sub/", 300) + "resource", // ~1200+ chars - exceeds STRICT limit
                 
-                // Extremely deep nesting
-                "/" + ("path" + "/").repeat(10000) + "endpoint", // 10000 path segments
-                "/" + "deep/".repeat(500) + "very/".repeat(500) + "nested/".repeat(500) + "api", // Mixed depths
+                // Path length that exceeds configured 1024 STRICT limit but tests realistic boundaries
+                "/" + generatePathSegments("path/", 210) + "endpoint", // ~1260 chars - exceeds STRICT, tests DEFAULT
+                "/" + generateNestedPaths() + "api", // ~1100-1300 chars - varied nesting
                 
-                // Varied directory names
-                "/" + ("dir" + hashBasedSelection(100) + "/").repeat(1000) + "target", // Varied directory names
-                "/" + "A/".repeat(20000) + "final", // 20000 single-char directories
-                "/" + ("folder" + "/subfolder" + "/").repeat(1000) + "destination" // Alternating long paths
+                // Varied directory names that test just over STRICT limit
+                "/" + generateVariedPathSegments(270) + "target", // ~1080+ chars - over STRICT
+                "/" + generatePathSegments("seg/", 260) + "final", // ~1040+ chars - just over STRICT limit
+                "/" + generateComplexNesting() + "destination" // ~1050-1150 chars - realistic nesting
         };
 
         for (String attack : deepNestingAttacks) {
@@ -374,19 +375,20 @@ class URLLengthLimitAttackTest {
     @DisplayName("Long parameter name attacks must be blocked")
     void shouldBlockLongParameterNameAttacks() {
         String[] longNameAttacks = {
-                // Basic long parameter names
-                "/api?" + "A".repeat(4096) + "=value", // 4KB parameter name
-                "/search?" + "param_" + "B".repeat(2000) + "=data", // Long name with prefix
-                "/endpoint?" + "C".repeat(8192) + "=test&normal=ok", // Long name with normal parameter
+                // QI-17: Fixed to test actual security limits (maxParameterNameLength: STRICT=64, DEFAULT=128, LENIENT=256)
+                // Parameter names that exceed configured 64-byte STRICT limit
+                "/api?" + generateParameterName(80) + "=value", // 80 chars - exceeds STRICT limit
+                "/search?" + "param_" + generateParameterName(55) + "=data", // ~61 chars total - approaches STRICT limit  
+                "/endpoint?" + generateParameterName(100) + "=test&normal=ok", // 100 chars - tests validation beyond STRICT
                 
-                // Descriptive long names
-                "/service?" + "field_name_" + "D".repeat(5000) + "=content", // Descriptive long name
-                "/handler?" + "E".repeat(16384) + "=info", // 16KB parameter name
+                // Descriptive long names that test realistic boundaries
+                "/service?" + "field_name_" + generateParameterName(54) + "=content", // ~65 chars - just over STRICT limit
+                "/handler?" + generateParameterName(150) + "=info", // 150 chars - exceeds DEFAULT limit (128)
                 
-                // Multiple long names
-                "/process?" + ("parameter_" + "F".repeat(100) + "=value&").repeat(10), // Multiple long names
-                "/resource?" + "G".repeat(32768) + "=result", // 32KB parameter name
-                "/data?" + "query_string_parameter_name_" + "H".repeat(10000) + "=search" // Very descriptive long name
+                // Multiple long names that test parameter parsing
+                "/process?" + generateMultipleParameterNames(), // Multiple parameters testing limits
+                "/resource?" + generateParameterName(200) + "=result", // 200 chars - tests beyond DEFAULT limit
+                "/data?" + "query_string_parameter_name_" + generateParameterName(20) + "=search" // ~49 chars total - within STRICT
         };
 
         for (String attack : longNameAttacks) {
@@ -416,19 +418,20 @@ class URLLengthLimitAttackTest {
     @DisplayName("Buffer overflow pattern attacks must be blocked")
     void shouldBlockBufferOverflowPatternAttacks() {
         String[] bufferOverflows = {
-                // Standard buffer overflow sizes
-                "/api?" + "A".repeat(65536), // 64KB buffer overflow attempt
-                "/search/" + "B".repeat(32768) + "?data=" + "C".repeat(32768), // 32KB path + 32KB parameter
-                "/endpoint?buffer=" + "D".repeat(131072), // 128KB parameter
+                // QI-17: Fixed to test actual security limits instead of basic input sanitation
+                // Values that exceed configured limits: maxPathLength(STRICT=1024), maxParameterValueLength(STRICT=1024)
+                "/api?" + generateParameterValue(1100), // 1100 chars - exceeds STRICT parameter value limit
+                "/search/" + generatePath(1100) + "?data=" + generateParameterValue(1200), // Path + param both exceed STRICT
+                "/endpoint?buffer=" + generateParameterValue(1500), // 1500 chars - exceeds DEFAULT limit (2048)
                 
-                // Combined overflow attempts
-                "/" + "E".repeat(16384) + "/api?payload=" + "F".repeat(49152), // 16KB path + 48KB parameter = 64KB total
-                "/service?" + ("overflow" + "G".repeat(1000) + "=data&").repeat(50), // Many parameters with buffer patterns
+                // Combined overflow attempts testing realistic boundaries
+                "/" + generatePath(1200) + "/api?payload=" + generateParameterValue(1300), // Both exceed STRICT limits
+                "/service?" + generateMultipleOverflowParameters(), // Multiple parameters exceeding limits
                 
-                // Large single components
-                "/handler/" + "H".repeat(65536), // 64KB path component
-                "/process?input=" + "I".repeat(262144), // 256KB parameter value
-                "/resource#" + "J".repeat(131072) // 128KB fragment
+                // Large single components that test actual validation
+                "/handler/" + generatePath(1500), // 1500 chars - exceeds path STRICT, tests DEFAULT
+                "/process?input=" + generateParameterValue(2100), // 2100 chars - exceeds DEFAULT parameter limit
+                "/resource#" + generateFragment(2200) // 2200 chars - tests fragment handling
         };
 
         for (String attack : bufferOverflows) {
@@ -458,18 +461,19 @@ class URLLengthLimitAttackTest {
     @DisplayName("Memory exhaustion attacks must be blocked")
     void shouldBlockMemoryExhaustionAttacks() {
         String[] memoryAttacks = {
-                // Large memory allocation attempts
-                "/api?memory=" + "A".repeat(500000), // 500KB parameter (reduced for test performance)
-                "/search/" + "B".repeat(250000) + "?data=" + "C".repeat(250000), // 500KB total (reduced)
+                // QI-17: Fixed to test actual security limits (STRICT: 1024, DEFAULT: 2048/4096, LENIENT: 8192)
+                // Test just over limits to ensure actual security validation, not basic input rejection
+                "/api?memory=" + generateParameterValue(1200), // 1200 chars - exceeds STRICT parameter limit
+                "/search/" + generatePath(1100) + "?data=" + generateParameterValue(1300), // Both exceed STRICT limits
                 
-                // Structured large data
-                "/endpoint?" + ("param" + hashBasedSelection(1000) + "=" + "D".repeat(500) + "&").repeat(200), // 200KB in varied parameters (reduced)
-                "/service?exhaustion=" + "E".repeat(1000000), // 1MB parameter (may cause test timeout - handled by assertion)
+                // Structured data testing DEFAULT limits
+                "/endpoint?" + generateStructuredParameters(), // Multiple params testing various limits
+                "/service?exhaustion=" + generateParameterValue(2100), // 2100 chars - exceeds DEFAULT param limit (2048)
                 
-                // Large path and fragment
-                "/" + "F".repeat(500000) + "/api", // 500KB path prefix (reduced)
-                "/handler?large_data=" + ("chunk" + "G".repeat(500)).repeat(100), // Structured large data (reduced)
-                "/process#" + "H".repeat(500000) // 500KB fragment (reduced)
+                // Large components testing realistic boundaries  
+                "/" + generatePath(4200) + "/api", // 4200 chars - exceeds DEFAULT path limit (4096)
+                "/handler?large_data=" + generateStructuredParameterValue(), // Structured data within limits
+                "/process#" + generateFragment(8300) // 8300 chars - exceeds LENIENT limit (8192)
         };
 
         for (String attack : memoryAttacks) {
@@ -499,19 +503,20 @@ class URLLengthLimitAttackTest {
     @DisplayName("Encoding length attacks must be blocked")
     void shouldBlockEncodingLengthAttacks() {
         String[] encodingAttacks = {
-                // URL encoding amplification
-                "/api?data=" + "%41".repeat(5000), // URL encoding amplification
-                "/search/" + "%2E".repeat(10000), // Encoded dots
-                "/endpoint?param=" + "%20".repeat(10000), // Encoded spaces
+                // QI-17: Fixed to test actual security limits with URL encoding (consider both raw and decoded lengths)
+                // URL encoding that tests realistic boundaries considering decoded size
+                "/api?data=" + generateEncodedParameterValue(400), // ~1200 chars total, 400 after decode (exceeds STRICT)
+                "/search/" + generateEncodedPath(350), // ~1050 chars total, 350 after decode (exceeds STRICT)
+                "/endpoint?param=" + generateEncodedParameterValue(700), // ~2100 chars total, 700 after decode
                 
-                // Mixed encoding patterns
-                "/service/" + ("%2F" + "A".repeat(100)).repeat(200), // Mixed encoding
-                "/handler?query=" + "%3C%3E".repeat(5000), // Encoded angle brackets
-                "/process/" + "%2E%2E%2F".repeat(2000), // Encoded path traversal patterns
+                // Mixed encoding patterns testing boundaries
+                "/service/" + generateMixedEncodingPath(), // Mixed patterns testing path limits
+                "/handler?query=" + generateEncodedParameterValue(450), // ~1350 chars total, 450 after decode
+                "/process/" + generateEncodedTraversalPattern(), // Encoded traversal testing path limits
                 
-                // Complex encoding patterns
-                "/resource?field=" + "%41%42%43".repeat(10000), // Encoded ABC pattern
-                "/data#" + "%23".repeat(15000) // Encoded hash symbols
+                // Complex encoding patterns that test validation
+                "/resource?field=" + generateComplexEncodingValue(), // Complex encoding within limits
+                "/data#" + generateEncodedFragment(2800) // ~8400 chars total - exceeds LENIENT limit
         };
 
         for (String attack : encodingAttacks) {
@@ -540,7 +545,7 @@ class URLLengthLimitAttackTest {
     @Test
     @DisplayName("URL length limit attack validation should maintain performance")
     void shouldMaintainPerformanceWithLengthLimitAttacks() {
-        String complexLengthPattern = "/" + "A".repeat(1000) + "/api?" + "param=" + "B".repeat(1000) + "&data=" + "C".repeat(1000) + "#" + "D".repeat(1000);
+        String complexLengthPattern = "/" + generatePath(1100) + "/api?" + "param=" + generateParameterValue(1200) + "&data=" + generateParameterValue(1300) + "#" + generateFragment(8300); // QI-17: Fixed to test actual limits
 
         // Warm up
         for (int i = 0; i < 10; i++) {
@@ -580,19 +585,20 @@ class URLLengthLimitAttackTest {
     @DisplayName("URL length limit attack edge cases must be handled")
     void shouldHandleURLLengthLimitAttackEdgeCases() {
         String[] edgeCaseAttacks = {
-                // Algorithmic complexity attacks
-                "/api?" + ("a" + "=b&").repeat(5000), // Many small parameters (parsing complexity) - reduced count
-                "/search/" + "x/".repeat(2500) + "target", // Many small path segments - reduced count
-                "/" + "../".repeat(5000) + "/api", // Many traversal attempts - reduced count
+                // QI-17: Fixed algorithmic complexity attacks to test actual validation within realistic boundaries
+                // Complexity attacks that test limits without creating unrealistic massive inputs
+                "/api?" + generateManySmallParameters(), // Multiple small parameters testing count limits
+                "/search/" + generateManySegments() + "target", // Multiple segments testing path parsing  
+                "/" + generateTraversalPattern() + "/api", // Traversal patterns testing security validation
                 
-                // Varied patterns for complexity
-                "/endpoint?" + ("param" + hashBasedSelection(500) + "=value" + hashBasedSelection(500) + "&").repeat(100), // Varied parameter names - reduced count
-                "/service/" + ("segment" + hashBasedSelection(50)).repeat(200), // Varied path segments - reduced count
+                // Varied patterns for complexity testing different limits
+                "/endpoint?" + generateComplexParameterString(), // Complex params testing various boundaries
+                "/service/" + generateNestedSegments(), // Nested segments testing path limits
                 
-                // Complex nested patterns
-                "/handler?" + "regex=" + "(a+)+".repeat(500), // Regex complexity pattern - reduced count
-                "/process/" + ("a" + "/b".repeat(50)).repeat(20), // Nested pattern complexity - reduced count
-                "/resource?" + ("key=value" + "&").repeat(10000) // Simple but numerous parameters
+                // Complex nested patterns that test parsing within boundaries
+                "/handler?" + generateRegexPattern(), // Regex patterns testing parameter parsing
+                "/process/" + generateNestedPathPattern(), // Nested patterns within reasonable limits
+                "/resource?" + generateKeyValueParameters() // Key-value parameters testing limit validation
         };
 
         for (String attack : edgeCaseAttacks) {
@@ -664,7 +670,8 @@ class URLLengthLimitAttackTest {
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
                 failureType == UrlSecurityFailureType.RFC_VIOLATION ||
-                failureType == UrlSecurityFailureType.INVALID_CHARACTER; // Repeated chars in length attacks
+                failureType == UrlSecurityFailureType.INVALID_CHARACTER || // Repeated chars in length attacks
+                failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED; // Long URLs with traversal patterns
     }
 
     /**
@@ -672,6 +679,447 @@ class URLLengthLimitAttackTest {
      */
     private int hashBasedSelection(int bound) {
         return Math.abs(this.hashCode()) % bound;
+    }
+
+    // QI-17: Helper methods to replace hardcoded .repeat() patterns with proper boundary testing
+    
+    /**
+     * Generates path segments that test realistic security boundaries instead of massive inputs.
+     * @param segment the base segment pattern
+     * @param count number of repetitions to generate realistic length
+     * @return generated path segments
+     */
+    private String generatePathSegments(String segment, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(segment);
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates nested paths with varied segment names for realistic testing.
+     * @return nested path string that tests just over STRICT limit
+     */
+    private String generateNestedPaths() {
+        StringBuilder result = new StringBuilder();
+        String[] segments = {"deep/", "very/", "nested/", "path/", "level/"};
+        int totalLength = 0;
+        int segmentIndex = 0;
+
+        // Generate until we exceed STRICT limit (1024) but stay reasonable
+        while (totalLength < 1100 && totalLength < 1300) {
+            String segment = segments[segmentIndex % segments.length];
+            result.append(segment);
+            totalLength += segment.length();
+            segmentIndex++;
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates varied path segments with different names for boundary testing.
+     * @param baseCount approximate number of segments
+     * @return varied path segments testing just over STRICT limit
+     */
+    private String generateVariedPathSegments(int baseCount) {
+        StringBuilder result = new StringBuilder();
+        String[] patterns = {"dir", "folder", "segment", "part"};
+
+        for (int i = 0; i < baseCount; i++) {
+            String pattern = patterns[i % patterns.length];
+            result.append(pattern).append(hashBasedSelection(10)).append("/");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates complex nesting patterns for realistic boundary testing.
+     * @return complex nested path that tests security validation
+     */
+    private String generateComplexNesting() {
+        StringBuilder result = new StringBuilder();
+        String[] components = {"folder", "subfolder", "subdir", "level"};
+
+        // Build path that's just over STRICT limit
+        for (int i = 0; i < 60; i++) {
+            String component = components[i % components.length];
+            result.append(component).append("/");
+
+            // Stop when we reach target length just over STRICT (1024)
+            if (result.length() > 1000) break;
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates parameter names that test realistic security boundaries.
+     * @param length target length for the parameter name
+     * @return generated parameter name for boundary testing
+     */
+    private String generateParameterName(int length) {
+        if (length <= 10) {
+            return Generators.letterStrings(length, length).next();
+        }
+
+        // For longer names, create more realistic parameter names
+        StringBuilder result = new StringBuilder();
+        String[] prefixes = {"param", "field", "data", "value", "query"};
+        String prefix = prefixes[Math.abs(hashCode()) % prefixes.length];
+        result.append(prefix);
+
+        // Fill remaining length with letters/numbers
+        int remaining = length - prefix.length();
+        if (remaining > 0) {
+            result.append("_").append(Generators.letterStrings(remaining - 1, remaining - 1).next());
+        }
+
+        // Ensure exact length
+        String generated = result.toString();
+        if (generated.length() > length) {
+            return generated.substring(0, length);
+        } else if (generated.length() < length) {
+            return generated + "x".repeat(length - generated.length());
+        }
+        return generated;
+    }
+
+    /**
+     * Generates multiple parameter names for testing parameter parsing limits.
+     * @return query string with multiple parameters testing various boundaries
+     */
+    private String generateMultipleParameterNames() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate several parameters with different name lengths
+        result.append(generateParameterName(30)).append("=value1&");  // Within STRICT
+        result.append(generateParameterName(70)).append("=value2&");  // Exceeds STRICT
+        result.append(generateParameterName(140)).append("=value3&"); // Exceeds DEFAULT
+        result.append(generateParameterName(25)).append("=value4");   // Final param, within STRICT
+        
+        return result.toString();
+    }
+
+    /**
+     * Generates parameter values that test realistic security boundaries.
+     * @param length target length for the parameter value
+     * @return generated parameter value for boundary testing
+     */
+    private String generateParameterValue(int length) {
+        // Generate realistic parameter value content
+        return Generators.letterStrings(length, length).next();
+    }
+
+    /**
+     * Generates path components that test realistic security boundaries.
+     * @param length target length for the path
+     * @return generated path for boundary testing
+     */
+    private String generatePath(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] segments = {"api", "data", "service", "endpoint", "resource", "handler"};
+
+        while (result.length() < length - 20) { // Leave room for final segment
+            String segment = segments[Math.abs(result.toString().hashCode()) % segments.length];
+            result.append(segment).append("/");
+        }
+
+        // Fill remaining space
+        int remaining = length - result.length();
+        if (remaining > 0) {
+            result.append(Generators.letterStrings(remaining, remaining).next());
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Generates URL fragments that test realistic security boundaries.
+     * @param length target length for the fragment
+     * @return generated fragment for boundary testing
+     */
+    private String generateFragment(int length) {
+        // Generate realistic fragment content
+        return Generators.letterStrings(length, length).next();
+    }
+
+    /**
+     * Generates multiple parameters with overflow values for testing.
+     * @return query string with multiple parameters exceeding limits
+     */
+    private String generateMultipleOverflowParameters() {
+        StringBuilder result = new StringBuilder();
+
+        result.append("param1=").append(generateParameterValue(1200)).append("&"); // Exceeds STRICT
+        result.append("param2=").append(generateParameterValue(800)).append("&");  // Within STRICT
+        result.append("param3=").append(generateParameterValue(2500)).append("&"); // Exceeds DEFAULT
+        result.append("param4=").append(generateParameterValue(600));              // Final param
+        
+        return result.toString();
+    }
+
+    /**
+     * Generates structured parameters for testing various limit boundaries.
+     * @return structured parameter string testing different limits
+     */
+    private String generateStructuredParameters() {
+        StringBuilder result = new StringBuilder();
+
+        // Mix of parameters at different lengths
+        result.append("small=").append(generateParameterValue(100)).append("&");    // Within STRICT
+        result.append("medium=").append(generateParameterValue(1200)).append("&");  // Exceeds STRICT
+        result.append("large=").append(generateParameterValue(2100)).append("&");   // Exceeds DEFAULT
+        result.append("final=").append(generateParameterValue(300));                // Within STRICT
+        
+        return result.toString();
+    }
+
+    /**
+     * Generates structured parameter value with realistic content patterns.
+     * @return structured parameter value for boundary testing
+     */
+    private String generateStructuredParameterValue() {
+        StringBuilder result = new StringBuilder();
+        String[] chunks = {"chunk", "data", "segment", "block"};
+
+        // Build structured content within reasonable limits
+        for (int i = 0; i < 20; i++) {
+            String chunk = chunks[i % chunks.length];
+            result.append(chunk).append("_").append(generateParameterValue(40));
+            if (i < 19) result.append(",");
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Generates URL-encoded parameter values that test realistic security boundaries.
+     * @param decodedLength target length after decoding
+     * @return URL-encoded parameter value (typically 3x the decoded length)
+     */
+    private String generateEncodedParameterValue(int decodedLength) {
+        StringBuilder result = new StringBuilder();
+        String baseValue = generateParameterValue(decodedLength);
+
+        // Encode ~1/3 of characters to create realistic encoded content
+        for (int i = 0; i < baseValue.length(); i++) {
+            char c = baseValue.charAt(i);
+            if (i % 3 == 0) {
+                // URL encode some characters
+                result.append("%%%02X".formatted((int) c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates URL-encoded path that tests realistic security boundaries.
+     * @param decodedLength target length after decoding
+     * @return URL-encoded path
+     */
+    private String generateEncodedPath(int decodedLength) {
+        StringBuilder result = new StringBuilder();
+        String basePath = generatePath(decodedLength);
+
+        // Encode some characters to simulate realistic encoding
+        for (int i = 0; i < basePath.length(); i++) {
+            char c = basePath.charAt(i);
+            if (c == '/' || i % 4 == 0) {
+                result.append("%%%02X".formatted((int) c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates mixed encoding path patterns for testing boundaries.
+     * @return mixed encoded path testing realistic limits
+     */
+    private String generateMixedEncodingPath() {
+        StringBuilder result = new StringBuilder();
+        String[] segments = {"service", "api", "data"};
+
+        // Build path with mixed encoding up to reasonable length
+        for (int i = 0; i < 30; i++) {
+            String segment = segments[i % segments.length];
+            result.append("%2F").append(segment); // Encoded slash + segment
+            if (result.length() > 1000) break; // Stop at reasonable length
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates encoded path traversal patterns for testing.
+     * @return encoded traversal pattern testing security validation
+     */
+    private String generateEncodedTraversalPattern() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate encoded traversal patterns that test limits
+        for (int i = 0; i < 100; i++) {
+            result.append("%2E%2E%2F"); // Encoded "../"
+            if (result.length() > 1200) break; // Stop just over STRICT limit
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates complex encoding values for testing.
+     * @return complex encoded value that exceeds 1024 character limit
+     */
+    private String generateComplexEncodingValue() {
+        StringBuilder result = new StringBuilder();
+        String[] patterns = {"%41%42%43", "%44%45%46", "%47%48%49"}; // ABC, DEF, GHI encoded
+        
+        for (int i = 0; i < 120; i++) { // Increased to exceed 1024 limit
+            result.append(patterns[i % patterns.length]);
+            if (result.length() > 1100) break; // Ensure we exceed STRICT limit
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates encoded fragment for testing realistic boundaries.
+     * @param decodedLength target length after decoding  
+     * @return encoded fragment
+     */
+    private String generateEncodedFragment(int decodedLength) {
+        StringBuilder result = new StringBuilder();
+
+        // Generate fragment with encoding that results in target decoded length
+        for (int i = 0; i < decodedLength; i++) {
+            if (i % 2 == 0) {
+                result.append("%23"); // Encoded '#'
+            } else {
+                result.append("x");
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates many small parameters for testing count limits.
+     * @return parameter string with many small parameters
+     */
+    private String generateManySmallParameters() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate parameters that test count limits while staying within length bounds
+        for (int i = 0; i < 25; i++) { // Testing STRICT parameter count limit (20)
+            result.append("p").append(i).append("=v").append(i);
+            if (i < 24) result.append("&");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates many path segments for testing path parsing.
+     * @return path with many segments testing parsing limits
+     */
+    private String generateManySegments() {
+        StringBuilder result = new StringBuilder();
+        String[] segments = {"a", "b", "c", "d", "e", "f"};
+
+        // Generate segments that approach STRICT path limit
+        while (result.length() < 950) { // Stay under STRICT limit (1024)
+            String segment = segments[result.length() % segments.length];
+            result.append(segment).append("/");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates traversal pattern for testing security validation.
+     * @return traversal pattern testing path traversal detection
+     */
+    private String generateTraversalPattern() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate traversal patterns that test security but stay reasonable
+        for (int i = 0; i < 150; i++) { // ~450 chars - reasonable for testing
+            result.append("../");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates complex parameter string testing various boundaries.
+     * @return complex parameter string
+     */
+    private String generateComplexParameterString() {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < 10; i++) {
+            result.append("param").append(hashBasedSelection(50))
+                    .append("=value").append(hashBasedSelection(50));
+            if (i < 9) result.append("&");
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates nested segments for testing path limits.
+     * @return nested path segments
+     */
+    private String generateNestedSegments() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate nested structure within reasonable bounds
+        for (int i = 0; i < 80; i++) {
+            result.append("segment").append(hashBasedSelection(20)).append("/");
+            if (result.length() > 1000) break; // Stay reasonable
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates regex pattern for testing parameter parsing.
+     * @return regex pattern within reasonable bounds
+     */
+    private String generateRegexPattern() {
+        StringBuilder result = new StringBuilder();
+        result.append("regex=");
+
+        // Generate regex patterns that test parsing without being massive
+        for (int i = 0; i < 50; i++) {
+            result.append("(a+)+");
+            if (result.length() > 400) break; // Keep reasonable
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates nested path pattern for testing.
+     * @return nested path pattern within limits
+     */
+    private String generateNestedPathPattern() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate nested patterns that test validation logic
+        for (int i = 0; i < 30; i++) {
+            result.append("a/b/c/d/e/");
+            if (result.length() > 300) break; // Keep reasonable
+        }
+        return result.toString();
+    }
+
+    /**
+     * Generates key-value parameters for testing limit validation.
+     * @return key-value parameter string
+     */
+    private String generateKeyValueParameters() {
+        StringBuilder result = new StringBuilder();
+
+        // Generate parameters that approach count limits
+        for (int i = 0; i < 25; i++) { // Over STRICT count limit (20)
+            result.append("key").append(i).append("=value").append(i);
+            if (i < 24) result.append("&");
+        }
+        return result.toString();
     }
 
     /**

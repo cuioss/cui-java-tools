@@ -21,21 +21,26 @@ import de.cuioss.tools.security.http.core.ValidationType;
 
 /**
  * Generator for supported ValidationType values in PipelineFactory.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Provides the subset of ValidationType enum values that are supported by the factory.
  */
 public class SupportedValidationTypeGenerator implements TypedGenerator<ValidationType> {
 
-    private final TypedGenerator<ValidationType> supportedTypes = Generators.fixedValues(
-            ValidationType.URL_PATH,
-            ValidationType.PARAMETER_VALUE,
-            ValidationType.HEADER_NAME,
-            ValidationType.HEADER_VALUE,
-            ValidationType.BODY
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> typeSelector = Generators.integers(1, 5);
 
     @Override
     public ValidationType next() {
-        return supportedTypes.next();
+        return switch (typeSelector.next()) {
+            case 1 -> ValidationType.URL_PATH;
+            case 2 -> ValidationType.PARAMETER_VALUE;
+            case 3 -> ValidationType.HEADER_NAME;
+            case 4 -> ValidationType.HEADER_VALUE;
+            case 5 -> ValidationType.BODY;
+            default -> ValidationType.URL_PATH;
+        };
     }
 
     @Override

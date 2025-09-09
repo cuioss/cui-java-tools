@@ -34,9 +34,7 @@ public class ValidHTTPBodyContentGenerator implements TypedGenerator<String> {
     private final TypedGenerator<String> nameGenerator = Generators.letterStrings(3, 12);
     private final TypedGenerator<String> valueGenerator = Generators.letterStrings(5, 20);
     private final TypedGenerator<Integer> ageGenerator = Generators.integers(18, 80);
-    private final TypedGenerator<String> cityGenerator = Generators.fixedValues(
-            "New York", "London", "Tokyo", "Paris", "Berlin", "Sydney", "Toronto", "Moscow"
-    );
+    private final TypedGenerator<Integer> citySelector = Generators.integers(1, 8);
     private final TypedGenerator<String> numberGenerator = Generators.letterStrings(5, 15);
 
     // QI-17: Replace .repeat(1000) with realistic long content
@@ -72,8 +70,22 @@ public class ValidHTTPBodyContentGenerator implements TypedGenerator<String> {
     private String generateFormDataContent() {
         String name = nameGenerator.next();
         int age = ageGenerator.next();
-        String city = cityGenerator.next();
+        String city = generateCity();
         return "name=" + name + "&age=" + age + "&city=" + city.replace(" ", "+");
+    }
+
+    private String generateCity() {
+        return switch (citySelector.next()) {
+            case 1 -> "New York";
+            case 2 -> "London";
+            case 3 -> "Tokyo";
+            case 4 -> "Paris";
+            case 5 -> "Berlin";
+            case 6 -> "Sydney";
+            case 7 -> "Toronto";
+            case 8 -> "Moscow";
+            default -> "London";
+        };
     }
 
     private String generatePlainTextContent() {

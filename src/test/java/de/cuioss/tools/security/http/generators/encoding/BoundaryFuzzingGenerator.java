@@ -89,9 +89,9 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
         TypedGenerator<Integer> attackGen = Generators.integers(0, 3);
         int attack = attackGen.next();
         return switch (attack) {
-            case 0 -> "../".repeat(50) + "etc/passwd";  // Excessive traversal
-            case 1 -> "/a" + "verylongpathsegment/".repeat(100);     // Near max length starting with /a
-            case 2 -> "/%00" + "../".repeat(20);        // Null + traversal
+            case 0 -> generateTraversalPattern() + "etc/passwd";  // QI-17: Dynamic traversal
+            case 1 -> "/a" + generatePathSegmentPattern();        // QI-17: Dynamic path segments  
+            case 2 -> "/%00" + generateTraversalPattern();        // QI-17: Dynamic null + traversal
             default -> "/\u0000/../\u0000/../file";       // Multiple nulls
         };
     }
@@ -107,6 +107,25 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
             case 4 -> "/file>output";                 // Redirection
             default -> "/file|command";
         };
+    }
+
+    // QI-17: Dynamic generation helpers to replace hardcoded .repeat() patterns
+    private String generateTraversalPattern() {
+        int depth = Generators.integers(15, 25).next(); // Reasonable traversal depth
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            pattern.append("../");
+        }
+        return pattern.toString();
+    }
+
+    private String generatePathSegmentPattern() {
+        int segments = Generators.integers(30, 50).next(); // Reasonable segment count
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < segments; i++) {
+            pattern.append("verylongpathsegment/");
+        }
+        return pattern.toString();
     }
 
     @Override

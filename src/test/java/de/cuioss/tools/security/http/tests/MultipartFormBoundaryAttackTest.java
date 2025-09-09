@@ -486,7 +486,7 @@ class MultipartFormBoundaryAttackTest {
                 // Large content with boundaries
                 "/profile/image?content=" + longContent + "%0d%0a--boundary" + "--boundary".repeat(10),
                 "/document/upload?multipart=" + Generators.letterStrings(8000, 12000).next(),
-                "/attachments?form=" + "input" + "X".repeat(2000) + "=value",
+                "/attachments?form=" + "input" + generateBoundaryPadding(200) + "=value", // QI-17: Fixed realistic boundary
 
                 // Multiple large fields
                 "/media/upload?upload=" + longContent + "&file=" + longContent,
@@ -611,5 +611,15 @@ class MultipartFormBoundaryAttackTest {
                 failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
                 failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
                 failureType == UrlSecurityFailureType.DOUBLE_ENCODING;
+    }
+
+    // QI-17: Helper method for realistic boundary testing instead of massive .repeat() patterns
+    /**
+     * Generates boundary padding that tests realistic security limits instead of massive inputs.
+     * @param length target length for padding (kept reasonable for actual security testing)
+     * @return padding string for boundary testing
+     */
+    private String generateBoundaryPadding(int length) {
+        return Generators.letterStrings(length, length + 20).next();
     }
 }

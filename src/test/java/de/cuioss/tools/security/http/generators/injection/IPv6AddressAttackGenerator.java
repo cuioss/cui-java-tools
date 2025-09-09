@@ -21,22 +21,40 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for IPv6 address attack patterns.
  * 
- * <p>
- * Provides malicious IPv6 address patterns designed to test security validation
- * against IPv6-specific attack vectors including address spoofing, parser confusion,
- * localhost bypass attempts, and malformed address exploitation.
- * </p>
+ * <p><strong>CRITICAL IPv6 SECURITY DATABASE:</strong> This generator contains IPv6-specific
+ * attack patterns that exploit network protocol vulnerabilities, parser weaknesses, and 
+ * IPv6 addressing mechanisms for security bypass attempts.</p>
  * 
- * <h3>Attack Categories Generated</h3>
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> NOT SUITABLE for dynamic conversion. 
+ * IPv6 attack patterns require exact network address formats, specific encoding sequences,
+ * and precise parser confusion techniques. These patterns test critical IPv6 security 
+ * vulnerabilities where exact address syntax is essential.</p>
+ * 
+ * <h3>IPv6 Security Attack Database</h3>
  * <ul>
- *   <li><strong>IPv4-mapped IPv6 bypass</strong>: Using ::ffff: mapping for localhost bypass</li>
- *   <li><strong>Address confusion</strong>: Malformed addresses to confuse parsers</li>
- *   <li><strong>Scope identifier abuse</strong>: Zone IDs for local network access</li>
- *   <li><strong>Bracket escaping</strong>: URL bracket manipulation</li>
- *   <li><strong>Compression abuse</strong>: Invalid use of :: compression</li>
- *   <li><strong>Parser confusion</strong>: Edge cases in IPv6 parsing</li>
- *   <li><strong>Protocol mixing</strong>: IPv4/IPv6 protocol confusion</li>
+ *   <li><strong>IPv4-mapped IPv6 bypass:</strong> {@code [::ffff:127.0.0.1]} - Localhost bypass via IPv4 mapping</li>
+ *   <li><strong>Address compression abuse:</strong> {@code [::::::1]} - Invalid :: compression exploitation</li>
+ *   <li><strong>Scope identifier injection:</strong> {@code [fe80::1%../../../etc]} - Zone ID path traversal</li>
+ *   <li><strong>Bracket escaping:</strong> {@code ]2001:db8::1[} - URL bracket manipulation</li>
+ *   <li><strong>Parser confusion:</strong> {@code [:::1]} - Malformed address parsing exploitation</li>
+ *   <li><strong>Invalid character injection:</strong> {@code [2001:db8::z1]} - Non-hex character exploitation</li>
+ *   <li><strong>Multiple compression abuse:</strong> {@code [2001::db8::1]} - Invalid multiple :: usage</li>
  * </ul>
+ * 
+ * <h3>IPv6-Specific Security Vulnerabilities</h3>
+ * <ul>
+ *   <li><strong>IPv4-mapped bypasses:</strong> Network access control bypass via IPv6 to IPv4 mapping</li>
+ *   <li><strong>Address parser confusion:</strong> Exploits IPv6 parsing inconsistencies between libraries</li>
+ *   <li><strong>Zone identifier injection:</strong> Local network access via scope ID manipulation</li>
+ *   <li><strong>Protocol stack confusion:</strong> Dual-stack implementation exploitation</li>
+ *   <li><strong>URL encoding bypasses:</strong> IPv6 bracket handling vulnerabilities</li>
+ * </ul>
+ * 
+ * <p><strong>PRESERVATION RATIONALE:</strong> IPv6 addressing has strict RFC specifications
+ * with specific parsing rules. These attack patterns exploit exact parser edge cases,
+ * network protocol vulnerabilities, and IPv6 implementation inconsistencies. Algorithmic
+ * generation would lose critical IPv6 address format requirements and network protocol
+ * attack effectiveness.</p>
  * 
  * Implements: Task G-IPv6 from HTTP verification test generators
  * 

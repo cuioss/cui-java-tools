@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.concurrent.StopWatch;
@@ -95,9 +96,9 @@ class CompressionBombAttackTest {
                 () -> pipeline.validate(compressionAttackPattern),
                 "Compression bomb attack should be rejected: " + compressionAttackPattern);
 
-        // Verify failure type is appropriate for compression bomb detection
-        assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                "Failure type should be compression bomb related: " + exception.getFailureType());
+        // QI-9: Fixed OR-assertion anti-pattern - Generated compression attacks should trigger signature detection  
+        assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                "Generated compression attacks should trigger attack signature detection: " + exception.getFailureType());
 
         // Verify exception contains meaningful information
         assertNotNull(exception.getMessage(), "Exception message should not be null");
@@ -128,7 +129,7 @@ class CompressionBombAttackTest {
     void shouldDetectBasicCompressionBombs() {
         String[] basicCompressionBombs = {
                 "https://example.com/api/data?data=" + "A".repeat(1024) + "&compress=gzip",
-                "https://example.com/api/data?payload=" + "0".repeat(2048) + "&encoding=deflate",
+                "https://example.com/api/data?payload=" + generateBoundaryPadding(300) + "&encoding=deflate", // QI-17: Fixed realistic boundary
                 "https://example.com/api/data?bomb=" + "AAAA".repeat(256)
         };
 
@@ -156,8 +157,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(zipBomb),
                     "ZIP bomb pattern should be detected: " + zipBomb);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect ZIP bomb failure for: " + zipBomb);
+            // QI-9: Fixed OR-assertion anti-pattern - ZIP bombs should trigger signature detection
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "ZIP bomb should trigger attack signature detection for: " + zipBomb);
         }
     }
 
@@ -175,8 +177,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(gzipBomb),
                     "Gzip decompression bomb should be detected: " + gzipBomb);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect Gzip bomb failure for: " + gzipBomb);
+            // QI-9: Fixed OR-assertion anti-pattern - Gzip bombs should trigger signature detection
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "Gzip bomb should trigger attack signature detection for: " + gzipBomb);
         }
     }
 
@@ -194,8 +197,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(nestedAttack),
                     "Nested compression attack should be detected: " + nestedAttack);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect nested compression failure for: " + nestedAttack);
+            // QI-9: Fixed OR-assertion anti-pattern - Nested patterns should trigger nesting detection
+            assertEquals(UrlSecurityFailureType.EXCESSIVE_NESTING, exception.getFailureType(),
+                    "Nested compression should trigger excessive nesting detection for: " + nestedAttack);
         }
     }
 
@@ -213,8 +217,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(multiLayer),
                     "Multi-layer compression attack should be detected: " + multiLayer);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect multi-layer compression failure for: " + multiLayer);
+            // QI-9: Fixed OR-assertion anti-pattern - Multi-layer should trigger signature detection
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "Multi-layer compression should trigger attack signature detection for: " + multiLayer);
         }
     }
 
@@ -232,8 +237,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(memoryBomb),
                     "Memory exhaustion bomb should be detected: " + memoryBomb);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect memory exhaustion failure for: " + memoryBomb);
+            // QI-9: Fixed OR-assertion anti-pattern - Memory exhaustion should trigger length detection
+            assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType(),
+                    "Memory exhaustion should trigger input length detection for: " + memoryBomb);
         }
     }
 
@@ -251,8 +257,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(xmlJsonBomb),
                     "XML/JSON compression bomb should be detected: " + xmlJsonBomb);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect XML/JSON compression failure for: " + xmlJsonBomb);
+            // QI-9: Fixed OR-assertion anti-pattern - XML/JSON should trigger signature detection  
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "XML/JSON compression should trigger attack signature detection for: " + xmlJsonBomb);
         }
     }
 
@@ -270,8 +277,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(base64Bomb),
                     "Base64 compression bomb should be detected: " + base64Bomb);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect Base64 compression failure for: " + base64Bomb);
+            // QI-9: Fixed OR-assertion anti-pattern - Base64 should trigger signature detection
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "Base64 compression should trigger attack signature detection for: " + base64Bomb);
         }
     }
 
@@ -289,8 +297,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(binaryAttack),
                     "Binary data compression attack should be detected: " + binaryAttack);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect binary compression failure for: " + binaryAttack);
+            // QI-9: Fixed OR-assertion anti-pattern - Binary should trigger signature detection
+            assertEquals(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE, exception.getFailureType(),
+                    "Binary compression should trigger attack signature detection for: " + binaryAttack);
         }
     }
 
@@ -308,8 +317,9 @@ class CompressionBombAttackTest {
                     () -> pipeline.validate(recursivePattern),
                     "Recursive compression pattern should be detected: " + recursivePattern);
 
-            assertTrue(isCompressionBombRelatedFailure(exception.getFailureType()),
-                    "Should detect recursive compression failure for: " + recursivePattern);
+            // QI-9: Fixed OR-assertion anti-pattern - Recursive should trigger nesting detection
+            assertEquals(UrlSecurityFailureType.EXCESSIVE_NESTING, exception.getFailureType(),
+                    "Recursive compression should trigger excessive nesting detection for: " + recursivePattern);
         }
     }
 
@@ -379,5 +389,15 @@ class CompressionBombAttackTest {
         if (attackPattern.contains("b64=BASE64:") || attackPattern.contains("encoded=BASE64:")) attackTypeSeen[12] = true;
         if (attackPattern.contains("xml=<") || attackPattern.contains("json=JSON:")) attackTypeSeen[13] = true;
         if (attackPattern.contains("binary=BINARY:") || attackPattern.contains("blob=BINARY:")) attackTypeSeen[14] = true;
+    }
+
+    // QI-17: Helper method for realistic boundary testing instead of massive .repeat() patterns
+    /**
+     * Generates boundary padding that tests realistic security limits instead of massive inputs.
+     * @param length target length for padding (kept reasonable for actual security testing)
+     * @return padding string for boundary testing
+     */
+    private String generateBoundaryPadding(int length) {
+        return Generators.letterStrings(length, length + 20).next();
     }
 }

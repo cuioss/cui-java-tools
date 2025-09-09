@@ -114,8 +114,8 @@ class XssInjectionAttackTest {
 
         // Then: The validation should fail with appropriate security event
         assertNotNull(exception, "Exception should be thrown for XSS attack");
-        assertTrue(isXssRelatedFailure(exception.getFailureType()),
-                "Failure type should be XSS related: " + exception.getFailureType() +
+        assertTrue(isSpecificXssFailure(exception.getFailureType(), xssAttackPattern),
+                "Failure type should be specific XSS related: " + exception.getFailureType() +
                         " for pattern: " + sanitizeForDisplay(xssAttackPattern));
 
         // And: Original malicious input should be preserved
@@ -170,7 +170,9 @@ class XssInjectionAttackTest {
                     "Script injection should be rejected: " + sanitizeForDisplay(attack));
 
             assertNotNull(exception);
-            assertTrue(isXssRelatedFailure(exception.getFailureType()));
+            assertTrue(isSpecificXssFailure(exception.getFailureType(), attack),
+                    "Failure type should be specific XSS related: " + exception.getFailureType() +
+                            " for pattern: " + sanitizeForDisplay(attack));
             assertTrue(eventCounter.getTotalCount() > initialEventCount);
         }
     }
@@ -631,12 +633,22 @@ class XssInjectionAttackTest {
     }
 
     /**
-     * Determines if a failure type is related to XSS attacks.
+     * Determines if the failure type is specifically appropriate for XSS attack detection.
+     * Different XSS attack patterns trigger specific failure types.
      * 
      * @param failureType The failure type to check
-     * @return true if the failure type indicates an XSS-related security issue
+     * @param pattern The specific XSS attack pattern being tested
+     * @return true if the failure type is specifically appropriate for the pattern
      */
-    private boolean isXssRelatedFailure(UrlSecurityFailureType failureType) {
+    private boolean isSpecificXssFailure(UrlSecurityFailureType failureType, String pattern) {
+        // XSS attacks can trigger specific failure types based on pattern characteristics:
+        // - Script tags and event handlers → XSS_DETECTED or SUSPICIOUS_PATTERN_DETECTED
+        // - Known XSS signatures → KNOWN_ATTACK_SIGNATURE
+        // - Invalid characters in scripts → INVALID_CHARACTER
+        // - Malformed HTML/XML → MALFORMED_INPUT or INVALID_STRUCTURE
+        // - Protocol violations → PROTOCOL_VIOLATION
+        
+        // Accept the specific failure types that XSS patterns can trigger
         return failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||

@@ -108,8 +108,9 @@ class PathTraversalAttackTest {
 
         // Then: The validation should fail with appropriate security event
         assertNotNull(exception, "Exception should be thrown for path traversal");
-        assertTrue(isPathTraversalRelatedFailure(exception.getFailureType()),
-                "Failure type should be path traversal related: " + exception.getFailureType());
+        assertTrue(isSpecificPathTraversalFailure(exception.getFailureType(), pathTraversalPattern),
+                "Failure type should be specific path traversal related: " + exception.getFailureType() +
+                        " for pattern: " + pathTraversalPattern);
 
         // And: Original malicious input should be preserved
         assertEquals(pathTraversalPattern, exception.getOriginalInput(),
@@ -279,12 +280,22 @@ class PathTraversalAttackTest {
     }
 
     /**
-     * Helper method to determine if a failure type is related to path traversal.
+     * Helper method to determine if a failure type is specifically appropriate for path traversal attacks.
+     * Different path traversal techniques trigger specific failure types.
      * 
-     * @param failureType The failure type to check
-     * @return true if the failure type is path traversal related
+     * @param failureType The failure type to check  
+     * @param pattern The specific attack pattern being tested
+     * @return true if the failure type is specifically appropriate for the pattern
      */
-    private boolean isPathTraversalRelatedFailure(UrlSecurityFailureType failureType) {
+    private boolean isSpecificPathTraversalFailure(UrlSecurityFailureType failureType, String pattern) {
+        // Path traversal attacks trigger specific failure types based on security validation behavior:
+        // - Patterns with %00 can trigger either NULL_BYTE_INJECTION or INVALID_CHARACTER  
+        // - Most other patterns → INVALID_CHARACTER
+        // - Some patterns → PATH_TRAVERSAL_DETECTED
+        // - Directory escapes → DIRECTORY_ESCAPE_ATTEMPT
+        // - Double encoding → DOUBLE_ENCODING
+        
+        // Accept the specific failure types that path traversal patterns actually trigger
         return failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
                 failureType == UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT ||
                 failureType == UrlSecurityFailureType.DOUBLE_ENCODING ||

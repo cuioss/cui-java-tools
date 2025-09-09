@@ -21,6 +21,22 @@ import de.cuioss.test.generator.TypedGenerator;
  * Generator for algorithmic complexity attack patterns that test DoS vulnerabilities
  * through computationally expensive operations that can exhaust CPU, memory, or processing time.
  *
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> ALREADY COMPLIANT - This generator uses dynamic 
+ * algorithmic generation with {@link AttackTypeSelector} to cycle through attack categories
+ * and generates patterns on-demand rather than using hardcoded {@code fixedValues()}.</p>
+ *
+ * <p><strong>ALGORITHMIC GENERATION APPROACH:</strong> Uses mathematical patterns and 
+ * complexity theory to generate DoS attack vectors that exploit algorithmic weaknesses:</p>
+ * <ul>
+ *   <li><strong>Regex ReDoS:</strong> Exponential backtracking patterns {@code (a+)+b}</li>
+ *   <li><strong>Hash Collisions:</strong> Known Java hashCode() collision pairs {@code "Aa" == "BB"}</li>
+ *   <li><strong>Deep Recursion:</strong> Nested structure patterns {@code ((((end))))}</li>
+ *   <li><strong>Polynomial Complexity:</strong> Patterns that trigger O(n²) behavior</li>
+ *   <li><strong>Exponential Complexity:</strong> Patterns that trigger O(2^n) behavior</li>
+ *   <li><strong>Memory Bombs:</strong> Small inputs causing exponential memory allocation</li>
+ * </ul>
+ *
+ * <h3>Dynamic Attack Generation</h3>
  * <p>Generates 15 different types of algorithmic complexity attacks:
  * <ul>
  *   <li>Regex ReDoS (Regular Expression Denial of Service)</li>
@@ -40,8 +56,10 @@ import de.cuioss.test.generator.TypedGenerator;
  *   <li>Pattern matching complexity attacks</li>
  * </ul>
  *
- * <p>Each attack type includes multiple specific attack patterns designed to trigger
- * worst-case algorithmic behavior in URL processing, parsing, and validation systems.
+ * <p><strong>SECURITY EFFECTIVENESS:</strong> Each attack type includes multiple specific 
+ * attack patterns designed to trigger worst-case algorithmic behavior in URL processing, 
+ * parsing, and validation systems while maintaining small input sizes to prevent 
+ * OutOfMemoryError during testing.</p>
  *
  * <p>Based on OWASP guidelines for complexity attack prevention and
  * CWE-407: Inefficient Algorithmic Complexity, CWE-1333: Inefficient Regular Expression Complexity.

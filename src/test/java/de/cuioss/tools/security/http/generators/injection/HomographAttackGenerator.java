@@ -21,38 +21,44 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generates homograph attack patterns for security testing.
  * 
- * <p>
- * This generator creates attack patterns that use Unicode homograph characters
- * (visually similar characters from different scripts) to create deceptive URLs
- * and bypass security controls. Homograph attacks exploit the fact that many
- * Unicode characters look identical or very similar to ASCII characters but
- * have different code points, allowing attackers to create convincing spoofs
- * of legitimate domains, file paths, and system commands.
- * </p>
+ * <p><strong>CRITICAL UNICODE HOMOGRAPH DATABASE:</strong> This generator contains Unicode
+ * homograph attack patterns that exploit visual character similarity across different
+ * writing systems. Each pattern uses exact Unicode character pairs that are visually
+ * identical or nearly identical to humans but have different code points.</p>
  * 
- * <h3>Attack Types Generated</h3>
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> NOT SUITABLE for dynamic conversion. 
+ * Homograph attacks depend on precise Unicode character relationships where visual
+ * similarity is critical (e.g., Cyrillic 'а' U+0430 vs Latin 'a' U+0061). These
+ * exact character mappings cannot be algorithmically generated without losing
+ * visual deception effectiveness.</p>
+ * 
+ * <h3>Unicode Homograph Attack Database</h3>
  * <ul>
- *   <li>Cyrillic homographs (а, о, р, с, е, х → a, o, p, c, e, x)</li>
- *   <li>Greek homographs (α, ο, ρ, υ → a, o, p, u)</li>
- *   <li>Mathematical script homographs (𝐚, 𝐨, 𝐩 → a, o, p)</li>
- *   <li>Fullwidth character homographs (ａ, ｏ, ｐ → a, o, p)</li>
- *   <li>Armenian, Georgian, and other script homographs</li>
- *   <li>Mixed script combinations for maximum deception</li>
- *   <li>Domain spoofing attacks (apple.com → аpple.com)</li>
- *   <li>File extension spoofing (.exe → .ехе)</li>
- *   <li>System command spoofing (admin → аdmin)</li>
+ *   <li><strong>Cyrillic homographs:</strong> {@code а, о, р, с, е, х} → {@code a, o, p, c, e, x}</li>
+ *   <li><strong>Greek homographs:</strong> {@code α, ο, ρ, υ} → {@code a, o, p, u}</li>
+ *   <li><strong>Mathematical script:</strong> {@code 𝐚, 𝐨, 𝐩} → {@code a, o, p} (Unicode Mathematical Bold)</li>
+ *   <li><strong>Fullwidth characters:</strong> {@code ａ, ｏ, ｐ} → {@code a, o, p} (U+FF01-FF5E range)</li>
+ *   <li><strong>Armenian homographs:</strong> Specific Armenian characters visually similar to Latin</li>
+ *   <li><strong>Georgian homographs:</strong> Georgian script characters matching Latin appearance</li>
+ *   <li><strong>Domain spoofing:</strong> {@code apple.com} → {@code аpple.com} (Cyrillic 'а')</li>
+ *   <li><strong>File extension spoofing:</strong> {@code .exe} → {@code .ехе} (Cyrillic 'е' and 'х')</li>
+ *   <li><strong>System command spoofing:</strong> {@code admin} → {@code аdmin} (Cyrillic 'а')</li>
  * </ul>
  * 
- * <h3>Security Standards</h3>
+ * <h3>Security Standards Compliance</h3>
  * <ul>
- *   <li>OWASP Top 10 - Security Misconfiguration</li>
- *   <li>CWE-20: Improper Input Validation</li>
- *   <li>CWE-178: Improper Handling of Case Sensitivity</li>
- *   <li>CWE-179: Incorrect Behavior Order: Early Validation</li>
- *   <li>Unicode Technical Standard #39 (Unicode Security Mechanisms)</li>
- *   <li>RFC 3490 - Internationalizing Domain Names in Applications (IDNA)</li>
- *   <li>Unicode Consortium Security Considerations</li>
+ *   <li><strong>Unicode Technical Standard #39:</strong> Unicode Security Mechanisms</li>
+ *   <li><strong>RFC 3490:</strong> Internationalizing Domain Names in Applications (IDNA)</li>
+ *   <li><strong>CWE-20:</strong> Improper Input Validation via homograph bypass</li>
+ *   <li><strong>CWE-178:</strong> Case sensitivity bypass through character substitution</li>
+ *   <li><strong>OWASP Top 10:</strong> Security misconfiguration via Unicode confusion</li>
  * </ul>
+ * 
+ * <p><strong>PRESERVATION RATIONALE:</strong> Homograph attacks are based on Unicode
+ * Consortium specifications and linguistic research. Each character pair represents
+ * a documented visual confusion vulnerability. The effectiveness depends on exact
+ * Unicode code point relationships that must be preserved for security testing.
+ * Algorithmic generation cannot reproduce these precise visual similarity relationships.</p>
  * 
  * Implements: Generator for Task T9 from HTTP verification specification
  * 

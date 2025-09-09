@@ -68,9 +68,9 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 5);
     private final TypedGenerator<Integer> depthGen = Generators.integers(2, 6);
-    private final TypedGenerator<String> scriptElementGen = Generators.fixedValues("script", "img", "iframe", "object");
-    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript", "data", "vbscript", "file");
-    private final TypedGenerator<String> funcGen = Generators.fixedValues("eval", "alert", "confirm", "setTimeout");
+    private final TypedGenerator<Integer> scriptElementGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> protocolGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> funcGen = Generators.integers(1, 4);
     private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 9);
 
     @Override
@@ -113,18 +113,36 @@ public class UnicodeNormalizationAttackGenerator implements TypedGenerator<Strin
     }
 
     private String generateScriptPattern() {
-        String element = scriptElementGen.next();
+        String element = switch (scriptElementGen.next()) {
+            case 1 -> "script";
+            case 2 -> "img";
+            case 3 -> "iframe";
+            case 4 -> "object";
+            default -> "script";
+        };
         return "<" + element + ">";
     }
 
     private String generateProtocolPattern() {
-        String protocol = protocolGen.next();
+        String protocol = switch (protocolGen.next()) {
+            case 1 -> "javascript";
+            case 2 -> "data";
+            case 3 -> "vbscript";
+            case 4 -> "file";
+            default -> "javascript";
+        };
         // Ensure dangerous protocol patterns that will trigger security validation
         return protocol + "://malicious.example.com/";
     }
 
     private String generateFunctionPattern() {
-        String func = funcGen.next();
+        String func = switch (funcGen.next()) {
+            case 1 -> "eval";
+            case 2 -> "alert";
+            case 3 -> "confirm";
+            case 4 -> "setTimeout";
+            default -> "eval";
+        };
         // Create more aggressive function injection patterns
         return func + "(document.cookie)";
     }

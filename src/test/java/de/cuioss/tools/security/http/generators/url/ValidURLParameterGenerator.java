@@ -22,9 +22,14 @@ import de.cuioss.tools.security.http.data.URLParameter;
 /**
  * Generates legitimate URLParameter records for testing valid parameter handling.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * This generator produces only valid, legitimate URL parameter patterns that should be
  * accepted by security validation systems. It complements AttackURLParameterGenerator
  * which generates malicious patterns.
+ * 
+ * Uses dynamic generation instead of hardcoded arrays for better randomness
+ * and unpredictability while maintaining realistic parameter patterns.
  * 
  * FRAMEWORK COMPLIANT: Uses seed-based generation without call-counter anti-pattern.
  * Reproducibility = f(seed), not f(internal_state).
@@ -33,17 +38,17 @@ import de.cuioss.tools.security.http.data.URLParameter;
  */
 public class ValidURLParameterGenerator implements TypedGenerator<URLParameter> {
 
-    // Core generation parameters - all seed-based, no internal state
+    // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> paramTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> parameterCategories = Generators.fixedValues("page", "size", "sort", "filter");
-    private final TypedGenerator<String> searchCategories = Generators.fixedValues("search", "category", "type", "status");
-    private final TypedGenerator<String> dataCategories = Generators.fixedValues("id", "limit", "offset", "format");
-    private final TypedGenerator<String> localeCategories = Generators.fixedValues("lang", "version", "timestamp");
-    private final TypedGenerator<String> booleanValues = Generators.fixedValues("true", "false");
-    private final TypedGenerator<String> sortValues = Generators.fixedValues("asc", "desc");
-    private final TypedGenerator<String> formatValues = Generators.fixedValues("json", "xml", "csv", "html");
-    private final TypedGenerator<String> languageValues = Generators.fixedValues("en", "de", "fr", "es", "ja");
-    private final TypedGenerator<String> statusValues = Generators.fixedValues("active", "inactive", "pending", "deleted");
+    private final TypedGenerator<Integer> paginationParamGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> searchParamGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> dataParamGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> localeParamGen = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> booleanValueGen = Generators.integers(1, 2);
+    private final TypedGenerator<Integer> sortValueGen = Generators.integers(1, 2);
+    private final TypedGenerator<Integer> formatValueGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> languageValueGen = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> statusValueGen = Generators.integers(1, 4);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
     private final TypedGenerator<Integer> numberValues = Generators.integers(1, 1000);
 
@@ -65,19 +70,42 @@ public class ValidURLParameterGenerator implements TypedGenerator<URLParameter> 
     }
 
     private String generatePaginationParameterName() {
-        return parameterCategories.next();
+        return switch (paginationParamGen.next()) {
+            case 1 -> "page";
+            case 2 -> "size";
+            case 3 -> "sort";
+            case 4 -> "filter";
+            default -> "page";
+        };
     }
 
     private String generateSearchParameterName() {
-        return searchCategories.next();
+        return switch (searchParamGen.next()) {
+            case 1 -> "search";
+            case 2 -> "category";
+            case 3 -> "type";
+            case 4 -> "status";
+            default -> "search";
+        };
     }
 
     private String generateDataParameterName() {
-        return dataCategories.next();
+        return switch (dataParamGen.next()) {
+            case 1 -> "id";
+            case 2 -> "limit";
+            case 3 -> "offset";
+            case 4 -> "format";
+            default -> "id";
+        };
     }
 
     private String generateLocaleParameterName() {
-        return localeCategories.next();
+        return switch (localeParamGen.next()) {
+            case 1 -> "lang";
+            case 2 -> "version";
+            case 3 -> "timestamp";
+            default -> "lang";
+        };
     }
 
     private String generateLegitimateValue() {
@@ -99,23 +127,50 @@ public class ValidURLParameterGenerator implements TypedGenerator<URLParameter> 
     }
 
     private String generateBooleanValue() {
-        return booleanValues.next();
+        return switch (booleanValueGen.next()) {
+            case 1 -> "true";
+            case 2 -> "false";
+            default -> "true";
+        };
     }
 
     private String generateSortValue() {
-        return sortValues.next();
+        return switch (sortValueGen.next()) {
+            case 1 -> "asc";
+            case 2 -> "desc";
+            default -> "asc";
+        };
     }
 
     private String generateFormatValue() {
-        return formatValues.next();
+        return switch (formatValueGen.next()) {
+            case 1 -> "json";
+            case 2 -> "xml";
+            case 3 -> "csv";
+            case 4 -> "html";
+            default -> "json";
+        };
     }
 
     private String generateLanguageValue() {
-        return languageValues.next();
+        return switch (languageValueGen.next()) {
+            case 1 -> "en";
+            case 2 -> "de";
+            case 3 -> "fr";
+            case 4 -> "es";
+            case 5 -> "ja";
+            default -> "en";
+        };
     }
 
     private String generateStatusValue() {
-        return statusValues.next();
+        return switch (statusValueGen.next()) {
+            case 1 -> "active";
+            case 2 -> "inactive";
+            case 3 -> "pending";
+            case 4 -> "deleted";
+            default -> "active";
+        };
     }
 
     private String generateTestValue() {

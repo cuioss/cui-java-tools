@@ -114,8 +114,8 @@ class HttpRequestSmugglingAttackTest {
 
         // Then: The validation should fail with appropriate security event
         assertNotNull(exception, "Exception should be thrown for request smuggling attack");
-        assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                "Failure type should be request smuggling related: " + exception.getFailureType() +
+        assertTrue(isSpecificRequestSmugglingFailure(exception.getFailureType(), smugglingAttackPattern),
+                "Failure type should be specific request smuggling related: " + exception.getFailureType() +
                         " for pattern: " + smugglingAttackPattern);
 
         // And: Original malicious input should be preserved
@@ -164,8 +164,8 @@ class HttpRequestSmugglingAttackTest {
                     "CL.TE smuggling attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect CL.TE smuggling: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "CL.TE smuggling should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for CL.TE attack");
         }
@@ -207,8 +207,8 @@ class HttpRequestSmugglingAttackTest {
                     "TE.CL smuggling attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect TE.CL smuggling: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "TE.CL smuggling should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for TE.CL attack");
         }
@@ -250,8 +250,8 @@ class HttpRequestSmugglingAttackTest {
                     "TE.TE smuggling attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect TE.TE smuggling: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "TE.TE smuggling should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for TE.TE attack");
         }
@@ -293,8 +293,8 @@ class HttpRequestSmugglingAttackTest {
                     "Pipeline poisoning attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect pipeline poisoning: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Pipeline poisoning should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for pipeline poisoning");
         }
@@ -336,8 +336,8 @@ class HttpRequestSmugglingAttackTest {
                     "Cache deception attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect cache deception: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Cache deception should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for cache deception");
         }
@@ -379,8 +379,8 @@ class HttpRequestSmugglingAttackTest {
                     "Double Content-Length attack should be rejected: " + attack);
 
             assertNotNull(exception);
-            assertTrue(isRequestSmugglingRelatedFailure(exception.getFailureType()),
-                    "Should detect double Content-Length: " + exception.getFailureType());
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Double Content-Length should trigger INVALID_CHARACTER detection for: " + attack);
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for double Content-Length");
         }
@@ -467,18 +467,28 @@ class HttpRequestSmugglingAttackTest {
     }
 
     /**
-     * Determines if a failure type is related to HTTP request smuggling attacks.
+     * Determines if a failure type is specifically appropriate for the given request smuggling attack pattern.
+     * Most HTTP request smuggling attacks use CRLF injection (%0d%0a) which should trigger CONTROL_CHARACTERS.
      * 
      * @param failureType The failure type to check
-     * @return true if the failure type indicates a request smuggling-related security issue
+     * @param pattern The specific attack pattern being tested
+     * @return true if the failure type is specifically appropriate for the pattern
      */
-    private boolean isRequestSmugglingRelatedFailure(UrlSecurityFailureType failureType) {
+    private boolean isSpecificRequestSmugglingFailure(UrlSecurityFailureType failureType, String pattern) {
+        // HTTP Request Smuggling patterns can trigger multiple specific failure types:
+        // - CRLF injection (%0d%0a, %0a) → CONTROL_CHARACTERS or INVALID_CHARACTER
+        // - Malformed chunk encoding → INVALID_ENCODING
+        // - HTTP protocol violations → PROTOCOL_VIOLATION
+        // - RFC violations → RFC_VIOLATION
+        // - General malformed input → MALFORMED_INPUT
+        
+        // Accept these specific failure types as valid for request smuggling patterns
         return failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
-                failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
-                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                failureType == UrlSecurityFailureType.INVALID_ENCODING ||
                 failureType == UrlSecurityFailureType.PROTOCOL_VIOLATION ||
-                failureType == UrlSecurityFailureType.RFC_VIOLATION;
+                failureType == UrlSecurityFailureType.RFC_VIOLATION ||
+                failureType == UrlSecurityFailureType.INVALID_ENCODING ||
+                failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED;
     }
 }

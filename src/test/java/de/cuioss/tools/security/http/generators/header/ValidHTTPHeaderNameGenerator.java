@@ -21,51 +21,139 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for valid HTTP header names.
  * 
- * IMPROVED: Uses dynamic generation instead of hardcoded arrays for better randomness
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
+ * Uses dynamic generation instead of hardcoded arrays for better randomness
  * and unpredictability while maintaining realistic HTTP header patterns.
  * 
  * Provides common standard and custom header name examples for testing.
  */
 public class ValidHTTPHeaderNameGenerator implements TypedGenerator<String> {
 
-    // Core generation parameters
-    private final TypedGenerator<String> standardHeaders = Generators.fixedValues("Authorization", "Content-Type", "User-Agent", "Host");
-    private final TypedGenerator<String> acceptHeaders = Generators.fixedValues("Accept", "Accept-Language", "Accept-Encoding");
-    private final TypedGenerator<String> contentHeaders = Generators.fixedValues("Content-Length", "Content-Encoding", "Cache-Control");
-    private final TypedGenerator<String> customPrefixes = Generators.fixedValues("X-", "X-Custom-", "X-API-", "X-Requested-");
-    private final TypedGenerator<String> customSuffixes = Generators.fixedValues("Key", "With", "For", "Header-Name");
-    private final TypedGenerator<String> cookieHeaders = Generators.fixedValues("Cookie", "Set-Cookie");
-    private final TypedGenerator<String> navigationHeaders = Generators.fixedValues("Origin", "Referer", "Location");
-    private final TypedGenerator<String> connectionHeaders = Generators.fixedValues("Connection", "Keep-Alive", "Upgrade");
-    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> headerTypeGen = Generators.integers(1, 7);
+    private final TypedGenerator<Integer> standardHeaderGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> acceptHeaderGen = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> contentHeaderGen = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> cookieHeaderGen = Generators.integers(1, 2);
+    private final TypedGenerator<Integer> navigationHeaderGen = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> connectionHeaderGen = Generators.integers(1, 3);
+    private final TypedGenerator<Boolean> customVariationGen = Generators.booleans();
 
     @Override
     public String next() {
-        int headerType = Generators.integers(0, 6).next();
-        return switch (headerType) {
-            case 0 -> standardHeaders.next();
-            case 1 -> acceptHeaders.next();
-            case 2 -> contentHeaders.next();
-            case 3 -> generateCustomHeader();
-            case 4 -> cookieHeaders.next();
-            case 5 -> navigationHeaders.next();
-            case 6 -> connectionHeaders.next();
-            default -> standardHeaders.next();
+        return switch (headerTypeGen.next()) {
+            case 1 -> generateStandardHeader();
+            case 2 -> generateAcceptHeader();
+            case 3 -> generateContentHeader();
+            case 4 -> generateCustomHeader();
+            case 5 -> generateCookieHeader();
+            case 6 -> generateNavigationHeader();
+            case 7 -> generateConnectionHeader();
+            default -> generateStandardHeader();
+        };
+    }
+
+    private String generateStandardHeader() {
+        return switch (standardHeaderGen.next()) {
+            case 1 -> "Authorization";
+            case 2 -> "Content-Type";
+            case 3 -> "User-Agent";
+            case 4 -> "Host";
+            default -> "Authorization";
+        };
+    }
+
+    private String generateAcceptHeader() {
+        return switch (acceptHeaderGen.next()) {
+            case 1 -> "Accept";
+            case 2 -> "Accept-Language";
+            case 3 -> "Accept-Encoding";
+            default -> "Accept";
+        };
+    }
+
+    private String generateContentHeader() {
+        return switch (contentHeaderGen.next()) {
+            case 1 -> "Content-Length";
+            case 2 -> "Content-Encoding";
+            case 3 -> "Cache-Control";
+            default -> "Content-Length";
+        };
+    }
+
+    private String generateCookieHeader() {
+        return switch (cookieHeaderGen.next()) {
+            case 1 -> "Cookie";
+            case 2 -> "Set-Cookie";
+            default -> "Cookie";
+        };
+    }
+
+    private String generateNavigationHeader() {
+        return switch (navigationHeaderGen.next()) {
+            case 1 -> "Origin";
+            case 2 -> "Referer";
+            case 3 -> "Location";
+            default -> "Origin";
+        };
+    }
+
+    private String generateConnectionHeader() {
+        return switch (connectionHeaderGen.next()) {
+            case 1 -> "Connection";
+            case 2 -> "Keep-Alive";
+            case 3 -> "Upgrade";
+            default -> "Connection";
         };
     }
 
     private String generateCustomHeader() {
-        String prefix = customPrefixes.next();
-        String suffix = customSuffixes.next();
+        String prefix = generateCustomPrefix();
+        String suffix = generateCustomSuffix();
 
         // Sometimes add a middle part for variety
-        if (contextSelector.next()) {
-            String[] middleParts = {"Request", "Response", "Client", "Server", "Auth", "Session"};
-            String middle = middleParts[Generators.integers(0, middleParts.length - 1).next()];
+        if (customVariationGen.next()) {
+            String middle = generateMiddlePart();
             return prefix + middle + "-" + suffix;
         }
 
         return prefix + suffix;
+    }
+
+    private String generateCustomPrefix() {
+        int type = Generators.integers(1, 4).next();
+        return switch (type) {
+            case 1 -> "X-";
+            case 2 -> "X-Custom-";
+            case 3 -> "X-API-";
+            case 4 -> "X-Requested-";
+            default -> "X-";
+        };
+    }
+
+    private String generateCustomSuffix() {
+        int type = Generators.integers(1, 4).next();
+        return switch (type) {
+            case 1 -> "Key";
+            case 2 -> "With";
+            case 3 -> "For";
+            case 4 -> "Header-Name";
+            default -> "Key";
+        };
+    }
+
+    private String generateMiddlePart() {
+        int type = Generators.integers(1, 6).next();
+        return switch (type) {
+            case 1 -> "Request";
+            case 2 -> "Response";
+            case 3 -> "Client";
+            case 4 -> "Server";
+            case 5 -> "Auth";
+            case 6 -> "Session";
+            default -> "Request";
+        };
     }
 
     @Override

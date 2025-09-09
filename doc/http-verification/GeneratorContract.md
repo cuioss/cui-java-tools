@@ -1,0 +1,450 @@
+# Security Generator Contract Specification
+
+## Overview
+
+This document defines the standard contract that all security generators must follow to ensure consistent behavior, reliability, and maintainability.
+
+## Critical Design Principle: Valid/Invalid Generator Pairs
+
+**FUNDAMENTAL REQUIREMENT**: You must ALWAYS create two types of generators for each data domain:
+
+1. **Valid Data Generator**: Generates legitimate, well-formed input that should pass validation
+2. **Invalid/Attack Data Generator**: Generates malicious or malformed input that should be rejected
+
+This separation is essential for comprehensive security testing:
+
+- **Valid generators** test that legitimate use cases work correctly (prevent false positives)
+- **Invalid/attack generators** test that security validation catches malicious input (prevent false negatives)
+- **Mixed-purpose generators** violate framework compliance and create unpredictable test behavior
+
+### Examples of Proper Generator Pairs:
+- `ValidCookieGenerator` + `AttackCookieGenerator`
+- `ValidURLParameterGenerator` + `AttackURLParameterGenerator`
+- `ValidHTTPHeaderNameGenerator` + `AttackHTTPHeaderNameGenerator`
+
+**Deprecated Pattern**: Mixed-purpose generators like the original `CookieGenerator` that generate both valid and attack data in the same generator violate reproducibility and test clarity.
+
+## QI-6 Generator Classification Strategy
+
+When working with existing generators, they fall into three distinct categories based on their purpose and conversion suitability:
+
+### ❌ NOT SUITABLE: Critical Security Databases
+Generators containing curated databases of proven attack vectors from real-world exploits, CVEs, and OWASP guidelines. Each pattern represents specific vulnerability exploitation where exact byte sequences are critical.
+
+**These generators MUST preserve their fixedValues() arrays** because they contain:
+- Documented CVE exploit patterns (e.g., CVE-2013-4547, CVE-2017-7529)
+- OWASP-verified attack vectors (UTF-8 overlong encoding, double URL encoding)
+- Unicode homograph attacks (precise character relationships for visual deception)
+- Protocol-specific bypass techniques (IPv6-mapped IPv4 bypass, scope injection)
+
+**Examples**: `OWASPTop10AttackGenerator`, `NginxCVEAttackGenerator`, `IPv6AddressAttackGenerator`, `HomographAttackGenerator`
+
+### ✅ ALREADY COMPLIANT: Dynamic Generation
+Generators already using algorithmic generation without hardcoded fixedValues() arrays.
+
+**These generators are already compliant** with modern practices:
+- Use integer selectors with switch statements
+- Generate varied, unpredictable output
+- Follow reproducibility = f(seed) principle
+
+**Examples**: `AlgorithmicComplexityAttackGenerator` (uses AttackTypeSelector for 15 attack types)
+
+### 🔄 SUITABLE FOR CONVERSION: Simple Test Data
+Generators using fixedValues() for simple test data where dynamic generation improves unpredictability without losing security effectiveness.
+
+**These generators should be converted** from hardcoded arrays to algorithmic generation:
+- Replace `Generators.fixedValues()` with integer selectors and switch statements
+- Maintain test compatibility while gaining unpredictability
+- Improve variety and randomness in test scenarios
+
+**Examples**: `SupportedValidationTypeGenerator`, `ValidHTTPHeaderNameGenerator`, `ValidURLParameterGenerator`
+
+### Conversion Pattern (QI-6):
+```java
+// Before: Hardcoded arrays
+private final TypedGenerator<String> gen = Generators.fixedValues("item1", "item2", "item3");
+
+// After: Dynamic algorithmic generation
+private final TypedGenerator<Integer> typeSelector = Generators.integers(1, 3);
+
+@Override
+public String next() {
+    return switch (typeSelector.next()) {
+        case 1 -> generateType1();
+        case 2 -> generateType2();
+        case 3 -> generateType3();
+        default -> generateType1();
+    };
+}
+```
+
+## Generator Framework Philosophy
+
+The testing framework follows a **Generator-Based Testing** approach with the following principles:
+
+### Testing Philosophy
+1. **Generator-Based Testing**: Dynamic test data generation using TypedGenerator pattern
+2. **Deterministic Generation**: Using cui-tools Generator (not Random) for reproducibility
+3. **Comprehensive Coverage**: All attack categories covered with explicit test cases
+4. **Performance Validation**: Sub-millisecond requirement verification
+5. **False Positive Prevention**: Ensuring legitimate inputs pass validation
+
+### Framework Structure
+Generators are organized into categorical sub-packages based on their domain:
+
+- `cookie/` - Cookie-related generators and tests  
+- `url/` - URL and parameter generators
+- `header/` - HTTP header generators
+- `body/` - HTTP body generators
+- `encoding/` - Encoding and path traversal generators
+- `injection/` - Injection attack generators
+
+### Generator Categories by Purpose
+- **Valid Data Generators**: Generate legitimate inputs for false positive testing
+- **Attack Generators**: Generate malicious inputs for security validation
+- **Boundary Generators**: Generate edge cases and boundary conditions
+- **Performance Generators**: Generate inputs for performance testing
+
+### TypedGenerator Pattern
+All generators implement the `TypedGenerator<T>` interface from cui-tools:
+
+```java
+public interface TypedGenerator<T> {
+    T next();           // Generate next value
+    Class<T> getType(); // Return generated type
+}
+```
+
+This ensures consistent behavior and integration with the existing cui-tools testing ecosystem.
+
+## Core Contract Requirements
+
+### 1. Interface Implementation
+```java
+public class ExampleGenerator implements TypedGenerator<T> {
+    // Must implement both methods
+    @Override
+    public T next();
+    
+    @Override 
+    public Class<T> getType();
+}
+```
+
+### 2. Null Safety
+- **MUST**: `next()` never returns null
+- **MUST**: Handle all edge cases gracefully
+- **MUST**: Provide meaningful output for any seed value
+
+### 3. Deterministic Behavior
+- **MUST**: Same seed produces same sequence (reproducibility = f(seed))
+- **MUST NOT**: Use internal state counters (call-counter anti-pattern)
+- **MUST**: Be thread-safe for concurrent access
+
+### 4. Documentation Standards
+```java
+/**
+ * Generator for [specific purpose].
+ * 
+ * <p>QI-6: [Conversion status - if applicable]</p>
+ * 
+ * [Detailed description of what the generator produces]
+ * 
+ * Implements: [Task reference from specification]
+ * 
+ * @author [Generator author]
+ * @since [Version]
+ */
+```
+
+### 5. Field Organization
+```java
+public class ExampleGenerator implements TypedGenerator<T> {
+    // 1. Core generation selectors (integers, booleans)
+    private final TypedGenerator<Integer> primarySelector = Generators.integers(1, N);
+    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
+    
+    // 2. Component generators (strings, numbers) 
+    private final TypedGenerator<String> componentGen = Generators.letterStrings(5, 15);
+    private final TypedGenerator<Integer> sizeGen = Generators.integers(10, 100);
+    
+    // 3. Constants (if absolutely necessary)
+    private static final String DEFAULT_VALUE = "default";
+}
+```
+
+### 6. Method Organization
+```java
+@Override
+public T next() {
+    // Main generation logic using switch statements
+    return switch (primarySelector.next()) {
+        case 1 -> generateType1();
+        case 2 -> generateType2();
+        default -> generateDefault();
+    };
+}
+
+// Private generation methods in logical order
+private T generateType1() { /* implementation */ }
+private T generateType2() { /* implementation */ }
+private T generateDefault() { /* implementation */ }
+
+@Override
+public Class<T> getType() {
+    return T.class;
+}
+```
+
+### 7. Naming Conventions
+- **Generators**: `[Purpose][Type]Generator` (e.g., `ValidURLPathGenerator`)
+- **Fields**: Descriptive names ending with purpose (e.g., `pathTypeSelector`, `lengthGen`)
+- **Methods**: `generate[Type]()` for private generation methods
+
+### 8. Output Validation
+- **MUST**: Generate output within expected bounds
+- **MUST**: Generate semantically valid content for the domain
+- **SHOULD**: Provide varied output across multiple calls
+
+### 9. Performance Requirements
+- **MUST**: Complete generation within reasonable time (< 1ms typical)
+- **MUST NOT**: Use unbounded loops or recursive calls
+- **SHOULD**: Minimize memory allocation
+
+### 10. Error Handling
+- **MUST**: Never throw exceptions during normal operation
+- **MUST**: Handle edge cases gracefully
+- **SHOULD**: Log warnings for unusual conditions (if logging available)
+
+## Contract Validation Infrastructure
+
+### GeneratorContractTestBase
+An abstract base class is provided for automatic contract validation of all generators:
+
+```java
+public abstract class GeneratorContractTestBase<T> {
+    
+    private static final int CONTRACT_TEST_ITERATIONS = 1000;
+    
+    // Implement this method in your test
+    protected abstract TypedGenerator<T> createGenerator();
+    
+    // Automatic contract validation tests
+    @Test
+    void shouldNeverReturnNull() { /* validates null safety */ }
+    
+    @Test 
+    void shouldReturnConsistentType() { /* validates type consistency */ }
+    
+    @Test
+    void shouldCompleteWithinTimeLimit() { /* validates performance */ }
+    
+    @Test
+    void shouldProvideVariedOutput() { /* validates output quality */ }
+}
+```
+
+### Usage Example
+```java
+public class MyGeneratorContractTest extends GeneratorContractTestBase<String> {
+    
+    @Override
+    protected TypedGenerator<String> createGenerator() {
+        return new MyGenerator();
+    }
+    
+    // Additional generator-specific tests can be added here
+}
+```
+
+This infrastructure automatically validates all core contract requirements and should be used for every generator.
+
+## Manual Contract Validation
+
+Generators MUST pass these validation tests if not using the base class:
+
+### Basic Contract Tests
+```java
+@Test
+void shouldNeverReturnNull() {
+    Generator gen = new Generator();
+    for (int i = 0; i < 1000; i++) {
+        assertNotNull(gen.next());
+    }
+}
+
+@Test  
+void shouldBeDeterministic() {
+    // Same seed should produce same sequence
+    // Implementation depends on seed control mechanism
+}
+
+@Test
+void shouldReturnCorrectType() {
+    Generator gen = new Generator();
+    assertEquals(ExpectedType.class, gen.getType());
+    assertTrue(gen.getType().isInstance(gen.next()));
+}
+```
+
+### Performance Contract Tests
+```java
+@Test
+void shouldCompleteWithinTimeLimit() {
+    Generator gen = new Generator();
+    long start = System.nanoTime();
+    for (int i = 0; i < 100; i++) {
+        gen.next();
+    }
+    long duration = System.nanoTime() - start;
+    assertTrue(duration < 10_000_000); // 10ms for 100 generations
+}
+```
+
+### Output Quality Tests  
+```java
+@Test
+void shouldProvideVariedOutput() {
+    Generator gen = new Generator();
+    Set<T> outputs = new HashSet<>();
+    for (int i = 0; i < 100; i++) {
+        outputs.add(gen.next());
+    }
+    assertTrue(outputs.size() > 1); // Should generate varied content
+}
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ Call-Counter Anti-Pattern
+```java
+// DON'T DO THIS
+private int callCounter = 0;
+public T next() {
+    callCounter++; // Breaks reproducibility
+    if (callCounter % 10 == 1) return specialCase();
+}
+```
+
+### ❌ Hardcoded Arrays in Dynamic Generators
+```java  
+// DON'T DO THIS in QI-6 converted generators
+private final TypedGenerator<String> gen = Generators.fixedValues("a", "b", "c");
+```
+
+### ❌ Hardcoded .repeat() Patterns (QI-17 Critical)
+```java
+// DON'T DO THIS - bypasses actual security validation
+private String generateLongURL() {
+    return "/api?" + "A".repeat(65536); // 64KB - rejected by basic input sanitation
+}
+
+// DO THIS INSTEAD - tests actual security limits
+private String generateLongURL() {
+    int length = Generators.integers(1030, 1050).next(); // Just over 1024 STRICT limit
+    return "/api?" + Generators.letterStrings(length, length + 20).next();
+}
+```
+
+**Critical Issue**: Hardcoded .repeat() patterns often create inputs so large they bypass security validation entirely, testing basic input sanitation instead of actual security logic. Always generate inputs that are just over the configured security limits:
+- **STRICT limit (1024)**: Test 1030-1050 characters
+- **DEFAULT limit (4096)**: Test 4100-4150 characters  
+- **LENIENT limit (8192)**: Test 8200-8250 characters
+
+### ❌ Unbounded Generation
+```java
+// DON'T DO THIS
+private String generateLong() {
+    while (true) { // Infinite loop risk
+        // generation logic
+    }
+}
+```
+
+### ❌ Null Returns
+```java
+// DON'T DO THIS  
+public T next() {
+    if (someCondition) return null; // Contract violation
+}
+```
+
+## Examples
+
+### ✅ Good Generator Example
+```java
+/**
+ * Generator for valid HTTP status codes.
+ * 
+ * Provides realistic HTTP status codes for testing validation pipelines.
+ * Uses dynamic generation for varied, unpredictable output.
+ */
+public class HTTPStatusCodeGenerator implements TypedGenerator<Integer> {
+    
+    private final TypedGenerator<Integer> categorySelector = Generators.integers(1, 5);
+    
+    @Override
+    public Integer next() {
+        return switch (categorySelector.next()) {
+            case 1 -> generate2xxSuccess();
+            case 2 -> generate3xxRedirect(); 
+            case 3 -> generate4xxClientError();
+            case 4 -> generate5xxServerError();
+            case 5 -> generateCustomCode();
+            default -> 200; // Safe default
+        };
+    }
+    
+    private Integer generate2xxSuccess() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> 200;
+            case 2 -> 201;
+            case 3 -> 204;
+            case 4 -> 206;
+            default -> 200;
+        };
+    }
+    
+    // Additional generation methods...
+    
+    @Override
+    public Class<Integer> getType() {
+        return Integer.class;
+    }
+}
+```
+
+## Contract Compliance Checklist
+
+- [ ] Implements TypedGenerator<T> correctly
+- [ ] Never returns null from next()  
+- [ ] Deterministic behavior (same seed = same sequence)
+- [ ] Thread-safe implementation
+- [ ] Proper documentation with purpose and QI-6 status
+- [ ] Organized fields (selectors, components, constants)
+- [ ] Switch-based generation logic
+- [ ] Consistent naming conventions
+- [ ] Output validation and bounds checking
+- [ ] Performance within limits (< 1ms typical)
+- [ ] Graceful error handling
+- [ ] No anti-patterns (call-counter, unbounded loops, nulls)
+- [ ] Follows valid/invalid generator pair principle
+- [ ] Appropriate QI-6 classification (NOT SUITABLE, COMPLIANT, or SUITABLE)
+- [ ] Avoids hardcoded .repeat() patterns that bypass security validation
+- [ ] Uses GeneratorContractTestBase for validation (recommended)
+
+## Related Documentation
+
+- [Testing Framework](specification/testing.adoc) - Complete testing framework specification
+- [Quality Issues](specification/bugs.md) - Generator quality issues and resolution tracking  
+- [Architecture Specification](specification/specification.adoc) - System architecture overview
+- [Implementation Plan](specification/plan.adoc) - Development roadmap and tasks
+
+## Generator Quality Issue References
+
+- **QI-6**: Generator reliability issues and conversion strategy
+- **QI-17**: Hardcoded .repeat() anti-pattern elimination  
+- **QI-4**: Generator contract violations and standardization
+- **QI-20**: Generator framework design violations
+
+See [specification/bugs.md](specification/bugs.md) for detailed quality issue tracking and resolution status.

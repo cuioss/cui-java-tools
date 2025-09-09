@@ -21,6 +21,8 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for protocol handler attack patterns.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * Provides malicious protocol handler patterns designed to test security validation
  * against protocol-based attacks including custom protocol exploitation, protocol
@@ -46,144 +48,280 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> protocolAttackPatterns = Generators.fixedValues(
-            // Javascript protocol attacks
-            "javascript:alert('XSS')/../../../etc/passwd",
-            "javascript:eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))/admin",
-            "javascript:window.location='http://evil.com'/../../config",
-            "javascript:document.location.href='malicious.com'/../sensitive",
-            "javascript:fetch('/../../etc/passwd').then(r=>r.text()).then(console.log)",
-            "javascript://comment%0Aalert('XSS')/../etc/hosts",
-
-            // Data URI exploitation
-            "data:text/html,<script>alert('XSS')</script>/../../../etc/passwd",
-            "data:application/javascript,alert('XSS')/../admin/config",
-            "data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=/../etc/hosts",
-            "data:image/svg+xml,<svg><script>alert('XSS')</script></svg>/../../sensitive",
-            "data:text/plain,../../../etc/passwd",
-            "data:,../../admin/config",
-
-            // File protocol with path traversal (these will be caught by path traversal detection)
-            "file:///../../../etc/passwd",
-            "file:////etc/passwd/../../../sensitive",
-            "file://../../../etc/hosts",
-            "file://localhost/../../../etc/passwd",
-            "file:///c:/../../windows/win.ini",
-            "file://./../../etc/shadow",
-            "file://.././../etc/passwd",
-            "file:///etc/../../../passwd",
-
-            // Custom protocol schemes
-            "custom://malicious.com/../../../etc/passwd",
-            "malware://evil.com/../../admin/config",
-            "exploit://attacker.com/../etc/hosts",
-            "backdoor://malicious.site/../../sensitive",
-            "trojan://evil.domain/../admin",
-            "virus://malicious.host/../../config",
-
-            // Protocol confusion attacks
-            "http://javascript:alert('XSS')@evil.com/../../../etc/passwd",
-            "https://data:text/html,<script>@malicious.com/../../config",
-            "ftp://file@evil.com/../../../admin/config",
-            "mailto://javascript:alert('XSS')@attacker.com/../sensitive",
-            "tel://data:text/html@malicious.com/../../etc/hosts",
-
-            // Protocol injection
-            "http://evil.com#javascript:alert('XSS')/../../../etc/passwd",
-            "https://malicious.com?redirect=javascript:alert('XSS')/../../config",
-            "http://attacker.com/path?url=file:///etc/passwd",
-            "https://evil.site/redirect?to=data:text/html,<script>/admin",
-            "http://malicious.host/proxy?target=javascript:alert(1)/../sensitive",
-
-            // Malformed protocol schemes
-            "ht tp://evil.com/../../../etc/passwd",
-            "htt p://malicious.com/../../admin/config",
-            "http ://attacker.com/../etc/hosts",
-            "http:////evil.com/../../sensitive",
-            "http:///evil.com/../admin",
-            "http::evil.com/../../etc/passwd",
-
-            // Protocol case manipulation
-            "HTTP://EVIL.COM/../../../etc/passwd",
-            "hTtP://MaLiCiOuS.cOm/../../admin/config",
-            "HTTPS://ATTACKER.COM/../etc/hosts",
-            "FTP://EVIL.SITE/../../sensitive",
-            "JAVASCRIPT:alert('XSS')/../admin",
-            "DATA:text/html,<script>/../../etc/passwd",
-
-            // Protocol with special characters
-            "http\u0001://evil.com/../../../etc/passwd",
-            "http\u0000://malicious.com/../../admin/config",
-            """
-            http
-            ://attacker.com/../etc/hosts""",
-            """
-            http\
-            \
-            ://evil.site/../../sensitive""",
-            "http\u0009://malicious.host/../admin",
-            "http\u0020://evil.domain/../../etc/passwd",
-
-            // Double protocol schemes
-            "http://http://evil.com/../../../etc/passwd",
-            "https://https://malicious.com/../../admin/config",
-            "ftp://ftp://attacker.com/../etc/hosts",
-            "javascript://javascript:alert('XSS')/../../sensitive",
-            "data://data:text/html,<script>alert(1)</script>/../admin",
-
-            // Protocol with authentication bypass
-            "http://admin:password@evil.com/../../../etc/passwd",
-            "https://root:toor@malicious.com/../../admin/config",
-            "ftp://user:pass@attacker.com/../etc/hosts",
-            "http://:%40@evil.site/../../sensitive",
-            "https://user@:@malicious.host/../admin",
-
-            // Protocol with port manipulation
-            "http://evil.com:0/../../../etc/passwd",
-            "https://malicious.com:65536/../../admin/config",
-            "http://attacker.com:-80/../etc/hosts",
-            "https://evil.site:99999/../../sensitive",
-            "ftp://malicious.host:21;ls/../../admin",
-
-            // Nested protocol attacks
-            "http://evil.com/redirect?url=javascript:alert('XSS')/../etc/passwd",
-            "https://malicious.com/proxy?target=file:///etc/shadow",
-            "http://attacker.com/gateway?dest=data:text/html,<script>/admin",
-            "https://evil.site/forward?to=custom://malicious/../../config",
-
-            // Protocol with path traversal
-            "http://evil.com/../../../etc/passwd",
-            "https://malicious.com/../../admin/config",
-            "ftp://attacker.com/../etc/hosts",
-            "file://localhost/../../../etc/passwd",
-            "javascript:location='http://evil.com'/../sensitive",
-
-            // Protocol handler exploitation
-            "gopher://evil.com/../../../etc/passwd",
-            "ldap://malicious.com/../../admin/config",
-            "dict://attacker.com/../etc/hosts",
-            "tftp://evil.site/../../sensitive",
-            "imap://malicious.host/../admin",
-            "pop3://evil.domain/../../etc/passwd",
-
-            // Protocol with fragment manipulation
-            "http://evil.com#/../../../etc/passwd",
-            "https://malicious.com#/../../admin/config",
-            "javascript:alert('XSS')#/../etc/hosts",
-            "data:text/html,<script>alert(1)</script>#/../../sensitive",
-            "file:///etc/passwd#/../admin",
-
-            // Protocol encoding attacks
-            "%68%74%74%70://evil.com/../../../etc/passwd",
-            "%6a%61%76%61%73%63%72%69%70%74:alert('XSS')/../admin",
-            "%64%61%74%61:text/html,<script>/../../etc/hosts",
-            "%66%69%6c%65:///../../../etc/passwd",
-            "h%74%74p://malicious.com/../../sensitive"
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> attackCategoryGen = Generators.integers(1, 17);
+    private final TypedGenerator<String> hostGen = Generators.fixedValues("evil.com", "malicious.com", "attacker.com", "evil.site", "malicious.host", "evil.domain");
+    private final TypedGenerator<String> pathGen = Generators.fixedValues("../../../etc/passwd", "/../../admin/config", "/../etc/hosts", "/../../sensitive", "/../admin", "/../../config");
 
     @Override
     public String next() {
-        return protocolAttackPatterns.next();
+        return switch (attackCategoryGen.next()) {
+            case 1 -> generateJavaScriptProtocolAttack();
+            case 2 -> generateDataUriExploitation();
+            case 3 -> generateFileProtocolAttack();
+            case 4 -> generateCustomProtocolSchemes();
+            case 5 -> generateProtocolConfusionAttacks();
+            case 6 -> generateProtocolInjection();
+            case 7 -> generateMalformedProtocolSchemes();
+            case 8 -> generateProtocolCaseManipulation();
+            case 9 -> generateProtocolWithSpecialCharacters();
+            case 10 -> generateDoubleProtocolSchemes();
+            case 11 -> generateProtocolWithAuthBypass();
+            case 12 -> generateProtocolWithPortManipulation();
+            case 13 -> generateNestedProtocolAttacks();
+            case 14 -> generateProtocolWithPathTraversal();
+            case 15 -> generateProtocolHandlerExploitation();
+            case 16 -> generateProtocolWithFragmentManipulation();
+            case 17 -> generateProtocolEncodingAttacks();
+            default -> generateJavaScriptProtocolAttack();
+        };
+    }
+
+    private String generateJavaScriptProtocolAttack() {
+        int type = Generators.integers(1, 6).next();
+        String path = pathGen.next();
+
+        return switch (type) {
+            case 1 -> "javascript:alert('XSS')" + path;
+            case 2 -> "javascript:eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))/admin";
+            case 3 -> "javascript:window.location='http://evil.com'/../../config";
+            case 4 -> "javascript:document.location.href='malicious.com'/../sensitive";
+            case 5 -> "javascript:fetch('/../../etc/passwd').then(r=>r.text()).then(console.log)";
+            case 6 -> "javascript://comment%0Aalert('XSS')/../etc/hosts";
+            default -> "javascript:alert('XSS')" + path;
+        };
+    }
+
+    private String generateDataUriExploitation() {
+        int type = Generators.integers(1, 6).next();
+        String path = pathGen.next();
+
+        return switch (type) {
+            case 1 -> "data:text/html,<script>alert('XSS')</script>" + path;
+            case 2 -> "data:application/javascript,alert('XSS')/../admin/config";
+            case 3 -> "data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=/../etc/hosts";
+            case 4 -> "data:image/svg+xml,<svg><script>alert('XSS')</script></svg>/../../sensitive";
+            case 5 -> "data:text/plain,../../../etc/passwd";
+            case 6 -> "data:,../../admin/config";
+            default -> "data:text/html,<script>alert('XSS')</script>" + path;
+        };
+    }
+
+    private String generateFileProtocolAttack() {
+        int type = Generators.integers(1, 8).next();
+
+        return switch (type) {
+            case 1 -> "file:///../../../etc/passwd";
+            case 2 -> "file:////etc/passwd/../../../sensitive";
+            case 3 -> "file://../../../etc/hosts";
+            case 4 -> "file://localhost/../../../etc/passwd";
+            case 5 -> "file:///c:/../../windows/win.ini";
+            case 6 -> "file://./../../etc/shadow";
+            case 7 -> "file://.././../etc/passwd";
+            case 8 -> "file:///etc/../../../passwd";
+            default -> "file:///../../../etc/passwd";
+        };
+    }
+
+    private String generateCustomProtocolSchemes() {
+        int type = Generators.integers(1, 6).next();
+        String host = hostGen.next();
+        String path = pathGen.next();
+
+        return switch (type) {
+            case 1 -> "custom://" + host + path;
+            case 2 -> "malware://" + host + "/../../admin/config";
+            case 3 -> "exploit://" + host + "/../etc/hosts";
+            case 4 -> "backdoor://" + host + "/../../sensitive";
+            case 5 -> "trojan://" + host + "/../admin";
+            case 6 -> "virus://" + host + "/../../config";
+            default -> "custom://" + host + path;
+        };
+    }
+
+    private String generateProtocolConfusionAttacks() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://javascript:alert('XSS')@" + host + "/../../../etc/passwd";
+            case 2 -> "https://data:text/html,<script>@" + host + "/../../config";
+            case 3 -> "ftp://file@" + host + "/../../../admin/config";
+            case 4 -> "mailto://javascript:alert('XSS')@" + host + "/../sensitive";
+            case 5 -> "tel://data:text/html@" + host + "/../../etc/hosts";
+            default -> "http://javascript:alert('XSS')@" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolInjection() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://" + host + "#javascript:alert('XSS')/../../../etc/passwd";
+            case 2 -> "https://" + host + "?redirect=javascript:alert('XSS')/../../config";
+            case 3 -> "http://" + host + "/path?url=file:///etc/passwd";
+            case 4 -> "https://" + host + "/redirect?to=data:text/html,<script>/admin";
+            case 5 -> "http://" + host + "/proxy?target=javascript:alert(1)/../sensitive";
+            default -> "http://" + host + "#javascript:alert('XSS')/../../../etc/passwd";
+        };
+    }
+
+    private String generateMalformedProtocolSchemes() {
+        int type = Generators.integers(1, 6).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "ht tp://" + host + "/../../../etc/passwd";
+            case 2 -> "htt p://" + host + "/../../admin/config";
+            case 3 -> "http ://" + host + "/../etc/hosts";
+            case 4 -> "http:////" + host + "/../../sensitive";
+            case 5 -> "http:///" + host + "/../admin";
+            case 6 -> "http::" + host + "/../../etc/passwd";
+            default -> "ht tp://" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolCaseManipulation() {
+        int type = Generators.integers(1, 6).next();
+
+        return switch (type) {
+            case 1 -> "HTTP://EVIL.COM/../../../etc/passwd";
+            case 2 -> "hTtP://MaLiCiOuS.cOm/../../admin/config";
+            case 3 -> "HTTPS://ATTACKER.COM/../etc/hosts";
+            case 4 -> "FTP://EVIL.SITE/../../sensitive";
+            case 5 -> "JAVASCRIPT:alert('XSS')/../admin";
+            case 6 -> "DATA:text/html,<script>/../../etc/passwd";
+            default -> "HTTP://EVIL.COM/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolWithSpecialCharacters() {
+        int type = Generators.integers(1, 6).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http\u0001://" + host + "/../../../etc/passwd";
+            case 2 -> "http\u0000://" + host + "/../../admin/config";
+            case 3 -> "http\n://attacker.com/../etc/hosts";
+            case 4 -> "http\\\n\\\n://evil.site/../../sensitive";
+            case 5 -> "http\u0009://" + host + "/../admin";
+            case 6 -> "http\u0020://" + host + "/../../etc/passwd";
+            default -> "http\u0001://" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateDoubleProtocolSchemes() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://http://" + host + "/../../../etc/passwd";
+            case 2 -> "https://https://" + host + "/../../admin/config";
+            case 3 -> "ftp://ftp://" + host + "/../etc/hosts";
+            case 4 -> "javascript://javascript:alert('XSS')/../../sensitive";
+            case 5 -> "data://data:text/html,<script>alert(1)</script>/../admin";
+            default -> "http://http://" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolWithAuthBypass() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://admin:password@" + host + "/../../../etc/passwd";
+            case 2 -> "https://root:toor@" + host + "/../../admin/config";
+            case 3 -> "ftp://user:pass@" + host + "/../etc/hosts";
+            case 4 -> "http://:%40@" + host + "/../../sensitive";
+            case 5 -> "https://user@:@" + host + "/../admin";
+            default -> "http://admin:password@" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolWithPortManipulation() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://" + host + ":0/../../../etc/passwd";
+            case 2 -> "https://" + host + ":65536/../../admin/config";
+            case 3 -> "http://" + host + ":-80/../etc/hosts";
+            case 4 -> "https://" + host + ":99999/../../sensitive";
+            case 5 -> "ftp://" + host + ":21;ls/../../admin";
+            default -> "http://" + host + ":0/../../../etc/passwd";
+        };
+    }
+
+    private String generateNestedProtocolAttacks() {
+        int type = Generators.integers(1, 4).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://" + host + "/redirect?url=javascript:alert('XSS')/../etc/passwd";
+            case 2 -> "https://" + host + "/proxy?target=file:///etc/shadow";
+            case 3 -> "http://" + host + "/gateway?dest=data:text/html,<script>/admin";
+            case 4 -> "https://" + host + "/forward?to=custom://malicious/../../config";
+            default -> "http://" + host + "/redirect?url=javascript:alert('XSS')/../etc/passwd";
+        };
+    }
+
+    private String generateProtocolWithPathTraversal() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://" + host + "/../../../etc/passwd";
+            case 2 -> "https://" + host + "/../../admin/config";
+            case 3 -> "ftp://" + host + "/../etc/hosts";
+            case 4 -> "file://localhost/../../../etc/passwd";
+            case 5 -> "javascript:location='http://evil.com'/../sensitive";
+            default -> "http://" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolHandlerExploitation() {
+        int type = Generators.integers(1, 6).next();
+        String host = hostGen.next();
+        String path = pathGen.next();
+
+        return switch (type) {
+            case 1 -> "gopher://" + host + path;
+            case 2 -> "ldap://" + host + "/../../admin/config";
+            case 3 -> "dict://" + host + "/../etc/hosts";
+            case 4 -> "tftp://" + host + "/../../sensitive";
+            case 5 -> "imap://" + host + "/../admin";
+            case 6 -> "pop3://" + host + "/../../etc/passwd";
+            default -> "gopher://" + host + path;
+        };
+    }
+
+    private String generateProtocolWithFragmentManipulation() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "http://" + host + "#/../../../etc/passwd";
+            case 2 -> "https://" + host + "#/../../admin/config";
+            case 3 -> "javascript:alert('XSS')#/../etc/hosts";
+            case 4 -> "data:text/html,<script>alert(1)</script>#/../../sensitive";
+            case 5 -> "file:///etc/passwd#/../admin";
+            default -> "http://" + host + "#/../../../etc/passwd";
+        };
+    }
+
+    private String generateProtocolEncodingAttacks() {
+        int type = Generators.integers(1, 5).next();
+        String host = hostGen.next();
+
+        return switch (type) {
+            case 1 -> "%68%74%74%70://" + host + "/../../../etc/passwd";
+            case 2 -> "%6a%61%76%61%73%63%72%69%70%74:alert('XSS')/../admin";
+            case 3 -> "%64%61%74%61:text/html,<script>/../../etc/hosts";
+            case 4 -> "%66%69%6c%65:///../../../etc/passwd";
+            case 5 -> "h%74%74p://" + host + "/../../sensitive";
+            default -> "%68%74%74%70://" + host + "/../../../etc/passwd";
+        };
     }
 
     @Override

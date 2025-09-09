@@ -21,22 +21,41 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for Internationalized Domain Name (IDN) attack patterns.
  * 
- * <p>
- * Provides malicious IDN patterns designed to test security validation
- * against internationalized domain name attacks including homograph attacks,
- * punycode exploitation, unicode domain spoofing, and IDN-based bypass attempts.
- * </p>
+ * <p><strong>CRITICAL UNICODE SECURITY DATABASE:</strong> This generator contains IDN-specific
+ * attack patterns that exploit Unicode homograph vulnerabilities, punycode encoding exploits,
+ * and visual domain spoofing techniques. Each pattern uses exact Unicode character sequences
+ * that are visually deceptive to humans but distinct to security systems.</p>
  * 
- * <h3>Attack Categories Generated</h3>
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> NOT SUITABLE for dynamic conversion. 
+ * IDN/homograph attacks require exact Unicode character pairs where visual similarity
+ * is critical (e.g., Cyrillic 'а' vs Latin 'a'). These precise character sequences
+ * cannot be algorithmically generated without losing attack effectiveness.</p>
+ * 
+ * <h3>Unicode Homograph Attack Database</h3>
  * <ul>
- *   <li><strong>Homograph attacks</strong>: Visually similar characters from different scripts</li>
- *   <li><strong>Punycode exploitation</strong>: Malicious use of ASCII-compatible encoding</li>
- *   <li><strong>Mixed script attacks</strong>: Combining scripts to create deceptive domains</li>
- *   <li><strong>Unicode normalization bypass</strong>: Exploiting normalization differences</li>
- *   <li><strong>IDN spoofing</strong>: Impersonating legitimate domains</li>
- *   <li><strong>Right-to-left override</strong>: RTL characters for domain confusion</li>
- *   <li><strong>Zero-width attacks</strong>: Invisible characters in domain names</li>
+ *   <li><strong>Cyrillic homographs:</strong> {@code аpple.com} - Cyrillic 'а' (U+0430) vs Latin 'a' (U+0061)</li>
+ *   <li><strong>Punycode exploitation:</strong> {@code xn--pple-43d.com} - ASCII-compatible encoding of Cyrillic domains</li>
+ *   <li><strong>Mixed script attacks:</strong> {@code goog1е.com} - Combining Latin and Cyrillic characters</li>
+ *   <li><strong>Armenian punctuation:</strong> {@code twitter․com} - Armenian full stop (U+2024) vs period (U+002E)</li>
+ *   <li><strong>Right-to-left override:</strong> {@code paypal‮moc.com} - RTL override (U+202E) manipulation</li>
+ *   <li><strong>Zero-width exploits:</strong> {@code google​.com} - Zero-width space (U+200B) insertion</li>
+ *   <li><strong>Unicode normalization:</strong> {@code café.com} - Composed vs decomposed character forms</li>
  * </ul>
+ * 
+ * <h3>IDN Attack Mechanics</h3>
+ * <ul>
+ *   <li><strong>Visual deception:</strong> Characters that look identical but have different Unicode code points</li>
+ *   <li><strong>Punycode bypass:</strong> ASCII encoding of international characters bypasses ASCII-only filters</li>
+ *   <li><strong>Script mixing:</strong> Combining characters from different writing systems</li>
+ *   <li><strong>Invisible characters:</strong> Zero-width and control characters for steganographic attacks</li>
+ *   <li><strong>Normalization exploits:</strong> Different Unicode normalizations of the same visual appearance</li>
+ * </ul>
+ * 
+ * <p><strong>PRESERVATION RATIONALE:</strong> IDN attacks depend on exact Unicode character
+ * relationships defined by the Unicode Consortium. Each homograph pair (e.g., Cyrillic а vs 
+ * Latin a) represents a specific visual vulnerability that must be preserved exactly.
+ * Algorithmic generation cannot reproduce these precise linguistic and visual relationships
+ * required for effective homograph attack testing.</p>
  * 
  * Implements: Task G-IDN from HTTP verification test generators
  * 

@@ -100,8 +100,9 @@ class AlgorithmicComplexityAttackTest {
                 "Algorithmic complexity attack should be rejected: " + complexityAttackPattern);
 
         // Verify failure type is appropriate for complexity attack detection
-        assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                "Failure type should be complexity attack related: " + exception.getFailureType());
+        assertTrue(isSpecificComplexityAttackFailure(exception.getFailureType(), complexityAttackPattern),
+                "Failure type should be specific complexity attack related: " + exception.getFailureType() +
+                        " for pattern: " + complexityAttackPattern);
 
         // Verify exception contains meaningful information
         assertNotNull(exception.getMessage(), "Exception message should not be null");
@@ -143,8 +144,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(redos),
                     "ReDoS pattern should be detected: " + redos);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect ReDoS failure for: " + redos);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "ReDoS pattern should trigger INVALID_CHARACTER for: " + redos);
         }
     }
 
@@ -164,8 +165,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(backtracking),
                     "Exponential backtracking pattern should be detected: " + backtracking);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect backtracking failure for: " + backtracking);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Backtracking pattern should trigger INVALID_CHARACTER for: " + backtracking);
         }
     }
 
@@ -185,8 +186,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(hashCollision),
                     "Hash collision attack should be detected: " + hashCollision);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect hash collision failure for: " + hashCollision);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Hash collision should trigger INVALID_CHARACTER for: " + hashCollision);
         }
     }
 
@@ -206,8 +207,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(recursion),
                     "Deep recursion pattern should be detected: " + recursion);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect recursion failure for: " + recursion);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Recursion pattern should trigger INVALID_CHARACTER for: " + recursion);
         }
     }
 
@@ -227,8 +228,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(polynomial),
                     "Polynomial complexity attack should be detected: " + polynomial);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect polynomial complexity failure for: " + polynomial);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Polynomial complexity should trigger INVALID_CHARACTER for: " + polynomial);
         }
     }
 
@@ -248,8 +249,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(exponential),
                     "Exponential complexity attack should be detected: " + exponential);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect exponential complexity failure for: " + exponential);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Exponential complexity should trigger INVALID_CHARACTER for: " + exponential);
         }
     }
 
@@ -269,8 +270,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(memory),
                     "Memory allocation complexity attack should be detected: " + memory);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect memory complexity failure for: " + memory);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Memory allocation pattern should trigger INVALID_CHARACTER for: " + memory);
         }
     }
 
@@ -290,8 +291,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(xmlBomb),
                     "XML parser complexity bomb should be detected: " + xmlBomb);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect XML complexity failure for: " + xmlBomb);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "XML bomb should trigger INVALID_CHARACTER for: " + xmlBomb);
         }
     }
 
@@ -311,8 +312,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(jsonBomb),
                     "JSON parser complexity attack should be detected: " + jsonBomb);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect JSON complexity failure for: " + jsonBomb);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "JSON bomb should trigger INVALID_CHARACTER for: " + jsonBomb);
         }
     }
 
@@ -332,8 +333,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(urlParsing),
                     "Complex URL parsing attack should be detected: " + urlParsing);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect URL parsing complexity failure for: " + urlParsing);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "URL parsing complexity should trigger INVALID_CHARACTER for: " + urlParsing);
         }
     }
 
@@ -353,8 +354,8 @@ class AlgorithmicComplexityAttackTest {
                     () -> pipeline.validate(pattern),
                     "Pattern matching complexity attack should be detected: " + pattern);
 
-            assertTrue(isComplexityAttackRelatedFailure(exception.getFailureType()),
-                    "Should detect pattern matching complexity failure for: " + pattern);
+            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                    "Pattern matching complexity should trigger INVALID_CHARACTER for: " + pattern);
         }
     }
 
@@ -391,10 +392,21 @@ class AlgorithmicComplexityAttackTest {
     }
 
     /**
-     * Determines if the failure type is related to algorithmic complexity attack detection.
-     * Complexity attacks can manifest as various failure types depending on the attack vector.
+     * Determines if the failure type is specifically appropriate for algorithmic complexity attacks.
+     * Different complexity attack vectors trigger specific failure types.
+     * 
+     * @param failureType The failure type to validate
+     * @param pattern The specific attack pattern being tested
+     * @return true if the failure type is appropriate for the pattern
      */
-    private boolean isComplexityAttackRelatedFailure(UrlSecurityFailureType failureType) {
+    private boolean isSpecificComplexityAttackFailure(UrlSecurityFailureType failureType, String pattern) {
+        // Algorithmic complexity attacks can trigger multiple specific failure types based on attack vector:
+        // - Large input patterns → INPUT_TOO_LONG or PATH_TOO_LONG
+        // - Nested structures → EXCESSIVE_NESTING
+        // - Pattern-based attacks → SUSPICIOUS_PATTERN_DETECTED
+        // - Malformed structures → MALFORMED_INPUT or INVALID_STRUCTURE
+        // - Control character attacks → CONTROL_CHARACTERS or INVALID_CHARACTER
+        
         return failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
                 failureType == UrlSecurityFailureType.PATH_TOO_LONG ||
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||

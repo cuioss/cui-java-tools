@@ -21,24 +21,40 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for nginx and other web server CVE attack patterns.
  * 
- * <p>
- * Provides malicious patterns based on known nginx, LiteSpeed, Caddy, and other
- * web server CVEs designed to test security validation against documented 
- * vulnerabilities including path traversal, directory traversal, and various
- * server-specific attack vectors.
- * </p>
+ * <p><strong>CRITICAL CVE DATABASE:</strong> This generator contains attack patterns
+ * based on documented CVE vulnerabilities with specific exploit techniques that have
+ * been proven to work against nginx, LiteSpeed, Caddy, and other web servers.</p>
  * 
- * <h3>CVE Categories Generated</h3>
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> NOT SUITABLE for dynamic conversion. 
+ * Each pattern represents a specific CVE exploit with exact syntax requirements
+ * for vulnerability reproduction. These are historical attack patterns preserved
+ * for security testing against known vulnerabilities.</p>
+ * 
+ * <h3>Documented CVE Attack Database</h3>
  * <ul>
- *   <li><strong>CVE-2013-4547</strong>: nginx space in URI vulnerability</li>
- *   <li><strong>CVE-2017-7529</strong>: nginx range filter integer overflow</li>
- *   <li><strong>CVE-2019-20372</strong>: nginx HTTP/2 request smuggling</li>
- *   <li><strong>CVE-2021-23017</strong>: nginx resolver off-by-one</li>
- *   <li><strong>CVE-2016-4450</strong>: nginx CRLF injection</li>
- *   <li><strong>CVE-2009-3898</strong>: nginx directory traversal</li>
- *   <li><strong>LiteSpeed CVEs</strong>: Path traversal and buffer overflow</li>
- *   <li><strong>Caddy/Other CVEs</strong>: Various server vulnerabilities</li>
+ *   <li><strong>CVE-2013-4547:</strong> nginx space in URI vulnerability ({@code "/test.php /../../etc/passwd"})</li>
+ *   <li><strong>CVE-2017-7529:</strong> nginx range filter integer overflow with massive byte ranges</li>
+ *   <li><strong>CVE-2019-20372:</strong> nginx HTTP/2 request smuggling path traversal</li>
+ *   <li><strong>CVE-2021-23017:</strong> nginx resolver off-by-one buffer overflow exploitation</li>
+ *   <li><strong>CVE-2016-4450:</strong> nginx CRLF injection with header manipulation</li>
+ *   <li><strong>CVE-2009-3898:</strong> nginx directory traversal alias misconfiguration</li>
+ *   <li><strong>LiteSpeed CVEs:</strong> Path traversal and buffer overflow specific patterns</li>
+ *   <li><strong>Caddy/Other CVEs:</strong> Various server vulnerability exploitation patterns</li>
  * </ul>
+ * 
+ * <h3>CVE-Specific Attack Mechanics</h3>
+ * <ul>
+ *   <li><strong>Space in URI (CVE-2013-4547):</strong> Exploits nginx URI parsing with embedded spaces</li>
+ *   <li><strong>Range Header Overflow:</strong> Massive byte ranges trigger integer overflow</li>
+ *   <li><strong>HTTP/2 Smuggling:</strong> Protocol version exploitation for path traversal</li>
+ *   <li><strong>CRLF Injection:</strong> Header injection via CRLF sequences in URLs</li>
+ *   <li><strong>Alias Misconfiguration:</strong> Specific nginx configuration bypass techniques</li>
+ * </ul>
+ * 
+ * <p><strong>PRESERVATION RATIONALE:</strong> These exact patterns reproduce documented
+ * CVE exploits. Each string has been validated against specific nginx versions and
+ * configurations. Algorithmic generation would lose the precise vulnerability trigger
+ * sequences required for CVE reproduction and security testing effectiveness.</p>
  * 
  * Implements: Task G-NginxCVE from HTTP verification test generators
  * 

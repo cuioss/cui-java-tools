@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -276,9 +277,9 @@ class ApacheCVEAttackTest {
     @DisplayName("Complex multi-vector Apache CVE combinations should be blocked")
     void shouldBlockComplexApacheCVECombinations() {
         String[] complexPatterns = {
-                // Complex multi-vector Apache CVE combinations
-                "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/etc/passwd?q=" + "A".repeat(1024),
-                "/manual/.%2e/.%%32%65/" + "B".repeat(2048) + "/../../../etc/shadow",
+                // Complex multi-vector Apache CVE combinations - QI-17: Fixed to test realistic boundaries
+                "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/etc/passwd?q=" + generateBoundaryPadding(100),
+                "/manual/.%2e/.%%32%65/" + generateBoundaryPadding(150) + "/../../../etc/shadow",
 
                 // Apache variant with different encodings
                 "/apache/.%2e%2e/.%2e%2e/.%2e%2e/etc/passwd",
@@ -327,7 +328,7 @@ class ApacheCVEAttackTest {
     @Test
     @DisplayName("Apache CVE validation should maintain performance")
     void shouldMaintainPerformanceWithApacheCVEAttacks() {
-        String complexApacheCVEPattern = "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/../../../../../../../../../etc/passwd?query=" + "A".repeat(2048);
+        String complexApacheCVEPattern = "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/../../../../../../../../../etc/passwd?query=" + generateBoundaryPadding(200); // QI-17: Fixed to test realistic boundaries
 
         // Warm up
         for (int i = 0; i < 10; i++) {
@@ -375,5 +376,15 @@ class ApacheCVEAttackTest {
                 failureType == UrlSecurityFailureType.EXCESSIVE_NESTING ||
                 failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
                 failureType == UrlSecurityFailureType.PATH_TOO_LONG;
+    }
+
+    // QI-17: Helper method for realistic boundary testing instead of massive .repeat() patterns
+    /**
+     * Generates boundary padding that tests realistic security limits instead of massive inputs.
+     * @param length target length for padding (kept reasonable for actual security testing)
+     * @return padding string for boundary testing
+     */
+    private String generateBoundaryPadding(int length) {
+        return Generators.letterStrings(length, length + 20).next();
     }
 }

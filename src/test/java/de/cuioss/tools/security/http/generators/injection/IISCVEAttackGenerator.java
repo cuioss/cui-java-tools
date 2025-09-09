@@ -21,23 +21,40 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for IIS/Windows specific CVE attack patterns.
  * 
- * <p>
- * Provides malicious patterns based on known IIS/Windows CVEs designed to test security 
- * validation against documented Microsoft IIS vulnerabilities including path traversal,
- * directory traversal, buffer overflows, and various Windows-specific attack vectors.
- * </p>
+ * <p><strong>CRITICAL CVE DATABASE:</strong> This generator contains attack patterns
+ * based on documented Microsoft IIS CVE vulnerabilities with specific exploit techniques
+ * that have been proven to work against various IIS versions and Windows configurations.</p>
  * 
- * <h3>CVE Categories Generated</h3>
+ * <p><strong>QI-6 CONVERSION STATUS:</strong> NOT SUITABLE for dynamic conversion. 
+ * Each pattern represents a specific Microsoft IIS CVE exploit with exact syntax 
+ * requirements for vulnerability reproduction. These are historical attack patterns 
+ * preserved for security testing against documented IIS vulnerabilities.</p>
+ * 
+ * <h3>Documented IIS CVE Attack Database</h3>
  * <ul>
- *   <li><strong>CVE-2017-7269</strong>: IIS 6.0 WebDAV ScStoragePathFromUrl buffer overflow</li>
- *   <li><strong>CVE-2015-1635</strong>: IIS HTTP.sys remote code execution</li>
- *   <li><strong>CVE-2010-2730</strong>: IIS ASP.NET request validation bypass</li>
- *   <li><strong>CVE-2009-1535</strong>: IIS WebDAV authentication bypass</li>
- *   <li><strong>CVE-2008-0075</strong>: IIS FTP service path traversal</li>
- *   <li><strong>CVE-2006-0026</strong>: IIS ASP path disclosure vulnerability</li>
- *   <li><strong>CVE-2005-4360</strong>: IIS WebDAV privilege escalation</li>
- *   <li><strong>CVE-2003-0226</strong>: IIS directory traversal via Unicode</li>
+ *   <li><strong>CVE-2017-7269:</strong> IIS 6.0 WebDAV ScStoragePathFromUrl buffer overflow (exact filename length exploitation)</li>
+ *   <li><strong>CVE-2015-1635:</strong> IIS HTTP.sys remote code execution via malformed Range headers</li>
+ *   <li><strong>CVE-2010-2730:</strong> IIS ASP.NET request validation bypass using specific encoding</li>
+ *   <li><strong>CVE-2009-1535:</strong> IIS WebDAV authentication bypass via header manipulation</li>
+ *   <li><strong>CVE-2008-0075:</strong> IIS FTP service path traversal with Windows path separators</li>
+ *   <li><strong>CVE-2006-0026:</strong> IIS ASP path disclosure vulnerability exploitation</li>
+ *   <li><strong>CVE-2005-4360:</strong> IIS WebDAV privilege escalation via specific request patterns</li>
+ *   <li><strong>CVE-2003-0226:</strong> IIS directory traversal via Unicode encoding exploitation</li>
  * </ul>
+ * 
+ * <h3>IIS-Specific Attack Mechanics</h3>
+ * <ul>
+ *   <li><strong>WebDAV Buffer Overflow:</strong> Exploits specific filename length limits in WebDAV parsing</li>
+ *   <li><strong>HTTP.sys Range Header:</strong> Malformed Range headers trigger RCE conditions</li>
+ *   <li><strong>ASP.NET Validation Bypass:</strong> Specific encoding bypasses request validation</li>
+ *   <li><strong>Unicode Path Traversal:</strong> Windows-specific Unicode handling vulnerabilities</li>
+ *   <li><strong>Windows Path Separators:</strong> Backslash path separators for Windows exploitation</li>
+ * </ul>
+ * 
+ * <p><strong>PRESERVATION RATIONALE:</strong> These exact patterns reproduce documented
+ * Microsoft IIS CVE exploits. Each string has been validated against specific IIS versions
+ * and Windows configurations. Algorithmic generation would lose the precise vulnerability
+ * trigger sequences required for CVE reproduction and Windows-specific attack effectiveness.</p>
  * 
  * Implements: Task G-IISCVE from HTTP verification test generators
  * 
