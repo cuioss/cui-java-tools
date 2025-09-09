@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -137,9 +138,10 @@ class IISCVEAttackTest {
     void shouldBlockCVE20177269Patterns() {
         String[] cve20177269Patterns = {
                 // WebDAV buffer overflow patterns
-                "/webdav/" + "A".repeat(40000) + "/../../../windows/win.ini",
-                "/dav/" + "B".repeat(40000) + "/../../../windows/system32/config/sam",
-                "/webdav/test.txt" + "C".repeat(40000) + "/../../../boot.ini"
+                // QI-17: Replace 40KB patterns with realistic path overflow boundaries
+                "/webdav/" + Generators.letterStrings(5000, 8000).next() + "/../../../windows/win.ini",
+                "/dav/" + Generators.letterStrings(5000, 8000).next() + "/../../../windows/system32/config/sam",
+                "/webdav/test.txt" + Generators.letterStrings(5000, 8000).next() + "/../../../boot.ini"
         };
 
         for (String pattern : cve20177269Patterns) {

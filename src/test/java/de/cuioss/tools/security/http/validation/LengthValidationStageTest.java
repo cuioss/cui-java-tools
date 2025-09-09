@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.validation;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.HttpSecurityValidator;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
@@ -105,8 +106,8 @@ class LengthValidationStageTest {
         String reasonablePath = "/api/users/123/profile";
         assertEquals(reasonablePath, stage.validate(reasonablePath));
 
-        // Should fail with extremely long path
-        String extremelyLongPath = "x".repeat(5000); // Exceeds default limit
+        // Should fail with path over default limit (4096)
+        String extremelyLongPath = Generators.letterStrings(4100, 4150).next(); // Just over default limit
         assertThrows(UrlSecurityException.class, () -> stage.validate(extremelyLongPath));
     }
 
@@ -157,8 +158,10 @@ class LengthValidationStageTest {
 
         assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType());
         assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertTrue(exception.getDetail().orElse("").contains("Parameter value"));
-        assertTrue(exception.getDetail().orElse("").contains("51 exceeds maximum 50"));
+        assertTrue(exception.getDetail().isPresent());
+        String detail = exception.getDetail().get();
+        assertTrue(detail.contains("Parameter value"));
+        assertTrue(detail.contains("51 exceeds maximum 50"));
     }
 
     // ========== Header Name Length Tests ==========
@@ -200,7 +203,7 @@ class LengthValidationStageTest {
                 .build();
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.HEADER_VALUE);
 
-        String longHeaderValue = "Bearer " + "x".repeat(200); // > 100 chars total
+        String longHeaderValue = "Bearer " + Generators.letterStrings(95, 100).next(); // Just over 100 chars total
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longHeaderValue));
@@ -275,8 +278,10 @@ class LengthValidationStageTest {
 
         assertEquals(UrlSecurityFailureType.INPUT_TOO_LONG, exception.getFailureType());
         assertEquals(ValidationType.BODY, exception.getValidationType());
-        assertTrue(exception.getDetail().orElse("").contains("Request body"));
-        assertTrue(exception.getDetail().orElse("").contains("1001 exceeds maximum 1000"));
+        assertTrue(exception.getDetail().isPresent());
+        String detail = exception.getDetail().get();
+        assertTrue(detail.contains("Request body"));
+        assertTrue(detail.contains("1001 exceeds maximum 1000"));
     }
 
     @Test
@@ -286,7 +291,7 @@ class LengthValidationStageTest {
                 .build();
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.BODY);
 
-        String validBody = "x".repeat(500); // Well within limit
+        String validBody = Generators.letterStrings(450, 500).next(); // Well within limit
         assertEquals(validBody, stage.validate(validBody));
     }
 
@@ -298,7 +303,7 @@ class LengthValidationStageTest {
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.BODY);
 
         // Should use Integer.MAX_VALUE as the effective limit for string length
-        String reasonableBody = "x".repeat(1000);
+        String reasonableBody = Generators.letterStrings(950, 1000).next();
         assertEquals(reasonableBody, stage.validate(reasonableBody));
     }
 
@@ -326,7 +331,7 @@ class LengthValidationStageTest {
         assertEquals(validInput, result);
 
         // Test input that exceeds all limits
-        String veryLongInput = "x".repeat(1000); // Exceeds all configured limits
+        String veryLongInput = Generators.letterStrings(1005, 1050).next(); // Exceeds all configured limits
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(veryLongInput));
 
@@ -405,7 +410,7 @@ class LengthValidationStageTest {
         String longPath = "x".repeat(1025); // Exceeds strict limit
         assertThrows(UrlSecurityException.class, () -> stage.validate(longPath));
 
-        String validPath = "x".repeat(500); // Within strict limit
+        String validPath = Generators.letterStrings(450, 500).next(); // Within strict limit
         assertEquals(validPath, stage.validate(validPath));
     }
 
@@ -415,10 +420,10 @@ class LengthValidationStageTest {
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.URL_PATH);
 
         // Should use lenient limits (maxPathLength = 8192 in lenient config)
-        String longPath = "x".repeat(5000); // Within lenient limit
+        String longPath = Generators.letterStrings(7000, 7500).next(); // Within lenient limit
         assertEquals(longPath, stage.validate(longPath));
 
-        String veryLongPath = "x".repeat(9000); // Exceeds even lenient limit
+        String veryLongPath = Generators.letterStrings(8200, 8250).next(); // Just over lenient limit
         assertThrows(UrlSecurityException.class, () -> stage.validate(veryLongPath));
     }
 
@@ -428,10 +433,10 @@ class LengthValidationStageTest {
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.URL_PATH);
 
         // Should use default limits (maxPathLength = 4096 in default config)
-        String longPath = "x".repeat(3000); // Within default limit
+        String longPath = Generators.letterStrings(3500, 3800).next(); // Within default limit
         assertEquals(longPath, stage.validate(longPath));
 
-        String veryLongPath = "x".repeat(5000); // Exceeds default limit
+        String veryLongPath = Generators.letterStrings(4100, 4150).next(); // Just over default limit
         assertThrows(UrlSecurityException.class, () -> stage.validate(veryLongPath));
     }
 
@@ -499,7 +504,7 @@ class LengthValidationStageTest {
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.PARAMETER_VALUE);
 
         // Should efficiently handle very long strings within limit
-        String veryLongString = "x".repeat(500000); // 500K characters, within limit
+        String veryLongString = Generators.letterStrings(400000, 500000).next(); // Replaces .repeat(500000) - massive pattern
         long startTime = System.nanoTime();
         String result = stage.validate(veryLongString);
         long endTime = System.nanoTime();

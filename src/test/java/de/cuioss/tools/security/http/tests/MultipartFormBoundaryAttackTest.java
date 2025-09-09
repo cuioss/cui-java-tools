@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -474,7 +475,8 @@ class MultipartFormBoundaryAttackTest {
     @Test
     @DisplayName("Multipart DoS attacks must be blocked")
     void shouldBlockMultipartDosAttacks() {
-        String longContent = "A".repeat(5000);
+        // QI-17: Replace 5KB pattern with realistic boundary testing
+        String longContent = Generators.letterStrings(4000, 6000).next();
         String[] dosAttacks = {
                 // Large number of parts
                 "/upload?parts=" + "part1&".repeat(50) + "admin=true",
@@ -483,7 +485,7 @@ class MultipartFormBoundaryAttackTest {
 
                 // Large content with boundaries
                 "/profile/image?content=" + longContent + "%0d%0a--boundary" + "--boundary".repeat(10),
-                "/document/upload?multipart=" + "A".repeat(10000),
+                "/document/upload?multipart=" + Generators.letterStrings(8000, 12000).next(),
                 "/attachments?form=" + "input" + "X".repeat(2000) + "=value",
 
                 // Multiple large fields

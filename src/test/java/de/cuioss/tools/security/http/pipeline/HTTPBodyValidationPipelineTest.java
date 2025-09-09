@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -297,7 +298,8 @@ class HTTPBodyValidationPipelineTest {
                     .build();
             HTTPBodyValidationPipeline largePipeline = new HTTPBodyValidationPipeline(largeConfig, eventCounter);
 
-            String mediumBody = "x".repeat(10000);
+            // QI-17: Replace 10KB hardcoded pattern with realistic body boundary testing
+            String mediumBody = Generators.letterStrings(8000, 12000).next();
             assertEquals(mediumBody, largePipeline.validate(mediumBody));
         }
     }

@@ -23,6 +23,8 @@ import java.util.Base64;
 /**
  * Generates mixed encoding attack patterns that combine different encoding schemes.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * This generator creates attack patterns that mix different types of encoding
  * to bypass security controls that might only check for a single encoding type.
@@ -56,45 +58,90 @@ import java.util.Base64;
  */
 public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "../",
-            "..\\",
-            "../../",
-            "../../../",
-            "<script>",
-            "javascript:",
-            "data:",
-            "vbscript:",
-            "file://",
-            "\\x00",
-            "\0"
-    );
-
-    private final TypedGenerator<String> encodingTypeGen = Generators.fixedValues(
-            "url_html",        // URL + HTML entities
-            "url_unicode",     // URL + Unicode escapes
-            "url_javascript",  // URL + JS escapes  
-            "html_unicode",    // HTML entities + Unicode
-            "base64_url",      // Base64 + URL
-            "utf8_url",        // UTF-8 overlong + URL
-            "mixed_url_formats" // Different URL encoding formats
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 7);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(2, 6);
+    private final TypedGenerator<String> scriptTagGen = Generators.fixedValues("script", "iframe", "object", "embed");
+    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript", "data", "vbscript", "file");
+    private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 7);
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String encodingType = encodingTypeGen.next();
+        String basePattern = generateBasePattern();
+        int encodingType = encodingTypeGen.next();
 
         return switch (encodingType) {
-            case "url_html" -> mixUrlWithHtmlEntities(basePattern);
-            case "url_unicode" -> mixUrlWithUnicodeEscapes(basePattern);
-            case "url_javascript" -> mixUrlWithJavaScriptEscapes(basePattern);
-            case "html_unicode" -> mixHtmlWithUnicodeEscapes(basePattern);
-            case "base64_url" -> mixBase64WithUrl(basePattern);
-            case "utf8_url" -> mixUtf8OverlongWithUrl(basePattern);
-            case "mixed_url_formats" -> mixDifferentUrlFormats(basePattern);
+            case 1 -> mixUrlWithHtmlEntities(basePattern);
+            case 2 -> mixUrlWithUnicodeEscapes(basePattern);
+            case 3 -> mixUrlWithJavaScriptEscapes(basePattern);
+            case 4 -> mixHtmlWithUnicodeEscapes(basePattern);
+            case 5 -> mixBase64WithUrl(basePattern);
+            case 6 -> mixUtf8OverlongWithUrl(basePattern);
+            case 7 -> mixDifferentUrlFormats(basePattern);
             default -> basePattern;
         };
+    }
+
+    private String generateBasePattern() {
+        return switch (basePatternTypeGen.next()) {
+            case 1 -> generateTraversalPattern();
+            case 2 -> generateScriptPattern();
+            case 3 -> generateProtocolPattern();
+            case 4 -> generateNullBytePattern();
+            case 5 -> generateBackslashPattern();
+            case 6 -> generateFileSchemePattern();
+            case 7 -> generateMixedTraversalPattern();
+            default -> "../";
+        };
+    }
+
+    private String generateTraversalPattern() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            pattern.append("../");
+        }
+        return pattern.toString();
+    }
+
+    private String generateScriptPattern() {
+        String tag = scriptTagGen.next();
+        return "<" + tag + ">";
+    }
+
+    private String generateProtocolPattern() {
+        String protocol = protocolGen.next();
+        return protocol + ":";
+    }
+
+    private String generateNullBytePattern() {
+        return Generators.booleans().next() ? "\\x00" : "\0";
+    }
+
+    private String generateBackslashPattern() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            pattern.append("..\\");
+        }
+        return pattern.toString();
+    }
+
+    private String generateFileSchemePattern() {
+        return "file://";
+    }
+
+    private String generateMixedTraversalPattern() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            if (Generators.booleans().next()) {
+                pattern.append("../");
+            } else {
+                pattern.append("..\\");
+            }
+        }
+        return pattern.toString();
     }
 
     /**

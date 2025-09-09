@@ -21,6 +21,8 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for path traversal attack patterns.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * This generator creates various path traversal patterns including:
  * - Basic traversal sequences (../, ..\\)
  * - Encoded variants (%2e%2e%2f, %252e%252e%252f)
@@ -37,12 +39,12 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class PathTraversalGenerator implements TypedGenerator<String> {
 
-    // Core generation parameters
+    // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> depthGenerator = Generators.integers(1, 8);
-    private final TypedGenerator<String> pathCategories = Generators.fixedValues("api", "admin", "files", "uploads");
+    private final TypedGenerator<Integer> pathTypeGen = Generators.integers(1, 4);
     private final TypedGenerator<Integer> attackTypeGenerator = Generators.integers(0, 6);
-    private final TypedGenerator<String> systemCategories = Generators.fixedValues("etc", "windows", "boot", "proc");
-    private final TypedGenerator<String> extensionCategories = Generators.fixedValues("txt", "php", "jsp", "exe");
+    private final TypedGenerator<Integer> systemTypeGen = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> extensionTypeGen = Generators.integers(1, 4);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
 
     @Override

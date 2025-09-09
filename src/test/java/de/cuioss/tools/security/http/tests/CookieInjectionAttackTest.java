@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -435,8 +436,9 @@ class CookieInjectionAttackTest {
     @Test
     @DisplayName("Cookie overflow attacks must be blocked")
     void shouldBlockCookieOverflowAttacks() {
-        String longValue = "A".repeat(8192);
-        String veryLongValue = "B".repeat(16384);
+        // QI-17: Replace massive 8KB/16KB patterns with realistic cookie overflow boundaries
+        String longValue = Generators.letterStrings(4100, 5000).next(); // Ensures substring(0,4000) works
+        String veryLongValue = Generators.letterStrings(6000, 8000).next(); // Very large cookie
 
         String[] overflowAttacks = {
                 // Large cookie values

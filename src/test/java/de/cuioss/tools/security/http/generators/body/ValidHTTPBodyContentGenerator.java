@@ -20,36 +20,84 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for valid HTTP body content.
- * Provides various body content formats for testing validation.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.
+ * QI-17: Replaced .repeat(1000) with realistic content length generation.</p>
+ * 
+ * <p>Provides various body content formats for testing validation including:
+ * JSON, XML, form data, plain text, UTF-8 content, numbers, and structured data.</p>
  */
 public class ValidHTTPBodyContentGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> validBodyContent = Generators.fixedValues(
-            "{\"user\":{\"name\":\"John\",\"age\":30}}",
-            "<root><user name=\"John\" age=\"30\"/></root>",
-            "name=John&age=30&city=New+York",
-            "Simple plain text content",
-            "Content with\nnewlines\tand\ttabs",
-            "Content with UTF-8: café naïve résumé",
-            "123456789",
-            "",
-            "a".repeat(1000),
-            "Mixed 123 content! @#$%^&*()",
-            "{\"data\": {\"items\": [1, 2, 3], \"status\": \"ok\"}}",
-            "<xml version=\"1.0\" encoding=\"UTF-8\"><data>test</data></xml>",
-            "username=test&password=secret123&remember=true",
-            "Multi-line\ncontent\nwith\nseveral\nlines",
-            "Extended ASCII: àáâãäåçèéêë ñóôõöøùúûü",
-            "0123456789abcdefghijklmnopqrstuvwxyz",
-            "Content with 'quotes' and \"double quotes\"",
-            "Whitespace    content    with    spaces",
-            "JSON array: [{\"id\": 1}, {\"id\": 2}]",
-            "Basic CSV: name,age,city\nJohn,30,NYC"
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> contentTypeSelector = Generators.integers(1, 8);
+    private final TypedGenerator<String> nameGenerator = Generators.letterStrings(3, 12);
+    private final TypedGenerator<String> valueGenerator = Generators.letterStrings(5, 20);
+    private final TypedGenerator<Integer> ageGenerator = Generators.integers(18, 80);
+    private final TypedGenerator<String> cityGenerator = Generators.fixedValues(
+            "New York", "London", "Tokyo", "Paris", "Berlin", "Sydney", "Toronto", "Moscow"
     );
+    private final TypedGenerator<String> numberGenerator = Generators.letterStrings(5, 15);
+
+    // QI-17: Replace .repeat(1000) with realistic long content
+    private final TypedGenerator<String> longContentGenerator = Generators.letterStrings(800, 1200);
 
     @Override
     public String next() {
-        return validBodyContent.next();
+        return switch (contentTypeSelector.next()) {
+            case 1 -> generateJsonContent();
+            case 2 -> generateXmlContent();
+            case 3 -> generateFormDataContent();
+            case 4 -> generatePlainTextContent();
+            case 5 -> generateUtf8Content();
+            case 6 -> generateNumericContent();
+            case 7 -> generateLongContent();
+            case 8 -> generateStructuredContent();
+            default -> generatePlainTextContent();
+        };
+    }
+
+    private String generateJsonContent() {
+        String name = nameGenerator.next();
+        int age = ageGenerator.next();
+        return "{\"user\":{\"name\":\"" + name + "\",\"age\":" + age + "}}";
+    }
+
+    private String generateXmlContent() {
+        String name = nameGenerator.next();
+        int age = ageGenerator.next();
+        return "<root><user name=\"" + name + "\" age=\"" + age + "\"/></root>";
+    }
+
+    private String generateFormDataContent() {
+        String name = nameGenerator.next();
+        int age = ageGenerator.next();
+        String city = cityGenerator.next();
+        return "name=" + name + "&age=" + age + "&city=" + city.replace(" ", "+");
+    }
+
+    private String generatePlainTextContent() {
+        return "Simple " + valueGenerator.next() + " text content";
+    }
+
+    private String generateUtf8Content() {
+        String base = valueGenerator.next();
+        return "Content with UTF-8: " + base + " café naïve résumé";
+    }
+
+    private String generateNumericContent() {
+        return numberGenerator.next();
+    }
+
+    private String generateLongContent() {
+        // QI-17: Dynamic long content instead of .repeat(1000)
+        return longContentGenerator.next();
+    }
+
+    private String generateStructuredContent() {
+        String name = nameGenerator.next();
+        int age = ageGenerator.next();
+        return "{\"data\": {\"user\": \"" + name + "\", \"age\": " + age + ", \"status\": \"ok\"}}";
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.data;
 
+import de.cuioss.test.generator.Generators;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -419,12 +420,14 @@ class HTTPBodyTest {
 
     @Test
     void shouldHandleLargeContent() {
-        String largeContent = "x".repeat(1000000); // 1MB of content
+        // QI-17: Replace 1MB hardcoded pattern with realistic large content
+        String largeContent = Generators.letterStrings(800000, 1000000).next(); // Variable large content
         HTTPBody body = new HTTPBody(largeContent, "text/plain", "");
 
         assertTrue(body.hasContent());
-        assertEquals(1000000, body.contentLength());
-        assertEquals("x".repeat(100) + "...", body.contentTruncated(100));
+        assertEquals(largeContent.length(), body.contentLength());
+        assertTrue(body.contentTruncated(100).endsWith("..."));
+        assertEquals(103, body.contentTruncated(100).length()); // 100 chars + "..."
     }
 
     @Test

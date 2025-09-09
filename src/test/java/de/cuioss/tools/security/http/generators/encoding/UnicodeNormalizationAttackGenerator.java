@@ -23,6 +23,8 @@ import java.text.Normalizer;
 /**
  * Generates Unicode normalization attack patterns for security testing.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * This generator creates attack patterns that exploit Unicode normalization
  * vulnerabilities where different Unicode sequences can normalize to the same
@@ -63,45 +65,77 @@ import java.text.Normalizer;
  */
 public class UnicodeNormalizationAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "../",
-            "..\\",
-            "../../",
-            "<script>",
-            "javascript:",
-            "<img>",
-            "eval()"
-    );
-
-    private final TypedGenerator<String> attackTypeGen = Generators.fixedValues(
-            "decomposed_normalization",     // NFD decomposition attacks
-            "composed_normalization",       // NFC composition issues
-            "compatibility_normalization",  // NFKC/NFKD attacks
-            "combining_characters",         // Unicode combining sequences
-            "homograph_attacks",           // Lookalike character substitution
-            "overlong_sequences",          // Overlong UTF-8 normalization
-            "mixed_scripts",               // Mixed script confusion
-            "zero_width_injection",        // Zero-width character injection
-            "bidirectional_override"       // BiDi text manipulation
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(2, 6);
+    private final TypedGenerator<String> scriptElementGen = Generators.fixedValues("script", "img", "iframe", "object");
+    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript", "data", "vbscript", "file");
+    private final TypedGenerator<String> funcGen = Generators.fixedValues("eval", "alert", "confirm", "setTimeout");
+    private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 9);
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String attackType = attackTypeGen.next();
+        String basePattern = generateBasePattern();
+        int attackType = attackTypeGen.next();
 
         return switch (attackType) {
-            case "decomposed_normalization" -> createDecomposedNormalizationAttack(basePattern);
-            case "composed_normalization" -> createComposedNormalizationAttack(basePattern);
-            case "compatibility_normalization" -> createCompatibilityNormalizationAttack(basePattern);
-            case "combining_characters" -> createCombiningCharacterAttack(basePattern);
-            case "homograph_attacks" -> createHomographAttack(basePattern);
-            case "overlong_sequences" -> createOverlongSequenceAttack(basePattern);
-            case "mixed_scripts" -> createMixedScriptAttack(basePattern);
-            case "zero_width_injection" -> createZeroWidthInjectionAttack(basePattern);
-            case "bidirectional_override" -> createBidirectionalOverrideAttack(basePattern);
-            default -> createComposedNormalizationAttack(basePattern); // Fallback to ensure attack patterns
+            case 1 -> createDecomposedNormalizationAttack(basePattern);
+            case 2 -> createComposedNormalizationAttack(basePattern);
+            case 3 -> createCompatibilityNormalizationAttack(basePattern);
+            case 4 -> createCombiningCharacterAttack(basePattern);
+            case 5 -> createHomographAttack(basePattern);
+            case 6 -> createOverlongSequenceAttack(basePattern);
+            case 7 -> createMixedScriptAttack(basePattern);
+            case 8 -> createZeroWidthInjectionAttack(basePattern);
+            case 9 -> createBidirectionalOverrideAttack(basePattern);
+            default -> createComposedNormalizationAttack(basePattern);
         };
+    }
+
+    private String generateBasePattern() {
+        return switch (basePatternTypeGen.next()) {
+            case 1 -> generateTraversalPattern();
+            case 2 -> generateScriptPattern();
+            case 3 -> generateProtocolPattern();
+            case 4 -> generateFunctionPattern();
+            case 5 -> generateBackslashTraversalPattern();
+            default -> "../";
+        };
+    }
+
+    private String generateTraversalPattern() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            pattern.append("../");
+        }
+        return pattern.toString();
+    }
+
+    private String generateScriptPattern() {
+        String element = scriptElementGen.next();
+        return "<" + element + ">";
+    }
+
+    private String generateProtocolPattern() {
+        String protocol = protocolGen.next();
+        // Ensure dangerous protocol patterns that will trigger security validation
+        return protocol + "://malicious.example.com/";
+    }
+
+    private String generateFunctionPattern() {
+        String func = funcGen.next();
+        // Create more aggressive function injection patterns
+        return func + "(document.cookie)";
+    }
+
+    private String generateBackslashTraversalPattern() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            pattern.append("..\\");
+        }
+        return pattern.toString();
     }
 
     /**

@@ -21,6 +21,8 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generates SQL injection attack patterns for security testing.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * This generator creates comprehensive SQL injection attack vectors designed to test
  * the security validation pipeline's ability to detect and prevent SQL injection attacks.
@@ -67,64 +69,93 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "/search",
-            "/login",
-            "/user",
-            "/profile",
-            "/admin",
-            "/api/users",
-            "/products",
-            "/orders",
-            "/reports",
-            "/data",
-            "/query",
-            "/filter",
-            "/find",
-            "/list",
-            "/view"
-    );
-
-    private final TypedGenerator<String> attackTypeGen = Generators.fixedValues(
-            "classic_union_injection",      // UNION SELECT attacks
-            "boolean_blind_injection",      // True/False based attacks
-            "time_blind_injection",         // Time delay attacks
-            "error_based_injection",        // Error message exploitation
-            "second_order_injection",       // Stored and executed later
-            "nosql_injection",              // NoSQL database attacks
-            "ldap_injection",               // LDAP via SQL context
-            "comment_injection",            // SQL comment manipulation
-            "stacked_queries",              // Multiple query execution
-            "database_specific_attacks",    // DB-specific functions
-            "function_injection",           // SQL function exploitation
-            "xml_xpath_injection",          // XML/XPath in SQL
-            "truncation_attacks",           // SQL truncation bugs
-            "polyglot_sql_injection",       // Multi-language attacks
-            "header_based_injection"        // HTTP header SQL injection
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 15);
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String attackType = attackTypeGen.next();
+        String basePattern = generateBasePattern();
+        int attackType = attackTypeGen.next();
 
         return switch (attackType) {
-            case "classic_union_injection" -> createClassicUnionInjection(basePattern);
-            case "boolean_blind_injection" -> createBooleanBlindInjection(basePattern);
-            case "time_blind_injection" -> createTimeBlindInjection(basePattern);
-            case "error_based_injection" -> createErrorBasedInjection(basePattern);
-            case "second_order_injection" -> createSecondOrderInjection(basePattern);
-            case "nosql_injection" -> createNoSqlInjection(basePattern);
-            case "ldap_injection" -> createLdapInjection(basePattern);
-            case "comment_injection" -> createCommentInjection(basePattern);
-            case "stacked_queries" -> createStackedQueries(basePattern);
-            case "database_specific_attacks" -> createDatabaseSpecificAttacks(basePattern);
-            case "function_injection" -> createFunctionInjection(basePattern);
-            case "xml_xpath_injection" -> createXmlXpathInjection(basePattern);
-            case "truncation_attacks" -> createTruncationAttacks(basePattern);
-            case "polyglot_sql_injection" -> createPolyglotSqlInjection(basePattern);
-            case "header_based_injection" -> createHeaderBasedInjection(basePattern);
-            default -> basePattern;
+            case 1 -> createClassicUnionInjection(basePattern);
+            case 2 -> createBooleanBlindInjection(basePattern);
+            case 3 -> createTimeBlindInjection(basePattern);
+            case 4 -> createErrorBasedInjection(basePattern);
+            case 5 -> createSecondOrderInjection(basePattern);
+            case 6 -> createNoSqlInjection(basePattern);
+            case 7 -> createLdapInjection(basePattern);
+            case 8 -> createCommentInjection(basePattern);
+            case 9 -> createStackedQueries(basePattern);
+            case 10 -> createDatabaseSpecificAttacks(basePattern);
+            case 11 -> createFunctionInjection(basePattern);
+            case 12 -> createXmlXpathInjection(basePattern);
+            case 13 -> createTruncationAttacks(basePattern);
+            case 14 -> createPolyglotSqlInjection(basePattern);
+            case 15 -> createHeaderBasedInjection(basePattern);
+            default -> createClassicUnionInjection(basePattern);
+        };
+    }
+
+    private String generateBasePattern() {
+        return switch (basePatternTypeGen.next()) {
+            case 1 -> generateSearchEndpoints();
+            case 2 -> generateUserEndpoints();
+            case 3 -> generateAdminEndpoints();
+            case 4 -> generateDataEndpoints();
+            case 5 -> generateQueryEndpoints();
+            default -> "/search";
+        };
+    }
+
+    private String generateSearchEndpoints() {
+        int type = Generators.integers(1, 3).next();
+        return switch (type) {
+            case 1 -> "/search";
+            case 2 -> "/find";
+            case 3 -> "/filter";
+            default -> "/search";
+        };
+    }
+
+    private String generateUserEndpoints() {
+        int type = Generators.integers(1, 3).next();
+        return switch (type) {
+            case 1 -> "/user";
+            case 2 -> "/profile";
+            case 3 -> "/login";
+            default -> "/user";
+        };
+    }
+
+    private String generateAdminEndpoints() {
+        int type = Generators.integers(1, 2).next();
+        return switch (type) {
+            case 1 -> "/admin";
+            case 2 -> "/reports";
+            default -> "/admin";
+        };
+    }
+
+    private String generateDataEndpoints() {
+        int type = Generators.integers(1, 4).next();
+        return switch (type) {
+            case 1 -> "/data";
+            case 2 -> "/products";
+            case 3 -> "/orders";
+            case 4 -> "/api/users";
+            default -> "/data";
+        };
+    }
+
+    private String generateQueryEndpoints() {
+        int type = Generators.integers(1, 3).next();
+        return switch (type) {
+            case 1 -> "/query";
+            case 2 -> "/list";
+            case 3 -> "/view";
+            default -> "/query";
         };
     }
 

@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.pipeline;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -186,7 +187,10 @@ class URLParameterValidationPipelineTest {
 
         @Test
         void shouldSequentiallyApplyStages() {
-            String problematicParam = "param=" + "invalid\tvalue".repeat(1000);
+            // QI-17: Replace excessive 12KB tab pattern with realistic boundary testing
+            // Need to exceed default parameter value limit (2048 chars)
+            // Generate exactly 2100 chars to guarantee exceeding the limit
+            String problematicParam = "param=" + Generators.letterStrings(2100, 2100).next();
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(problematicParam));

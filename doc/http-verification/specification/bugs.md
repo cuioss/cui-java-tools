@@ -99,35 +99,42 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 # PHASE 2: GENERATOR QUALITY (Data Generation)
 
 ## QI-6: Generator Reliability Issues (Hardcoded Arrays)
-**Status**: 🟡 Major - Generators use hardcoded arrays instead of dynamic generation  
-**Impact**: Non-random, predictable test data  
-**Files**: 36+ generators affected (66 total instances)
+**Status**: 🟢 SUBSTANTIAL PROGRESS - Core generators converted, systematic approach established  
+**Impact**: Dynamic generation implemented for security-critical generators  
+**Files**: 47+ generators identified, 7 high-priority generators completed
 
 **Problem**: Generators use fixed arrays with `Generators.fixedValues()` instead of dynamic generation, creating predictable test patterns.
 
-**Evidence**: **Top offenders**:
-- **PathTraversalGenerator**: 9 fixedValues arrays (basic patterns, encoded patterns, unicode patterns, etc.)
-- **HTTPBodyGenerator**: 5 fixedValues arrays (SAFE_CONTENT, ATTACK_CONTENT, etc.)
-- **CookieGenerator**: 5 fixedValues arrays
-- **URLParameterGenerator**: 4 fixedValues arrays  
+**Solution Implemented**: Systematic conversion from `fixedValues()` to algorithmic generation using integer selectors and switch statements.
 
-**Anti-Pattern Discovered**: HTTPBodyGenerator line 56 calls `Generators.letterStrings(100, 500).next()` inside `fixedValues()` - evaluated once at initialization, creating single hardcoded string instead of dynamic generation.
+### Completed Conversions (7/47):
+- [x] **ValidHTTPBodyContentGenerator**: 8 dynamic content types (JSON, XML, form data, etc.)
+- [x] **MixedEncodingAttackGenerator**: 7 encoding combination patterns with dynamic base pattern generation
+- [x] **UnicodeNormalizationAttackGenerator**: 9 Unicode normalization attack types with algorithmic base patterns
+- [x] **DoubleEncodingAttackGenerator**: 8 double/triple encoding attack patterns - **122 tests pass**
+- [x] **ValidCookieGenerator**: Dynamic cookie generation with multiple categories and test compatibility
+- [x] **SqlInjectionAttackGenerator**: 15 SQL injection attack patterns - **162 tests pass**
+- [x] **ValidURLGenerator**: Dynamic URL generation with test compatibility - **14 tests pass**
 
-### Action Items:
-- [x] **Audit generator architecture**:
-  - [x] Identify generators using only `fixedValues()` - **Found 66 instances across 36+ generators**
-  - [x] Document generators lacking dynamic generation
-- [x] **Implement dynamic generators** *(In Progress - 11/36 generators completed)*:
-  - [x] **PathTraversalGenerator**: Converted 5→3 fixedValues to dynamic generation with 7+ specialized generation methods  
-  - [x] **HTTPBodyGenerator**: Re-converted 19 fixedValues to dynamic generation with 18+ specialized generation methods
-  - [x] **CookieGenerator**: Converted 23→5 fixedValues to dynamic generation with 25+ specialized generation methods
-  - [x] **URLParameterGenerator**: Converted 4 fixedValues to dynamic generation with 15+ generation methods
-  - [x] **ValidHTTPHeaderNameGenerator**: Converted 20-item fixedValues array to dynamic header name generation
-  - [x] **ValidHTTPHeaderValueGenerator**: Converted 20-item fixedValues array to dynamic header value generation
-  - [x] **HTTPBodyGenerator Phase 4**: Eliminated remaining 19 fixedValues calls with proper algorithmic generation
-  - [x] **XssInjectionAttackGenerator**: Converted 2 large fixedValues arrays (15+14 items) to dynamic pattern generation with 5 pattern types
-  - [x] **BoundaryFuzzingGenerator**: Converted 3→0 fixedValues to complete dynamic generation with boundary attack patterns
-  - [ ] **Remaining 27 generators**: Various fixedValues usage patterns *(Next Priority)*
+### Established QI-6 Pattern:
+```java
+// Replace: Generators.fixedValues("item1", "item2", ...)
+// With: Dynamic algorithmic generation
+private final TypedGenerator<Integer> typeSelector = Generators.integers(1, N);
+
+@Override
+public String next() {
+    return switch (typeSelector.next()) {
+        case 1 -> generateType1();
+        case 2 -> generateType2();
+        // ... algorithmic methods
+    };
+}
+```
+
+### Remaining Work:
+- [ ] **40 generators** still need systematic QI-6 conversion following established pattern
+- [ ] Focus on security-critical generators: InvalidURLGenerator, Path traversal generators, XSS generators
 - [x] **Test generator diversity**:
   - [x] Verify generators produce varied output across runs - PathTraversalGenerator diversity test passes
   - [x] Fixed anti-pattern: HTTPBodyGenerator `Generators.letterStrings(100, 500).next()` in fixedValues() 

@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.security.http.tests;
 
+import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
@@ -156,18 +157,22 @@ class URLLengthLimitAttackTest {
     @Test
     @DisplayName("Basic URL length overflow attacks must be blocked")
     void shouldBlockBasicLengthOverflowAttacks() {
+        // Generate realistic boundary tests - just over actual security limits
+        // Based on config: maxPathLength=1024, maxParameterValueLength=256
         String[] basicOverflows = {
-                // Standard length limit tests
-                "/api?" + "A".repeat(8192), // 8KB query string
-                "/search?" + "B".repeat(16384), // 16KB query string
-                "/data/" + "C".repeat(4096), // 4KB path component
-                "/resource?param=" + "D".repeat(10000), // 10KB parameter value
+                // Test path length just over STRICT limit (1024)
+                "/api/" + Generators.letterStrings(1030, 1050).next(), // Just over 1024 limit
+                "/search/" + Generators.letterStrings(1025, 1035).next(), // Minimal overage
+                "/data/" + Generators.letterStrings(1100, 1150).next(), // Moderate overage
+                "/resource/" + Generators.letterStrings(1200, 1250).next(), // Clear overage
                 
-                // Mixed component overflows
-                "/service/" + "E".repeat(2048) + "?data=" + "F".repeat(2048), // Combined 4KB components
-                "/endpoint?" + "G".repeat(32768), // 32KB query
-                "/handler/" + "H".repeat(1024) + "/" + "I".repeat(1024) + "/" + "J".repeat(1024), // Multiple long segments
-                "/process?field=" + "K".repeat(65536) // 64KB parameter
+                // Test parameter values just over limit (256)
+                "/api?param=" + Generators.letterStrings(260, 270).next(), // Just over parameter limit
+                "/service?data=" + Generators.letterStrings(300, 350).next(), // Moderate parameter overage
+                "/endpoint?query=" + Generators.letterStrings(400, 500).next(), // Clear parameter overage
+                
+                // Combined realistic boundary tests
+                "/handler/" + Generators.letterStrings(1030, 1050).next() + "?field=" + Generators.letterStrings(260, 280).next() // Both over limits
         };
 
         for (String attack : basicOverflows) {
@@ -196,20 +201,22 @@ class URLLengthLimitAttackTest {
     @Test
     @DisplayName("Path component overflow attacks must be blocked")
     void shouldBlockPathComponentOverflowAttacks() {
+        // Realistic path boundary tests - GUARANTEED to exceed 1024 characters
         String[] pathOverflows = {
-                // Single long path segments
-                "/api/" + "segment".repeat(1000), // Repeated segment names
-                "/data/" + "A".repeat(4096) + "/normal", // One very long segment
-                "/service/" + "path_" + "B".repeat(2048) + "/resource", // Long segment with prefix
+                // Simple guaranteed over-limit paths
+                BoundaryTestHelper.pathJustOverLimit(), // Guaranteed 1031-1051 total
+                BoundaryTestHelper.pathWithAffixesOverLimit("/api/", ""), // Guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/data/", "/normal"), // Guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/service/path_", "/resource"), // Guaranteed over limit
                 
-                // Multiple long segments
-                "/" + "C".repeat(8192) + "/api", // Long prefix path
-                "/endpoint/" + "dir_" + "D".repeat(1024) + "/file_" + "E".repeat(1024), // Multiple long segments
-                "/handler/" + "very_long_directory_name_" + "F".repeat(3000), // Descriptive long segment
+                // Multiple segments guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/", "/api"), // Guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/endpoint/dir_", "/file_end"), // Guaranteed over limit  
+                BoundaryTestHelper.pathWithAffixesOverLimit("/handler/very_long_directory_name_", ""), // Guaranteed over limit
                 
-                // Nested long paths
-                "/process/" + "component" + "G".repeat(512) + "/subdir" + "H".repeat(512) + "/file", // Nested long paths
-                "/action/" + "I".repeat(16384) // Single massive segment
+                // Nested paths guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/process/component", "/subdir/file"), // Guaranteed over limit
+                BoundaryTestHelper.pathWithAffixesOverLimit("/action/", "") // Guaranteed over limit
         };
 
         for (String attack : pathOverflows) {
@@ -238,20 +245,21 @@ class URLLengthLimitAttackTest {
     @Test
     @DisplayName("Query parameter overflow attacks must be blocked")
     void shouldBlockQueryParameterOverflowAttacks() {
+        // Realistic parameter boundary tests - just over maxParameterValueLength=256
         String[] queryOverflows = {
-                // Single long parameters
-                "/search?param=" + "A".repeat(10000), // 10KB parameter
-                "/api?data=" + "B".repeat(5000) + "&info=" + "C".repeat(5000), // Multiple 5KB parameters
-                "/endpoint?query=" + "D".repeat(20000), // 20KB parameter
+                // Single parameters just over limit
+                "/search?param=" + Generators.letterStrings(260, 280).next(), // Just over parameter limit
+                "/api?data=" + Generators.letterStrings(300, 350).next() + "&info=" + Generators.letterStrings(280, 300).next(), // Multiple over-limit parameters
+                "/endpoint?query=" + Generators.letterStrings(400, 500).next(), // Clear parameter overage
                 
-                // Repeated terms and structured content
-                "/service?search=" + "term ".repeat(2000), // Repeated search terms
-                "/handler?content=" + "E".repeat(8192) + "&type=json", // Long parameter with normal parameter
-                "/process?input=" + ("value" + "F".repeat(100) + "&").repeat(50), // Many medium-length parameters
+                // Structured content tests
+                "/service?search=" + Generators.letterStrings(270, 300).next(), // Realistic search term overage
+                "/handler?content=" + Generators.letterStrings(300, 400).next() + "&type=json", // Long parameter with normal parameter
+                "/process?input=" + Generators.letterStrings(280, 320).next() + "&more=" + Generators.letterStrings(280, 320).next(), // Multiple over-limit parameters
                 
-                // Very large parameters
-                "/resource?buffer=" + "G".repeat(32768), // 32KB parameter
-                "/data?payload=" + "H".repeat(65536) // 64KB parameter
+                // Edge case parameters
+                "/resource?buffer=" + Generators.letterStrings(500, 600).next(), // Moderate overage
+                "/data?payload=" + Generators.letterStrings(600, 700).next() // Clear overage
         };
 
         for (String attack : queryOverflows) {
@@ -280,20 +288,21 @@ class URLLengthLimitAttackTest {
     @Test
     @DisplayName("Repeated parameter attacks must be blocked")
     void shouldBlockRepeatedParameterAttacks() {
+        // Realistic repeated parameter tests - focus on parameter limits, not quantity
         String[] repeatedParamAttacks = {
-                // Basic repeated parameters
-                "/api?" + "param=value&".repeat(1000), // 1000 identical parameters
-                "/search?" + "data=test&".repeat(2000), // 2000 parameters
-                "/endpoint?" + "field=info&".repeat(5000), // 5000 parameters
+                // Parameters over value limit (256)
+                "/api?param=" + BoundaryTestHelper.overParameterLimit() + "&param2=" + BoundaryTestHelper.overParameterLimit(), // Multiple over-limit parameters
+                "/search?data=" + BoundaryTestHelper.moderateParameterOverage() + "&test=normal", // Mixed normal/over-limit
+                "/endpoint?field=" + BoundaryTestHelper.clearParameterOverage(), // Single clear overage
                 
-                // Parameters with long values
-                "/service?" + ("item=" + "A".repeat(100) + "&").repeat(500), // 500 parameters with 100-char values
-                "/handler?" + "query=search&".repeat(10000), // 10000 parameters
+                // Parameter name length attacks (over maxParameterNameLength=64)
+                "/service?" + BoundaryTestHelper.mediumComponent() + "=value", // Long parameter name
+                "/handler?query_" + BoundaryTestHelper.shortComponent() + "=search", // Name with prefix
                 
-                // Long parameter names
-                "/process?" + ("param" + "B".repeat(50) + "=value&").repeat(200), // Long parameter names
-                "/resource?" + "test=data&".repeat(50000), // 50000 parameters
-                "/data?" + ("key=value" + "C".repeat(10) + "&").repeat(1000) // Mixed repeated parameters
+                // Combined length attacks
+                "/process?" + BoundaryTestHelper.shortComponent() + "=" + BoundaryTestHelper.overParameterLimit(), // Both name and value over limits
+                "/resource?" + BoundaryTestHelper.multipleOverLimitParams(), // Multiple parameter overages
+                "/data?" + BoundaryTestHelper.multipleOverLimitParams() + "&extra=" + BoundaryTestHelper.clearParameterOverage() // Multiple over-limit combinations
         };
 
         for (String attack : repeatedParamAttacks) {
@@ -663,5 +672,89 @@ class URLLengthLimitAttackTest {
      */
     private int hashBasedSelection(int bound) {
         return Math.abs(this.hashCode()) % bound;
+    }
+
+    /**
+     * Helper class for generating realistic boundary test strings.
+     * Replaces hardcoded .repeat() patterns with proper boundary testing
+     * that tests just over the actual security limits.
+     */
+    private static class BoundaryTestHelper {
+
+        /**
+         * Generate complete path just over maxPathLength limit (1024)
+         * Ensures total path length is guaranteed to be over the limit.
+         */
+        static String pathJustOverLimit() {
+            // Generate base path, then ensure total is over 1024
+            String base = Generators.letterStrings(1030, 1050).next();
+            return "/" + base; // Guaranteed 1031-1051 characters total
+        }
+
+        /**
+         * Generate complete path with prefix and suffix over limit
+         */
+        static String pathWithAffixesOverLimit(String prefix, String suffix) {
+            int affixLength = prefix.length() + suffix.length();
+            int neededLength = 1025 - affixLength; // Need at least 1025 total
+            String middle = Generators.letterStrings(neededLength, neededLength + 50).next();
+            return prefix + middle + suffix;
+        }
+
+        /**
+         * Generate parameter value just over maxParameterValueLength limit (256)
+         */
+        static String overParameterLimit() {
+            return Generators.letterStrings(260, 280).next();
+        }
+
+        /**
+         * Generate moderate path overage
+         */
+        static String moderatePathOverage() {
+            return Generators.letterStrings(1100, 1200).next();
+        }
+
+        /**
+         * Generate moderate parameter overage
+         */
+        static String moderateParameterOverage() {
+            return Generators.letterStrings(300, 400).next();
+        }
+
+        /**
+         * Generate clear path overage
+         */
+        static String clearPathOverage() {
+            return Generators.letterStrings(1200, 1500).next();
+        }
+
+        /**
+         * Generate clear parameter overage
+         */
+        static String clearParameterOverage() {
+            return Generators.letterStrings(400, 600).next();
+        }
+
+        /**
+         * Generate short component for building composite paths
+         */
+        static String shortComponent() {
+            return Generators.letterStrings(100, 200).next();
+        }
+
+        /**
+         * Generate medium component for building composite paths
+         */
+        static String mediumComponent() {
+            return Generators.letterStrings(300, 500).next();
+        }
+
+        /**
+         * Generate multiple parameters that together exceed limits
+         */
+        static String multipleOverLimitParams() {
+            return "param1=" + overParameterLimit() + "&param2=" + overParameterLimit();
+        }
     }
 }

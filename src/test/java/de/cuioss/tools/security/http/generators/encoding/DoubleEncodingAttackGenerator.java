@@ -20,62 +20,112 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generates double and multiple encoding attack patterns.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Focuses specifically on double encoding bypass techniques for security testing.
  * 
  * Implements: Task G5 from HTTP verification specification
  */
 public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> doubleEncodingPatterns = Generators.fixedValues(
-            // Classic double encoding patterns
-            "%252e%252e%252f../../../etc/passwd",
-            "%252e%252e%252f%252e%252e%252f%252e%252e%252f",
-
-            // CVE-2021-42013: Apache double encoding bypass
-            "%%32%65",                                              // %2e double encoded
-            "%%32%66",                                              // %2f double encoded
-            "/icons%%32%65%%32%65/etc/passwd",
-            "/cgi-bin/.%%32%65/%%32%65%%32%65/etc/passwd",
-
-            // Mixed single/double encoding
-            "%2e%252e%2f../etc/passwd",
-            "%252e%2e%252f%2e%2e/etc/shadow",
-
-            // Triple encoding
-            "%25252e%25252e%25252f",
-            "%252525%252e%252525%2e%252525%2f",
-
-            // Case variations in double encoding
-            "%252E%252E%252F",
-            "%252e%252E%252f%252F",
-
-            // Windows path separators
-            "%255c%252e%252e%255c",
-            "%252e%252e%255c%252e%252e%255c",
-
-            // Combined with legitimate paths
-            "/api/v1%252e%252e%252f%252e%252e%252fadmin",
-            "/files%252f%252e%252e%252f%252e%252e%252fconfig",
-
-            // Deep double encoding
-            "%252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252f",
-
-            // Windows specific double encoding
-            "/scripts%%35%63%%32%65%%32%65/cmd.exe",
-            "/inetpub%%35%63%%32%65%%32%65/wwwroot",
-
-            // Additional path traversal double encoding
-            "/api%%32%65%%32%65%%32%66%%32%65%%32%65/config",
-            "/upload%%32%66%%32%65%%32%65%%32%66%%32%65%%32%65/admin",
-
-            // Mixed with normal paths
-            "/admin%252e%252e%252f%252e%252e%252fconfig",
-            "/backup%252f%252e%252e%252fadmin%252fpasswords"
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 8);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 6);
+    private final TypedGenerator<String> pathPrefixGen = Generators.fixedValues("api", "admin", "files", "config", "upload", "backup");
+    private final TypedGenerator<String> targetFileGen = Generators.fixedValues("passwd", "shadow", "config", "cmd.exe", "win.ini", "hosts");
 
     @Override
     public String next() {
-        return doubleEncodingPatterns.next();
+        int encodingType = encodingTypeGen.next();
+
+        return switch (encodingType) {
+            case 1 -> generateClassicDoubleEncoding();
+            case 2 -> generateApacheCVEDoubleEncoding();
+            case 3 -> generateMixedSingleDoubleEncoding();
+            case 4 -> generateTripleEncoding();
+            case 5 -> generateCaseVariationDoubleEncoding();
+            case 6 -> generateWindowsDoubleEncoding();
+            case 7 -> generateLegitimatePathDoubleEncoding();
+            case 8 -> generateDeepDoubleEncoding();
+            default -> generateClassicDoubleEncoding();
+        };
+    }
+
+    private String generateClassicDoubleEncoding() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%252e%252e%252f");
+        }
+
+        if (Generators.booleans().next()) {
+            pattern.append("etc/").append(targetFileGen.next());
+        }
+
+        return pattern.toString();
+    }
+
+    private String generateApacheCVEDoubleEncoding() {
+        String[] cvePatterns = {
+                "%%32%65",  // %2e double encoded
+                "%%32%66",  // %2f double encoded
+                "/icons%%32%65%%32%65/etc/" + targetFileGen.next(),
+                "/cgi-bin/.%%32%65/%%32%65%%32%65/etc/" + targetFileGen.next()
+        };
+        return cvePatterns[Generators.integers(0, 3).next()];
+    }
+
+    private String generateMixedSingleDoubleEncoding() {
+        String target = targetFileGen.next();
+        return Generators.booleans().next()
+                ? "%2e%252e%2f../etc/" + target
+                : "%252e%2e%252f%2e%2e/etc/" + target;
+    }
+
+    private String generateTripleEncoding() {
+        return Generators.booleans().next()
+                ? "%25252e%25252e%25252f"
+                : "%252525%252e%252525%2e%252525%2f";
+    }
+
+    private String generateCaseVariationDoubleEncoding() {
+        return Generators.booleans().next()
+                ? "%252E%252E%252F"
+                : "%252e%252E%252f%252F";
+    }
+
+    private String generateWindowsDoubleEncoding() {
+        int depth = depthGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%255c%252e%252e");
+        }
+        pattern.append("%255c");
+
+        if (Generators.booleans().next()) {
+            pattern.append(targetFileGen.next());
+        }
+
+        return pattern.toString();
+    }
+
+    private String generateLegitimatePathDoubleEncoding() {
+        String prefix = pathPrefixGen.next();
+        return "/" + prefix + "%252e%252e%252f%252e%252e%252f" + targetFileGen.next();
+    }
+
+    private String generateDeepDoubleEncoding() {
+        int depth = depthGen.next() + 2;  // Ensure deep encoding
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%252e%252e%252f");
+        }
+
+        return pattern.toString();
     }
 
     @Override
