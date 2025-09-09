@@ -128,9 +128,9 @@ class CompressionBombAttackTest {
     @DisplayName("Basic compression bomb patterns should be detected")
     void shouldDetectBasicCompressionBombs() {
         String[] basicCompressionBombs = {
-                "https://example.com/api/data?data=" + "A".repeat(1024) + "&compress=gzip",
+                "https://example.com/api/data?data=" + generateBoundaryPadding(1024) + "&compress=gzip", // QI-17: Fixed realistic content
                 "https://example.com/api/data?payload=" + generateBoundaryPadding(300) + "&encoding=deflate", // QI-17: Fixed realistic boundary
-                "https://example.com/api/data?bomb=" + "AAAA".repeat(256)
+                "https://example.com/api/data?bomb=" + generateBoundaryPadding(256) + "&format=AAAA" // QI-17: Fixed realistic bomb data
         };
 
         for (String bomb : basicCompressionBombs) {
@@ -287,9 +287,9 @@ class CompressionBombAttackTest {
     @DisplayName("Binary data compression attacks should be detected")
     void shouldDetectBinaryDataCompressionAttacks() {
         String[] binaryAttacks = {
-                "https://example.com/api/data?binary=BINARY:SIZE:1024:DATA:" + "\\x00".repeat(25),
-                "https://example.com/api/data?blob=BINARY:SIZE:2048:DATA:" + "\\x00".repeat(25),
-                "https://example.com/api/data?raw=BINARY:SIZE:4096:DATA:" + "\\x00".repeat(25)
+                "https://example.com/api/data?binary=BINARY:SIZE:1024:DATA:" + generateBinaryPadding(25), // QI-17: Fixed realistic binary data
+                "https://example.com/api/data?blob=BINARY:SIZE:2048:DATA:" + generateBinaryPadding(25), // QI-17: Fixed realistic binary data
+                "https://example.com/api/data?raw=BINARY:SIZE:4096:DATA:" + generateBinaryPadding(25) // QI-17: Fixed realistic binary data
         };
 
         for (String binaryAttack : binaryAttacks) {
@@ -405,5 +405,19 @@ class CompressionBombAttackTest {
      */
     private String generateBoundaryPadding(int length) {
         return Generators.letterStrings(length, length + 20).next();
+    }
+
+    /**
+     * QI-17: Generates realistic binary-like padding instead of .repeat() patterns.
+     * @param length target length for binary padding
+     * @return realistic binary sequence for testing
+     */
+    private String generateBinaryPadding(int length) {
+        StringBuilder binary = new StringBuilder();
+        String[] binaryPatterns = {"\\x00", "\\x01", "\\x02", "\\xFF", "\\xFE"};
+        for (int i = 0; i < length; i++) {
+            binary.append(binaryPatterns[i % binaryPatterns.length]);
+        }
+        return binary.toString();
     }
 }
