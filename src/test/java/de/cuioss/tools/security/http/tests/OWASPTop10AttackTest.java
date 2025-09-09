@@ -452,7 +452,7 @@ class OWASPTop10AttackTest {
     @Test
     @DisplayName("OWASP pattern validation should maintain performance")
     void shouldMaintainPerformanceWithOWASPAttacks() {
-        String complexPattern = "/" + "A".repeat(50) + "/../../../../../../../../../etc/passwd%00.jpg";
+        String complexPattern = "/" + generatePathPadding(50) + "/../../../../../../../../../etc/passwd%00.jpg";
 
         // Warm up
         for (int i = 0; i < 10; i++) {
@@ -511,5 +511,23 @@ class OWASPTop10AttackTest {
                 failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
                 failureType == UrlSecurityFailureType.PATH_TOO_LONG ||
                 failureType == UrlSecurityFailureType.INVALID_URL_FORMAT;
+    }
+
+    /**
+     * QI-17: Generate realistic path padding instead of using .repeat().
+     * Creates varied path padding for OWASP attack testing.
+     */
+    private String generatePathPadding(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] chars = {"A", "B", "C", "D", "E", "F"};
+        
+        for (int i = 0; i < length; i++) {
+            result.append(chars[i % chars.length]);
+            // Add digit variation every few characters
+            if (i % 7 == 6) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

@@ -286,7 +286,7 @@ class UnicodeNormalizationAttackTest {
                 "\u202E\u202D\u202C\u202B\u202A",     // Multiple BiDi controls
                 
                 // Very long normalization sequences
-                ".\u0300".repeat(100),              // Long sequence of decomposed dots
+                generateDecomposedSequence(100),   // QI-17: Long sequence of decomposed dots
                 
                 // Normalization boundary cases
                 "\uFFFE",                             // Byte order mark (BOM) variant
@@ -517,6 +517,20 @@ class UnicodeNormalizationAttackTest {
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
                 failureType == UrlSecurityFailureType.INVALID_ENCODING ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION;
+    }
+
+    /**
+     * QI-17: Generate realistic decomposed sequence instead of using .repeat().
+     * Creates varied Unicode decomposed patterns for normalization testing.
+     */
+    private String generateDecomposedSequence(int count) {
+        StringBuilder result = new StringBuilder();
+        String[] patterns = {".\u0300", ".\u0301", ".\u0302", ".\u0303"}; // Various combining marks
+        
+        for (int i = 0; i < count; i++) {
+            result.append(patterns[i % patterns.length]);
+        }
+        return result.toString();
     }
 
 }

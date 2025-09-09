@@ -220,9 +220,9 @@ class NginxCVEAttackTest {
     void shouldBlockCVE202123017Patterns() {
         String[] cve202123017Patterns = {
                 // nginx resolver off-by-one patterns
-                "/resolver/" + "A".repeat(10) + "/../../../etc/passwd",
-                "/dns/" + "B".repeat(10) + "/../../../etc/shadow",
-                "/lookup/" + "C".repeat(10) + "/../../../etc/hosts"
+                "/resolver/" + generatePaddingChars("A", 10) + "/../../../etc/passwd",
+                "/dns/" + generatePaddingChars("B", 10) + "/../../../etc/shadow",
+                "/lookup/" + generatePaddingChars("C", 10) + "/../../../etc/hosts"
         };
 
         for (String pattern : cve202123017Patterns) {
@@ -352,7 +352,7 @@ class NginxCVEAttackTest {
                 "/lsphp/../../../etc/shadow",
                 "/litespeed/../../../etc/hosts",
                 "/lshttpd/../../../windows/win.ini",
-                "/cgi-bin/" + "D".repeat(10) + "/../../../etc/passwd"
+                "/cgi-bin/" + generatePaddingChars("D", 10) + "/../../../etc/passwd"
         };
 
         for (String pattern : litespeedPatterns) {
@@ -530,7 +530,7 @@ class NginxCVEAttackTest {
     @Test
     @DisplayName("nginx CVE validation should maintain performance")
     void shouldMaintainPerformanceWithNginxCVEAttacks() {
-        String complexNginxCVEPattern = "/resolver/" + "A".repeat(100) + "/../../../../../../../../../etc/passwd";
+        String complexNginxCVEPattern = "/resolver/" + generatePaddingChars("A", 100) + "/../../../../../../../../../etc/passwd";
 
         // Warm up
         for (int i = 0; i < 10; i++) {
@@ -588,5 +588,21 @@ class NginxCVEAttackTest {
                 failureType == UrlSecurityFailureType.EXCESSIVE_NESTING ||
                 failureType == UrlSecurityFailureType.INPUT_TOO_LONG ||
                 failureType == UrlSecurityFailureType.PATH_TOO_LONG;
+    }
+
+    /**
+     * QI-17: Generate realistic padding characters instead of using .repeat().
+     * Creates varied character patterns for nginx CVE testing.
+     */
+    private String generatePaddingChars(String baseChar, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(baseChar);
+            // Add slight variation every few characters for realism
+            if (i % 5 == 4) {
+                result.append(i % 10); // Add digit variation
+            }
+        }
+        return result.toString();
     }
 }
