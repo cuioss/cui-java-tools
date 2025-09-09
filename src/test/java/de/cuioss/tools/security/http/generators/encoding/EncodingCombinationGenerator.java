@@ -20,23 +20,24 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generates various encoding combinations for bypass attempts.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Implements: Task G2 from HTTP verification specification
  */
 public class EncodingCombinationGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "../",
-            "..\\",
-            "../../",
-            "../../../"
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
+    private final TypedGenerator<Boolean> useBackslashGen = Generators.booleans();
 
     private final TypedGenerator<Integer> encodingLevelGen = Generators.integers(1, 3);
     private final TypedGenerator<Boolean> mixedCaseGen = Generators.booleans();
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
+        String basePattern = generateBasePattern();
         int level = encodingLevelGen.next();
         boolean mixedCase = mixedCaseGen.next();
 
@@ -53,6 +54,54 @@ public class EncodingCombinationGenerator implements TypedGenerator<String> {
         }
 
         return encoded;
+    }
+
+    private String generateBasePattern() {
+        return switch (basePatternTypeGen.next()) {
+            case 1 -> generateSimpleTraversal();
+            case 2 -> generateWindowsTraversal();
+            case 3 -> generateDeepTraversal();
+            case 4 -> generateMixedSeparatorTraversal();
+            case 5 -> generateCustomDepthTraversal();
+            default -> generateSimpleTraversal();
+        };
+    }
+
+    private String generateSimpleTraversal() {
+        return useBackslashGen.next() ? "..\\" : "../";
+    }
+
+    private String generateWindowsTraversal() {
+        return "..\\";
+    }
+
+    private String generateDeepTraversal() {
+        int depth = depthGen.next();
+        String separator = useBackslashGen.next() ? "\\" : "/";
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("..").append(separator);
+        }
+
+        return pattern.toString();
+    }
+
+    private String generateMixedSeparatorTraversal() {
+        // Mix forward and backward slashes
+        return "../..\\../";
+    }
+
+    private String generateCustomDepthTraversal() {
+        int customDepth = Generators.integers(2, 6).next();
+        String separator = useBackslashGen.next() ? "\\" : "/";
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < customDepth; i++) {
+            pattern.append("..").append(separator);
+        }
+
+        return pattern.toString();
     }
 
     private String urlEncode(String input) {

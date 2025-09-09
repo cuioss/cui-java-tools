@@ -20,31 +20,170 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for URL parameter values containing path traversal attacks.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Provides parameter VALUES (not full "name=value" strings) with various path traversal patterns.
  * These values are designed to be detected by URLParameterValidationPipeline.
  */
 public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> pathTraversalParameters = Generators.fixedValues(
-            "..%2F..%2Fetc%2Fpasswd",            // Encoded path traversal
-            "%2E%2E%2F%2E%2E%2Fconfig",          // Double encoded traversal
-            "%2e%2e%5c%2e%2e%5cwindows",         // Mixed encoding
-            "..%5c..%5c..%5croot",               // Windows style traversal
-            "..%2F..%2Fshadow",                  // Simple traversal
-            "%2e%2e%2f%2e%2e%2fetc%2fhosts",     // Mixed case encoding
-            "..%5c..%5csystem32%5cdrivers%5cetc%5chosts", // Windows paths
-            "%2e%2e%2f%2e%2e%2f%2e%2e%2froot%2f.ssh%2fid_rsa", // Deep traversal
-            "..%2f..%2fvar%2flog%2fauth.log",    // Log files
-            "%2e%2e%5c%2e%2e%5cwindows%5csystem32%5cconfig%5csam", // Registry
-            "....%2f....%2f....%2fetc%2fpasswd", // Quad-dot bypass
-            "%252e%252e%252f%252e%252e%252fboot.ini", // Double encoded
-            "..%c0%af..%c0%afetc%c0%afpasswd",   // UTF-8 overlong
-            "%c0%ae%c0%ae%c0%afetc%c0%afhosts"   // UTF-8 overlong alt
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 8);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
+    private final TypedGenerator<String> targetFileGen = Generators.fixedValues("etc/passwd", "config", "windows", "root", "shadow", "etc/hosts", "boot.ini", "var/log/auth.log", "windows/system32/config/sam", "root/.ssh/id_rsa");
+    private final TypedGenerator<String> pathSepGen = Generators.fixedValues("/", "\\");
+    private final TypedGenerator<Boolean> caseVariationGen = Generators.booleans();
 
     @Override
     public String next() {
-        return pathTraversalParameters.next();
+        return switch (attackTypeGen.next()) {
+            case 1 -> generateBasicEncodedTraversal();
+            case 2 -> generateDoubleEncodedTraversal();
+            case 3 -> generateMixedEncodingTraversal();
+            case 4 -> generateWindowsStyleTraversal();
+            case 5 -> generateDeepTraversal();
+            case 6 -> generateQuadDotBypass();
+            case 7 -> generateUtf8OverlongTraversal();
+            case 8 -> generateTripleEncodedTraversal();
+            default -> generateBasicEncodedTraversal();
+        };
+    }
+
+    private String generateBasicEncodedTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("..%2F");
+        }
+
+        // Encode the target file path
+        String encodedTarget = targetFile.replace("/", "%2F");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateDoubleEncodedTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%2E%2E%2F");
+        }
+
+        String encodedTarget = targetFile.replace("/", "%2F");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateMixedEncodingTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            if (caseVariationGen.next()) {
+                pattern.append("%2e%2e%2f"); // Lowercase
+            } else {
+                pattern.append("%2E%2E%2F"); // Uppercase
+            }
+        }
+
+        String encodedTarget = targetFile.replace("/", "%2f");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateWindowsStyleTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            if (caseVariationGen.next()) {
+                pattern.append("..%5c"); // Mixed with unencoded
+            } else {
+                pattern.append("%2e%2e%5c"); // Fully encoded
+            }
+        }
+
+        String encodedTarget = targetFile.replace("/", "%5c").replace("\\", "%5c");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateDeepTraversal() {
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        // Generate deep path (3-6 levels)
+        int deepDepth = Generators.integers(3, 6).next();
+        for (int i = 0; i < deepDepth; i++) {
+            pattern.append("%2e%2e%2f");
+        }
+
+        String encodedTarget = targetFile.replace("/", "%2f");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateQuadDotBypass() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        // Use quad-dots as bypass technique
+        for (int i = 0; i < depth; i++) {
+            pattern.append("....%2f");
+        }
+
+        String encodedTarget = targetFile.replace("/", "%2f");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateUtf8OverlongTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        for (int i = 0; i < depth; i++) {
+            if (caseVariationGen.next()) {
+                pattern.append("..%c0%af"); // UTF-8 overlong slash variant 1
+            } else {
+                pattern.append("%c0%ae%c0%ae%c0%af"); // UTF-8 overlong dots + slash variant 2
+            }
+        }
+
+        String encodedTarget = targetFile.replace("/", "%c0%af");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
+    }
+
+    private String generateTripleEncodedTraversal() {
+        int depth = depthGen.next();
+        String targetFile = targetFileGen.next();
+        StringBuilder pattern = new StringBuilder();
+
+        // Triple URL encoding (%252e = double encoded %2e)
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%252e%252e%252f");
+        }
+
+        String encodedTarget = targetFile.replace("/", "%252f");
+        pattern.append(encodedTarget);
+
+        return pattern.toString();
     }
 
     @Override

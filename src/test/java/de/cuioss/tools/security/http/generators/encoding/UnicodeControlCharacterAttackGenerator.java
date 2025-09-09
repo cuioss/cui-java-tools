@@ -21,6 +21,8 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generates Unicode control character attack patterns for security testing.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * This generator creates attack patterns that exploit Unicode control characters
  * which can be used to bypass security filters, manipulate display, or cause
@@ -65,63 +67,47 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class UnicodeControlCharacterAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "../",
-            "..\\",
-            "../../",
-            "<script>",
-            "javascript:",
-            "data:",
-            "file:",
-            "admin",
-            "root",
-            "config",
-            "/etc/passwd",
-            "/windows/system32",
-            "cmd.exe",
-            "shell",
-            "upload",
-            ".",
-            "/",
-            "\\",
-            ":",
-            "="
-    );
-
-    private final TypedGenerator<String> attackTypeGen = Generators.fixedValues(
-            "c0_control_characters",        // 0x00-0x1F ASCII control
-            "c1_control_characters",        // 0x80-0x9F extended control
-            "format_control_characters",    // Line/paragraph separators
-            "bidirectional_control",        // LTR/RTL text direction
-            "zero_width_characters",        // Invisible characters
-            "variation_selectors",          // Unicode variation control
-            "private_use_characters",       // Private Unicode ranges
-            "surrogate_pairs",              // Invalid Unicode surrogates
-            "line_break_control",           // Line breaking control
-            "url_control_injection",        // Control chars in URLs
-            "mixed_control_sequences",      // Multiple control types
-            "encoded_control_bypasses"      // Encoded control characters
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 12);
+    private final TypedGenerator<String> traversalGen = Generators.fixedValues("../", "..\\", "../../", "../../../");
+    private final TypedGenerator<String> scriptGen = Generators.fixedValues("<script>", "<iframe>", "<img>", "<svg>");
+    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript:", "data:", "file:", "vbscript:");
+    private final TypedGenerator<String> systemGen = Generators.fixedValues("admin", "root", "config", "system");
+    private final TypedGenerator<String> pathGen = Generators.fixedValues("/etc/passwd", "/windows/system32", "/proc/self", "/var/log");
+    private final TypedGenerator<String> commandGen = Generators.fixedValues("cmd.exe", "shell", "bash", "powershell");
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String attackType = attackTypeGen.next();
+        String basePattern = generateBasePattern();
+        int attackType = attackTypeGen.next();
 
         return switch (attackType) {
-            case "c0_control_characters" -> injectC0ControlCharacters(basePattern);
-            case "c1_control_characters" -> injectC1ControlCharacters(basePattern);
-            case "format_control_characters" -> injectFormatControlCharacters(basePattern);
-            case "bidirectional_control" -> injectBidirectionalControl(basePattern);
-            case "zero_width_characters" -> injectZeroWidthCharacters(basePattern);
-            case "variation_selectors" -> injectVariationSelectors(basePattern);
-            case "private_use_characters" -> injectPrivateUseCharacters(basePattern);
-            case "surrogate_pairs" -> injectSurrogatePairs(basePattern);
-            case "line_break_control" -> injectLineBreakControl(basePattern);
-            case "url_control_injection" -> injectUrlControlCharacters(basePattern);
-            case "mixed_control_sequences" -> injectMixedControlSequences(basePattern);
-            case "encoded_control_bypasses" -> injectEncodedControlBypasses(basePattern);
+            case 1 -> injectC0ControlCharacters(basePattern);
+            case 2 -> injectC1ControlCharacters(basePattern);
+            case 3 -> injectFormatControlCharacters(basePattern);
+            case 4 -> injectBidirectionalControl(basePattern);
+            case 5 -> injectZeroWidthCharacters(basePattern);
+            case 6 -> injectVariationSelectors(basePattern);
+            case 7 -> injectPrivateUseCharacters(basePattern);
+            case 8 -> injectSurrogatePairs(basePattern);
+            case 9 -> injectLineBreakControl(basePattern);
+            case 10 -> injectUrlControlCharacters(basePattern);
+            case 11 -> injectMixedControlSequences(basePattern);
+            case 12 -> injectEncodedControlBypasses(basePattern);
             default -> basePattern;
+        };
+    }
+
+    private String generateBasePattern() {
+        return switch (basePatternTypeGen.next()) {
+            case 1 -> traversalGen.next();
+            case 2 -> scriptGen.next();
+            case 3 -> protocolGen.next();
+            case 4 -> systemGen.next();
+            case 5 -> pathGen.next();
+            case 6 -> commandGen.next();
+            default -> traversalGen.next();
         };
     }
 

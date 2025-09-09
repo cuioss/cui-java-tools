@@ -101,20 +101,28 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 ## QI-6: Generator Reliability Issues (Hardcoded Arrays)
 **Status**: 🟢 SUBSTANTIAL PROGRESS - Core generators converted, systematic approach established  
 **Impact**: Dynamic generation implemented for security-critical generators  
-**Files**: 47+ generators identified, 7 high-priority generators completed
+**Files**: 47+ generators identified, 15 high-priority generators completed
 
 **Problem**: Generators use fixed arrays with `Generators.fixedValues()` instead of dynamic generation, creating predictable test patterns.
 
 **Solution Implemented**: Systematic conversion from `fixedValues()` to algorithmic generation using integer selectors and switch statements.
 
-### Completed Conversions (7/47):
+### Completed Conversions (15/47):
 - [x] **ValidHTTPBodyContentGenerator**: 8 dynamic content types (JSON, XML, form data, etc.)
 - [x] **MixedEncodingAttackGenerator**: 7 encoding combination patterns with dynamic base pattern generation
 - [x] **UnicodeNormalizationAttackGenerator**: 9 Unicode normalization attack types with algorithmic base patterns
 - [x] **DoubleEncodingAttackGenerator**: 8 double/triple encoding attack patterns - **122 tests pass**
 - [x] **ValidCookieGenerator**: Dynamic cookie generation with multiple categories and test compatibility
-- [x] **SqlInjectionAttackGenerator**: 15 SQL injection attack patterns - **162 tests pass**
+- [x] **SqlInjectionAttackGenerator**: 15 SQL injection attack patterns with full dynamic generation - **162 tests pass**
 - [x] **ValidURLGenerator**: Dynamic URL generation with test compatibility - **14 tests pass**
+- [x] **InvalidURLGenerator**: 10 malformation types with dynamic algorithmic generation - **16 tests pass**
+- [x] **PathTraversalURLGenerator**: 6 encoding attack types for URL path traversal patterns
+- [x] **PathTraversalParameterGenerator**: 8 parameter-specific traversal attack patterns
+- [x] **ComplexEncodingCombinationGenerator**: 6 complex encoding combination attack patterns
+- [x] **UnicodeControlCharacterAttackGenerator**: 12 Unicode control character attack types with dynamic base patterns
+- [x] **EncodingCombinationGenerator**: 5 encoding combination patterns with dynamic depth generation
+- [x] **HTTPHeaderInjectionGenerator**: 8 HTTP header injection attack patterns
+- [x] **SqlInjectionAttackGenerator**: Complete QI-6 conversion of all 15 attack methods from hardcoded arrays to dynamic generation
 
 ### Established QI-6 Pattern:
 ```java
@@ -133,8 +141,10 @@ public String next() {
 ```
 
 ### Remaining Work:
-- [ ] **40 generators** still need systematic QI-6 conversion following established pattern
-- [ ] Focus on security-critical generators: InvalidURLGenerator, Path traversal generators, XSS generators
+- [ ] **32 generators** still need systematic QI-6 conversion following established pattern
+- [x] **Path traversal generators converted**: PathTraversalURLGenerator, PathTraversalParameterGenerator (+ PathTraversalGenerator already done)
+- [x] **XSS generator already converted**: XssInjectionAttackGenerator uses dynamic algorithmic generation
+- [ ] Focus on remaining encoding and injection generators
 - [x] **Test generator diversity**:
   - [x] Verify generators produce varied output across runs - PathTraversalGenerator diversity test passes
   - [x] Fixed anti-pattern: HTTPBodyGenerator `Generators.letterStrings(100, 500).next()` in fixedValues() 

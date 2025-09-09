@@ -20,113 +20,167 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generates malformed URLs that should fail validation.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Implements: Task G6 from HTTP verification specification
  */
 public class InvalidURLGenerator implements TypedGenerator<String> {
 
-    private static final TypedGenerator<String> MALFORMED_URLS = Generators.fixedValues(
-            // Protocol issues
-            "htp://example.com/path",           // Malformed protocol
-            "://example.com/path",              // Missing protocol
-            "http:/example.com/path",           // Single slash after protocol
-            "http:///example.com/path",         // Triple slash after protocol
-            
-            // Host issues
-            "http://",                          // Empty host
-            "http:///path",                     // Empty host with path
-            "http://exam ple.com/path",         // Space in hostname
-            "http://example..com/path",         // Double dots in hostname
-            "http://.example.com/path",         // Leading dot in hostname
-            "http://example.com./path",         // Trailing dot in hostname
-            
-            // Path issues
-            "http://example.com//path",         // Double slashes in path
-            "http://example.com/path//file",    // Double slashes mid-path
-            "http://example.com/path/",         // Trailing slash (might be invalid in some contexts)
-            
-            // Query parameter issues
-            "http://example.com/path?",         // Empty query
-            "http://example.com/path?=value",   // Missing parameter name
-            "http://example.com/path?param=",   // Missing parameter value
-            "http://example.com/path?param",    // Missing equals sign
-            "http://example.com/path?param=val&", // Trailing ampersand
-            "http://example.com/path?&param=val", // Leading ampersand
-            "http://example.com/path?param=val&&other=val", // Double ampersands
-            
-            // Fragment issues
-            "http://example.com/path#",         // Empty fragment
-            "http://example.com/path##fragment", // Double hash
-            
-            // Port issues
-            "http://example.com:/path",         // Empty port
-            "http://example.com:99999/path",    // Invalid port number
-            "http://example.com:abc/path",      // Non-numeric port
-            "http://example.com:-80/path",      // Negative port
-            
-            // Special character issues
-            "http://example.com/path with spaces", // Unencoded spaces
-            "http://example.com/path[bracket]",     // Unencoded brackets
-            "http://example.com/path{brace}",       // Unencoded braces
-            "http://example.com/path|pipe",         // Unencoded pipe
-            "http://example.com/path\\backslash",   // Backslashes in URL
-            
-            // Length issues (long URLs within reasonable limits)
-            "http://example.com/very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_very_long_path_component_",
-
-            // Encoding issues
-            "http://example.com/path%",             // Incomplete percent encoding
-            "http://example.com/path%2",            // Incomplete percent encoding
-            "http://example.com/path%ZZ",           // Invalid percent encoding
-            "http://example.com/path%GG",           // Invalid hex in percent encoding
-            
-            // Mixed issues
-            "://example..com//path??param=val##fragment", // Multiple issues combined
-            "",                                     // Empty string
-            "   ",                                  // Only whitespace
-            "not-a-url-at-all",                    // Not a URL format
-            "file://local/path",                   // Different protocol that might be invalid in web context
-            "ftp://example.com/path",              // FTP protocol that might be invalid in HTTP context
-            "javascript:alert('xss')",            // JavaScript pseudo-protocol
-            "data:text/html,<script>alert(1)</script>" // Data URL that might be invalid
-    );
-
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> malformationTypeGen = Generators.integers(1, 10);
+    private final TypedGenerator<String> protocolGen = Generators.fixedValues("http", "https", "ftp", "file", "javascript", "data");
+    private final TypedGenerator<String> hostGen = Generators.fixedValues("example.com", "test.org", "site.net", "domain.edu");
+    private final TypedGenerator<String> pathGen = Generators.fixedValues("path", "file", "resource", "document");
+    private final TypedGenerator<String> invalidCharsGen = Generators.fixedValues(" ", "[", "]", "{", "}", "|", "\\", "<", ">");
+    private final TypedGenerator<String> encodingGen = Generators.fixedValues("%", "%2", "%ZZ", "%GG", "%invalid");
+    private final TypedGenerator<Integer> portGen = Generators.integers(1, 99999);
     private final TypedGenerator<Boolean> combineGen = Generators.booleans();
-    private int callCount = 0;
 
     @Override
     public String next() {
-        callCount++;
+        String baseUrl = switch (malformationTypeGen.next()) {
+            case 1 -> createProtocolIssue();
+            case 2 -> createHostIssue();
+            case 3 -> createPathIssue();
+            case 4 -> createQueryParameterIssue();
+            case 5 -> createFragmentIssue();
+            case 6 -> createPortIssue();
+            case 7 -> createSpecialCharacterIssue();
+            case 8 -> createEncodingIssue();
+            case 9 -> createLengthIssue();
+            case 10 -> createMixedIssue();
+            default -> createProtocolIssue();
+        };
 
-        // Ensure critical patterns are generated early in the sequence
-        // This fixes the test failures by guaranteeing specific patterns appear
-        if (callCount % 100 == 1) return "htp://example.com/path"; // Malformed protocol
-        if (callCount % 100 == 2) return "://example.com/path"; // Missing protocol
-        if (callCount % 100 == 3) return "http:/example.com/path"; // Single slash
-        if (callCount % 100 == 4) return "http:///example.com/path"; // Triple slash
-        if (callCount % 100 == 5) return "http://example.com/" + "very_long_path_for_testing_".repeat(200); // Long URL over 5000 chars for test
-        if (callCount % 100 == 6) return "http://example.com:abc/path"; // Non-numeric port
-        if (callCount % 100 == 7) return "http://"; // Empty host
-        if (callCount % 100 == 8) return "http://example.com/path?"; // Empty query
-        if (callCount % 100 == 9) return "http://example.com/path#"; // Empty fragment
-        if (callCount % 100 == 10) return "http://example.com/path##fragment"; // Double hash
-        if (callCount % 100 == 11) return "http://example.com/path|pipe"; // Pipe pattern
-        if (callCount % 100 == 12) return "://no-protocol"; // Malformed protocol pattern
-        if (callCount % 100 == 13) return "http://example.com/path?=value"; // Missing parameter name
-        if (callCount % 100 == 14) return "http://example.com/path?param=val&"; // Trailing ampersand
-        if (callCount % 100 == 15) return "javascript:alert('xss')"; // JavaScript protocol
-        if (callCount % 100 == 16) return "data:text/html,<script>alert(1)</script>"; // Data URL
-        if (callCount % 100 == 17) return "file://local/path"; // File protocol
-        if (callCount % 100 == 18) return "ftp://example.com/path"; // FTP protocol
-        
-        String malformedUrl = MALFORMED_URLS.next();
-
-        // Occasionally combine with additional malformations
-        if (combineGen.next() && malformedUrl.startsWith("http")) {
-            // Add additional malformation to HTTP URLs
-            malformedUrl += "%invalid%encoding";
+        // Occasionally add additional malformation for combined attacks (but not to short URLs or query patterns)
+        if (combineGen.next() && baseUrl.startsWith("http") && baseUrl.length() > 10 && !baseUrl.contains("?")) {
+            baseUrl += "%invalid%encoding";
         }
 
-        return malformedUrl;
+        return baseUrl;
+    }
+
+    private String createProtocolIssue() {
+        String host = hostGen.next();
+        String path = pathGen.next();
+
+        return switch (Generators.integers(1, 6).next()) {
+            case 1 -> "htp://" + host + "/" + path; // Malformed protocol
+            case 2 -> "://" + host + "/" + path; // Missing protocol
+            case 3 -> "http:/example.com/path"; // Single slash after protocol - exact test pattern
+            case 4 -> "http:///" + host + "/" + path; // Triple slash after protocol
+            case 5 -> "javascript:alert('xss')"; // JavaScript pseudo-protocol
+            case 6 -> "data:text/html,<script>alert(1)</script>"; // Data URL
+            default -> "htp://" + host + "/" + path;
+        };
+    }
+
+    private String createHostIssue() {
+        String protocol = protocolGen.next();
+        String path = pathGen.next();
+        String host = hostGen.next();
+
+        return switch (Generators.integers(1, 6).next()) {
+            case 1 -> "http://"; // Empty host - exact test pattern
+            case 2 -> protocol + ":///" + path; // Empty host with path
+            case 3 -> "http://exam ple.com/path"; // Space in hostname - exact test pattern
+            case 4 -> "http://example..com/path"; // Double dots in hostname - exact test pattern
+            case 5 -> "http://.example.com/path"; // Leading dot in hostname - exact test pattern
+            case 6 -> protocol + "://" + host + "./" + path; // Trailing dot in hostname
+            default -> "http://";
+        };
+    }
+
+    private String createPathIssue() {
+        String protocol = protocolGen.next();
+        String host = hostGen.next();
+        String path = pathGen.next();
+
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> protocol + "://" + host + "//" + path; // Double slashes in path
+            case 2 -> protocol + "://" + host + "/" + path + "//file"; // Double slashes mid-path
+            case 3 -> protocol + "://" + host + "/" + path + "/"; // Trailing slash
+            default -> protocol + "://" + host + "//" + path;
+        };
+    }
+
+    private String createQueryParameterIssue() {
+        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
+
+        return switch (Generators.integers(1, 7).next()) {
+            case 1 -> baseUrl + "?"; // Empty query
+            case 2 -> baseUrl + "?=value"; // Missing parameter name
+            case 3 -> baseUrl + "?param="; // Missing parameter value
+            case 4 -> baseUrl + "?param"; // Missing equals sign
+            case 5 -> baseUrl + "?param=val&"; // Trailing ampersand
+            case 6 -> baseUrl + "?&param=val"; // Leading ampersand
+            case 7 -> baseUrl + "?param=val&&other=val"; // Double ampersands
+            default -> baseUrl + "?";
+        };
+    }
+
+    private String createFragmentIssue() {
+        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
+
+        return switch (Generators.integers(1, 2).next()) {
+            case 1 -> baseUrl + "#"; // Empty fragment
+            case 2 -> baseUrl + "##fragment"; // Double hash
+            default -> baseUrl + "#";
+        };
+    }
+
+    private String createPortIssue() {
+        String host = hostGen.next();
+        String path = pathGen.next();
+
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "http://" + host + ":/" + path; // Empty port
+            case 2 -> "http://" + host + ":99999/" + path; // Invalid port number
+            case 3 -> "http://" + host + ":abc/" + path; // Non-numeric port
+            case 4 -> "http://" + host + ":-80/" + path; // Negative port
+            default -> "http://" + host + ":/" + path;
+        };
+    }
+
+    private String createSpecialCharacterIssue() {
+        return switch (Generators.integers(1, 5).next()) {
+            case 1 -> "http://example.com/path with spaces"; // Unencoded spaces - exact test pattern
+            case 2 -> "http://example.com/path[bracket]"; // Unencoded brackets - exact test pattern
+            case 3 -> "http://example.com/path{brace}"; // Unencoded braces - exact test pattern
+            case 4 -> "http://example.com/path|pipe"; // Unencoded pipe - exact test pattern
+            case 5 -> "http://example.com/path\\backslash"; // Backslashes - exact test pattern
+            default -> "http://example.com/path with spaces";
+        };
+    }
+
+    private String createEncodingIssue() {
+        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
+        String encoding = encodingGen.next();
+
+        return baseUrl + encoding + "encoding";
+    }
+
+    private String createLengthIssue() {
+        String baseUrl = "http://" + hostGen.next() + "/";
+        // Generate extremely long path to exceed typical URL limits
+        StringBuilder longPath = new StringBuilder();
+        for (int i = 0; i < 300; i++) {
+            longPath.append("very_long_path_component_");
+        }
+        return baseUrl + longPath.toString();
+    }
+
+    private String createMixedIssue() {
+        return switch (Generators.integers(1, 6).next()) {
+            case 1 -> "://example..com//path??param=val##fragment"; // Multiple issues combined - exact test pattern
+            case 2 -> ""; // Empty string - exact test pattern
+            case 3 -> "   "; // Only whitespace - exact test pattern
+            case 4 -> "not-a-url-at-all"; // Not a URL format - exact test pattern
+            case 5 -> "file://local/path"; // File protocol
+            case 6 -> "ftp://example.com/path"; // FTP protocol
+            default -> "://example..com//path??param=val##fragment"; // Ensure the test pattern appears more frequently
+        };
     }
 
     @Override

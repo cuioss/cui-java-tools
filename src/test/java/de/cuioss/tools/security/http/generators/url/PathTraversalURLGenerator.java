@@ -20,31 +20,130 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for URL paths containing path traversal attacks.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Provides various encoded path traversal patterns in URL context.
  */
 public class PathTraversalURLGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> pathTraversalURLs = Generators.fixedValues(
-            "/api/%2E%2E/admin",              // Encoded ..
-            "/api/users/%2E%2E/%2E%2E/%2E%2E/etc/passwd", // Multiple encoded traversal
-            "/api/users/%2E/%2E%2E/admin",    // Encoded ./../
-            "/api/users/%2E%2E%5Cadmin",      // Windows style encoded
-            "/api/users/%2e%2e/admin",        // Lowercase encoded traversal
-            "/api/%2e%2e%2f%2e%2e%2froot",    // Double encoded traversal
-            "/api/files/%2E%2E%2F%2E%2E%2Fconfig", // Config file access
-            "/api/docs/%2e%2e%5c%2e%2e%5cwindows", // Windows traversal
-            "/api/admin/%2E%2E/../../etc/shadow", // Mixed traversal
-            "/api/download/%2e%2e%2fetc%2fhosts", // Hosts file access
-            "/api/backup/%2E%2E%2F%2E%2E%2Fvar%2Flog", // Log directory access
-            "/api/upload/%2e%2e%5c%2e%2e%5csystem32", // System32 access
-            "/api/files/..%2f..%2fetc%2fpasswd", // Mixed encoding
-            "/api/data/%252e%252e%252f%252e%252e%252f", // Double URL encoded
-            "/api/content/%2E%2E%2F%2E%2E%2F%2E%2E%2Froot%2F.ssh" // SSH keys access
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
+    private final TypedGenerator<String> apiPathGen = Generators.fixedValues("api", "files", "admin", "users", "docs", "backup", "upload", "download", "data", "content");
+    private final TypedGenerator<String> targetGen = Generators.fixedValues("admin", "etc/passwd", "config", "windows", "etc/shadow", "etc/hosts", "var/log", "system32", "root", "root/.ssh");
+    private final TypedGenerator<Boolean> mixedEncodingGen = Generators.booleans();
 
     @Override
     public String next() {
-        return pathTraversalURLs.next();
+        return switch (encodingTypeGen.next()) {
+            case 1 -> generateBasicEncodedTraversal();
+            case 2 -> generateWindowsStyleTraversal();
+            case 3 -> generateDoubleEncodedTraversal();
+            case 4 -> generateMixedEncodingTraversal();
+            case 5 -> generateLowercaseEncodedTraversal();
+            case 6 -> generateMultipleDepthTraversal();
+            default -> generateBasicEncodedTraversal();
+        };
+    }
+
+    private String generateBasicEncodedTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+        int depth = depthGen.next();
+
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%2E%2E/");
+        }
+        pattern.append(target);
+
+        return pattern.toString();
+    }
+
+    private String generateWindowsStyleTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+        int depth = depthGen.next();
+
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%2E%2E%5C");
+        }
+        pattern.append(target);
+
+        return pattern.toString();
+    }
+
+    private String generateDoubleEncodedTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+        int depth = depthGen.next();
+
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%252e%252e%252f");
+        }
+        pattern.append(target);
+
+        return pattern.toString();
+    }
+
+    private String generateMixedEncodingTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+        int depth = depthGen.next();
+
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
+
+        // Mix encoded and unencoded traversal
+        for (int i = 0; i < depth; i++) {
+            if (mixedEncodingGen.next()) {
+                pattern.append("%2E%2E/");
+            } else {
+                pattern.append("../");
+            }
+        }
+
+        // Sometimes add encoded target path
+        if (mixedEncodingGen.next()) {
+            pattern.append(target.replace("/", "%2f"));
+        } else {
+            pattern.append(target);
+        }
+
+        return pattern.toString();
+    }
+
+    private String generateLowercaseEncodedTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+        int depth = depthGen.next();
+
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
+        for (int i = 0; i < depth; i++) {
+            pattern.append("%2e%2e/");
+        }
+        pattern.append(target);
+
+        return pattern.toString();
+    }
+
+    private String generateMultipleDepthTraversal() {
+        String apiPath = apiPathGen.next();
+        String target = targetGen.next();
+
+        // Generate deep traversal pattern
+        StringBuilder pattern = new StringBuilder("/" + apiPath + "/users/");
+
+        // Add 3+ levels of traversal
+        int deepDepth = Generators.integers(3, 6).next();
+        for (int i = 0; i < deepDepth; i++) {
+            pattern.append("%2E%2E%2F");
+        }
+        pattern.append(target);
+
+        return pattern.toString();
     }
 
     @Override
