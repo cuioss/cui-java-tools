@@ -20,9 +20,9 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generator for URL parameter values containing path traversal attacks.
- * 
+ *
  * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
- * 
+ *
  * Provides parameter VALUES (not full "name=value" strings) with various path traversal patterns.
  * These values are designed to be detected by URLParameterValidationPipeline.
  */
@@ -32,7 +32,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
     private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 8);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
     private final TypedGenerator<String> targetFileGen = Generators.fixedValues("etc/passwd", "config", "windows", "root", "shadow", "etc/hosts", "boot.ini", "var/log/auth.log", "windows/system32/config/sam", "root/.ssh/id_rsa");
-    private final TypedGenerator<String> pathSepGen = Generators.fixedValues("/", "\\");
+    private final TypedGenerator<Integer> pathSepSelector = Generators.integers(1, 2);
     private final TypedGenerator<Boolean> caseVariationGen = Generators.booleans();
 
     @Override
@@ -184,6 +184,14 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
         pattern.append(encodedTarget);
 
         return pattern.toString();
+    }
+
+    private String generatePathSeparator() {
+        return switch (pathSepSelector.next()) {
+            case 1 -> "/";
+            case 2 -> "\\";
+            default -> "/";
+        };
     }
 
     @Override
