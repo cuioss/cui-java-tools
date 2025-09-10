@@ -21,19 +21,43 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generator for invalid HTTP header names containing control characters.
  * Provides header names with various injection and control character patterns.
+ * 
+ * QI-6: Converted from fixedValues() to dynamic generation for improved test diversity.
  */
 public class InvalidHTTPHeaderNameGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> invalidHeaderNames = Generators.fixedValues(
-            "Header\rName",         // CR in header name
-            "Header\nName",         // LF in header name
-            "Header\r\nName",       // CRLF in header name
-            "Header\u0000Name"      // Null byte in header name
+    private final TypedGenerator<Integer> invalidTypeSelector = Generators.integers(1, 4);
+    private final TypedGenerator<String> baseHeaderNames = Generators.fixedValues(
+            "Authorization", "Content-Type", "Accept", "User-Agent", "Host", 
+            "Referer", "Cookie", "X-Custom", "Cache-Control"
     );
 
     @Override
     public String next() {
-        return invalidHeaderNames.next();
+        String baseName = baseHeaderNames.next();
+        return switch (invalidTypeSelector.next()) {
+            case 1 -> generateCarriageReturnInjection(baseName);
+            case 2 -> generateLineFeedInjection(baseName);
+            case 3 -> generateCRLFInjection(baseName);
+            case 4 -> generateNullByteInjection(baseName);
+            default -> throw new IllegalStateException("Invalid type selector");
+        };
+    }
+
+    private String generateCarriageReturnInjection(String baseName) {
+        return baseName + "\r" + "Injected";
+    }
+
+    private String generateLineFeedInjection(String baseName) {
+        return baseName + "\n" + "Injected";
+    }
+
+    private String generateCRLFInjection(String baseName) {
+        return baseName + "\r\n" + "Injected";
+    }
+
+    private String generateNullByteInjection(String baseName) {
+        return baseName + "\u0000" + "Injected";
     }
 
     @Override
