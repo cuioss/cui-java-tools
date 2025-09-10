@@ -20,7 +20,7 @@ import de.cuioss.tools.security.http.database.AttackTestCase;
 import de.cuioss.tools.security.http.database.XssInjectionAttackDatabase;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
-import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
+import de.cuioss.tools.security.http.pipeline.HTTPBodyValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,14 +57,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("XSS Injection Attack Database Tests")
 class XssInjectionAttackDatabaseTest {
 
-    private URLPathValidationPipeline pipeline;
+    private HTTPBodyValidationPipeline pipeline;
     private SecurityEventCounter eventCounter;
 
     @BeforeEach
     void setUp() {
         SecurityConfiguration config = SecurityConfiguration.defaults();
         eventCounter = new SecurityEventCounter();
-        pipeline = new URLPathValidationPipeline(config, eventCounter);
+        pipeline = new HTTPBodyValidationPipeline(config, eventCounter);
     }
 
     /**
