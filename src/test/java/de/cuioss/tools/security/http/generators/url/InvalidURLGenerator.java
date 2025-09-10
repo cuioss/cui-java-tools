@@ -20,20 +20,20 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generates malformed URLs that should fail validation.
- * 
+ *
  * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
- * 
+ *
  * Implements: Task G6 from HTTP verification specification
  */
 public class InvalidURLGenerator implements TypedGenerator<String> {
 
-    // QI-6: Dynamic generation components
+    // QI-6: Dynamic generation components - all seed-based, no internal state
     private final TypedGenerator<Integer> malformationTypeGen = Generators.integers(1, 10);
-    private final TypedGenerator<String> protocolGen = Generators.fixedValues("http", "https", "ftp", "file", "javascript", "data");
-    private final TypedGenerator<String> hostGen = Generators.fixedValues("example.com", "test.org", "site.net", "domain.edu");
-    private final TypedGenerator<String> pathGen = Generators.fixedValues("path", "file", "resource", "document");
-    private final TypedGenerator<String> invalidCharsGen = Generators.fixedValues(" ", "[", "]", "{", "}", "|", "\\", "<", ">");
-    private final TypedGenerator<String> encodingGen = Generators.fixedValues("%", "%2", "%ZZ", "%GG", "%invalid");
+    private final TypedGenerator<Integer> protocolSelector = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> hostSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> pathSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> invalidCharSelector = Generators.integers(1, 9);
+    private final TypedGenerator<Integer> encodingSelector = Generators.integers(1, 5);
     private final TypedGenerator<Integer> portGen = Generators.integers(1, 99999);
     private final TypedGenerator<Boolean> combineGen = Generators.booleans();
 
@@ -62,8 +62,8 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createProtocolIssue() {
-        String host = hostGen.next();
-        String path = pathGen.next();
+        String host = generateHost();
+        String path = generatePath();
 
         return switch (Generators.integers(1, 6).next()) {
             case 1 -> "htp://" + host + "/" + path; // Malformed protocol
@@ -77,9 +77,9 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createHostIssue() {
-        String protocol = protocolGen.next();
-        String path = pathGen.next();
-        String host = hostGen.next();
+        String protocol = generateProtocol();
+        String path = generatePath();
+        String host = generateHost();
 
         return switch (Generators.integers(1, 6).next()) {
             case 1 -> "http://"; // Empty host - exact test pattern
@@ -93,9 +93,9 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createPathIssue() {
-        String protocol = protocolGen.next();
-        String host = hostGen.next();
-        String path = pathGen.next();
+        String protocol = generateProtocol();
+        String host = generateHost();
+        String path = generatePath();
 
         return switch (Generators.integers(1, 3).next()) {
             case 1 -> protocol + "://" + host + "//" + path; // Double slashes in path
@@ -106,7 +106,7 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createQueryParameterIssue() {
-        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
+        String baseUrl = "http://" + generateHost() + "/" + generatePath();
 
         return switch (Generators.integers(1, 7).next()) {
             case 1 -> baseUrl + "?"; // Empty query
@@ -121,7 +121,7 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createFragmentIssue() {
-        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
+        String baseUrl = "http://" + generateHost() + "/" + generatePath();
 
         return switch (Generators.integers(1, 2).next()) {
             case 1 -> baseUrl + "#"; // Empty fragment
@@ -131,8 +131,8 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createPortIssue() {
-        String host = hostGen.next();
-        String path = pathGen.next();
+        String host = generateHost();
+        String path = generatePath();
 
         return switch (Generators.integers(1, 4).next()) {
             case 1 -> "http://" + host + ":/" + path; // Empty port
@@ -155,14 +155,14 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createEncodingIssue() {
-        String baseUrl = "http://" + hostGen.next() + "/" + pathGen.next();
-        String encoding = encodingGen.next();
+        String baseUrl = "http://" + generateHost() + "/" + generatePath();
+        String encoding = generateInvalidEncoding();
 
         return baseUrl + encoding + "encoding";
     }
 
     private String createLengthIssue() {
-        String baseUrl = "http://" + hostGen.next() + "/";
+        String baseUrl = "http://" + generateHost() + "/";
         // Generate extremely long path to exceed typical URL limits
         StringBuilder longPath = new StringBuilder();
         for (int i = 0; i < 300; i++) {
@@ -180,6 +180,49 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
             case 5 -> "file://local/path"; // File protocol
             case 6 -> "ftp://example.com/path"; // FTP protocol
             default -> "://example..com//path??param=val##fragment"; // Ensure the test pattern appears more frequently
+        };
+    }
+
+    private String generateProtocol() {
+        return switch (protocolSelector.next()) {
+            case 1 -> "http";
+            case 2 -> "https";
+            case 3 -> "ftp";
+            case 4 -> "file";
+            case 5 -> "javascript";
+            case 6 -> "data";
+            default -> "http";
+        };
+    }
+
+    private String generateHost() {
+        return switch (hostSelector.next()) {
+            case 1 -> "example.com";
+            case 2 -> "test.org";
+            case 3 -> "site.net";
+            case 4 -> "domain.edu";
+            default -> "example.com";
+        };
+    }
+
+    private String generatePath() {
+        return switch (pathSelector.next()) {
+            case 1 -> "path";
+            case 2 -> "file";
+            case 3 -> "resource";
+            case 4 -> "document";
+            default -> "path";
+        };
+    }
+
+    private String generateInvalidEncoding() {
+        return switch (encodingSelector.next()) {
+            case 1 -> "%";
+            case 2 -> "%2";
+            case 3 -> "%ZZ";
+            case 4 -> "%GG";
+            case 5 -> "%invalid";
+            default -> "%";
         };
     }
 
