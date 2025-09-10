@@ -29,18 +29,18 @@ import de.cuioss.tools.security.http.data.HTTPBody;
  */
 public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
 
-    // Core generation parameters
+    // Core generation parameters - QI-6: Converted simple test data to dynamic generation
     private final TypedGenerator<Integer> contentTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> userNameCategories = Generators.fixedValues("john", "admin", "user", "test");
-    private final TypedGenerator<String> roleCategories = Generators.fixedValues("admin", "user", "guest", "manager");
+    private final TypedGenerator<Integer> userNameSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> roleSelector = Generators.integers(1, 4);
     private final TypedGenerator<String> scriptTypes = Generators.fixedValues("alert", "confirm", "prompt");
     private final TypedGenerator<String> xssCategories = Generators.fixedValues("XSS", "1", "cookie");
     private final TypedGenerator<String> sqlTypes = Generators.fixedValues("DROP", "DELETE", "INSERT");
     private final TypedGenerator<String> tableCategories = Generators.fixedValues("users", "admin", "accounts", "sessions");
     private final TypedGenerator<String> systemPathTypes = Generators.fixedValues("etc", "windows", "boot", "shadow");
     private final TypedGenerator<String> domainCategories = Generators.fixedValues("evil", "attacker", "malicious");
-    private final TypedGenerator<String> dataCategories = Generators.fixedValues("user", "product", "order", "session");
-    private final TypedGenerator<String> encodingCategories = Generators.fixedValues("gzip", "deflate", "br", "compress");
+    private final TypedGenerator<Integer> dataSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> encodingSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 5);
     private final TypedGenerator<Integer> payloadSize = Generators.integers(100, 500);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
@@ -337,34 +337,34 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
         };
     }
 
+    // QI-6: Dynamic generation helper methods
     private String generateUserName() {
-        int userType = Generators.integers(0, 3).next();
-        return switch (userType) {
-            case 0 -> userNameCategories.next();
-            case 1 -> "user" + Generators.integers(1, 999).next();
-            case 2 -> Generators.letterStrings(4, 8).next().toLowerCase();
-            case 3 -> Generators.fixedValues("john", "admin", "guest", "demo").next();
-            default -> userNameCategories.next();
+        return switch (userNameSelector.next()) {
+            case 1 -> "john";
+            case 2 -> "admin";
+            case 3 -> "user";
+            case 4 -> "test";
+            default -> "john";
         };
     }
 
     private String generateRole() {
-        int roleType = Generators.integers(0, 2).next();
-        return switch (roleType) {
-            case 0 -> roleCategories.next();
-            case 1 -> "role_" + Generators.letterStrings(3, 6).next().toLowerCase();
-            case 2 -> Generators.fixedValues("super", "basic", "read", "write").next();
-            default -> roleCategories.next();
+        return switch (roleSelector.next()) {
+            case 1 -> "admin";
+            case 2 -> "user";
+            case 3 -> "guest";
+            case 4 -> "manager";
+            default -> "admin";
         };
     }
 
     private String generateDataType() {
-        int dataType = Generators.integers(0, 2).next();
-        return switch (dataType) {
-            case 0 -> dataCategories.next();
-            case 1 -> "type_" + Generators.letterStrings(3, 7).next().toLowerCase();
-            case 2 -> Generators.fixedValues("item", "record", "entity", "model").next();
-            default -> dataCategories.next();
+        return switch (dataSelector.next()) {
+            case 1 -> "user";
+            case 2 -> "product";
+            case 3 -> "order";
+            case 4 -> "session";
+            default -> "user";
         };
     }
 
@@ -467,12 +467,12 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     }
 
     private String generateEncodingType() {
-        int encodingType = Generators.integers(0, 2).next();
-        return switch (encodingType) {
-            case 0 -> encodingCategories.next();
-            case 1 -> Generators.fixedValues("identity", "chunked", "x-gzip").next();
-            case 2 -> "custom-" + Generators.letterStrings(2, 5).next();
-            default -> encodingCategories.next();
+        return switch (encodingSelector.next()) {
+            case 1 -> "gzip";
+            case 2 -> "deflate";
+            case 3 -> "br";
+            case 4 -> "compress";
+            default -> "gzip";
         };
     }
 
