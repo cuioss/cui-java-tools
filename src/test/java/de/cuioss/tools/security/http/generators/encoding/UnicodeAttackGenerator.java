@@ -20,31 +20,51 @@ import de.cuioss.test.generator.TypedGenerator;
 
 /**
  * Generates Unicode-based attack patterns.
+ * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * Implements: Task G3 from HTTP verification specification
  */
 public class UnicodeAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> unicodeAttacks = Generators.fixedValues(
-            "\u002e\u002e\u002f",           // Unicode dots and slash
-            "\u2024\u2024\u2215",           // Lookalike characters
-            "\u202e",                       // Right-to-left override
-            "\u200b",                       // Zero-width space
-            "\uFEFF",                       // Zero-width no-break space
-            "\u0000"                        // Null character
-    );
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> unicodeAttackTypeGen = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> pathTargetSelector = Generators.integers(1, 4);
 
     private final TypedGenerator<Boolean> combineGen = Generators.booleans();
 
     @Override
     public String next() {
-        String attack = unicodeAttacks.next();
+        String attack = generateUnicodeAttack();
 
         if (combineGen.next()) {
             // Combine with path traversal
-            return attack + "../etc/passwd";
+            return attack + "../" + generatePathTarget();
         }
 
         return attack;
+    }
+
+    private String generateUnicodeAttack() {
+        return switch (unicodeAttackTypeGen.next()) {
+            case 1 -> "\u002e\u002e\u002f";           // Unicode dots and slash
+            case 2 -> "\u2024\u2024\u2215";           // Lookalike characters
+            case 3 -> "\u202e";                       // Right-to-left override
+            case 4 -> "\u200b";                       // Zero-width space
+            case 5 -> "\uFEFF";                       // Zero-width no-break space
+            case 6 -> "\u0000";                        // Null character
+            default -> "\u002e\u002e\u002f";
+        };
+    }
+
+    private String generatePathTarget() {
+        return switch (pathTargetSelector.next()) {
+            case 1 -> "etc/passwd";
+            case 2 -> "etc/shadow";
+            case 3 -> "windows/win.ini";
+            case 4 -> "boot.ini";
+            default -> "etc/passwd";
+        };
     }
 
     @Override

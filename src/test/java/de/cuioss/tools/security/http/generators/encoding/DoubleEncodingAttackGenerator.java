@@ -33,7 +33,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
     private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 8);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 6);
     private final TypedGenerator<Integer> pathPrefixSelector = Generators.integers(1, 6);
-    private final TypedGenerator<String> targetFileGen = Generators.fixedValues("passwd", "shadow", "config", "cmd.exe", "win.ini", "hosts");
+    private final TypedGenerator<Integer> targetFileSelector = Generators.integers(1, 6);
 
     @Override
     public String next() {
@@ -61,7 +61,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
         }
 
         if (Generators.booleans().next()) {
-            pattern.append("etc/").append(targetFileGen.next());
+            pattern.append("etc/").append(generateTargetFile());
         }
 
         return pattern.toString();
@@ -71,14 +71,14 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
         String[] cvePatterns = {
                 "%%32%65",  // %2e double encoded
                 "%%32%66",  // %2f double encoded
-                "/icons%%32%65%%32%65/etc/" + targetFileGen.next(),
-                "/cgi-bin/.%%32%65/%%32%65%%32%65/etc/" + targetFileGen.next()
+                "/icons%%32%65%%32%65/etc/" + generateTargetFile(),
+                "/cgi-bin/.%%32%65/%%32%65%%32%65/etc/" + generateTargetFile()
         };
         return cvePatterns[Generators.integers(0, 3).next()];
     }
 
     private String generateMixedSingleDoubleEncoding() {
-        String target = targetFileGen.next();
+        String target = generateTargetFile();
         return Generators.booleans().next()
                 ? "%2e%252e%2f../etc/" + target
                 : "%252e%2e%252f%2e%2e/etc/" + target;
@@ -106,7 +106,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
         pattern.append("%255c");
 
         if (Generators.booleans().next()) {
-            pattern.append(targetFileGen.next());
+            pattern.append(generateTargetFile());
         }
 
         return pattern.toString();
@@ -114,7 +114,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
 
     private String generateLegitimatePathDoubleEncoding() {
         String prefix = generatePathPrefix();
-        return "/" + prefix + "%252e%252e%252f%252e%252e%252f" + targetFileGen.next();
+        return "/" + prefix + "%252e%252e%252f%252e%252e%252f" + generateTargetFile();
     }
 
     private String generateDeepDoubleEncoding() {
@@ -137,6 +137,18 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
             case 5 -> "upload";
             case 6 -> "backup";
             default -> "api";
+        };
+    }
+
+    private String generateTargetFile() {
+        return switch (targetFileSelector.next()) {
+            case 1 -> "passwd";
+            case 2 -> "shadow";
+            case 3 -> "config";
+            case 4 -> "cmd.exe";
+            case 5 -> "win.ini";
+            case 6 -> "hosts";
+            default -> "passwd";
         };
     }
 

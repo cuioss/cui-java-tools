@@ -29,12 +29,15 @@ public class HTTPHeaderInjectionGenerator implements TypedGenerator<String> {
 
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> injectionTypeGen = Generators.integers(1, 8);
-    private final TypedGenerator<String> baseTokenGen = Generators.fixedValues("Bearer token", "auth", "value", "token", "session");
-    private final TypedGenerator<String> injectedHeaderGen = Generators.fixedValues("X-Injected", "X-Forwarded-For", "X-Real-IP", "X-Admin", "Authorization");
-    private final TypedGenerator<String> maliciousValueGen = Generators.fixedValues("malicious", "evil=value", "admin", "bypass", "attack");
-    private final TypedGenerator<String> maliciousUrlGen = Generators.fixedValues("http://evil.com", "https://attacker.example", "//malicious.site", "javascript:alert(1)");
-    private final TypedGenerator<String> contentTypeGen = Generators.fixedValues("text/html", "text/javascript", "application/octet-stream", "image/svg+xml");
-    private final TypedGenerator<String> hostGen = Generators.fixedValues("evil.example.com", "attacker.com", "127.0.0.1", "localhost");
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> baseTokenSelector = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> injectedHeaderSelector = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> maliciousValueSelector = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> maliciousUrlSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> contentTypeSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> hostGeneratorSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> methodSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> pathInjectionSelector = Generators.integers(1, 4);
 
     @Override
     public String next() {
@@ -52,9 +55,9 @@ public class HTTPHeaderInjectionGenerator implements TypedGenerator<String> {
     }
 
     private String generateCrlfInjection() {
-        String baseToken = baseTokenGen.next();
-        String injectedHeader = injectedHeaderGen.next();
-        String maliciousValue = maliciousValueGen.next();
+        String baseToken = generateBaseToken();
+        String injectedHeader = generateInjectedHeader();
+        String maliciousValue = generateMaliciousValue();
 
         // Vary the line ending type
         String lineEnding = switch (Generators.integers(1, 3).next()) {
@@ -68,23 +71,23 @@ public class HTTPHeaderInjectionGenerator implements TypedGenerator<String> {
     }
 
     private String generateHttpResponseSplitting() {
-        String baseToken = baseTokenGen.next();
+        String baseToken = generateBaseToken();
         return baseToken + "\r\n\r\nHTTP/1.1 200 OK";
     }
 
     private String generateNullByteInjection() {
-        String baseToken = baseTokenGen.next();
+        String baseToken = generateBaseToken();
         return baseToken + "\u0000admin";
     }
 
     private String generateCookieInjection() {
-        String baseToken = baseTokenGen.next();
-        String maliciousValue = maliciousValueGen.next();
+        String baseToken = generateBaseToken();
+        String maliciousValue = generateMaliciousValue();
         return baseToken + "\r\nSet-Cookie: " + maliciousValue;
     }
 
     private String generateSecurityHeaderOverride() {
-        String baseToken = baseTokenGen.next();
+        String baseToken = generateBaseToken();
 
         return switch (Generators.integers(1, 4).next()) {
             case 1 -> baseToken + "\r\nX-Frame-Options: DENY";
@@ -96,8 +99,8 @@ public class HTTPHeaderInjectionGenerator implements TypedGenerator<String> {
     }
 
     private String generateContentTypeOverride() {
-        String baseToken = baseTokenGen.next();
-        String contentType = contentTypeGen.next();
+        String baseToken = generateBaseToken();
+        String contentType = generateContentType();
 
         return switch (Generators.integers(1, 3).next()) {
             case 1 -> baseToken + "\r\nContent-Type: " + contentType;
@@ -108,21 +111,105 @@ public class HTTPHeaderInjectionGenerator implements TypedGenerator<String> {
     }
 
     private String generateHttpRequestSmuggling() {
-        String baseToken = baseTokenGen.next();
-        String method = Generators.fixedValues("GET", "POST", "PUT", "DELETE").next();
-        String path = Generators.fixedValues("/admin", "/api", "/config", "/users").next();
+        String baseToken = generateBaseToken();
+        String method = generateMethod();
+        String path = generatePathInjection();
 
         return baseToken + "\n\n" + method + " " + path + " HTTP/1.1";
     }
 
     private String generateHostHeaderInjection() {
-        String baseToken = baseTokenGen.next();
-        String host = hostGen.next();
+        String baseToken = generateBaseToken();
+        String host = generateHostHeader();
 
         return switch (Generators.integers(1, 2).next()) {
             case 1 -> baseToken + "\r\nHost: " + host;
-            case 2 -> baseToken + "\r\nLocation: " + maliciousUrlGen.next();
+            case 2 -> baseToken + "\r\nLocation: " + generateMaliciousUrl();
             default -> baseToken + "\r\nHost: " + host;
+        };
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateBaseToken() {
+        return switch (baseTokenSelector.next()) {
+            case 1 -> "Bearer token";
+            case 2 -> "auth";
+            case 3 -> "value";
+            case 4 -> "token";
+            case 5 -> "session";
+            default -> "Bearer token";
+        };
+    }
+
+    private String generateInjectedHeader() {
+        return switch (injectedHeaderSelector.next()) {
+            case 1 -> "X-Injected";
+            case 2 -> "X-Forwarded-For";
+            case 3 -> "X-Real-IP";
+            case 4 -> "X-Admin";
+            case 5 -> "Authorization";
+            default -> "X-Injected";
+        };
+    }
+
+    private String generateMaliciousValue() {
+        return switch (maliciousValueSelector.next()) {
+            case 1 -> "malicious";
+            case 2 -> "evil=value";
+            case 3 -> "admin";
+            case 4 -> "bypass";
+            case 5 -> "attack";
+            default -> "malicious";
+        };
+    }
+
+    private String generateMaliciousUrl() {
+        return switch (maliciousUrlSelector.next()) {
+            case 1 -> "http://evil.com";
+            case 2 -> "https://attacker.example";
+            case 3 -> "//malicious.site";
+            case 4 -> "javascript:alert(1)";
+            default -> "http://evil.com";
+        };
+    }
+
+    private String generateContentType() {
+        return switch (contentTypeSelector.next()) {
+            case 1 -> "text/html";
+            case 2 -> "text/javascript";
+            case 3 -> "application/octet-stream";
+            case 4 -> "image/svg+xml";
+            default -> "text/html";
+        };
+    }
+
+    private String generateHostHeader() {
+        return switch (hostGeneratorSelector.next()) {
+            case 1 -> "evil.example.com";
+            case 2 -> "attacker.com";
+            case 3 -> "127.0.0.1";
+            case 4 -> "localhost";
+            default -> "evil.example.com";
+        };
+    }
+
+    private String generateMethod() {
+        return switch (methodSelector.next()) {
+            case 1 -> "GET";
+            case 2 -> "POST";
+            case 3 -> "PUT";
+            case 4 -> "DELETE";
+            default -> "GET";
+        };
+    }
+
+    private String generatePathInjection() {
+        return switch (pathInjectionSelector.next()) {
+            case 1 -> "/admin";
+            case 2 -> "/api";
+            case 3 -> "/config";
+            case 4 -> "/users";
+            default -> "/admin";
         };
     }
 

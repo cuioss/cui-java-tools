@@ -21,6 +21,8 @@ import de.cuioss.test.generator.TypedGenerator;
 /**
  * Generates HTML entity encoding attack patterns for security testing.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * <p>
  * This generator creates attack patterns that use HTML entity encoding
  * to bypass security controls that might not properly decode HTML entities
@@ -58,55 +60,50 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class HtmlEntityEncodingAttackGenerator implements TypedGenerator<String> {
 
-    private final TypedGenerator<String> basePatternGen = Generators.fixedValues(
-            "../",
-            "..\\",
-            "../../",
-            "../../../",
-            "<script>",
-            "</script>",
-            "<img src=x>",
-            "javascript:",
-            "data:",
-            "on",  // For event handlers like onclick
-            "\"",
-            "'",
-            "&",
-            "<",
-            ">",
-            "/",
-            "\\",
-            "."
-    );
-
-    private final TypedGenerator<String> encodingTypeGen = Generators.fixedValues(
-            "named_entities",           // Standard named HTML entities
-            "decimal_numeric",          // Decimal numeric entities  
-            "hex_numeric",              // Hexadecimal numeric entities
-            "hex_mixed_case",           // Mixed case hex entities
-            "leading_zeros",            // Numeric entities with leading zeros
-            "malformed_entities",       // Malformed entities for robustness
-            "nested_entities",          // Nested entity encoding
-            "path_traversal_entities",  // Path traversal with entities
-            "xss_entities"              // XSS payloads with entity encoding
-    );
+    // QI-6: Converted from fixedValues() to dynamic generation
+    private final TypedGenerator<Integer> basePatternSelector = Generators.integers(1, 18);
+    private final TypedGenerator<Integer> encodingTypeSelector = Generators.integers(1, 9);
 
     @Override
     public String next() {
-        String basePattern = basePatternGen.next();
-        String encodingType = encodingTypeGen.next();
+        int encodingType = encodingTypeSelector.next();
 
         return switch (encodingType) {
-            case "named_entities" -> applyNamedEntities(basePattern);
-            case "decimal_numeric" -> applyDecimalNumericEntities(basePattern);
-            case "hex_numeric" -> applyHexNumericEntities(basePattern);
-            case "hex_mixed_case" -> applyMixedCaseHexEntities(basePattern);
-            case "leading_zeros" -> applyLeadingZeroEntities(basePattern);
-            case "malformed_entities" -> applyMalformedEntities(basePattern);
-            case "nested_entities" -> applyNestedEntities(basePattern);
-            case "path_traversal_entities" -> createPathTraversalWithEntities();
-            case "xss_entities" -> createXssWithEntities();
-            default -> basePattern;
+            case 1 -> applyNamedEntities(generateBasePattern());
+            case 2 -> applyDecimalNumericEntities(generateBasePattern());
+            case 3 -> applyHexNumericEntities(generateBasePattern());
+            case 4 -> applyMixedCaseHexEntities(generateBasePattern());
+            case 5 -> applyLeadingZeroEntities(generateBasePattern());
+            case 6 -> applyMalformedEntities(generateBasePattern());
+            case 7 -> applyNestedEntities(generateBasePattern());
+            case 8 -> createPathTraversalWithEntities();
+            case 9 -> createXssWithEntities();
+            default -> generateBasePattern();
+        };
+    }
+
+    // QI-6: Dynamic base pattern generation
+    private String generateBasePattern() {
+        return switch (basePatternSelector.next()) {
+            case 1 -> "../";
+            case 2 -> "..\\";
+            case 3 -> "../../";
+            case 4 -> "../../../";
+            case 5 -> "<script>";
+            case 6 -> "</script>";
+            case 7 -> "<img src=x>";
+            case 8 -> "javascript:";
+            case 9 -> "data:";
+            case 10 -> "on";  // For event handlers like onclick
+            case 11 -> "\"";
+            case 12 -> "'";
+            case 13 -> "&";
+            case 14 -> "<";
+            case 15 -> ">";
+            case 16 -> "/";
+            case 17 -> "\\";
+            case 18 -> ".";
+            default -> "../";
         };
     }
 
@@ -246,33 +243,33 @@ public class HtmlEntityEncodingAttackGenerator implements TypedGenerator<String>
      * Create path traversal attacks with HTML entities.
      */
     private String createPathTraversalWithEntities() {
-        String[] pathTraversalPatterns = {
-                "&#46;&#46;&#47;",                    // ../
-                "&#x2E;&#x2E;&#x2F;",                // ../
-                "&#46;&#46;&#92;",                   // ..\
-                "&#46;&#46;&#47;&#46;&#46;&#47;",    // ../../
-                "&#x2E;&#x2E;&#x5C;",                // ..\
-                "&amp;#46;&amp;#46;&amp;#47;",      // Nested encoding
-                "&#00046;&#00046;&#00047;",          // With leading zeros
+        return switch (Generators.integers(1, 7).next()) {
+            case 1 -> "&#46;&#46;&#47;";                    // ../
+            case 2 -> "&#x2E;&#x2E;&#x2F;";                // ../
+            case 3 -> "&#46;&#46;&#92;";                   // ..\
+            case 4 -> "&#46;&#46;&#47;&#46;&#46;&#47;";    // ../../
+            case 5 -> "&#x2E;&#x2E;&#x5C;";                // ..\
+            case 6 -> "&amp;#46;&amp;#46;&amp;#47;";      // Nested encoding
+            case 7 -> "&#00046;&#00046;&#00047;";          // With leading zeros
+            default -> "&#46;&#46;&#47;";                    // ../
         };
-        return pathTraversalPatterns[pathTraversalPatterns.length % pathTraversalPatterns.length];
     }
 
     /**
      * Create XSS attacks with HTML entity encoding.
      */
     private String createXssWithEntities() {
-        String[] xssPatterns = {
-                "&lt;script&gt;alert&#40;1&#41;&lt;&#47;script&gt;",
-                "&lt;img src&#61;x onerror&#61;alert&#40;1&#41;&gt;",
-                "javascript&#58;alert&#40;1&#41;",
-                "&lt;svg onload&#61;alert&#40;1&#41;&gt;",
-                "&quot;&gt;&lt;script&gt;alert&#40;document.cookie&#41;&lt;&#47;script&gt;",
-                "&lt;iframe src&#61;javascript&#58;alert&#40;1&#41;&gt;",
-                "&#39;&gt;&lt;script&gt;alert&#40;String.fromCharCode&#40;88,83,83&#41;&#41;&lt;&#47;script&gt;",
-                "&lt;body onload&#61;&quot;alert&#40;&#39;XSS&#39;&#41;&quot;&gt;"
+        return switch (Generators.integers(1, 8).next()) {
+            case 1 -> "&lt;script&gt;alert&#40;1&#41;&lt;&#47;script&gt;";
+            case 2 -> "&lt;img src&#61;x onerror&#61;alert&#40;1&#41;&gt;";
+            case 3 -> "javascript&#58;alert&#40;1&#41;";
+            case 4 -> "&lt;svg onload&#61;alert&#40;1&#41;&gt;";
+            case 5 -> "&quot;&gt;&lt;script&gt;alert&#40;document.cookie&#41;&lt;&#47;script&gt;";
+            case 6 -> "&lt;iframe src&#61;javascript&#58;alert&#40;1&#41;&gt;";
+            case 7 -> "&#39;&gt;&lt;script&gt;alert&#40;String.fromCharCode&#40;88,83,83&#41;&#41;&lt;&#47;script&gt;";
+            case 8 -> "&lt;body onload&#61;&quot;alert&#40;&#39;XSS&#39;&#41;&quot;&gt;";
+            default -> "&lt;script&gt;alert&#40;1&#41;&lt;&#47;script&gt;";
         };
-        return xssPatterns[xssPatterns.length % xssPatterns.length];
     }
 
     @Override

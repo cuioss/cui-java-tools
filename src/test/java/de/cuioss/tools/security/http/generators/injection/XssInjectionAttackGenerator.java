@@ -68,13 +68,14 @@ import de.cuioss.test.generator.TypedGenerator;
 public class XssInjectionAttackGenerator implements TypedGenerator<String> {
 
     // Core generation parameters
-    private final TypedGenerator<String> pathCategories = Generators.fixedValues("/admin", "/user", "/api", "/config");
-    private final TypedGenerator<String> functionCategories = Generators.fixedValues("search", "login", "upload", "comments");
-    private final TypedGenerator<String> traversalCategories = Generators.fixedValues("../", "../../", "/etc", "/proc");
-    private final TypedGenerator<String> systemCategories = Generators.fixedValues("passwd", "environ", "shadow", "config");
-    private final TypedGenerator<String> attackCategories = Generators.fixedValues("script", "event", "protocol", "attribute");
-    private final TypedGenerator<String> technicalCategories = Generators.fixedValues("css", "svg", "uri", "bypass");
-    private final TypedGenerator<String> contextCategories = Generators.fixedValues("polyglot", "mutation", "template", "dom");
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> pathCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> functionCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> traversalCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> systemCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> attackCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> technicalCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> contextCategorySelector = Generators.integers(1, 4);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
     private final TypedGenerator<Integer> stringSize = Generators.integers(3, 10);
     private final TypedGenerator<Integer> attackTypeSelector = Generators.integers(0, 13);
@@ -558,42 +559,92 @@ public class XssInjectionAttackGenerator implements TypedGenerator<String> {
     }
 
     private String generatePathPattern() {
-        String basePath = pathCategories.next();
+        String basePath = generatePathCategory();
         if (contextSelector.next()) {
-            String function = functionCategories.next();
+            String function = generateFunctionCategory();
             return basePath + "/" + function;
         }
         return basePath;
     }
 
     private String generateFunctionPattern() {
-        String function = functionCategories.next();
+        String function = generateFunctionCategory();
         if (contextSelector.next()) {
-            String path = pathCategories.next();
+            String path = generatePathCategory();
             return path + "/" + function;
         }
         return "/" + function;
     }
 
     private String generateTraversalPattern() {
-        String traversal = traversalCategories.next();
+        String traversal = generateTraversalCategory();
         if (contextSelector.next()) {
-            String system = systemCategories.next();
+            String system = generateSystemCategory();
             return traversal + system;
         }
         return traversal;
     }
 
     private String generateSystemPattern() {
-        String system = systemCategories.next();
+        String system = generateSystemCategory();
         String prefix = contextSelector.next() ? "/etc/" : "/proc/self/";
         return prefix + system;
     }
 
     private String generateCustomPattern() {
-        String category = Generators.fixedValues("dashboard", "settings", "profile").next();
+        String category = generateUICategory();
         String suffix = contextSelector.next() ? "/" + Generators.letterStrings(3, 8).next() : "";
         return "/" + category + suffix;
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generatePathCategory() {
+        return switch (pathCategorySelector.next()) {
+            case 1 -> "/admin";
+            case 2 -> "/user";
+            case 3 -> "/api";
+            case 4 -> "/config";
+            default -> "/admin";
+        };
+    }
+
+    private String generateFunctionCategory() {
+        return switch (functionCategorySelector.next()) {
+            case 1 -> "search";
+            case 2 -> "login";
+            case 3 -> "upload";
+            case 4 -> "comments";
+            default -> "search";
+        };
+    }
+
+    private String generateTraversalCategory() {
+        return switch (traversalCategorySelector.next()) {
+            case 1 -> "../";
+            case 2 -> "../../";
+            case 3 -> "/etc";
+            case 4 -> "/proc";
+            default -> "../";
+        };
+    }
+
+    private String generateSystemCategory() {
+        return switch (systemCategorySelector.next()) {
+            case 1 -> "passwd";
+            case 2 -> "environ";
+            case 3 -> "shadow";
+            case 4 -> "config";
+            default -> "passwd";
+        };
+    }
+
+    private String generateUICategory() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "dashboard";
+            case 2 -> "settings";
+            case 3 -> "profile";
+            default -> "dashboard";
+        };
     }
 
     @Override

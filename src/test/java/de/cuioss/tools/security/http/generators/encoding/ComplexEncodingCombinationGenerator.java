@@ -30,7 +30,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> complexityTypeGen = Generators.integers(1, 6);
     private final TypedGenerator<Integer> basePathSelector = Generators.integers(1, 6);
-    private final TypedGenerator<String> targetGen = Generators.fixedValues("admin/config", "etc/passwd", "admin", "root", "config");
+    private final TypedGenerator<Integer> targetSelector = Generators.integers(1, 5);
     private final TypedGenerator<Integer> depthGen = Generators.integers(2, 5);
     private final TypedGenerator<Boolean> useWindowsStyleGen = Generators.booleans();
     private final TypedGenerator<Boolean> mixedCaseGen = Generators.booleans();
@@ -50,7 +50,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     private String generateMixedSingleDoubleEncoding() {
         String basePath = generateBasePath();
-        String target = targetGen.next();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + basePath + "%2F");
@@ -70,7 +70,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     private String generateUtf8OverlongCombination() {
         String basePath = generateBasePath();
-        String target = targetGen.next();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder();
@@ -91,7 +91,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     private String generateWindowsMixedEncoding() {
         String basePath = generateBasePath();
-        String target = targetGen.next();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + basePath);
@@ -110,7 +110,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateTripleEncodingCombination() {
-        String target = targetGen.next();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder();
@@ -131,7 +131,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     private String generateComplexPathEncoding() {
         String basePath = generateBasePath();
-        String target = targetGen.next();
+        String target = generateTarget();
         boolean useWindows = useWindowsStyleGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + basePath + "%2F");
@@ -151,7 +151,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     private String generateDeepTraversalEncoding() {
         String basePath = generateBasePath();
-        String target = targetGen.next();
+        String target = generateTarget();
 
         StringBuilder pattern = new StringBuilder("/" + basePath + "%2F");
 
@@ -178,6 +178,18 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
             case 5 -> "backup";
             case 6 -> "config";
             default -> "api";
+        };
+    }
+
+    // QI-6: Dynamic generation helper method
+    private String generateTarget() {
+        return switch (targetSelector.next()) {
+            case 1 -> "admin/config";
+            case 2 -> "etc/passwd";
+            case 3 -> "admin";
+            case 4 -> "root";
+            case 5 -> "config";
+            default -> "admin/config";
         };
     }
 

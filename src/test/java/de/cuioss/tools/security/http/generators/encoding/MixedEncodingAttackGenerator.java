@@ -58,11 +58,11 @@ import java.util.Base64;
  */
 public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
 
-    // QI-6: Dynamic generation components
+    // QI-6: Dynamic generation components - fully converted from fixedValues()
     private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 7);
     private final TypedGenerator<Integer> depthGen = Generators.integers(2, 6);
-    private final TypedGenerator<String> scriptTagGen = Generators.fixedValues("script", "iframe", "object", "embed");
-    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript", "data", "vbscript", "file");
+    private final TypedGenerator<Integer> scriptTagSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> protocolSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 7);
 
     @Override
@@ -105,12 +105,12 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
     }
 
     private String generateScriptPattern() {
-        String tag = scriptTagGen.next();
+        String tag = generateScriptTag();
         return "<" + tag + ">";
     }
 
     private String generateProtocolPattern() {
-        String protocol = protocolGen.next();
+        String protocol = generateProtocol();
         return protocol + ":";
     }
 
@@ -246,6 +246,27 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
                 .replace("/", "%2F")             // Uppercase percent encoding
                 .replace("\\", "%5c")            // Lowercase percent encoding
                 .replace(":", "%3A");            // Uppercase percent encoding
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateScriptTag() {
+        return switch (scriptTagSelector.next()) {
+            case 1 -> "script";
+            case 2 -> "iframe";
+            case 3 -> "object";
+            case 4 -> "embed";
+            default -> "script";
+        };
+    }
+
+    private String generateProtocol() {
+        return switch (protocolSelector.next()) {
+            case 1 -> "javascript";
+            case 2 -> "data";
+            case 3 -> "vbscript";
+            case 4 -> "file";
+            default -> "javascript";
+        };
     }
 
     @Override

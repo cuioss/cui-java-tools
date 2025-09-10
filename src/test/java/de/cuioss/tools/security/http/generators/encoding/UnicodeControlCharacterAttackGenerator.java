@@ -67,15 +67,15 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class UnicodeControlCharacterAttackGenerator implements TypedGenerator<String> {
 
-    // QI-6: Dynamic generation components
+    // QI-6: Dynamic generation components - fully converted from fixedValues()
     private final TypedGenerator<Integer> basePatternTypeGen = Generators.integers(1, 6);
     private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 12);
-    private final TypedGenerator<String> traversalGen = Generators.fixedValues("../", "..\\", "../../", "../../../");
-    private final TypedGenerator<String> scriptGen = Generators.fixedValues("<script>", "<iframe>", "<img>", "<svg>");
-    private final TypedGenerator<String> protocolGen = Generators.fixedValues("javascript:", "data:", "file:", "vbscript:");
-    private final TypedGenerator<String> systemGen = Generators.fixedValues("admin", "root", "config", "system");
-    private final TypedGenerator<String> pathGen = Generators.fixedValues("/etc/passwd", "/windows/system32", "/proc/self", "/var/log");
-    private final TypedGenerator<String> commandGen = Generators.fixedValues("cmd.exe", "shell", "bash", "powershell");
+    private final TypedGenerator<Integer> traversalSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> scriptSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> protocolSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> systemSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> pathSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> commandSelector = Generators.integers(1, 4);
 
     @Override
     public String next() {
@@ -101,13 +101,13 @@ public class UnicodeControlCharacterAttackGenerator implements TypedGenerator<St
 
     private String generateBasePattern() {
         return switch (basePatternTypeGen.next()) {
-            case 1 -> traversalGen.next();
-            case 2 -> scriptGen.next();
-            case 3 -> protocolGen.next();
-            case 4 -> systemGen.next();
-            case 5 -> pathGen.next();
-            case 6 -> commandGen.next();
-            default -> traversalGen.next();
+            case 1 -> generateTraversalPattern();
+            case 2 -> generateScriptTag();
+            case 3 -> generateProtocol();
+            case 4 -> generateSystemTarget();
+            case 5 -> generateSystemPath();
+            case 6 -> generateCommand();
+            default -> generateTraversalPattern();
         };
     }
 
@@ -447,6 +447,67 @@ public class UnicodeControlCharacterAttackGenerator implements TypedGenerator<St
     private boolean isBidirectionalControl(char c) {
         return c == '\u202C' || c == '\u202D' || c == '\u202E' ||
                 c == '\u200E' || c == '\u200F' || c == '\u061C';
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateTraversalPattern() {
+        return switch (traversalSelector.next()) {
+            case 1 -> "../";
+            case 2 -> "..\\";
+            case 3 -> "../../";
+            case 4 -> "../../../";
+            default -> "../";
+        };
+    }
+
+    private String generateScriptTag() {
+        return switch (scriptSelector.next()) {
+            case 1 -> "<script>";
+            case 2 -> "<iframe>";
+            case 3 -> "<img>";
+            case 4 -> "<svg>";
+            default -> "<script>";
+        };
+    }
+
+    private String generateProtocol() {
+        return switch (protocolSelector.next()) {
+            case 1 -> "javascript:";
+            case 2 -> "data:";
+            case 3 -> "file:";
+            case 4 -> "vbscript:";
+            default -> "javascript:";
+        };
+    }
+
+    private String generateSystemTarget() {
+        return switch (systemSelector.next()) {
+            case 1 -> "admin";
+            case 2 -> "root";
+            case 3 -> "config";
+            case 4 -> "system";
+            default -> "admin";
+        };
+    }
+
+    private String generateSystemPath() {
+        return switch (pathSelector.next()) {
+            case 1 -> "/etc/passwd";
+            case 2 -> "/windows/system32";
+            case 3 -> "/proc/self";
+            case 4 -> "/var/log";
+            default -> "/etc/passwd";
+        };
+    }
+
+    private String generateCommand() {
+        return switch (commandSelector.next()) {
+            case 1 -> "cmd.exe";
+            case 2 -> "shell";
+            case 3 -> "bash";
+            case 4 -> "powershell";
+            default -> "cmd.exe";
+        };
     }
 
     @Override

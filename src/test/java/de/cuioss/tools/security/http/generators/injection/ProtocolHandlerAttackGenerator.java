@@ -50,8 +50,8 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> attackCategoryGen = Generators.integers(1, 17);
-    private final TypedGenerator<String> hostGen = Generators.fixedValues("evil.com", "malicious.com", "attacker.com", "evil.site", "malicious.host", "evil.domain");
-    private final TypedGenerator<String> pathGen = Generators.fixedValues("../../../etc/passwd", "/../../admin/config", "/../etc/hosts", "/../../sensitive", "/../admin", "/../../config");
+    private final TypedGenerator<Integer> hostSelector = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> pathSelector = Generators.integers(1, 6);
 
     @Override
     public String next() {
@@ -79,7 +79,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateJavaScriptProtocolAttack() {
         int type = Generators.integers(1, 6).next();
-        String path = pathGen.next();
+        String path = generatePath();
 
         return switch (type) {
             case 1 -> "javascript:alert('XSS')" + path;
@@ -94,7 +94,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateDataUriExploitation() {
         int type = Generators.integers(1, 6).next();
-        String path = pathGen.next();
+        String path = generatePath();
 
         return switch (type) {
             case 1 -> "data:text/html,<script>alert('XSS')</script>" + path;
@@ -125,8 +125,8 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateCustomProtocolSchemes() {
         int type = Generators.integers(1, 6).next();
-        String host = hostGen.next();
-        String path = pathGen.next();
+        String host = generateHost();
+        String path = generatePath();
 
         return switch (type) {
             case 1 -> "custom://" + host + path;
@@ -141,7 +141,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolConfusionAttacks() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://javascript:alert('XSS')@" + host + "/../../../etc/passwd";
@@ -155,7 +155,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolInjection() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://" + host + "#javascript:alert('XSS')/../../../etc/passwd";
@@ -169,7 +169,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateMalformedProtocolSchemes() {
         int type = Generators.integers(1, 6).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "ht tp://" + host + "/../../../etc/passwd";
@@ -198,7 +198,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolWithSpecialCharacters() {
         int type = Generators.integers(1, 6).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http\u0001://" + host + "/../../../etc/passwd";
@@ -213,7 +213,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateDoubleProtocolSchemes() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://http://" + host + "/../../../etc/passwd";
@@ -227,7 +227,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolWithAuthBypass() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://admin:password@" + host + "/../../../etc/passwd";
@@ -241,7 +241,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolWithPortManipulation() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://" + host + ":0/../../../etc/passwd";
@@ -255,7 +255,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateNestedProtocolAttacks() {
         int type = Generators.integers(1, 4).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://" + host + "/redirect?url=javascript:alert('XSS')/../etc/passwd";
@@ -268,7 +268,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolWithPathTraversal() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://" + host + "/../../../etc/passwd";
@@ -282,8 +282,8 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolHandlerExploitation() {
         int type = Generators.integers(1, 6).next();
-        String host = hostGen.next();
-        String path = pathGen.next();
+        String host = generateHost();
+        String path = generatePath();
 
         return switch (type) {
             case 1 -> "gopher://" + host + path;
@@ -298,7 +298,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolWithFragmentManipulation() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "http://" + host + "#/../../../etc/passwd";
@@ -312,7 +312,7 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
 
     private String generateProtocolEncodingAttacks() {
         int type = Generators.integers(1, 5).next();
-        String host = hostGen.next();
+        String host = generateHost();
 
         return switch (type) {
             case 1 -> "%68%74%74%70://" + host + "/../../../etc/passwd";
@@ -321,6 +321,30 @@ public class ProtocolHandlerAttackGenerator implements TypedGenerator<String> {
             case 4 -> "%66%69%6c%65:///../../../etc/passwd";
             case 5 -> "h%74%74p://" + host + "/../../sensitive";
             default -> "%68%74%74%70://" + host + "/../../../etc/passwd";
+        };
+    }
+
+    private String generateHost() {
+        return switch (hostSelector.next()) {
+            case 1 -> "evil.com";
+            case 2 -> "malicious.com";
+            case 3 -> "attacker.com";
+            case 4 -> "evil.site";
+            case 5 -> "malicious.host";
+            case 6 -> "evil.domain";
+            default -> "evil.com";
+        };
+    }
+
+    private String generatePath() {
+        return switch (pathSelector.next()) {
+            case 1 -> "../../../etc/passwd";
+            case 2 -> "/../../admin/config";
+            case 3 -> "/../etc/hosts";
+            case 4 -> "/../../sensitive";
+            case 5 -> "/../admin";
+            case 6 -> "/../../config";
+            default -> "../../../etc/passwd";
         };
     }
 

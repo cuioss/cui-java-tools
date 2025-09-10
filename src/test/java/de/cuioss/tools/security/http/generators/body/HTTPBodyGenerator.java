@@ -22,6 +22,8 @@ import de.cuioss.tools.security.http.data.HTTPBody;
 /**
  * Generates HTTPBody records for testing purposes.
  * 
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ * 
  * IMPROVED: Uses dynamic generation instead of hardcoded arrays for better randomness
  * and unpredictability while maintaining attack effectiveness.
  * 
@@ -29,16 +31,16 @@ import de.cuioss.tools.security.http.data.HTTPBody;
  */
 public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
 
-    // Core generation parameters - QI-6: Converted simple test data to dynamic generation
+    // Core generation parameters - QI-6: Converted from fixedValues() to dynamic generation
     private final TypedGenerator<Integer> contentTypeGenerator = Generators.integers(0, 3);
     private final TypedGenerator<Integer> userNameSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> roleSelector = Generators.integers(1, 4);
-    private final TypedGenerator<String> scriptTypes = Generators.fixedValues("alert", "confirm", "prompt");
-    private final TypedGenerator<String> xssCategories = Generators.fixedValues("XSS", "1", "cookie");
-    private final TypedGenerator<String> sqlTypes = Generators.fixedValues("DROP", "DELETE", "INSERT");
-    private final TypedGenerator<String> tableCategories = Generators.fixedValues("users", "admin", "accounts", "sessions");
-    private final TypedGenerator<String> systemPathTypes = Generators.fixedValues("etc", "windows", "boot", "shadow");
-    private final TypedGenerator<String> domainCategories = Generators.fixedValues("evil", "attacker", "malicious");
+    private final TypedGenerator<Integer> scriptTypeSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> xssCategorySelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> sqlTypeSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> tableCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> systemPathTypeSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> domainCategorySelector = Generators.integers(1, 3);
     private final TypedGenerator<Integer> dataSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> encodingSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 5);
@@ -381,59 +383,181 @@ public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
     private String generateScriptName() {
         int scriptType = Generators.integers(0, 2).next();
         return switch (scriptType) {
-            case 0 -> scriptTypes.next();
-            case 1 -> Generators.fixedValues("eval", "setTimeout", "setInterval").next();
+            case 0 -> generateScriptType();
+            case 1 -> generateAsyncScriptType();
             case 2 -> "func" + Generators.integers(1, 99).next();
-            default -> scriptTypes.next();
+            default -> generateScriptType();
+        };
+    }
+
+    private String generateScriptType() {
+        return switch (scriptTypeSelector.next()) {
+            case 1 -> "alert";
+            case 2 -> "confirm";
+            case 3 -> "prompt";
+            default -> "alert";
+        };
+    }
+
+    private String generateAsyncScriptType() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "eval";
+            case 2 -> "setTimeout";
+            case 3 -> "setInterval";
+            default -> "eval";
         };
     }
 
     private String generateXSSPayload() {
         int xssType = Generators.integers(0, 3).next();
         return switch (xssType) {
-            case 0 -> xssCategories.next();
-            case 1 -> "document." + Generators.fixedValues("cookie", "domain", "location").next();
+            case 0 -> generateXSSCategory();
+            case 1 -> "document." + generateDocumentProperty();
             case 2 -> String.valueOf(Generators.integers(1, 9999).next());
             case 3 -> "'" + Generators.letterStrings(3, 8).next() + "'";
-            default -> xssCategories.next();
+            default -> generateXSSCategory();
+        };
+    }
+
+    private String generateXSSCategory() {
+        return switch (xssCategorySelector.next()) {
+            case 1 -> "XSS";
+            case 2 -> "1";
+            case 3 -> "cookie";
+            default -> "XSS";
+        };
+    }
+
+    private String generateDocumentProperty() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "cookie";
+            case 2 -> "domain";
+            case 3 -> "location";
+            default -> "cookie";
         };
     }
 
     private String generateSQLCommand() {
-        String type = sqlTypes.next();
+        String type = generateSQLType();
         return switch (type) {
             case "DROP" -> "DROP TABLE";
             case "DELETE" -> "DELETE FROM";
             case "INSERT" -> "INSERT INTO";
-            default -> type + " " + Generators.fixedValues("FROM", "INTO", "TABLE").next();
+            default -> type + " " + generateSQLKeyword();
+        };
+    }
+
+    private String generateSQLType() {
+        return switch (sqlTypeSelector.next()) {
+            case 1 -> "DROP";
+            case 2 -> "DELETE";
+            case 3 -> "INSERT";
+            default -> "DROP";
+        };
+    }
+
+    private String generateSQLKeyword() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "FROM";
+            case 2 -> "INTO";
+            case 3 -> "TABLE";
+            default -> "FROM";
         };
     }
 
     private String generateTableName() {
         int tableType = Generators.integers(0, 2).next();
         return switch (tableType) {
-            case 0 -> tableCategories.next();
+            case 0 -> generateTableCategory();
             case 1 -> "tbl_" + Generators.letterStrings(4, 8).next().toLowerCase();
-            case 2 -> Generators.fixedValues("data", "config", "logs", "temp").next();
-            default -> tableCategories.next();
+            case 2 -> generateSystemTableName();
+            default -> generateTableCategory();
+        };
+    }
+
+    private String generateTableCategory() {
+        return switch (tableCategorySelector.next()) {
+            case 1 -> "users";
+            case 2 -> "admin";
+            case 3 -> "accounts";
+            case 4 -> "sessions";
+            default -> "users";
+        };
+    }
+
+    private String generateSystemTableName() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "data";
+            case 2 -> "config";
+            case 3 -> "logs";
+            case 4 -> "temp";
+            default -> "data";
         };
     }
 
     private String generateSystemFile() {
-        String pathType = systemPathTypes.next();
+        String pathType = generateSystemPathType();
         return switch (pathType) {
-            case "etc" -> "etc/" + Generators.fixedValues("passwd", "shadow", "hosts", "config").next();
-            case "windows" -> "windows/" + Generators.fixedValues("win.ini", "system.ini", "boot.ini").next();
+            case "etc" -> "etc/" + generateEtcFile();
+            case "windows" -> "windows/" + generateWindowsFile();
             case "boot" -> "boot.ini";
             case "shadow" -> "etc/shadow";
             default -> pathType + "/" + Generators.letterStrings(3, 8).next();
         };
     }
 
+    private String generateSystemPathType() {
+        return switch (systemPathTypeSelector.next()) {
+            case 1 -> "etc";
+            case 2 -> "windows";
+            case 3 -> "boot";
+            case 4 -> "shadow";
+            default -> "etc";
+        };
+    }
+
+    private String generateEtcFile() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "passwd";
+            case 2 -> "shadow";
+            case 3 -> "hosts";
+            case 4 -> "config";
+            default -> "passwd";
+        };
+    }
+
+    private String generateWindowsFile() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "win.ini";
+            case 2 -> "system.ini";
+            case 3 -> "boot.ini";
+            default -> "win.ini";
+        };
+    }
+
     private String generateMaliciousDomain() {
-        String category = domainCategories.next();
-        String tld = Generators.fixedValues("com", "net", "org", "xyz").next();
+        String category = generateDomainCategory();
+        String tld = generateTopLevelDomain();
         return category + "." + tld;
+    }
+
+    private String generateDomainCategory() {
+        return switch (domainCategorySelector.next()) {
+            case 1 -> "evil";
+            case 2 -> "attacker";
+            case 3 -> "malicious";
+            default -> "evil";
+        };
+    }
+
+    private String generateTopLevelDomain() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "com";
+            case 2 -> "net";
+            case 3 -> "org";
+            case 4 -> "xyz";
+            default -> "com";
+        };
     }
 
     private String generateExploitTerm() {

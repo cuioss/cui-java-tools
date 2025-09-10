@@ -37,11 +37,12 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
 
     // Core generation parameters
     private final TypedGenerator<Integer> cookieTypeGenerator = Generators.integers(0, 3);
-    private final TypedGenerator<String> sessionCategories = Generators.fixedValues("JSESSION", "session", "auth", "csrf");
-    private final TypedGenerator<String> tokenCategories = Generators.fixedValues("token", "id", "key", "hash");
-    private final TypedGenerator<String> contextCategories = Generators.fixedValues("user", "cart", "device", "track");
-    private final TypedGenerator<String> domainCategories = Generators.fixedValues("example", "test", "demo");
-    private final TypedGenerator<String> pathCategories = Generators.fixedValues("admin", "api", "user", "files");
+    // QI-6: Dynamic generation components
+    private final TypedGenerator<Integer> sessionSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> tokenSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> contextSelector2 = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> domainSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> pathSelectorCookie = Generators.integers(1, 4);
     private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
     private final TypedGenerator<Integer> longStringSize = Generators.integers(100, 200);
     private final TypedGenerator<Integer> veryLongStringSize = Generators.integers(5000, 8000);
@@ -117,8 +118,8 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
         return switch (nameType) {
             case 0 -> "JSESSIONID";
             case 1 -> "session_id";
-            case 2 -> sessionCategories.next() + "ID";
-            case 3 -> sessionCategories.next() + "_" + tokenCategories.next();
+            case 2 -> generateSessionCategory() + "ID";
+            case 3 -> generateSessionCategory() + "_" + generateTokenCategory();
             default -> "JSESSIONID";
         };
     }
@@ -129,14 +130,14 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
             case 0 -> "auth_token";
             case 1 -> "csrf_token";
             case 2 -> "user_id";
-            case 3 -> contextCategories.next() + "_" + tokenCategories.next();
-            case 4 -> sessionCategories.next() + "_" + tokenCategories.next();
+            case 3 -> generateContextCategory() + "_" + generateTokenCategory();
+            case 4 -> generateSessionCategory() + "_" + generateTokenCategory();
             default -> "auth_token";
         };
     }
 
     private String generateContextName() {
-        String context = contextCategories.next();
+        String context = generateContextCategory();
         String suffix = generateDataSuffix();
         return context + "_" + suffix;
     }
@@ -172,7 +173,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
             case 3 -> "login";
             default -> "tracking";
         };
-        return prefix + "_" + (contextSelector.next() ? "me" : tokenCategories.next());
+        return prefix + "_" + (contextSelector.next() ? "me" : generateTokenCategory());
     }
 
     private String generateSpecialCookieName() {
@@ -253,7 +254,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
     }
 
     private String generateSessionValue() {
-        String prefix = contextCategories.next();
+        String prefix = generateContextCategory();
         int number = Generators.integers(10000, 99999).next();
         // Ensure we sometimes generate the exact pattern the tests expect
         if (contextSelector.next()) {
@@ -321,7 +322,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
     }
 
     private String generateContextValue() {
-        String context = contextCategories.next();
+        String context = generateContextCategory();
         String suffix = Generators.letterStrings(6, 10).next().toLowerCase();
         return context + "_" + suffix;
     }
@@ -521,9 +522,9 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
     private String generateDomain() {
         int domainType = Generators.integers(0, 2).next();
         return switch (domainType) {
-            case 0 -> domainCategories.next() + ".com";
-            case 1 -> domainCategories.next() + ".org";
-            case 2 -> domainCategories.next() + ".net";
+            case 0 -> generateDomainCategory() + ".com";
+            case 1 -> generateDomainCategory() + ".org";
+            case 2 -> generateDomainCategory() + ".net";
             default -> "example.com";
         };
     }
@@ -532,10 +533,10 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
         int pathType = Generators.integers(0, 4).next();
         return switch (pathType) {
             case 0 -> "/";
-            case 1 -> "/" + pathCategories.next();
-            case 2 -> "/" + pathCategories.next() + "/" + pathCategories.next();
-            case 3 -> "/" + pathCategories.next() + "/files";
-            case 4 -> "/" + pathCategories.next() + "/data";
+            case 1 -> "/" + generatePathCategoryForCookie();
+            case 2 -> "/" + generatePathCategoryForCookie() + "/" + generatePathCategoryForCookie();
+            case 3 -> "/" + generatePathCategoryForCookie() + "/files";
+            case 4 -> "/" + generatePathCategoryForCookie() + "/data";
             default -> "/";
         };
     }
@@ -608,6 +609,56 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
             case 2 -> "Domain="; // Incomplete attribute
             case 3 -> "=; Path=/"; // Missing attribute name
             default -> "Domain=; Path=";
+        };
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateSessionCategory() {
+        return switch (sessionSelector.next()) {
+            case 1 -> "JSESSION";
+            case 2 -> "session";
+            case 3 -> "auth";
+            case 4 -> "csrf";
+            default -> "JSESSION";
+        };
+    }
+
+    private String generateTokenCategory() {
+        return switch (tokenSelector.next()) {
+            case 1 -> "token";
+            case 2 -> "id";
+            case 3 -> "key";
+            case 4 -> "hash";
+            default -> "token";
+        };
+    }
+
+    private String generateContextCategory() {
+        return switch (contextSelector2.next()) {
+            case 1 -> "user";
+            case 2 -> "cart";
+            case 3 -> "device";
+            case 4 -> "track";
+            default -> "user";
+        };
+    }
+
+    private String generateDomainCategory() {
+        return switch (domainSelector.next()) {
+            case 1 -> "example";
+            case 2 -> "test";
+            case 3 -> "demo";
+            default -> "example";
+        };
+    }
+
+    private String generatePathCategoryForCookie() {
+        return switch (pathSelectorCookie.next()) {
+            case 1 -> "admin";
+            case 2 -> "api";
+            case 3 -> "user";
+            case 4 -> "files";
+            default -> "admin";
         };
     }
 
