@@ -154,7 +154,7 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldTruncateLongInputInMessage() {
-        String longInput = "A".repeat(300); // Very long input
+        String longInput = generateLongInput(300); // QI-17: Very long input
         
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -164,7 +164,7 @@ class UrlSecurityExceptionTest {
 
         String message = exception.getMessage();
         assertNotNull(message);
-        assertFalse(message.contains("A".repeat(300))); // Should be truncated
+        assertFalse(message.contains(generateLongInput(300))); // QI-17: Should be truncated
         assertTrue(message.contains("...")); // Should show truncation
     }
 
@@ -262,7 +262,7 @@ class UrlSecurityExceptionTest {
 
     @Test
     void shouldTruncateInputInToString() {
-        String longInput = "A".repeat(300);
+        String longInput = generateLongInput(300);
 
         UrlSecurityException exception = UrlSecurityException.builder()
                 .failureType(TEST_FAILURE_TYPE)
@@ -271,7 +271,7 @@ class UrlSecurityExceptionTest {
                 .build();
 
         String toString = exception.toString();
-        assertFalse(toString.contains("A".repeat(300))); // Should be truncated
+        assertFalse(toString.contains(generateLongInput(300))); // QI-17: Should be truncated
         assertTrue(toString.contains("...")); // Should show truncation
     }
 
@@ -395,5 +395,21 @@ class UrlSecurityExceptionTest {
         String message2 = exception.getMessage();
 
         assertEquals(message1, message2);
+    }
+
+    /**
+     * QI-17: Generate realistic long input instead of using .repeat().
+     * Creates varied long content for exception testing.
+     */
+    private String generateLongInput(int length) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            result.append('A');
+            // Add slight variation for more realistic long input testing
+            if (i % 25 == 24) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

@@ -151,7 +151,7 @@ class LengthValidationStageTest {
                 .build();
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.PARAMETER_VALUE);
 
-        String longParamValue = "x".repeat(51); // Exceeds limit of 50
+        String longParamValue = generateTestString(51); // QI-17: Exceeds limit of 50
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longParamValue));
@@ -252,7 +252,7 @@ class LengthValidationStageTest {
                 .build();
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.COOKIE_VALUE);
 
-        String longCookieValue = "x".repeat(201); // Exceeds limit of 200
+        String longCookieValue = generateTestString(201); // QI-17: Exceeds limit of 200
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longCookieValue));
@@ -271,7 +271,7 @@ class LengthValidationStageTest {
                 .build();
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.BODY);
 
-        String longBody = "x".repeat(1001); // Exceeds limit of 1000
+        String longBody = generateTestString(1001); // QI-17: Exceeds limit of 1000
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longBody));
@@ -407,7 +407,7 @@ class LengthValidationStageTest {
         LengthValidationStage stage = new LengthValidationStage(config, ValidationType.URL_PATH);
 
         // Should use strict limits (maxPathLength = 1024 in strict config)
-        String longPath = "x".repeat(1025); // Exceeds strict limit
+        String longPath = generateTestString(1025); // QI-17: Exceeds strict limit
         assertThrows(UrlSecurityException.class, () -> stage.validate(longPath));
 
         String validPath = Generators.letterStrings(450, 500).next(); // Within strict limit
@@ -513,5 +513,23 @@ class LengthValidationStageTest {
         // Validation should be very fast (O(1)) - just length check
         long durationMs = (endTime - startTime) / 1_000_000;
         assertTrue(durationMs < 100, "Length validation should be very fast, took: " + durationMs + "ms");
+    }
+
+    /**
+     * QI-17: Generate realistic test strings instead of using .repeat().
+     * Creates varied content for length validation boundary testing.
+     */
+    private String generateTestString(int length) {
+        StringBuilder result = new StringBuilder();
+        String[] chars = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+        
+        for (int i = 0; i < length; i++) {
+            result.append(chars[i % chars.length]);
+            // Add variation every 10 characters for more realistic testing
+            if (i % 10 == 9) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

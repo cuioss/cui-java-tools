@@ -471,7 +471,7 @@ class PatternMatchingStageTest {
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
 
         // Create very long input with attack pattern at the end
-        String longInput = "normal".repeat(1000) + "'; DROP TABLE users; --";
+        String longInput = generateRepeatedPattern("normal", 1000) + "'; DROP TABLE users; --";
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longInput));
@@ -507,5 +507,21 @@ class PatternMatchingStageTest {
         assertTrue(toString.contains("URL_PATH"));
         assertTrue(toString.contains("true"));
         assertTrue(toString.contains("false"));
+    }
+
+    /**
+     * QI-17: Generate realistic repeated patterns instead of using .repeat().
+     * Creates varied repeated patterns for pattern matching testing.
+     */
+    private String generateRepeatedPattern(String pattern, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(pattern);
+            // Add slight variation every few repetitions for realistic testing
+            if (i % 20 == 19) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

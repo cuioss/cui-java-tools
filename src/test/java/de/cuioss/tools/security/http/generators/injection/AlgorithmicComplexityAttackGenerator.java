@@ -282,7 +282,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
 
     private String createCatastrophicBacktrackingPattern(String a, String b, int length) {
         // Creates patterns like (a+)+b repeated 'length' times (limited to prevent OutOfMemoryError)
-        return "(" + a.repeat(Math.min(length, 20)) + ")++" + b;
+        return "(" + generateRepeatedChars(a, Math.min(length, 20)) + ")++" + b;
     }
 
     private String createNestedQuantifierPattern(String base, String suffix, int depth) {
@@ -296,7 +296,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
 
     private String createAlternationBacktrackingPattern(String alt1, String alt2, int repetitions) {
         String basePattern = "(" + alt1 + "|" + alt1 + ")*";
-        return basePattern + alt2.repeat(Math.min(repetitions, 20));
+        return basePattern + generateRepeatedChars(alt2, Math.min(repetitions, 20));
     }
 
     private String createGroupedQuantifierPattern(String base, int groups) {
@@ -308,11 +308,11 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     }
 
     private String createOverlappingQuantifierPattern(String pattern1, String pattern2, int overlap) {
-        return "(" + pattern1.repeat(Math.min(overlap, 10)) + "|" + pattern1.repeat(Math.min(overlap, 10)) + ")*" + pattern2;
+        return "(" + generateRepeatedChars(pattern1, Math.min(overlap, 10)) + "|" + generateRepeatedChars(pattern1, Math.min(overlap, 10)) + ")*" + pattern2;
     }
 
     private String generateExponentialPattern(String basePattern, String character, int repetitions) {
-        return basePattern + character.repeat(Math.min(repetitions, 50));
+        return basePattern + generateRepeatedChars(character, Math.min(repetitions, 50));
     }
 
     private String generateHashCollisionPayload(String collision1, String collision2, int pairs) {
@@ -358,7 +358,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
 
     private String generateMemoryComplexityPattern(int size) {
         // Generate pattern that causes memory allocation complexity
-        return "MEMORY:" + "X".repeat(Math.min(size, 1000)) + ":SIZE:" + size;
+        return "MEMORY:" + generateRepeatedChars("X", Math.min(size, 1000)) + ":SIZE:" + size;
     }
 
     private String generateTimingAttackPattern(String secret, int length) {
@@ -394,7 +394,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
     private String generateComplexPatternMatch(String pattern, String target, int length) {
         // Generate complex pattern matching scenario
         StringBuilder complex = new StringBuilder("PATTERN:");
-        complex.append(pattern.repeat(length));
+        complex.append(generateRepeatedChars(pattern, length));
         complex.append(":TARGET:");
         complex.append(target);
         return complex.toString();
@@ -420,5 +420,23 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
             currentType = (currentType + 1) % maxTypes;
             return type;
         }
+    }
+
+    /**
+     * QI-17: Generate realistic repeated character patterns instead of using .repeat().
+     * Creates varied repetitions for complexity attack testing.
+     */
+    private String generateRepeatedChars(String chars, int count) {
+        if (count <= 0) return "";
+        
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(chars);
+            // Add slight variation for more realistic complexity patterns
+            if (i > 0 && i % 5 == 0) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }

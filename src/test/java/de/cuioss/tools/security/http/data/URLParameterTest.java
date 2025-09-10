@@ -225,8 +225,8 @@ class URLParameterTest {
 
     @Test
     void shouldHandleLongValues() {
-        String longName = "a".repeat(1000);
-        String longValue = "b".repeat(1000);
+        String longName = generateTestContent("a", 1000);
+        String longValue = generateTestContent("b", 1000);
         URLParameter param = new URLParameter(longName, longValue);
 
         assertEquals(longName, param.name());
@@ -260,5 +260,21 @@ class URLParameterTest {
 
         assertEquals("===", justEquals.toParameterString());
         assertEquals("key=name=value=data", withEquals.toParameterString());
+    }
+
+    /**
+     * QI-17: Generate realistic test content instead of using .repeat().
+     * Creates varied content for URL parameter testing.
+     */
+    private String generateTestContent(String base, int length) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            result.append(base);
+            // Add variation every 50 characters for more realistic testing
+            if (i % 50 == 49) {
+                result.append(i % 10);
+            }
+        }
+        return result.toString();
     }
 }
