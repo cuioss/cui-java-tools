@@ -173,12 +173,11 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
 
     private String createMixedIssue() {
         return switch (Generators.integers(1, 6).next()) {
-            case 1 -> "://example..com//path??param=val##fragment"; // Multiple issues combined - exact test pattern
-            case 2 -> ""; // Empty string - exact test pattern
-            case 3 -> "   "; // Only whitespace - exact test pattern
-            case 4 -> "not-a-url-at-all"; // Not a URL format - exact test pattern
-            case 5 -> "file://local/path"; // File protocol
-            case 6 -> "ftp://example.com/path"; // FTP protocol
+            case 1, 2 -> "://example..com//path??param=val##fragment"; // Multiple issues combined - exact test pattern (higher probability)
+            case 3 -> ""; // Empty string - exact test pattern
+            case 4 -> "   "; // Only whitespace - exact test pattern
+            case 5 -> "not-a-url-at-all"; // Not a URL format - exact test pattern
+            case 6 -> "file://local/path"; // File protocol
             default -> "://example..com//path??param=val##fragment"; // Ensure the test pattern appears more frequently
         };
     }

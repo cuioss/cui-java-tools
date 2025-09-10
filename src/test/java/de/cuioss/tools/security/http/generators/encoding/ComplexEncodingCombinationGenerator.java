@@ -29,7 +29,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> complexityTypeGen = Generators.integers(1, 6);
-    private final TypedGenerator<String> basePathGen = Generators.fixedValues("api", "files", "data", "system", "backup", "config");
+    private final TypedGenerator<Integer> basePathSelector = Generators.integers(1, 6);
     private final TypedGenerator<String> targetGen = Generators.fixedValues("admin/config", "etc/passwd", "admin", "root", "config");
     private final TypedGenerator<Integer> depthGen = Generators.integers(2, 5);
     private final TypedGenerator<Boolean> useWindowsStyleGen = Generators.booleans();
@@ -49,7 +49,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateMixedSingleDoubleEncoding() {
-        String basePath = basePathGen.next();
+        String basePath = generateBasePath();
         String target = targetGen.next();
         int depth = depthGen.next();
 
@@ -69,7 +69,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateUtf8OverlongCombination() {
-        String basePath = basePathGen.next();
+        String basePath = generateBasePath();
         String target = targetGen.next();
         int depth = depthGen.next();
 
@@ -90,7 +90,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateWindowsMixedEncoding() {
-        String basePath = basePathGen.next();
+        String basePath = generateBasePath();
         String target = targetGen.next();
         int depth = depthGen.next();
 
@@ -130,7 +130,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateComplexPathEncoding() {
-        String basePath = basePathGen.next();
+        String basePath = generateBasePath();
         String target = targetGen.next();
         boolean useWindows = useWindowsStyleGen.next();
 
@@ -150,7 +150,7 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
     }
 
     private String generateDeepTraversalEncoding() {
-        String basePath = basePathGen.next();
+        String basePath = generateBasePath();
         String target = targetGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + basePath + "%2F");
@@ -167,6 +167,18 @@ public class ComplexEncodingCombinationGenerator implements TypedGenerator<Strin
 
         pattern.append(target.replace("/", "%2F"));
         return pattern.toString();
+    }
+
+    private String generateBasePath() {
+        return switch (basePathSelector.next()) {
+            case 1 -> "api";
+            case 2 -> "files";
+            case 3 -> "data";
+            case 4 -> "system";
+            case 5 -> "backup";
+            case 6 -> "config";
+            default -> "api";
+        };
     }
 
     @Override

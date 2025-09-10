@@ -520,7 +520,7 @@ class OWASPTop10AttackTest {
     private String generatePathPadding(int length) {
         StringBuilder result = new StringBuilder();
         String[] chars = {"A", "B", "C", "D", "E", "F"};
-        
+
         for (int i = 0; i < length; i++) {
             result.append(chars[i % chars.length]);
             // Add digit variation every few characters

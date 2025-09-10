@@ -206,16 +206,16 @@ class URLPathValidationPipelineTest {
     private String generatePathContent(int length) {
         StringBuilder result = new StringBuilder();
         String[] segments = {"api", "data", "user", "admin", "config", "test"};
-        
+
         for (int i = 0; i < length; i++) {
             if (i % 20 == 0 && i > 0) {
                 result.append("/").append(segments[i / 20 % segments.length]);
                 i += segments[i / 20 % segments.length].length() + 1;
                 if (i >= length) break;
             }
-            result.append((char)('a' + (i % 26)));
+            result.append((char) ('a' + (i % 26)));
         }
-        
+
         // Ensure exact length
         String generated = result.toString();
         return generated.length() > length ? generated.substring(0, length) : generated;

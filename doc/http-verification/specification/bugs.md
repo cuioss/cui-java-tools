@@ -161,7 +161,7 @@ Generators using fixedValues() for simple test data where dynamic generation imp
 
 **Solution Implemented**: Systematic conversion from `fixedValues()` to algorithmic generation using integer selectors and switch statements.
 
-### Completed Conversions (15/47):
+### Completed Conversions (17/47):
 - [x] **ValidHTTPBodyContentGenerator**: 8 dynamic content types (JSON, XML, form data, etc.)
 - [x] **MixedEncodingAttackGenerator**: 7 encoding combination patterns with dynamic base pattern generation
 - [x] **UnicodeNormalizationAttackGenerator**: 9 Unicode normalization attack types with algorithmic base patterns
@@ -182,6 +182,8 @@ Generators using fixedValues() for simple test data where dynamic generation imp
 - [x] **ValidURLPathGenerator**: Complete conversion from 20 hardcoded paths to 7 dynamic path generation categories
 - [x] **ValidURLParameterGenerator**: Complete conversion from 10 fixedValues() arrays to dynamic parameter generation
 - [x] **UnicodeNormalizationAttackGenerator**: Completed remaining fixedValues() conversions for script elements, protocols, and functions
+- [x] **InvalidHTTPHeaderNameGenerator**: Converted from 4 hardcoded control character patterns to dynamic generation with 4 injection types
+- [x] **ValidURLParameterStringGenerator**: Converted from 20 hardcoded parameter values to 8 dynamic categories (numeric, encoded text, IDs, etc.)
 
 ### Established QI-6 Pattern:
 ```java
@@ -200,7 +202,7 @@ public String next() {
 ```
 
 ### Remaining Work:
-- [ ] **32 generators** still need systematic QI-6 conversion following established pattern
+- [ ] **30 generators** still need systematic QI-6 conversion following established pattern
 - [x] **Path traversal generators converted**: PathTraversalURLGenerator, PathTraversalParameterGenerator (+ PathTraversalGenerator already done)
 - [x] **XSS generator already converted**: XssInjectionAttackGenerator uses dynamic algorithmic generation
 - [ ] Focus on remaining encoding and injection generators

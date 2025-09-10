@@ -32,7 +32,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 8);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 6);
-    private final TypedGenerator<String> pathPrefixGen = Generators.fixedValues("api", "admin", "files", "config", "upload", "backup");
+    private final TypedGenerator<Integer> pathPrefixSelector = Generators.integers(1, 6);
     private final TypedGenerator<String> targetFileGen = Generators.fixedValues("passwd", "shadow", "config", "cmd.exe", "win.ini", "hosts");
 
     @Override
@@ -113,7 +113,7 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
     }
 
     private String generateLegitimatePathDoubleEncoding() {
-        String prefix = pathPrefixGen.next();
+        String prefix = generatePathPrefix();
         return "/" + prefix + "%252e%252e%252f%252e%252e%252f" + targetFileGen.next();
     }
 
@@ -126,6 +126,18 @@ public class DoubleEncodingAttackGenerator implements TypedGenerator<String> {
         }
 
         return pattern.toString();
+    }
+
+    private String generatePathPrefix() {
+        return switch (pathPrefixSelector.next()) {
+            case 1 -> "api";
+            case 2 -> "admin";
+            case 3 -> "files";
+            case 4 -> "config";
+            case 5 -> "upload";
+            case 6 -> "backup";
+            default -> "api";
+        };
     }
 
     @Override

@@ -448,7 +448,7 @@ class HtmlEntityEncodingAttackTest {
     private String generateHtmlEntitySequence(int length) {
         StringBuilder sequence = new StringBuilder();
         String[] entities = {"&#46;", "&#47;", "&#60;", "&#62;", "&#39;", "&#34;"};
-        
+
         for (int i = 0; i < length; i++) {
             sequence.append(entities[i % entities.length]);
         }
@@ -462,7 +462,7 @@ class HtmlEntityEncodingAttackTest {
     private String generateMixedEntitySequence(int length) {
         StringBuilder sequence = new StringBuilder();
         String[] patterns = {"&#x2E;&#x2E;&#x2F;", "&#46;&#46;&#47;", "&#x3C;&#x3E;", "&#60;&#62;"};
-        
+
         for (int i = 0; i < length; i++) {
             sequence.append(patterns[i % patterns.length]);
         }
@@ -476,7 +476,7 @@ class HtmlEntityEncodingAttackTest {
     private String generatePaddingDigits(int length) {
         StringBuilder digits = new StringBuilder();
         String[] digitPatterns = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        
+
         for (int i = 0; i < length; i++) {
             digits.append(digitPatterns[i % digitPatterns.length]);
         }

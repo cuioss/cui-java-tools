@@ -428,7 +428,7 @@ public class AlgorithmicComplexityAttackGenerator implements TypedGenerator<Stri
      */
     private String generateRepeatedChars(String chars, int count) {
         if (count <= 0) return "";
-        
+
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < count; i++) {
             result.append(chars);

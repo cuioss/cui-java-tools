@@ -27,14 +27,11 @@ import de.cuioss.test.generator.TypedGenerator;
 public class InvalidHTTPHeaderNameGenerator implements TypedGenerator<String> {
 
     private final TypedGenerator<Integer> invalidTypeSelector = Generators.integers(1, 4);
-    private final TypedGenerator<String> baseHeaderNames = Generators.fixedValues(
-            "Authorization", "Content-Type", "Accept", "User-Agent", "Host", 
-            "Referer", "Cookie", "X-Custom", "Cache-Control"
-    );
+    private final TypedGenerator<Integer> baseHeaderSelector = Generators.integers(1, 9);
 
     @Override
     public String next() {
-        String baseName = baseHeaderNames.next();
+        String baseName = generateBaseHeaderName();
         return switch (invalidTypeSelector.next()) {
             case 1 -> generateCarriageReturnInjection(baseName);
             case 2 -> generateLineFeedInjection(baseName);
@@ -58,6 +55,21 @@ public class InvalidHTTPHeaderNameGenerator implements TypedGenerator<String> {
 
     private String generateNullByteInjection(String baseName) {
         return baseName + "\u0000" + "Injected";
+    }
+
+    private String generateBaseHeaderName() {
+        return switch (baseHeaderSelector.next()) {
+            case 1 -> "Authorization";
+            case 2 -> "Content-Type";
+            case 3 -> "Accept";
+            case 4 -> "User-Agent";
+            case 5 -> "Host";
+            case 6 -> "Referer";
+            case 7 -> "Cookie";
+            case 8 -> "X-Custom";
+            case 9 -> "Cache-Control";
+            default -> "Authorization";
+        };
     }
 
     @Override

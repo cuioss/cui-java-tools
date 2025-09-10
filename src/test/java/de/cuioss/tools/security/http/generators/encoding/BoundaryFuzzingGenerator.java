@@ -120,7 +120,7 @@ public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
     }
 
     private String generatePathSegmentPattern() {
-        int segments = Generators.integers(30, 50).next(); // Reasonable segment count
+        int segments = Generators.integers(50, 80).next(); // Increased to exceed 1000 chars
         StringBuilder pattern = new StringBuilder();
         for (int i = 0; i < segments; i++) {
             pattern.append("verylongpathsegment/");

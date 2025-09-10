@@ -27,19 +27,14 @@ import de.cuioss.test.generator.TypedGenerator;
  */
 public class ValidURLParameterStringGenerator implements TypedGenerator<String> {
 
+    // QI-6: Dynamic generation components - all seed-based, no internal state
     private final TypedGenerator<Integer> parameterTypeSelector = Generators.integers(1, 8);
-    private final TypedGenerator<String> words = Generators.fixedValues(
-            "product", "user", "order", "item", "data", "content", "info", "system"
-    );
-    private final TypedGenerator<String> formats = Generators.fixedValues(
-            "json", "xml", "csv", "pdf", "txt", "html"
-    );
-    private final TypedGenerator<String> languages = Generators.fixedValues(
-            "en", "de", "fr", "es", "it", "pt"
-    );
-    private final TypedGenerator<String> statuses = Generators.fixedValues(
-            "active", "inactive", "pending", "enabled", "disabled", "draft"
-    );
+    private final TypedGenerator<Integer> wordSelector = Generators.integers(1, 8);
+    private final TypedGenerator<Integer> formatSelector = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> languageSelector = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> statusSelector = Generators.integers(1, 6);
+    private final TypedGenerator<Integer> emailNameSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> emailDomainSelector = Generators.integers(1, 3);
 
     @Override
     public String next() {
@@ -62,15 +57,15 @@ public class ValidURLParameterStringGenerator implements TypedGenerator<String> 
     }
 
     private String generateEncodedText() {
-        return words.next() + "%20" + words.next(); // URL encoded space
+        return generateWord() + "%20" + generateWord(); // URL encoded space
     }
 
     private String generateSimpleText() {
-        return words.next();
+        return generateWord();
     }
 
     private String generateBooleanLike() {
-        return statuses.next();
+        return generateStatus();
     }
 
     private String generateTimestamp() {
@@ -85,9 +80,9 @@ public class ValidURLParameterStringGenerator implements TypedGenerator<String> 
     }
 
     private String generateEncodedEmail() {
-        TypedGenerator<String> names = Generators.fixedValues("john", "jane", "mike", "sara");
-        TypedGenerator<String> domains = Generators.fixedValues("example.com", "test.org", "demo.net");
-        return names.next() + "%40" + domains.next(); // URL encoded @
+        String name = generateEmailName();
+        String domain = generateEmailDomain();
+        return name + "%40" + domain; // URL encoded @
     }
 
     private String generatePhone() {
@@ -95,6 +90,75 @@ public class ValidURLParameterStringGenerator implements TypedGenerator<String> 
         TypedGenerator<Integer> exchange = Generators.integers(100, 999);
         TypedGenerator<Integer> number = Generators.integers(1000, 9999);
         return area.next() + "-" + exchange.next() + "-" + number.next();
+    }
+
+    private String generateWord() {
+        return switch (wordSelector.next()) {
+            case 1 -> "product";
+            case 2 -> "user";
+            case 3 -> "order";
+            case 4 -> "item";
+            case 5 -> "data";
+            case 6 -> "content";
+            case 7 -> "info";
+            case 8 -> "system";
+            default -> "product";
+        };
+    }
+
+    private String generateFormat() {
+        return switch (formatSelector.next()) {
+            case 1 -> "json";
+            case 2 -> "xml";
+            case 3 -> "csv";
+            case 4 -> "txt";
+            case 5 -> "pdf";
+            case 6 -> "html";
+            default -> "json";
+        };
+    }
+
+    private String generateLanguage() {
+        return switch (languageSelector.next()) {
+            case 1 -> "en";
+            case 2 -> "de";
+            case 3 -> "fr";
+            case 4 -> "es";
+            case 5 -> "it";
+            case 6 -> "pt";
+            default -> "en";
+        };
+    }
+
+    private String generateStatus() {
+        return switch (statusSelector.next()) {
+            case 1 -> "true";
+            case 2 -> "false";
+            case 3 -> "yes";
+            case 4 -> "no";
+            case 5 -> "on";
+            case 6 -> "off";
+            default -> "true";
+        };
+    }
+
+    private String generateEmailName() {
+        return switch (emailNameSelector.next()) {
+            case 1 -> "john";
+            case 2 -> "jane";
+            case 3 -> "mike";
+            case 4 -> "sara";
+            default -> "john";
+        };
+    }
+
+    private String generateEmailDomain() {
+        return switch (emailDomainSelector.next()) {
+            case 1 -> "example.com";
+            case 2 -> "test.org";
+            case 3 -> "demo.net";
+            default -> "example.com";
+        };
     }
 
     @Override

@@ -79,6 +79,7 @@ public class CookieGenerator implements TypedGenerator<Cookie> {
         if (callCounter % 50 == 26) return new Cookie("cookie\ttab", generateSafeValue(), generateAttributes());
         if (callCounter % 50 == 27) return new Cookie("cookie\nnewline", generateSafeValue(), generateAttributes());
         if (callCounter % 50 == 28) return new Cookie("cookie[bracket]", generateSafeValue(), generateAttributes());
+        if (callCounter % 50 == 29) return new Cookie("cookie;semicolon", generateSafeValue(), generateAttributes());
 
         int type = cookieTypeGenerator.next();
 

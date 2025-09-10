@@ -499,7 +499,7 @@ class HttpRequestSmugglingAttackTest {
     private String generateLongPath(int length) {
         StringBuilder path = new StringBuilder();
         String[] segments = {"admin", "data", "secret", "config", "api", "user"};
-        
+
         while (path.length() < length - 10) { // Leave room for final segment
             String segment = segments[path.length() % segments.length];
             path.append(segment);
@@ -507,12 +507,12 @@ class HttpRequestSmugglingAttackTest {
                 path.append("/");
             }
         }
-        
+
         // Fill remaining length with varied characters
         while (path.length() < length) {
             path.append("x");
         }
-        
+
         return path.toString();
     }
 }

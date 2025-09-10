@@ -532,15 +532,15 @@ class HomographAttackTest {
         StringBuilder sequence = new StringBuilder();
         // Diverse homograph characters instead of repeating single character
         String[] homographs = {
-            "\u0430", // Cyrillic small letter a 
-            "\u043E", // Cyrillic small letter o
-            "\u0440", // Cyrillic small letter p
-            "\u0441", // Cyrillic small letter c
-            "\u03B1", // Greek small letter alpha
-            "\uFF41", // Fullwidth latin small letter a
-            "\uFF4F"  // Fullwidth latin small letter o
+                "\u0430", // Cyrillic small letter a 
+                "\u043E", // Cyrillic small letter o
+                "\u0440", // Cyrillic small letter p
+                "\u0441", // Cyrillic small letter c
+                "\u03B1", // Greek small letter alpha
+                "\uFF41", // Fullwidth latin small letter a
+                "\uFF4F"  // Fullwidth latin small letter o
         };
-        
+
         for (int i = 0; i < length; i++) {
             sequence.append(homographs[i % homographs.length]);
         }

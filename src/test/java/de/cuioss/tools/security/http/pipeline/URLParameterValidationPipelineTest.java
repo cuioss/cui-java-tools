@@ -241,16 +241,16 @@ class URLParameterValidationPipelineTest {
     private String generateParameterValue(int length) {
         StringBuilder result = new StringBuilder();
         String[] values = {"value", "param", "data", "user", "id", "name"};
-        
+
         for (int i = 0; i < length; i++) {
             if (i % 30 == 0 && i > 0) {
                 result.append("_").append(values[i / 30 % values.length]).append("_");
                 i += values[i / 30 % values.length].length() + 2;
                 if (i >= length) break;
             }
-            result.append((char)('a' + (i % 26)));
+            result.append((char) ('a' + (i % 26)));
         }
-        
+
         // Ensure exact length
         String generated = result.toString();
         return generated.length() > length ? generated.substring(0, length) : generated;

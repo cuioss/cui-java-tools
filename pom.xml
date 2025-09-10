@@ -111,6 +111,7 @@
                             <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
                             <includes>
                                 <include>**/security/http/generators/**</include>
+                                <include>**/security/http/database/**</include>
                             </includes>
                             <excludes>
                                 <exclude>**/security/http/generators/**/*Test.class</exclude>

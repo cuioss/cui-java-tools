@@ -504,19 +504,19 @@ class URLLengthLimitAttackTest {
     void shouldBlockEncodingLengthAttacks() {
         String[] encodingAttacks = {
                 // QI-17: Fixed to test actual security limits with URL encoding (consider both raw and decoded lengths)
-                // URL encoding that tests realistic boundaries considering decoded size
-                "/api?data=" + generateEncodedParameterValue(400), // ~1200 chars total, 400 after decode (exceeds STRICT)
-                "/search/" + generateEncodedPath(350), // ~1050 chars total, 350 after decode (exceeds STRICT)
-                "/endpoint?param=" + generateEncodedParameterValue(700), // ~2100 chars total, 700 after decode
+                // URL encoding that tests realistic boundaries in raw encoded form
+                "/api?data=" + generateEncodedParameterValue(1000), // ~1000 chars in parameter (exceeds STRICT total)
+                "/search/" + generateEncodedPath(1030), // ~1030 chars in path (exceeds STRICT with prefix)
+                "/endpoint?param=" + generateEncodedParameterValue(1200), // ~1200 chars in parameter (exceeds STRICT)
                 
                 // Mixed encoding patterns testing boundaries
                 "/service/" + generateMixedEncodingPath(), // Mixed patterns testing path limits
-                "/handler?query=" + generateEncodedParameterValue(450), // ~1350 chars total, 450 after decode
+                "/handler?query=" + generateEncodedParameterValue(1100), // ~1100 chars in parameter (exceeds STRICT)
                 "/process/" + generateEncodedTraversalPattern(), // Encoded traversal testing path limits
                 
                 // Complex encoding patterns that test validation
                 "/resource?field=" + generateComplexEncodingValue(), // Complex encoding within limits
-                "/data#" + generateEncodedFragment(2800) // ~8400 chars total - exceeds LENIENT limit
+                "/data#" + generateEncodedFragment(1200) // ~1200 chars in fragment (exceeds STRICT)
         };
 
         for (String attack : encodingAttacks) {
@@ -745,13 +745,13 @@ class URLLengthLimitAttackTest {
         StringBuilder result = new StringBuilder();
         String[] components = {"folder", "subfolder", "subdir", "level"};
 
-        // Build path that's just over STRICT limit
-        for (int i = 0; i < 60; i++) {
+        // Build path that exceeds STRICT limit (1024) - need more iterations
+        for (int i = 0; i < 100; i++) {  // Increased iterations to ensure we exceed 1024
             String component = components[i % components.length];
             result.append(component).append("/");
 
-            // Stop when we reach target length just over STRICT (1024)
-            if (result.length() > 1000) break;
+            // Continue until we clearly exceed 1024 + buffer for suffix like "destination"
+            if (result.length() > 1035) break;  // 1024 + "destination" = 1035 minimum
         }
         return result.toString();
     }
@@ -923,18 +923,19 @@ class URLLengthLimitAttackTest {
      * @param decodedLength target length after decoding
      * @return URL-encoded path
      */
-    private String generateEncodedPath(int decodedLength) {
+    private String generateEncodedPath(int targetEncodedLength) {
         StringBuilder result = new StringBuilder();
-        String basePath = generatePath(decodedLength);
+        String[] pathSegments = {"api", "data", "service", "endpoint", "resource", "handler"};
 
-        // Encode some characters to simulate realistic encoding
-        for (int i = 0; i < basePath.length(); i++) {
-            char c = basePath.charAt(i);
-            if (c == '/' || i % 4 == 0) {
+        // Generate path that will exceed the limit in encoded form
+        while (result.length() < targetEncodedLength) {
+            String segment = pathSegments[result.length() % pathSegments.length];
+
+            // Encode each character to expand the length significantly
+            for (char c : segment.toCharArray()) {
                 result.append("%%%02X".formatted((int) c));
-            } else {
-                result.append(c);
             }
+            result.append("%2F"); // Encoded slash
         }
         return result.toString();
     }
@@ -947,11 +948,11 @@ class URLLengthLimitAttackTest {
         StringBuilder result = new StringBuilder();
         String[] segments = {"service", "api", "data"};
 
-        // Build path with mixed encoding up to reasonable length
-        for (int i = 0; i < 30; i++) {
+        // Build path with mixed encoding up to exceed maxPathLength(1024)
+        for (int i = 0; i < 100; i++) {
             String segment = segments[i % segments.length];
             result.append("%2F").append(segment); // Encoded slash + segment
-            if (result.length() > 1000) break; // Stop at reasonable length
+            if (result.length() > 1200) break; // Well over maxPathLength(1024) + prefix margin
         }
         return result.toString();
     }
@@ -964,9 +965,9 @@ class URLLengthLimitAttackTest {
         StringBuilder result = new StringBuilder();
 
         // Generate encoded traversal patterns that test limits
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 140; i++) {
             result.append("%2E%2E%2F"); // Encoded "../"
-            if (result.length() > 1200) break; // Stop just over STRICT limit
+            if (result.length() > 1040) break; // Stop just over STRICT limit
         }
         return result.toString();
     }
@@ -1028,8 +1029,8 @@ class URLLengthLimitAttackTest {
         StringBuilder result = new StringBuilder();
         String[] segments = {"a", "b", "c", "d", "e", "f"};
 
-        // Generate segments that approach STRICT path limit
-        while (result.length() < 950) { // Stay under STRICT limit (1024)
+        // Generate segments that exceed STRICT path limit (1024) with buffer for prefix/suffix
+        while (result.length() < 1200) { // Well exceed STRICT limit plus buffer for prefix/suffix
             String segment = segments[result.length() % segments.length];
             result.append(segment).append("/");
         }
@@ -1072,10 +1073,10 @@ class URLLengthLimitAttackTest {
     private String generateNestedSegments() {
         StringBuilder result = new StringBuilder();
 
-        // Generate nested structure within reasonable bounds
-        for (int i = 0; i < 80; i++) {
+        // Generate nested structure that exceeds STRICT path limit
+        for (int i = 0; i < 120; i++) {
             result.append("segment").append(hashBasedSelection(20)).append("/");
-            if (result.length() > 1000) break; // Stay reasonable
+            if (result.length() > 1040) break; // Exceed STRICT limit plus buffer for prefix
         }
         return result.toString();
     }
@@ -1216,10 +1217,10 @@ class URLLengthLimitAttackTest {
      */
     private String generatePaddingChars(int length) {
         if (length <= 0) return "";
-        
+
         StringBuilder padding = new StringBuilder();
         String[] chars = {"x", "y", "z", "a", "b", "c", "1", "2", "3"};
-        
+
         for (int i = 0; i < length; i++) {
             padding.append(chars[i % chars.length]);
         }

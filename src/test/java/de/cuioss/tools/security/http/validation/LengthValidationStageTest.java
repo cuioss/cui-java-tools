@@ -522,13 +522,9 @@ class LengthValidationStageTest {
     private String generateTestString(int length) {
         StringBuilder result = new StringBuilder();
         String[] chars = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
-        
+
         for (int i = 0; i < length; i++) {
             result.append(chars[i % chars.length]);
-            // Add variation every 10 characters for more realistic testing
-            if (i % 10 == 9) {
-                result.append(i % 10);
-            }
         }
         return result.toString();
     }
