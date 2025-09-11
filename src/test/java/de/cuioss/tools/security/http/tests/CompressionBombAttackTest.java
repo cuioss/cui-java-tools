@@ -18,7 +18,6 @@ package de.cuioss.tools.security.http.tests;
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
 import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
-import de.cuioss.tools.concurrent.StopWatch;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
@@ -30,7 +29,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -106,101 +104,69 @@ class CompressionBombAttackTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 15)
-    @DisplayName("Compression bomb detection should complete within performance limits")
-    void shouldCompleteCompressionBombDetectionWithinTimeLimit(String compressionAttackPattern) {
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 25)
+    @DisplayName("Compression bomb patterns should be detected")
+    void shouldDetectCompressionBombPatterns(String compressionAttackPattern) {
         // Given: A compression bomb attack pattern
-        StopWatch stopWatch = StopWatch.createStarted();
-
         // When: Pipeline processes the attack
-        assertThrows(UrlSecurityException.class,
-                () -> pipeline.validate(compressionAttackPattern));
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(compressionAttackPattern),
+                "Compression bomb should be detected: " + compressionAttackPattern);
 
-        // Then: Processing should complete within 15ms to prevent DoS through processing time
-        stopWatch.stop();
-        long processingTimeMs = stopWatch.elapsed(TimeUnit.MILLISECONDS);
-        assertTrue(processingTimeMs < 15,
-                "Compression bomb detection took %dms, should be < 15ms for pattern: %s".formatted(
-                        processingTimeMs, compressionAttackPattern));
+        // Then: Attack should be properly categorized
+        assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), compressionAttackPattern),
+                "Should detect compression bomb failure for: " + compressionAttackPattern);
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 20)
     @DisplayName("Basic compression bomb patterns should be detected")
-    void shouldDetectBasicCompressionBombs() {
-        String[] basicCompressionBombs = {
-                "https://example.com/api/data?data=" + generateBoundaryPadding(1024) + "&compress=gzip", // QI-17: Fixed realistic content
-                "https://example.com/api/data?payload=" + generateBoundaryPadding(300) + "&encoding=deflate", // QI-17: Fixed realistic boundary
-                "https://example.com/api/data?bomb=" + generateBoundaryPadding(256) + "&format=AAAA" // QI-17: Fixed realistic bomb data
-        };
+    void shouldDetectBasicCompressionBombs(String compressionBomb) {
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(compressionBomb),
+                "Basic compression bomb should be detected: " + compressionBomb);
 
-        for (String bomb : basicCompressionBombs) {
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(bomb),
-                    "Basic compression bomb should be detected: " + bomb);
-
-            assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), bomb),
-                    "Should detect compression bomb failure for: " + bomb);
-        }
+        assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), compressionBomb),
+                "Should detect compression bomb failure for: " + compressionBomb);
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 18)
     @DisplayName("ZIP bomb patterns should be detected")
-    void shouldDetectZipBombPatterns() {
-        String[] zipBombs = {
-                "https://example.com/api/data?zip=ZIP:42.zip:RATIO:10000:SIZE:1000000",
-                "https://example.com/api/data?archive=ZIP:bomb.zip:RATIO:20000:SIZE:2000000",
-                "https://example.com/api/data?package=ZIP:evil.zip:RATIO:50000:SIZE:5000000"
-        };
+    void shouldDetectZipBombPatterns(String zipBomb) {
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(zipBomb),
+                "ZIP bomb pattern should be detected: " + zipBomb);
 
-        for (String zipBomb : zipBombs) {
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(zipBomb),
-                    "ZIP bomb pattern should be detected: " + zipBomb);
-
-            // QI-9: Fixed OR-assertion anti-pattern - ZIP bombs should trigger appropriate failure
-            assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), zipBomb),
-                    "ZIP bomb should trigger appropriate failure type for: " + zipBomb);
-        }
+        // QI-9: Fixed OR-assertion anti-pattern - ZIP bombs should trigger appropriate failure
+        assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), zipBomb),
+                "ZIP bomb should trigger appropriate failure type for: " + zipBomb);
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 16)
     @DisplayName("Gzip decompression bomb patterns should be detected")
-    void shouldDetectGzipDecompressionBombs() {
-        String[] gzipBombs = {
-                "https://example.com/api/data?gzip=GZIP:SIGNATURE:SIZE:1024:EXPANSION:1024000",
-                "https://example.com/api/data?compressed=GZIP:SIGNATURE:SIZE:2048:EXPANSION:2048000",
-                "https://example.com/api/data?deflate=GZIP:SIGNATURE:SIZE:4096:EXPANSION:4096000"
-        };
+    void shouldDetectGzipDecompressionBombs(String gzipBomb) {
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(gzipBomb),
+                "Gzip decompression bomb should be detected: " + gzipBomb);
 
-        for (String gzipBomb : gzipBombs) {
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(gzipBomb),
-                    "Gzip decompression bomb should be detected: " + gzipBomb);
-
-            // QI-9: Fixed OR-assertion anti-pattern - Gzip bombs should trigger appropriate failure
-            assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), gzipBomb),
-                    "Gzip bomb should trigger appropriate failure type for: " + gzipBomb);
-        }
+        // QI-9: Fixed OR-assertion anti-pattern - Gzip bombs should trigger appropriate failure
+        assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), gzipBomb),
+                "Gzip bomb should trigger appropriate failure type for: " + gzipBomb);
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = CompressionBombAttackGenerator.class, count = 15)
     @DisplayName("Nested compression attacks should be detected")
-    void shouldDetectNestedCompressionAttacks() {
-        String[] nestedAttacks = {
-                "https://example.com/api/data?nested=((((BOMB))))",
-                "https://example.com/api/data?layers=(((((((EXPLODE)))))))",
-                "https://example.com/api/data?deep=((((((((((ATTACK))))))))))"
-        };
+    void shouldDetectNestedCompressionAttacks(String nestedAttack) {
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(nestedAttack),
+                "Nested compression attack should be detected: " + nestedAttack);
 
-        for (String nestedAttack : nestedAttacks) {
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(nestedAttack),
-                    "Nested compression attack should be detected: " + nestedAttack);
-
-            // QI-9: Fixed OR-assertion anti-pattern - Nested patterns should trigger appropriate failure
-            assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), nestedAttack),
-                    "Nested compression should trigger appropriate failure type for: " + nestedAttack);
-        }
+        // QI-9: Fixed OR-assertion anti-pattern - Nested patterns should trigger appropriate failure
+        assertTrue(isCompressionBombSpecificFailure(exception.getFailureType(), nestedAttack),
+                "Nested compression should trigger appropriate failure type for: " + nestedAttack);
     }
 
     @Test

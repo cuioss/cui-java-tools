@@ -173,97 +173,61 @@ class SqlInjectionAttackTest {
     }
 
     /**
-     * Test time-based blind SQL injection attacks.
+     * Test time-based blind SQL injection attacks using SqlInjectionAttackGenerator.
      * 
      * <p>
      * Tests SQL attacks that use time delays to extract information
-     * when no visible response differences are available.
+     * when no visible response differences are available. The generator
+     * includes time-based patterns for MySQL, PostgreSQL, MSSQL, Oracle,
+     * and conditional time delays.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = SqlInjectionAttackGenerator.class, count = 20)
     @DisplayName("Time-based blind SQL injections must be blocked")
-    void shouldBlockTimeBlindSqlInjections() {
-        String[] timeInjections = {
-                // MySQL time delays
-                "/delay?test='; SELECT SLEEP(5)--",
-                "/mysql?query=' AND SLEEP(5)--",
-                "/time?check=' OR SLEEP(5)--",
+    void shouldBlockTimeBlindSqlInjections(String sqlInjectionAttack) {
+        // Given: A time-based SQL injection attack from generator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // PostgreSQL time delays
-                "/postgres?test='; SELECT pg_sleep(5)--",
-                "/pg?query=' AND (SELECT pg_sleep(5))IS NULL--",
+        // When & Then: Time-based injection should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(sqlInjectionAttack),
+                "Time-based injection should be rejected: " + sanitizeForDisplay(sqlInjectionAttack));
 
-                // MSSQL time delays
-                "/mssql?test='; WAITFOR DELAY '00:00:05'--",
-                "/sqlserver?query=' AND (SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3)--",
-
-                // Oracle time delays
-                "/oracle?test='; SELECT dbms_lock.sleep(5) FROM dual--",
-                "/ora?query=' AND (SELECT dbms_pipe.receive_message(('a'),5) FROM dual) IS NULL--",
-
-                // Conditional time delays
-                "/conditional?test=' AND IF(ASCII(SUBSTRING(password,1,1))>96,SLEEP(5),0) FROM users WHERE username='admin'--",
-
-                // Heavy computation delays
-                "/heavy?query=' AND (SELECT * FROM (SELECT COUNT(*) FROM information_schema.columns A, information_schema.columns B))--"
-        };
-
-        for (String attack : timeInjections) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Time-based injection should be rejected: " + sanitizeForDisplay(attack));
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
-     * Test error-based SQL injection attacks.
+     * Test error-based SQL injection attacks using SqlInjectionAttackGenerator.
      * 
      * <p>
      * Tests SQL attacks that exploit database error messages to
-     * extract sensitive information from the database.
+     * extract sensitive information from the database. The generator
+     * includes error-based patterns for MySQL, PostgreSQL, MSSQL,
+     * division by zero, type conversion, and XML errors.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = SqlInjectionAttackGenerator.class, count = 25)
     @DisplayName("Error-based SQL injections must be blocked")
-    void shouldBlockErrorBasedSqlInjections() {
-        String[] errorInjections = {
-                // MySQL error-based extraction
-                "/mysql_error?test=' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--",
-                "/extract?query=' AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT password FROM users WHERE username='admin'),0x7e))--",
+    void shouldBlockErrorBasedSqlInjections(String sqlInjectionAttack) {
+        // Given: An error-based SQL injection attack from generator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // PostgreSQL error-based
-                "/postgres_error?test=' AND CAST((SELECT password FROM users WHERE username='admin') AS int)--",
+        // When & Then: Error-based injection should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(sqlInjectionAttack),
+                "Error-based injection should be rejected: " + sanitizeForDisplay(sqlInjectionAttack));
 
-                // MSSQL error-based
-                "/mssql_error?test=' AND CONVERT(INT,(SELECT password FROM users WHERE username='admin'))--",
-
-                // Division by zero errors
-                "/div_zero?test=' AND 1/0--",
-                "/zero?query=' AND 1/(SELECT 0)--",
-
-                // Type conversion errors
-                "/type_error?test=' AND 'a'=0--",
-                "/convert?query=' AND CONVERT(INT,@@version)--",
-
-                // XML errors
-                "/xml_error?test=' AND EXTRACTVALUE(0x0a,CONCAT(0x0a,(SELECT password FROM users WHERE username='admin')))--"
-        };
-
-        for (String attack : errorInjections) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Error-based injection should be rejected: " + sanitizeForDisplay(attack));
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**

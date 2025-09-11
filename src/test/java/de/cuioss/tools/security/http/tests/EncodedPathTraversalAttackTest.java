@@ -129,29 +129,20 @@ class EncodedPathTraversalAttackTest {
         assertEquals(complexPattern, exception.getOriginalInput(), "Should preserve original input");
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 20)
     @DisplayName("Should handle legitimate encoded characters correctly")
-    void shouldHandleLegitimateEncodedCharacters() {
-        String[] legitimatePatterns = {
-                "/api/users%40example.com",           // @ symbol encoded
-                "/files/document%20name.txt",         // space encoded
-                "/search?q=hello%2Bworld",            // + encoded in query
-                "/api/data%5B0%5D",                   // [0] array notation encoded
-                "/path/file%2Etxt",                   // Normal file.txt (note: this might be blocked by security rules)
-        };
-
+    void shouldHandleLegitimateEncodedCharacters(String legitimatePattern) {
         // Note: Some of these might still be blocked by security rules if they contain
         // patterns that could be dangerous even in legitimate contexts
-        for (String pattern : legitimatePatterns) {
-            try {
-                String result = pipeline.validate(pattern);
-                // If validation passes, result should not be null/empty
-                assertNotNull(result, "Validated result should not be null for: " + pattern);
-            } catch (UrlSecurityException e) {
-                // Some legitimate patterns might be blocked by strict security rules
-                // This is acceptable for security-first approach
-                // Logging disabled for test performance
-            }
+        try {
+            String result = pipeline.validate(legitimatePattern);
+            // If validation passes, result should not be null/empty
+            assertNotNull(result, "Validated result should not be null for: " + legitimatePattern);
+        } catch (UrlSecurityException e) {
+            // Some legitimate patterns might be blocked by strict security rules
+            // This is acceptable for security-first approach
+            // Logging disabled for test performance
         }
     }
 
@@ -175,25 +166,14 @@ class EncodedPathTraversalAttackTest {
         }
     }
 
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = BoundaryFuzzingGenerator.class, count = 15)
     @DisplayName("Should handle edge cases in encoded patterns")
-    void shouldHandleEdgeCases() {
-        String[] edgeCases = {
-                "%",                                  // Incomplete encoding
-                "%2",                                 // Incomplete encoding
-                "%2G",                                // Invalid hex character
-                "%ZZ",                                // Invalid hex characters
-                "%%2E",                               // Double %
-                "%2E%",                               // Trailing %
-                "%2E%G",                              // Invalid after valid
-        };
-
-        for (String edgeCase : edgeCases) {
-            // These should either be rejected for invalid encoding or for security reasons
-            assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(edgeCase),
-                    "Edge case should be rejected: " + edgeCase);
-        }
+    void shouldHandleEdgeCases(String edgeCase) {
+        // These should either be rejected for invalid encoding or for security reasons
+        assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(edgeCase),
+                "Edge case should be rejected: " + edgeCase);
     }
 
     @Test

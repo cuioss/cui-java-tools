@@ -138,56 +138,24 @@ class MixedEncodingAttackTest {
      * in real-world attacks or security research.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = MixedEncodingAttackGenerator.class, count = 30)
     @DisplayName("Known mixed encoding attack vectors should be rejected")
-    void shouldRejectKnownMixedEncodingAttacks() {
-        String[] knownAttacks = {
-                // URL + HTML entity combinations
-                "%2e%2e/&lt;script&gt;",
-                "%2e%2e\\&quot;alert()&quot;",
+    void shouldRejectKnownMixedEncodingAttacks(String mixedEncodingAttack) {
+        // Given: A known mixed encoding attack pattern from MixedEncodingAttackGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // URL + Unicode escape combinations
-                "%2e%2e\\\\u002f",
-                "%2e%2e\\\\u005c",
-                "..\\\\u002f..\\\\u002f",
+        // When & Then: Known mixed encoding attack should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(mixedEncodingAttack),
+                "Known mixed encoding attack should be rejected: " + mixedEncodingAttack);
 
-                // URL + JavaScript escape combinations
-                "%2e%2e\\x2f",
-                "%2e%2e\\x5c",
-                "javascript\\x3a\\x2f\\x2f",
-
-                // HTML + Unicode combinations
-                "&lt;\\\\u0073cript&gt;",
-                "&amp;\\\\u0023x41;",
-
-                // URL encoded attack combinations
-                "%2e%2e%2f%2e%2e%2f", // URL encoded ../../
-                "%2e%2e%5c%2e%2e%5c", // URL encoded ..\..\ 
-                
-                // UTF-8 overlong + URL combinations
-                "%C0%AE%2F%C0%AE%2F", // Overlong . + URL encoded /
-                "%C0%AE%C0%AF",       // Overlong . + overlong /
-                
-                // Mixed URL format combinations
-                "%2e%2e+%2F%2e%2e",  // Mixed % and + encoding
-                "%2E%2e%2F%2f",      // Mixed case encoding
-                
-                // Polyglot attacks
-                "%2e%2e/&lt;\\\\u0073cript\\x3e",
-                "data\\x3atext/html\\x2c&lt;\\\\u0073cript&gt;"
-        };
-
-        for (String attack : knownAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Known mixed encoding attack should be rejected: " + attack);
-
-            assertNotNull(exception, "Exception should be thrown for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for: " + attack);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception, "Exception should be thrown for: " + mixedEncodingAttack);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for: " + mixedEncodingAttack);
     }
 
     /**
@@ -198,40 +166,26 @@ class MixedEncodingAttackTest {
      * detection logic, including incomplete encodings and boundary conditions.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = MixedEncodingAttackGenerator.class, count = 20)
     @DisplayName("Should handle edge cases in mixed encoding detection")
-    void shouldHandleEdgeCasesInMixedEncoding() {
-        String[] edgeCases = {
-                "%2e&",                    // Incomplete HTML entity
-                "%2e&#",                   // Incomplete numeric entity
-                "%2e\\\\u",                  // Incomplete Unicode escape
-                "%2e\\\\u00",                // Incomplete Unicode escape
-                "%2e\\x",                  // Incomplete JavaScript escape
-                "\\\\u002e%",               // Unicode escape + incomplete %
-                "&lt%2e",                // Incomplete HTML entity + URL encoding
-                "%C0%AE\\\\u",              // UTF-8 overlong + incomplete Unicode
-                "+%2e+",                  // Mixed space encodings
-                "%2E%2e%2F%2f%2G",        // Mixed case + invalid hex
-                "&amp;\\\\u005c%25%25",     // Triple encoding mix
-                "\\x2e\\x2e/\\\\u002f"     // JS escapes + Unicode + raw
-        };
+    void shouldHandleEdgeCasesInMixedEncoding(String edgeCase) {
+        // Given: An edge case mixed encoding pattern from MixedEncodingAttackGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String edgeCase : edgeCases) {
-            long initialEventCount = eventCounter.getTotalCount();
+        // When: Attempting to validate the edge case
+        try {
+            String result = pipeline.validate(edgeCase);
+            // Then: If validation passes, result should not be null
+            assertNotNull(result, "Validated result should not be null for: " + edgeCase);
 
-            try {
-                String result = pipeline.validate(edgeCase);
-                // If validation passes, result should not be null
-                assertNotNull(result, "Validated result should not be null for: " + edgeCase);
+        } catch (UrlSecurityException e) {
+            // Then: Edge cases might be rejected for various reasons
+            assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                    "Security event should be recorded when rejecting: " + edgeCase);
 
-            } catch (UrlSecurityException e) {
-                // Edge cases might be rejected for various reasons
-                assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                        "Security event should be recorded when rejecting: " + edgeCase);
-
-                assertNotNull(e.getFailureType(),
-                        "Exception should have failure type for: " + edgeCase);
-            }
+            assertNotNull(e.getFailureType(),
+                    "Exception should have failure type for: " + edgeCase);
         }
     }
 
@@ -244,33 +198,27 @@ class MixedEncodingAttackTest {
      * false positives.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = ValidURLPathGenerator.class, count = 15)
     @DisplayName("Legitimate mixed format URLs should be handled correctly")
-    void shouldHandleLegitimatesMixedFormatUrls() {
-        String[] legitimatePaths = {
-                "/search?q=hello+world",         // Plus for spaces in query (common)
-                "/path/My+Document.pdf",         // Plus in filename
-                "/api/user%40example.com",       // URL encoding for @
-                "/files/doc+with+spaces.txt",    // Plus for spaces in filename
-                "/path?name=John+Doe&age=30",    // Mixed query parameters
-        };
+    void shouldHandleLegitimatesMixedFormatUrls(String path) {
+        // Given: A legitimate URL path from ValidURLPathGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String path : legitimatePaths) {
-            long initialEventCount = eventCounter.getTotalCount();
+        // When: Attempting to validate the legitimate path
+        try {
+            String result = pipeline.validate(path);
+            // Then: Legitimate path should be validated
+            assertNotNull(result, "Legitimate path should be validated: " + path);
 
-            try {
-                String result = pipeline.validate(path);
-                assertNotNull(result, "Legitimate path should be validated: " + path);
-
-                // Legitimate paths should generally not trigger security events
-                // (though some might still be blocked if they contain suspicious patterns)
+            // And: Legitimate paths should generally not trigger security events
+            // (though some might still be blocked if they contain suspicious patterns)
                 
-            } catch (UrlSecurityException e) {
-                // Some legitimate paths might still be blocked by conservative security rules
-                // This is acceptable in a security-first approach
-                assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                        "If legitimate path is blocked, security event should be recorded: " + path);
-            }
+        } catch (UrlSecurityException e) {
+            // Then: Some legitimate paths might still be blocked by conservative security rules
+            // This is acceptable in a security-first approach
+            assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                    "If legitimate path is blocked, security event should be recorded: " + path);
         }
     }
 

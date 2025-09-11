@@ -123,42 +123,35 @@ class NullBytePathTraversalAttackTest {
     }
 
     /**
-     * Test focused null byte patterns from boundary fuzzing.
+     * Test focused null byte patterns using NullByteURLGenerator.
      * 
      * <p>
      * This test specifically validates that null byte patterns are always rejected,
-     * focusing on the core requirement of T4.
+     * focusing on the core requirement of T4. Uses the NullByteURLGenerator which
+     * produces comprehensive null byte patterns including raw nulls, encoded nulls,
+     * extension bypasses, and path traversal combinations.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NullByteURLGenerator.class, count = 25)
     @DisplayName("Focused null byte patterns must always be blocked")
-    void shouldAlwaysBlockFocusedNullBytePatterns() {
-        String[] focusedNullBytePatterns = {
-                // From BoundaryFuzzingGenerator.generateNullBytes()
-                "/file\u0000.txt",              // Raw null byte
-                "/admin%00.php",                // Encoded null byte
-                "../etc/passwd%00.jpg",         // Path traversal with null
-                "file.jsp%00.png",              // Extension bypass
-                "%00../../etc/shadow",          // Leading null byte
-                
-                // From BoundaryFuzzingGenerator.generateMixedBoundaryAttacks()
-                "/%00../../../../../etc/passwd",          // Null + traversal
-                "/\u0000/../\u0000/../file"               // Multiple nulls
-        };
+    void shouldAlwaysBlockFocusedNullBytePatterns(String nullBytePattern) {
+        // Given: A focused null byte pattern from NullByteURLGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String pattern : focusedNullBytePatterns) {
-            long initialEventCount = eventCounter.getTotalCount();
+        // When & Then: Null byte pattern must be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(nullBytePattern),
+                "Null byte pattern must be rejected: " + nullBytePattern);
 
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "Null byte pattern must be rejected: " + pattern);
-
-            assertNotNull(exception);
-            assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), pattern),
-                    "Should detect null byte attack: " + exception.getFailureType() + " for pattern: " + pattern);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for: " + pattern);
-        }
+        // And: Exception should have proper details
+        assertNotNull(exception);
+        assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), nullBytePattern),
+                "Should detect null byte attack: " + exception.getFailureType() + " for pattern: " + nullBytePattern);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for: " + nullBytePattern);
     }
 
     /**
@@ -205,48 +198,24 @@ class NullBytePathTraversalAttackTest {
      * combinations are consistently blocked.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NullByteURLGenerator.class, count = 25)
     @DisplayName("High-risk null byte + path traversal combinations must be blocked")
-    void shouldBlockHighRiskNullBytePathTraversalCombinations() {
-        String[] highRiskPatterns = {
-                // Classic null byte path traversal
-                "../../../etc/passwd\u0000.jpg",
-                "%00../../../etc/shadow",
-                "../etc/passwd%00.png",
+    void shouldBlockHighRiskNullBytePathTraversalCombinations(String nullBytePathTraversalPattern) {
+        // Given: A high-risk null byte + path traversal pattern from NullByteURLGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // Extension bypass attacks
-                "config.php\u0000.txt",
-                "admin.jsp%00.jpg",
-                "secret.conf\u0000.log",
+        // When & Then: High-risk null byte pattern should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(nullBytePathTraversalPattern),
+                "High-risk null byte pattern should be rejected: " + nullBytePathTraversalPattern);
 
-                // Multiple null byte attacks
-                "../\u0000/../\u0000/../etc/passwd",
-                "%00../%00../%00../etc/hosts",
-
-                // Null byte + encoding combinations
-                "../%00%2e%2e/etc/passwd",
-                "%00%2e%2e%2f%2e%2e%2fetc%2fpasswd",
-
-                // Leading null byte attacks
-                "\u0000../../../etc/passwd",
-                "%00../../windows/win.ini",
-
-                // Mixed format attacks
-                "..\\..\\..\\boot.ini\u0000.txt",
-                "../../../usr/bin/id%00.sh"
-        };
-
-        for (String pattern : highRiskPatterns) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "High-risk null byte pattern should be rejected: " + pattern);
-
-            assertNotNull(exception);
-            assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), pattern));
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception);
+        assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), nullBytePathTraversalPattern));
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -257,42 +226,23 @@ class NullBytePathTraversalAttackTest {
      * basic filtering mechanisms.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NullByteURLGenerator.class, count = 20)
     @DisplayName("Null byte encoding variations must be blocked")
-    void shouldBlockNullByteEncodingVariations() {
-        String[] encodingVariations = {
-                // Standard URL encoding
-                "../etc/passwd%00.txt",
-                "%00../etc/shadow",
+    void shouldBlockNullByteEncodingVariations(String nullByteEncodingPattern) {
+        // Given: A null byte encoding variation from NullByteURLGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // Double URL encoding
-                "../etc/passwd%2500.txt",
-                "%2500../etc/hosts",
+        // When & Then: Null byte encoding variation should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(nullByteEncodingPattern),
+                "Null byte encoding variation should be rejected: " + nullByteEncodingPattern);
 
-                // Unicode encoding
-                "../etc/passwd\\u0000.txt",
-                "\\u0000../etc/passwd",
-
-                // Mixed encoding
-                "../etc/passwd%00%2etxt",
-                "%00%2e%2e/etc/passwd",
-
-                // Alternative representations
-                "../etc/passwd\0.txt",           // C-style null
-                "../etc/passwd%0.txt",          // Malformed encoding
-                "../etc/passwd%000.txt",        // Extended encoding
-        };
-
-        for (String attack : encodingVariations) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Null byte encoding variation should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -303,42 +253,23 @@ class NullBytePathTraversalAttackTest {
      * file extension filtering and access controls.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = NullByteURLGenerator.class, count = 22)
     @DisplayName("File extension bypass attacks using null bytes must be blocked")
-    void shouldBlockExtensionBypassAttacks() {
-        String[] extensionBypassAttacks = {
-                // Web application bypasses
-                "shell.php\u0000.txt",
-                "backdoor.jsp%00.jpg",
-                "webshell.asp\u0000.gif",
-                "exploit.cgi%00.png",
+    void shouldBlockExtensionBypassAttacks(String extensionBypassPattern) {
+        // Given: A file extension bypass pattern with null bytes from NullByteURLGenerator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // Script execution bypasses
-                "script.py\u0000.log",
-                "payload.sh%00.txt",
-                "malware.exe\u0000.dat",
+        // When & Then: Extension bypass attack should be rejected
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(extensionBypassPattern),
+                "Extension bypass attack should be rejected: " + extensionBypassPattern);
 
-                // Config file access
-                "database.conf\u0000.bak",
-                ".htaccess%00.old",
-                "settings.ini\u0000.tmp",
-
-                // Combined with path traversal
-                "../../config.php\u0000.txt",
-                "../admin.jsp%00.backup",
-                "../../.env%00.sample"
-        };
-
-        for (String attack : extensionBypassAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Extension bypass attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        // And: Exception should be properly formed
+        assertNotNull(exception);
+        
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**

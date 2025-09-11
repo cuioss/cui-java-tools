@@ -147,72 +147,56 @@ class PathTraversalAttackTest {
     }
 
     /**
-     * Test known CVE path traversal patterns.
+     * Test known CVE path traversal patterns using PathTraversalGenerator.
      * 
      * <p>
-     * Validates that specific patterns from known CVEs are properly blocked,
+     * Validates that patterns similar to known CVEs are properly blocked,
      * ensuring protection against documented security vulnerabilities.
+     * The PathTraversalGenerator produces comprehensive patterns including
+     * those similar to CVE-2019-5418, CVE-2018-1000671, CVE-2020-5398, etc.
      * </p>
      */
-    @Test
-    @DisplayName("Known CVE path traversal patterns should be blocked")
-    void shouldBlockKnownCVEPatterns() {
-        String[] cvePatterns = {
-                // CVE-2019-5418: Rails path traversal
-                "../../../../../../../etc/passwd{{",
+    @ParameterizedTest
+    @TypeGeneratorSource(value = PathTraversalGenerator.class, count = 25)
+    @DisplayName("CVE-style path traversal patterns should be blocked")
+    void shouldBlockCVEStylePatterns(String pathTraversalPattern) {
+        // Given: A CVE-style path traversal pattern from generator
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // CVE-2018-1000671: Mercurial path traversal  
-                "../.hg/hgrc",
+        // When & Then: CVE-style pattern should be blocked
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pathTraversalPattern),
+                "CVE-style pattern should be blocked: " + pathTraversalPattern);
 
-                // CVE-2020-5398: Spring Framework path traversal
-                "/..;/..;/..;/..;/..;/..;/etc/passwd",
+        // And: Appropriate failure type should be specified
+        assertNotNull(exception.getFailureType(),
+                "Failure type should be specified for CVE-style pattern: " + pathTraversalPattern);
 
-                // CVE-2021-22204: GitLab path traversal
-                "../../../../../../../../../../../etc/passwd",
-
-                // CVE-2019-0230: Apache Struts path traversal
-                "/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
-        };
-
-        for (String cvePattern : cvePatterns) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(cvePattern),
-                    "CVE pattern should be blocked: " + cvePattern);
-
-            assertNotNull(exception.getFailureType(),
-                    "Failure type should be specified for CVE pattern: " + cvePattern);
-
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for CVE pattern: " + cvePattern);
-        }
+        // And: Security event should be recorded
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for CVE-style pattern: " + pathTraversalPattern);
     }
 
     /**
-     * Test path traversal patterns with legitimate-looking prefixes.
+     * Test path traversal patterns with legitimate-looking prefixes using PathTraversalGenerator.
      * 
      * <p>
      * Ensures that path traversal attempts are detected even when embedded
-     * within seemingly legitimate URL paths.
+     * within seemingly legitimate URL paths. The PathTraversalGenerator includes
+     * context-aware patterns that simulate real-world attack scenarios with
+     * legitimate prefixes.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = PathTraversalGenerator.class, count = 20)
     @DisplayName("Path traversal with legitimate prefixes should be blocked")
-    void shouldBlockPathTraversalWithLegitimatePrefix() {
-        String[] legitimatePrefixPatterns = {
-                "/api/v1/users/../../../etc/passwd",
-                "/admin/dashboard/../../config/database.yml",
-                "/uploads/images/../../../.env",
-                "/files/documents/..\\..\\..\\windows\\win.ini",
-                "/public/assets/%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd"
-        };
+    void shouldBlockPathTraversalWithLegitimatePrefix(String pathTraversalPattern) {
+        // Given: A path traversal pattern (potentially with legitimate prefix) from generator
 
-        for (String pattern : legitimatePrefixPatterns) {
-            assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "Legitimate prefix should not mask path traversal: " + pattern);
-        }
+        // When & Then: Pattern should be blocked regardless of legitimate-looking prefix
+        assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pathTraversalPattern),
+                "Legitimate prefix should not mask path traversal: " + pathTraversalPattern);
     }
 
     /**

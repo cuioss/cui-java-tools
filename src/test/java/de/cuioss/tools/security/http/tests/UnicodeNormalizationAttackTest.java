@@ -376,7 +376,7 @@ class UnicodeNormalizationAttackTest {
      * @param validPath A valid URL path
      */
     @ParameterizedTest
-    @TypeGeneratorSource(value = ValidURLPathGenerator.class, count = 10)
+    @TypeGeneratorSource(value = ValidURLPathGenerator.class, count = 15)
     @DisplayName("Valid URL paths should pass validation")
     void shouldValidateValidPaths(String validPath) {
         // Given: A valid path from the generator

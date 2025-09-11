@@ -87,7 +87,7 @@ class AlgorithmicComplexityAttackTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = AlgorithmicComplexityAttackGenerator.class, count = 3)
+    @TypeGeneratorSource(value = AlgorithmicComplexityAttackGenerator.class, count = 25)
     @DisplayName("All algorithmic complexity attacks should be rejected")
     void shouldRejectAllAlgorithmicComplexityAttacks(String complexityAttackPattern) {
         // Given: An algorithmic complexity attack pattern
@@ -110,7 +110,7 @@ class AlgorithmicComplexityAttackTest {
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = AlgorithmicComplexityAttackGenerator.class, count = 2)
+    @TypeGeneratorSource(value = AlgorithmicComplexityAttackGenerator.class, count = 20)
     @DisplayName("Algorithmic complexity detection should complete within performance limits")
     void shouldCompleteComplexityDetectionWithinTimeLimit(String complexityAttackPattern) {
         // Given: An algorithmic complexity attack pattern
