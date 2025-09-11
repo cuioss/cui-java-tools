@@ -25,7 +25,9 @@ import lombok.Value;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
+import java.util.Map;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -121,6 +123,47 @@ public class DecodingStage implements HttpSecurityValidator {
     );
 
     /**
+     * Pre-compiled pattern for detecting HTML entity patterns.
+     * Matches both named entities (&lt;, &gt;, etc.) and numeric entities (&#47;, &#x2F;).
+     */
+    private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile(
+            "&(?:([a-zA-Z][a-zA-Z0-9]{1,8})|#(?:([0-9]{1,7})|x([0-9a-fA-F]{1,6})));?"
+    );
+
+    /**
+     * Pre-compiled pattern for detecting JavaScript escape sequences.
+     * Matches hex escapes (\x2f), Unicode escapes (\u002f), and octal escapes (\057).
+     */
+    private static final Pattern JS_ESCAPE_PATTERN = Pattern.compile(
+            "\\\\(?:x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4})|([0-7]{1,3}))"
+    );
+
+
+    /**
+     * Map of common HTML entities to their character equivalents.
+     * Includes security-critical entities commonly used in attacks.
+     */
+    private static final Map<String, String> HTML_ENTITIES = createHtmlEntitiesMap();
+
+    /**
+     * Creates the HTML entities map. Separated to avoid Map.of() size limitations.
+     */
+    private static Map<String, String> createHtmlEntitiesMap() {
+        return Map.of(
+                "lt", "<",
+                "gt", ">",
+                "amp", "&",
+                "quot", "\"",
+                "apos", "'",
+                "nbsp", "\u00A0",
+                "sol", "/",
+                "bsol", "\\",
+                "colon", ":",
+                "semi", ";"
+        );
+    }
+
+    /**
      * Security configuration controlling validation behavior.
      */
     SecurityConfiguration config;
@@ -133,9 +176,11 @@ public class DecodingStage implements HttpSecurityValidator {
     /**
      * Validates input through multi-layer decoding with security checks.
      * 
-     * <p>Processing stages:</p>
+     * <p>QI-2 Enhanced Processing stages:</p>
      * <ol>
      *   <li>Double encoding detection - fails fast if %25XX patterns found</li>
+     *   <li>HTML entity decoding - decodes &lt;, &#47;, &#x2F;, etc.</li>
+     *   <li>JavaScript escape decoding - decodes \x2f, \u002f, \057, etc.</li>
      *   <li>URL decoding - converts percent-encoded sequences to characters</li>
      *   <li>Unicode normalization - optionally normalizes and detects changes</li>
      * </ol>
@@ -175,10 +220,15 @@ public class DecodingStage implements HttpSecurityValidator {
                     .build();
         }
 
-        // Step 2: URL decode
-        String decoded;
+        // QI-2 Step 2: HTML entity decoding - decode HTML entities first
+        String decoded = decodeHtmlEntities(value);
+
+        // QI-2 Step 3: JavaScript escape decoding - decode JS escapes after HTML entities  
+        decoded = decodeJavaScriptEscapes(decoded);
+
+        // Step 4: URL decode (original step 2)
         try {
-            decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
+            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
             throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.INVALID_ENCODING)
@@ -189,7 +239,7 @@ public class DecodingStage implements HttpSecurityValidator {
                     .build();
         }
 
-        // Step 3: Unicode normalization with change detection
+        // Step 5: Unicode normalization with change detection (original step 3)
         if (config.normalizeUnicode()) {
             String normalized = Normalizer.normalize(decoded, Normalizer.Form.NFC);
             if (!decoded.equals(normalized)) {
@@ -207,6 +257,142 @@ public class DecodingStage implements HttpSecurityValidator {
 
         return decoded;
     }
+
+    /**
+     * Decodes HTML entities in the input string.
+     * 
+     * <p>Supports both named entities (&lt;, &gt;, &amp;, etc.) and numeric entities 
+     * (&#47;, &#x2F;). Handles malformed entities gracefully by leaving them unchanged.</p>
+     * 
+     * @param input The input string that may contain HTML entities
+     * @return The string with HTML entities decoded
+     */
+    private String decodeHtmlEntities(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        Matcher matcher = HTML_ENTITY_PATTERN.matcher(input);
+        StringBuilder result = new StringBuilder();
+        int lastEnd = 0;
+
+        while (matcher.find()) {
+            result.append(input, lastEnd, matcher.start());
+
+            String namedEntity = matcher.group(1);
+            String decimalEntity = matcher.group(2);
+            String hexEntity = matcher.group(3);
+
+            if (namedEntity != null) {
+                // Named entity (e.g., &lt;)
+                String replacement = HTML_ENTITIES.get(namedEntity.toLowerCase());
+                if (replacement != null) {
+                    result.append(replacement);
+                } else {
+                    // Unknown entity, keep as-is
+                    result.append(matcher.group());
+                }
+            } else if (decimalEntity != null) {
+                // Decimal numeric entity (e.g., &#47;)
+                try {
+                    int codePoint = Integer.parseInt(decimalEntity);
+                    // Security: Only decode reasonable Unicode ranges to prevent abuse
+                    if (Character.isValidCodePoint(codePoint) && codePoint <= 0x10FFFF && codePoint >= 1) {
+                        result.append(Character.toChars(codePoint));
+                    } else {
+                        result.append(matcher.group());
+                    }
+                } catch (NumberFormatException e) {
+                    result.append(matcher.group());
+                }
+            } else if (hexEntity != null) {
+                // Hexadecimal numeric entity (e.g., &#x2F;)
+                try {
+                    int codePoint = Integer.parseInt(hexEntity, 16);
+                    // Security: Only decode reasonable Unicode ranges to prevent abuse
+                    if (Character.isValidCodePoint(codePoint) && codePoint <= 0x10FFFF && codePoint >= 1) {
+                        result.append(Character.toChars(codePoint));
+                    } else {
+                        result.append(matcher.group());
+                    }
+                } catch (NumberFormatException e) {
+                    result.append(matcher.group());
+                }
+            }
+
+            lastEnd = matcher.end();
+        }
+
+        result.append(input, lastEnd, input.length());
+        return result.toString();
+    }
+
+    /**
+     * Decodes JavaScript escape sequences in the input string.
+     * 
+     * <p>Supports hex escapes (\x2f), Unicode escapes (\u002f), and octal escapes (\057).
+     * Handles malformed escapes gracefully by leaving them unchanged.</p>
+     * 
+     * @param input The input string that may contain JavaScript escapes
+     * @return The string with JavaScript escapes decoded
+     */
+    private String decodeJavaScriptEscapes(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        Matcher matcher = JS_ESCAPE_PATTERN.matcher(input);
+        StringBuilder result = new StringBuilder();
+        int lastEnd = 0;
+
+        while (matcher.find()) {
+            result.append(input, lastEnd, matcher.start());
+
+            String hexEscape = matcher.group(1);
+            String unicodeEscape = matcher.group(2);
+            String octalEscape = matcher.group(3);
+
+            if (hexEscape != null) {
+                // Hex escape (e.g., \x2f)
+                try {
+                    int value = Integer.parseInt(hexEscape, 16);
+                    result.append((char) value);
+                } catch (NumberFormatException e) {
+                    result.append(matcher.group());
+                }
+            } else if (unicodeEscape != null) {
+                // Unicode escape (e.g., \u002f)
+                try {
+                    int value = Integer.parseInt(unicodeEscape, 16);
+                    if (Character.isValidCodePoint(value)) {
+                        result.append(Character.toChars(value));
+                    } else {
+                        result.append(matcher.group());
+                    }
+                } catch (NumberFormatException e) {
+                    result.append(matcher.group());
+                }
+            } else if (octalEscape != null) {
+                // Octal escape (e.g., \057)
+                try {
+                    int value = Integer.parseInt(octalEscape, 8);
+                    if (value <= 255) { // Valid byte value
+                        result.append((char) value);
+                    } else {
+                        result.append(matcher.group());
+                    }
+                } catch (NumberFormatException e) {
+                    result.append(matcher.group());
+                }
+            }
+
+            lastEnd = matcher.end();
+        }
+
+        result.append(input, lastEnd, input.length());
+        return result.toString();
+    }
+
 
     /**
      * Creates a conditional validator that only processes non-null, non-empty inputs.

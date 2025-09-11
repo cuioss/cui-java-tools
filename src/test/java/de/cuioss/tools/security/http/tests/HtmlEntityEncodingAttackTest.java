@@ -433,8 +433,8 @@ class HtmlEntityEncodingAttackTest {
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
                 failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
                 failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||

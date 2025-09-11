@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * 
  * <ol>
  *   <li><strong>Path Traversal Patterns</strong> - Detects directory traversal attempts</li>
- *   <li><strong>Injection Attack Patterns</strong> - Identifies SQL injection, XSS, and command injection</li>
+ *   <li><strong>Cross-Site Scripting Patterns</strong> - Identifies XSS attack patterns</li>
  *   <li><strong>Suspicious Path Patterns</strong> - Detects access to sensitive system locations</li>
  *   <li><strong>Parameter Attack Patterns</strong> - Identifies malicious parameter usage</li>
  * </ol>
@@ -52,9 +52,7 @@ import java.util.regex.Pattern;
  * <h3>Security Validations</h3>
  * <ul>
  *   <li><strong>Path Traversal</strong> - ../,..\\, and encoded variants</li>
- *   <li><strong>SQL Injection</strong> - UNION SELECT, OR 1=1, and other SQL attack patterns</li>
  *   <li><strong>XSS Attacks</strong> - Script tags, event handlers, and JavaScript injection</li>
- *   <li><strong>Command Injection</strong> - System command execution patterns</li>
  *   <li><strong>File Access</strong> - Attempts to access sensitive system files</li>
  *   <li><strong>Parameter Pollution</strong> - Suspicious parameter names and patterns</li>
  * </ul>
@@ -73,12 +71,12 @@ import java.util.regex.Pattern;
  *     logger.warn("Path traversal blocked: {}", e.getDetail());
  * }
  * 
- * // Detect SQL injection
+ * // Detect XSS attack  
  * try {
- *     matcher.validate("'; DROP TABLE users; --");
- *     // Throws UrlSecurityException with SQL_INJECTION_DETECTED
+ *     matcher.validate("<script>alert('xss')</script>");
+ *     // Throws UrlSecurityException with XSS_DETECTED
  * } catch (UrlSecurityException e) {
- *     logger.warn("SQL injection blocked: {}", e.getDetail());
+ *     logger.warn("XSS attack blocked: {}", e.getDetail());
  * }
  * 
  * // Configurable sensitivity
@@ -137,13 +135,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
             [.]{2}%2f[.]{2}|[.]{2}/%2e%2e"""
     );
 
-    /**
-     * Pre-compiled regex pattern for detecting SQL injection keywords.
-     * Matches common SQL injection patterns with word boundaries.
-     */
-    private static final Pattern SQL_INJECTION_PATTERN = Pattern.compile(
-            "(?i)\\b(union\\s+select|or\\s+1\\s*=\\s*1|drop\\s+table|delete\\s+from|insert\\s+into|update\\s+set)\\b"
-    );
 
     /**
      * Pre-compiled regex pattern for detecting XSS script injection.
@@ -153,13 +144,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
             "(?i)<script[^>]*>|</script>|javascript\\s*:|vbscript\\s*:|\\bon\\w+\\s*="
     );
 
-    /**
-     * Pre-compiled regex pattern for detecting command injection.
-     * Matches command execution patterns and shell metacharacters.
-     */
-    private static final Pattern COMMAND_INJECTION_PATTERN = Pattern.compile(
-            "(?i)(\\|\\s*|;\\s*|&\\s*|`\\s*|\\$\\s*\\()(cat|ls|dir|type|echo|whoami|id|uname|pwd)\\b"
-    );
 
     /**
      * Security configuration controlling validation behavior.
@@ -187,9 +171,7 @@ public class PatternMatchingStage implements HttpSecurityValidator {
      * @throws UrlSecurityException if malicious patterns are detected:
      *         <ul>
      *           <li>PATH_TRAVERSAL_DETECTED - if path traversal patterns found</li>
-     *           <li>SQL_INJECTION_DETECTED - if SQL injection patterns found</li>
      *           <li>XSS_DETECTED - if XSS attack patterns found</li>
-     *           <li>COMMAND_INJECTION_DETECTED - if command injection patterns found</li>
      *           <li>SUSPICIOUS_PATTERN_DETECTED - if suspicious patterns found and policy requires failure</li>
      *         </ul>
      */
@@ -210,8 +192,8 @@ public class PatternMatchingStage implements HttpSecurityValidator {
             checkPathTraversalPatterns(value, testValue);
         }
 
-        // Step 2: Check for injection attack patterns (applies to all content types)
-        checkInjectionPatterns(value, testValue);
+        // Step 2: Check for XSS attack patterns (applies to all content types)
+        checkXSSPatterns(value, testValue);
 
         // Step 3: Check for suspicious system paths (paths and parameters)
         if (validationType == ValidationType.URL_PATH || validationType == ValidationType.PARAMETER_VALUE) {
@@ -286,37 +268,17 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     }
 
     /**
-     * Checks input for various injection attack patterns.
+     * Checks input for cross-site scripting (XSS) attack patterns.
+     * 
+     * <p>XSS detection is appropriate for the HTTP/URL layer as it involves
+     * HTTP-based content injection that can be detected without application context.</p>
      * 
      * @param originalValue The original input value
      * @param testValue The value prepared for testing (case-normalized if needed)
-     * @throws UrlSecurityException if injection patterns are detected
+     * @throws UrlSecurityException if XSS patterns are detected
      */
-    private void checkInjectionPatterns(String originalValue, String testValue) {
-        // SQL injection patterns
-        for (String pattern : SecurityDefaults.SQL_INJECTION_PATTERNS) {
-            String checkPattern = config.caseSensitiveComparison() ? pattern : pattern.toLowerCase();
-            if (testValue.contains(checkPattern)) {
-                throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.SQL_INJECTION_DETECTED)
-                        .validationType(validationType)
-                        .originalInput(originalValue)
-                        .detail("SQL injection pattern detected: " + pattern)
-                        .build();
-            }
-        }
-
-        // SQL injection regex patterns
-        if (SQL_INJECTION_PATTERN.matcher(originalValue).find()) {
-            throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.SQL_INJECTION_DETECTED)
-                    .validationType(validationType)
-                    .originalInput(originalValue)
-                    .detail("SQL injection pattern detected via regex")
-                    .build();
-        }
-
-        // XSS patterns
+    private void checkXSSPatterns(String originalValue, String testValue) {
+        // XSS patterns from SecurityDefaults
         for (String pattern : SecurityDefaults.XSS_PATTERNS) {
             String checkPattern = config.caseSensitiveComparison() ? pattern : pattern.toLowerCase();
             if (testValue.contains(checkPattern)) {
@@ -336,16 +298,6 @@ public class PatternMatchingStage implements HttpSecurityValidator {
                     .validationType(validationType)
                     .originalInput(originalValue)
                     .detail("XSS script pattern detected via regex")
-                    .build();
-        }
-
-        // Command injection using regex
-        if (COMMAND_INJECTION_PATTERN.matcher(originalValue).find()) {
-            throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED)
-                    .validationType(validationType)
-                    .originalInput(originalValue)
-                    .detail("Command injection pattern detected")
                     .build();
         }
     }

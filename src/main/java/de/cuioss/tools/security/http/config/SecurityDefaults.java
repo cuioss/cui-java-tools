@@ -144,11 +144,9 @@ public final class SecurityDefaults {
     /** Maximum parameter value length for lenient configurations */
     public static final int MAX_PARAMETER_VALUE_LENGTH_LENIENT = 8192;
 
-    /** Parameter names that are commonly used in attacks */
+    /** Parameter names that are commonly used in HTTP-layer attacks */
     public static final Set<String> SUSPICIOUS_PARAMETER_NAMES = Set.of(
-            "cmd", "exec", "command", "system", "shell", "eval", "script",
-            "include", "require", "file", "path", "url", "redirect", "forward",
-            "sql", "query", "union", "select", "insert", "update", "delete"
+            "script", "include", "require", "file", "path", "url", "redirect", "forward"
     );
 
     // ========== HEADER SECURITY CONSTANTS ==========
@@ -278,12 +276,6 @@ public final class SecurityDefaults {
             '<', '>', '\'', '"', '&', ';', '|', '`', '$', '(', ')', '{', '}'
     );
 
-    /** SQL injection patterns to detect */
-    public static final Set<String> SQL_INJECTION_PATTERNS = Set.of(
-            "union select", "or 1=1", "' or '1'='1", "\" or \"1\"=\"1\"",
-            "drop table", "delete from", "insert into", "update set",
-            "exec(", "execute(", "sp_", "xp_", "/*", "*/", "--", "@@"
-    );
 
     /** XSS patterns to detect */
     public static final Set<String> XSS_PATTERNS = Set.of(

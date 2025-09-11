@@ -247,9 +247,9 @@ public class XssInjectionAttackDatabase implements AttackDatabase {
     // Polyglot Payloads
     public static final AttackTestCase POLYGLOT_MULTI_CONTEXT = new AttackTestCase(
             "/search?payload='\\\"--></script></title></textarea></style></template></noembed></noscript></iframe></noframes></plaintext></xmp><svg onload=alert()>",
-            UrlSecurityFailureType.SQL_INJECTION_DETECTED,
+            UrlSecurityFailureType.XSS_DETECTED,
             "Polyglot XSS payload designed to work across multiple HTML contexts by closing various HTML elements and injecting SVG with script execution. This comprehensive payload attempts to break out of numerous possible HTML contexts where user input might be placed.",
-            "SQL_INJECTION_DETECTED is expected because the polyglot payload contains SQL comment pattern ('\"--) which is detected before XSS pattern matching occurs due to validation priority order."
+            "XSS_DETECTED is expected because the polyglot payload contains script execution patterns that are detected by XSS pattern matching."
     );
 
     public static final AttackTestCase POLYGLOT_JAVASCRIPT_CONTEXT = new AttackTestCase(

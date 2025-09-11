@@ -176,7 +176,7 @@ class InvalidURLGeneratorTest {
         Set<String> generated = new HashSet<>();
 
         // Generate patterns to test special character issues
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 500; i++) {
             generated.add(generator.next());
         }
 

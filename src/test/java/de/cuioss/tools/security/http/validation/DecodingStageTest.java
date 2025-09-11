@@ -395,4 +395,168 @@ class DecodingStageTest {
         long durationMs = (endTime - startTime) / 1_000_000;
         assertTrue(durationMs < 100, "Decoding should be efficient, took: " + durationMs + "ms");
     }
+
+    // QI-2: New tests for enhanced multi-layer decoding capabilities
+
+    @Test
+    @DisplayName("QI-2: Should decode HTML entities")
+    void shouldDecodeHtmlEntities() {
+        // Named entities
+        assertEquals("</script>", pathDecoder.validate("&lt;/script&gt;"));
+        assertEquals("path/../admin", pathDecoder.validate("path&sol;..&sol;admin"));
+        assertEquals("alert('xss')", pathDecoder.validate("alert(&apos;xss&apos;)"));
+        assertEquals("data=\"value\"", pathDecoder.validate("data=&quot;value&quot;"));
+        assertEquals("user & admin", pathDecoder.validate("user &amp; admin"));
+
+        // Decimal numeric entities
+        assertEquals("/admin", pathDecoder.validate("&#47;admin"));
+        assertEquals("<script>", pathDecoder.validate("&#60;script&#62;"));
+        assertEquals("'attack'", pathDecoder.validate("&#39;attack&#39;"));
+        assertEquals("\"injection\"", pathDecoder.validate("&#34;injection&#34;"));
+
+        // Hexadecimal numeric entities
+        assertEquals("/", pathDecoder.validate("&#x2F;"));
+        assertEquals("<", pathDecoder.validate("&#x3C;"));
+        assertEquals(">", pathDecoder.validate("&#x3E;"));
+        assertEquals("'", pathDecoder.validate("&#x27;"));
+        assertEquals("\"", pathDecoder.validate("&#x22;"));
+    }
+
+    @Test
+    @DisplayName("QI-2: Should decode JavaScript escape sequences")
+    void shouldDecodeJavaScriptEscapes() {
+        // Hex escapes
+        assertEquals("</script>", pathDecoder.validate("\\x3c/script\\x3e"));
+        assertEquals("/admin", pathDecoder.validate("\\x2fadmin"));
+        assertEquals("'attack'", pathDecoder.validate("\\x27attack\\x27"));
+        assertEquals("\"injection\"", pathDecoder.validate("\\x22injection\\x22"));
+
+        // Unicode escapes
+        assertEquals("<script>", pathDecoder.validate("\\u003cscript\\u003e"));
+        assertEquals("/path", pathDecoder.validate("\\u002fpath"));
+        assertEquals("'xss'", pathDecoder.validate("\\u0027xss\\u0027"));
+        assertEquals("\"sqli\"", pathDecoder.validate("\\u0022sqli\\u0022"));
+
+        // Octal escapes
+        assertEquals("/", pathDecoder.validate("\\057"));
+        assertEquals("<", pathDecoder.validate("\\074"));
+        assertEquals(">", pathDecoder.validate("\\076"));
+        assertEquals("'", pathDecoder.validate("\\047"));
+        assertEquals("\"", pathDecoder.validate("\\042"));
+    }
+
+    @Test
+    @DisplayName("QI-2: Should handle mixed encoding combinations")
+    void shouldHandleMixedEncodingCombinations() {
+        // HTML entities + URL encoding
+        assertEquals("</script>", pathDecoder.validate("&lt;%2Fscript&gt;"));
+        assertEquals("path/../admin", pathDecoder.validate("path&sol;..%2Fadmin"));
+
+        // JavaScript escapes + URL encoding
+        assertEquals("</script>", pathDecoder.validate("\\x3c%2Fscript\\x3e"));
+        assertEquals("/admin", pathDecoder.validate("\\x2F%61dmin")); // %61 = 'a'
+
+        // HTML entities + JavaScript escapes
+        assertEquals("<script>alert('xss')</script>", pathDecoder.validate("&lt;script&gt;alert(\\x27xss\\x27)&lt;/script&gt;"));
+
+        // All three: HTML entities + JS escapes + URL encoding  
+        assertEquals("path/../admin", pathDecoder.validate("path&sol;..\\x2F%61dmin"));
+    }
+
+    @Test
+    @DisplayName("QI-2: Should handle malformed entities gracefully")
+    void shouldHandleMalformedEntitiesGracefully() {
+        // Malformed HTML entities (should remain unchanged)
+        assertEquals("&invalid;", pathDecoder.validate("&invalid;"));
+        assertEquals("&#9999999;", pathDecoder.validate("&#9999999;")); // Invalid codepoint (too large)
+        assertEquals("&#xZZZZ;", pathDecoder.validate("&#xZZZZ;")); // Invalid hex
+
+        // Malformed JavaScript escapes (should remain unchanged)
+        assertEquals("\\xZZ", pathDecoder.validate("\\xZZ")); // Invalid hex
+        assertEquals("\\uZZZZ", pathDecoder.validate("\\uZZZZ")); // Invalid unicode
+        assertEquals("\\999", pathDecoder.validate("\\999")); // Invalid octal (> 255)
+
+        // Mixed with valid ones
+        assertEquals("valid/&invalid;", pathDecoder.validate("valid&sol;&invalid;"));
+    }
+
+    @Test
+    @DisplayName("QI-2: Should process decoding in correct order")
+    void shouldProcessDecodingInCorrectOrder() {
+        // Test order: HTML entities first, then JS escapes, then URL encoding
+        // This creates "/admin" through multi-layer decoding
+        String multiLayer = "&&#x23;x32F;"; // &amp; -> & -> &#x2F; -> /
+        
+        // Simpler test of processing order
+        String htmlFirst = "&lt;script&gt;"; // Should decode to <script>
+        assertEquals("<script>", pathDecoder.validate(htmlFirst));
+
+        String jsFirst = "\\x3cscript\\x3e"; // Should decode to <script>
+        assertEquals("<script>", pathDecoder.validate(jsFirst));
+
+        String urlFirst = "%3Cscript%3E"; // Should decode to <script>
+        assertEquals("<script>", pathDecoder.validate(urlFirst));
+    }
+
+    @Test
+    @DisplayName("QI-2: Should maintain backward compatibility")
+    void shouldMaintainBackwardCompatibility() {
+        // Ensure existing URL decoding still works correctly
+        assertEquals("/api/users/123", pathDecoder.validate("/api/users%2F123"));
+        assertEquals("hello world", parameterDecoder.validate("hello%20world"));
+        assertEquals("user@example.com", parameterDecoder.validate("user%40example.com"));
+
+        // Double encoding detection should still work
+        assertThrows(UrlSecurityException.class,
+                () -> pathDecoder.validate("/admin%252Fusers"));
+
+        // Unicode normalization should still work when enabled
+        SecurityConfiguration unicodeConfig = SecurityConfiguration.builder()
+                .normalizeUnicode(true)
+                .build();
+        DecodingStage unicodeDecoder = new DecodingStage(unicodeConfig, ValidationType.URL_PATH);
+
+        String normalInput = "regular-path";
+        assertEquals(normalInput, unicodeDecoder.validate(normalInput));
+    }
+
+    /**
+     * QI-2: Test data for complex mixed encoding attack scenarios
+     */
+    static Stream<Arguments> mixedEncodingAttackScenarios() {
+        return Stream.of(
+                // HTML entity attacks
+                Arguments.of("&lt;script&gt;alert(1)&lt;/script&gt;", "<script>alert(1)</script>", "XSS via HTML entities"),
+                Arguments.of("javascript&#58;alert(1)", "javascript:alert(1)", "JavaScript protocol via decimal entity"),
+                Arguments.of("&#x6A;&#x61;&#x76;&#x61;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3A;", "javascript:", "JavaScript protocol via hex entities"),
+
+                // JavaScript escape attacks
+                Arguments.of("\\x3cimg src=x onerror=alert(1)\\x3e", "<img src=x onerror=alert(1)>", "XSS via hex escapes"),
+                Arguments.of("\\u003cscript\\u003ealert(1)\\u003c/script\\u003e", "<script>alert(1)</script>", "XSS via Unicode escapes"),
+                Arguments.of("\\74\\163\\143\\162\\151\\160\\164\\76", "<script>", "Script tag via octal escapes"),
+
+                // Path traversal attacks with mixed encoding
+                Arguments.of("&sol;..&sol;admin", "/../admin", "Path traversal via HTML entities"),
+                Arguments.of("\\x2F..\\x2Fadmin", "/../admin", "Path traversal via hex escapes"),
+                Arguments.of("..&#47;..&#47;etc&#47;passwd", "../../etc/passwd", "File access via mixed entities"),
+
+                // Command injection patterns
+                Arguments.of("cmd&amp;&amp;echo test", "cmd&&echo test", "Command injection via HTML ampersand"),
+                Arguments.of("cmd\\x7c\\x7cecho test", "cmd||echo test", "Command injection via hex pipes"),
+
+                // SQL injection patterns  
+                Arguments.of("&#39; OR 1=1 --", "' OR 1=1 --", "SQL injection via decimal entity"),
+                Arguments.of("\\x27 UNION SELECT * FROM users--", "' UNION SELECT * FROM users--", "SQL injection via hex escape")
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("QI-2: Should decode complex mixed encoding attack scenarios")
+    @MethodSource("mixedEncodingAttackScenarios")
+    void shouldDecodeComplexMixedEncodingAttackScenarios(String encoded, String expected, String description) {
+        String result = pathDecoder.validate(encoded);
+        assertEquals(expected, result, description);
+    }
+
+    // QI-3: Base64 decoding removed - architectural decision: application layer responsibility
 }

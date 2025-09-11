@@ -193,17 +193,17 @@ class HTTPBodyValidationPipelineTest {
         }
 
         @Test
-        void shouldDetectSqlInjectionWithStrictConfig() {
+        void shouldDetectXssAttacksWithStrictConfig() {
             HTTPBodyValidationPipeline strictPipeline = new HTTPBodyValidationPipeline(strictConfig, eventCounter);
 
-            String sqlInjection = "test OR 1=1 and stuff";
+            String xssAttack = "test <script>alert('xss')</script> stuff";
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> strictPipeline.validate(sqlInjection));
+                    () -> strictPipeline.validate(xssAttack));
 
             assertEquals(ValidationType.BODY, exception.getValidationType());
-            assertEquals(sqlInjection, exception.getOriginalInput());
-            assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
+            assertEquals(xssAttack, exception.getOriginalInput());
+            assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
         }
 
         @Test

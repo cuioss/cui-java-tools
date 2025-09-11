@@ -113,13 +113,13 @@ public final class PipelineFactory {
     /**
      * Creates a URL parameter validation pipeline for validating query parameter values.
      * 
-     * <p>This pipeline validates URL parameter values for security threats including:</p>
+     * <p>This pipeline validates URL parameter values for HTTP-layer security threats including:</p>
      * <ul>
-     *   <li>SQL injection patterns</li>
      *   <li>XSS attack patterns</li>
-     *   <li>Command injection attempts</li>
+     *   <li>Path traversal attempts</li>
      *   <li>Invalid URL encoding</li>
      *   <li>Parameter-based attacks</li>
+     *   <li>Character encoding attacks</li>
      * </ul>
      * 
      * @param config The security configuration to use
@@ -179,14 +179,14 @@ public final class PipelineFactory {
     /**
      * Creates an HTTP body content validation pipeline.
      * 
-     * <p>This pipeline validates HTTP request/response body content for security
-     * threats including:</p>
+     * <p>This pipeline validates HTTP request/response body content for HTTP-layer
+     * security threats including:</p>
      * <ul>
-     *   <li>SQL injection patterns</li>
      *   <li>XSS attack patterns</li>
-     *   <li>Command injection attempts</li>
+     *   <li>Character encoding attacks</li>
      *   <li>Body-based DoS attacks</li>
-     *   <li>Malicious content patterns</li>
+     *   <li>Content structure violations</li>
+     *   <li>HTTP protocol attacks</li>
      * </ul>
      * 
      * @param config The security configuration to use

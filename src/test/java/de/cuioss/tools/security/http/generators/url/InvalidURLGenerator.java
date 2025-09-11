@@ -65,13 +65,15 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
         String host = generateHost();
         String path = generatePath();
 
-        return switch (Generators.integers(1, 6).next()) {
+        return switch (Generators.integers(1, 8).next()) {
             case 1 -> "htp://" + host + "/" + path; // Malformed protocol
             case 2 -> "://" + host + "/" + path; // Missing protocol
             case 3 -> "http:/example.com/path"; // Single slash after protocol - exact test pattern
             case 4 -> "http:///" + host + "/" + path; // Triple slash after protocol
             case 5 -> "javascript:alert('xss')"; // JavaScript pseudo-protocol
             case 6 -> "data:text/html,<script>alert(1)</script>"; // Data URL
+            case 7 -> "ftp://" + host + "/" + path; // FTP protocol
+            case 8 -> "file://" + host + "/" + path; // File protocol
             default -> "htp://" + host + "/" + path;
         };
     }
@@ -144,12 +146,13 @@ public class InvalidURLGenerator implements TypedGenerator<String> {
     }
 
     private String createSpecialCharacterIssue() {
-        return switch (Generators.integers(1, 5).next()) {
+        return switch (Generators.integers(1, 6).next()) {
             case 1 -> "http://example.com/path with spaces"; // Unencoded spaces - exact test pattern
             case 2 -> "http://example.com/path[bracket]"; // Unencoded brackets - exact test pattern
             case 3 -> "http://example.com/path{brace}"; // Unencoded braces - exact test pattern
             case 4 -> "http://example.com/path|pipe"; // Unencoded pipe - exact test pattern
             case 5 -> "http://example.com/path\\backslash"; // Backslashes - exact test pattern
+            case 6 -> "http://example.com/path\\with\\backslashes"; // More backslashes - exact test pattern
             default -> "http://example.com/path with spaces";
         };
     }

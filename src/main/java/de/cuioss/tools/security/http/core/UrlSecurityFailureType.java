@@ -96,16 +96,10 @@ public enum UrlSecurityFailureType {
     /** Known attack signatures from security databases */
     KNOWN_ATTACK_SIGNATURE("Known attack signature detected"),
 
-    // === Injection Attacks ===
+    // === Cross-Site Scripting (XSS) - HTTP Layer Appropriate ===
     
-    /** SQL injection patterns detected */
-    SQL_INJECTION_DETECTED("SQL injection pattern detected"),
-
     /** Cross-site scripting (XSS) patterns detected */
     XSS_DETECTED("XSS attack pattern detected"),
-
-    /** Command injection patterns detected */
-    COMMAND_INJECTION_DETECTED("Command injection pattern detected"),
 
     // === Structural Issues ===
     
@@ -212,14 +206,12 @@ public enum UrlSecurityFailureType {
     }
 
     /**
-     * Indicates whether this failure type represents an injection attack.
+     * Indicates whether this failure type represents a cross-site scripting attack.
      * 
-     * @return true if this is an injection attack failure type
+     * @return true if this is an XSS attack failure type
      */
-    public boolean isInjectionAttack() {
-        return this == SQL_INJECTION_DETECTED ||
-                this == XSS_DETECTED ||
-                this == COMMAND_INJECTION_DETECTED;
+    public boolean isXSSAttack() {
+        return this == XSS_DETECTED;
     }
 
     /**

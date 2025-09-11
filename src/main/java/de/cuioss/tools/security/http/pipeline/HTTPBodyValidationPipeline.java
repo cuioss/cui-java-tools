@@ -54,7 +54,7 @@ import java.util.Objects;
  * <ul>
  *   <li><strong>Size Limits</strong> - Prevents body-based DoS attacks via maxBodySize</li>
  *   <li><strong>Content Validation</strong> - Validates against RFC-compliant character sets</li>
- *   <li><strong>Injection Prevention</strong> - Detects XSS, SQL injection, and other attack patterns</li>
+ *   <li><strong>XSS Prevention</strong> - Detects cross-site scripting and HTTP-based attack patterns</li>
  *   <li><strong>Content Type Filtering</strong> - Supports allowed/blocked content type lists</li>
  *   <li><strong>Encoding Safety</strong> - Handles Unicode normalization and dangerous characters</li>
  * </ul>

@@ -124,10 +124,11 @@ class SecurityDefaultsTest {
         assertNotNull(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES);
         assertFalse(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.isEmpty());
 
-        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("cmd"));
-        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("exec"));
-        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("sql"));
+        // Only HTTP-layer appropriate suspicious parameter names
         assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("script"));
+        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("include"));
+        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("file"));
+        assertTrue(SecurityDefaults.SUSPICIOUS_PARAMETER_NAMES.contains("path"));
     }
 
     @Test
@@ -205,14 +206,7 @@ class SecurityDefaultsTest {
     }
 
     @Test
-    void shouldHaveInjectionPatterns() {
-        assertNotNull(SecurityDefaults.SQL_INJECTION_PATTERNS);
-        assertFalse(SecurityDefaults.SQL_INJECTION_PATTERNS.isEmpty());
-
-        assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("union select"));
-        assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("or 1=1"));
-        assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.contains("drop table"));
-
+    void shouldHaveXSSPatterns() {
         assertNotNull(SecurityDefaults.XSS_PATTERNS);
         assertFalse(SecurityDefaults.XSS_PATTERNS.isEmpty());
 
@@ -318,7 +312,6 @@ class SecurityDefaultsTest {
         assertTrue(SecurityDefaults.DANGEROUS_CONTENT_TYPES.size() > 3);
         assertTrue(SecurityDefaults.PROBLEMATIC_CONTROL_CHARS.size() > 10);
         assertTrue(SecurityDefaults.INJECTION_CHARACTERS.size() > 5);
-        assertTrue(SecurityDefaults.SQL_INJECTION_PATTERNS.size() > 5);
         assertTrue(SecurityDefaults.XSS_PATTERNS.size() > 5);
     }
 

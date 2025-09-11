@@ -115,7 +115,7 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
     }
 
     private String generateNullBytePattern() {
-        return Generators.booleans().next() ? "\\x00" : "\0";
+        return Generators.booleans().next() ? "test\\x00path" : "path\0file";
     }
 
     private String generateBackslashPattern() {

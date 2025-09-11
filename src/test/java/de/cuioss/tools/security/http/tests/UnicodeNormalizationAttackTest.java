@@ -508,8 +508,8 @@ class UnicodeNormalizationAttackTest {
                 failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
                 failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||

@@ -152,7 +152,7 @@ class MixedEncodingAttackTest {
 
         // And: Exception should be properly formed
         assertNotNull(exception, "Exception should be thrown for: " + mixedEncodingAttack);
-        
+
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount,
                 "Security event should be recorded for: " + mixedEncodingAttack);
@@ -317,8 +317,8 @@ class MixedEncodingAttackTest {
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
                 failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
                 failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.SQL_INJECTION_DETECTED ||
-                failureType == UrlSecurityFailureType.COMMAND_INJECTION_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS;

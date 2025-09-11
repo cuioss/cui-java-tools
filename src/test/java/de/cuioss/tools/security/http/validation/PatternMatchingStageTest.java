@@ -112,55 +112,9 @@ class PatternMatchingStageTest {
 
     // ========== SQL Injection Detection Tests ==========
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "'; DROP TABLE users; --",
-            "' UNION SELECT * FROM passwords --",
-            "\" OR 1=1 --",
-            "' OR '1'='1",
-            "admin' OR 1=1#",
-            "1 UNION SELECT username,password FROM users",
-            "'; DELETE FROM accounts; --"
-    })
-    void shouldDetectSQLInjectionPatterns(String sqlInjection) {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
+    // SQL injection tests removed - application layer responsibility
 
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate(sqlInjection));
-
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType(), "Exception should indicate SQL injection detection");
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType(), "Exception should indicate parameter value validation type");
-        assertTrue(exception.getDetail().orElse("").contains("SQL"), "Exception detail should mention SQL");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "union select",
-            "UNION SELECT",
-            "Union Select",
-            "or 1=1",
-            "OR 1 = 1",
-            "drop table",
-            "DROP TABLE",
-            "delete from",
-            "DELETE FROM",
-            "insert into",
-            "INSERT INTO",
-            "update set",
-            "UPDATE SET"
-    })
-    void shouldDetectSQLKeywordsWithRegex(String sqlKeyword) {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-
-        String maliciousQuery = "user " + sqlKeyword + " something";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate(maliciousQuery));
-
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
-    }
+    // SQL keyword regex tests removed - application layer responsibility
 
     // ========== XSS Detection Tests ==========
 
@@ -217,30 +171,8 @@ class PatternMatchingStageTest {
     }
 
     // ========== Command Injection Detection Tests ==========
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "; cat /etc/passwd",
-            "| whoami",
-            "& ls -la",
-            "`id`",
-            "$(uname -a)",
-            "; dir c:\\",
-            "| type c:\\windows\\system32\\drivers\\etc\\hosts",
-            "& echo %PATH%"
-    })
-    void shouldDetectCommandInjectionPatterns(String cmdInjection) {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-
-        String payload = "normal input" + cmdInjection;
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate(payload));
-
-        assertEquals(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED, exception.getFailureType());
-        assertTrue(exception.getDetail().orElse("").contains("Command injection"));
-    }
+    
+    // Command injection tests removed - application layer responsibility
 
     // ========== Suspicious Path Pattern Tests ==========
 
@@ -299,12 +231,6 @@ class PatternMatchingStageTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "cmd",
-            "exec",
-            "command",
-            "system",
-            "shell",
-            "eval",
             "script",
             "include",
             "require",
@@ -312,14 +238,7 @@ class PatternMatchingStageTest {
             "path",
             "url",
             "redirect",
-            "forward",
-            "sql",
-            "query",
-            "union",
-            "select",
-            "insert",
-            "update",
-            "delete"
+            "forward"
     })
     void shouldDetectSuspiciousParameterNamesWithFailOnSuspiciousEnabled(String suspiciousName) {
         SecurityConfiguration config = SecurityConfiguration.builder()
@@ -356,9 +275,9 @@ class PatternMatchingStageTest {
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate("UNION SELECT * FROM users"));
+                () -> stage.validate("<script>alert('xss')</script>"));
 
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
     }
 
     @Test
@@ -370,9 +289,9 @@ class PatternMatchingStageTest {
 
         // Should still detect due to regex patterns being case-insensitive
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate("UNION SELECT * FROM users"));
+                () -> stage.validate("<script>alert('xss')</script>"));
 
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
     }
 
     // ========== Validation Type Context Tests ==========
@@ -395,22 +314,22 @@ class PatternMatchingStageTest {
     }
 
     @Test
-    void shouldApplyInjectionToAllTypes() {
+    void shouldApplyXSSToAllTypes() {
         SecurityConfiguration config = SecurityConfiguration.defaults();
-        String sqlInjection = "' OR 1=1 --";
+        String xssAttack = "<script>alert('xss')</script>";
 
-        // SQL injection should be detected across all validation types
+        // XSS should be detected across all validation types
         PatternMatchingStage pathStage = new PatternMatchingStage(config, ValidationType.URL_PATH);
-        assertThrows(UrlSecurityException.class, () -> pathStage.validate(sqlInjection));
+        assertThrows(UrlSecurityException.class, () -> pathStage.validate(xssAttack));
 
         PatternMatchingStage paramStage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-        assertThrows(UrlSecurityException.class, () -> paramStage.validate(sqlInjection));
+        assertThrows(UrlSecurityException.class, () -> paramStage.validate(xssAttack));
 
         PatternMatchingStage nameStage = new PatternMatchingStage(config, ValidationType.PARAMETER_NAME);
-        assertThrows(UrlSecurityException.class, () -> nameStage.validate(sqlInjection));
+        assertThrows(UrlSecurityException.class, () -> nameStage.validate(xssAttack));
 
         PatternMatchingStage headerStage = new PatternMatchingStage(config, ValidationType.HEADER_VALUE);
-        assertThrows(UrlSecurityException.class, () -> headerStage.validate(sqlInjection));
+        assertThrows(UrlSecurityException.class, () -> headerStage.validate(xssAttack));
     }
 
     @Test
@@ -421,14 +340,14 @@ class PatternMatchingStageTest {
 
         // Should detect in PARAMETER_NAME
         PatternMatchingStage nameStage = new PatternMatchingStage(config, ValidationType.PARAMETER_NAME);
-        assertThrows(UrlSecurityException.class, () -> nameStage.validate("cmd"));
+        assertThrows(UrlSecurityException.class, () -> nameStage.validate("script"));
 
         // Should NOT detect in other types
         PatternMatchingStage pathStage = new PatternMatchingStage(config, ValidationType.URL_PATH);
-        assertEquals("cmd", pathStage.validate("cmd"));
+        assertEquals("script", pathStage.validate("script"));
 
         PatternMatchingStage valueStage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-        assertEquals("cmd", valueStage.validate("cmd"));
+        assertEquals("script", valueStage.validate("script"));
     }
 
     // ========== Conditional Validation Tests ==========
@@ -471,12 +390,12 @@ class PatternMatchingStageTest {
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
 
         // Create very long input with attack pattern at the end
-        String longInput = generateRepeatedPattern("normal", 1000) + "'; DROP TABLE users; --";
+        String longInput = generateRepeatedPattern("normal", 1000) + "<script>alert('xss')</script>";
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longInput));
 
-        assertEquals(UrlSecurityFailureType.SQL_INJECTION_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
     }
 
     @Test

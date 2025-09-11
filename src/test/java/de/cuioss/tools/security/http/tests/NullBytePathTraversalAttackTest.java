@@ -148,7 +148,7 @@ class NullBytePathTraversalAttackTest {
         assertNotNull(exception);
         assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), nullBytePattern),
                 "Should detect null byte attack: " + exception.getFailureType() + " for pattern: " + nullBytePattern);
-        
+
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount,
                 "Security event should be recorded for: " + nullBytePattern);
@@ -213,7 +213,7 @@ class NullBytePathTraversalAttackTest {
         // And: Exception should be properly formed
         assertNotNull(exception);
         assertTrue(isNullBytePathTraversalSpecificFailure(exception.getFailureType(), nullBytePathTraversalPattern));
-        
+
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
@@ -240,7 +240,7 @@ class NullBytePathTraversalAttackTest {
 
         // And: Exception should be properly formed
         assertNotNull(exception);
-        
+
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
@@ -267,7 +267,7 @@ class NullBytePathTraversalAttackTest {
 
         // And: Exception should be properly formed
         assertNotNull(exception);
-        
+
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }

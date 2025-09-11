@@ -50,9 +50,7 @@ class UrlSecurityFailureTypeTest {
         assertNotNull(UrlSecurityFailureType.EXCESSIVE_NESTING);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PARAMETER_NAME);
-        assertNotNull(UrlSecurityFailureType.SQL_INJECTION_DETECTED);
         assertNotNull(UrlSecurityFailureType.XSS_DETECTED);
-        assertNotNull(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED);
         assertNotNull(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE);
         assertNotNull(UrlSecurityFailureType.MALFORMED_INPUT);
         assertNotNull(UrlSecurityFailureType.INVALID_STRUCTURE);
@@ -61,14 +59,14 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldHave25FailureTypes() {
-        // Verify we have the expected number of failure types
+    void shouldHave23FailureTypes() {
+        // Verify we have the expected number of failure types (removed 2 application-layer types)
         UrlSecurityFailureType[] values = UrlSecurityFailureType.values();
-        assertEquals(25, values.length, "Should have 25 failure types");
+        assertEquals(23, values.length, "Should have 23 failure types after removing SQL and Command injection");
     }
 
     @ParameterizedTest
-    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 25)
+    @TypeGeneratorSource(value = UrlSecurityFailureTypeGenerator.class, count = 23)
     void shouldHaveNonNullDescriptions(UrlSecurityFailureType type) {
         assertNotNull(type.getDescription(), "Description should not be null for: " + type);
         assertFalse(type.getDescription().trim().isEmpty(), "Description should not be empty for: " + type);
@@ -159,15 +157,13 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldCorrectlyIdentifyInjectionAttacks() {
-        assertTrue(UrlSecurityFailureType.SQL_INJECTION_DETECTED.isInjectionAttack());
-        assertTrue(UrlSecurityFailureType.XSS_DETECTED.isInjectionAttack());
-        assertTrue(UrlSecurityFailureType.COMMAND_INJECTION_DETECTED.isInjectionAttack());
+    void shouldCorrectlyIdentifyXSSAttacks() {
+        assertTrue(UrlSecurityFailureType.XSS_DETECTED.isXSSAttack());
 
-        // Non-injection attacks should return false
-        assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isInjectionAttack());
-        assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isInjectionAttack());
-        assertFalse(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED.isInjectionAttack());
+        // Non-XSS attacks should return false
+        assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isXSSAttack());
+        assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isXSSAttack());
+        assertFalse(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED.isXSSAttack());
     }
 
     @Test
@@ -202,7 +198,7 @@ class UrlSecurityFailureTypeTest {
         if (type.isCharacterAttack()) categoryCount++;
         if (type.isSizeViolation()) categoryCount++;
         if (type.isPatternBased()) categoryCount++;
-        if (type.isInjectionAttack()) categoryCount++;
+        if (type.isXSSAttack()) categoryCount++;
         if (type.isStructuralIssue()) categoryCount++;
         if (type.isProtocolViolation()) categoryCount++;
         if (type.isIPv6HostAttack()) categoryCount++;
