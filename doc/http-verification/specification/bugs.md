@@ -22,7 +22,7 @@ During comprehensive analysis of the HTTP security test framework, systematic qu
 - [x] **Document framework violations** - Identified systematic design errors
 - [x] **Audit all converted generators** - Comprehensive audit completed
 - [x] **Split mixed-purpose generators**: Implemented "Option B: Separate Generators"
-  - [x] **CookieGenerator** → `ValidCookieGenerator` + `AttackCookieGenerator` 
+  - [x] ~~**CookieGenerator**~~ **REMOVED** ✅ → `ValidCookieGenerator` + `AttackCookieGenerator` 
   - [x] **URLParameterGenerator** → `ValidURLParameterGenerator` + `AttackURLParameterGenerator`
   - [x] **ValidHTTPHeaderValueGenerator** - Removed call-counter anti-pattern
 - [x] **Remove call-counter anti-pattern** - All generators now seed-based and stateless
@@ -188,7 +188,7 @@ Generators using fixedValues() for simple test data where dynamic generation imp
 - [x] **UnicodeAttackGenerator**: Converted unicodeAttacks from fixedValues() to dynamic generation (6 Unicode attack patterns + 4 path targets)
 - [x] **ComplexEncodingCombinationGenerator**: Converted targetGen from fixedValues() to dynamic generation (5 target patterns)
 - [x] **ProtocolHandlerAttackGenerator**: Converted hostGen and pathGen from fixedValues() to dynamic generation (6 hosts + 6 paths)
-- [x] **CookieGenerator**: Converted 5 category generators from fixedValues() to dynamic generation (sessionCategories, tokenCategories, contextCategories, domainCategories, pathCategories)
+- [x] ~~**CookieGenerator**~~ **REMOVED** ✅: Was converted from 5 category generators from fixedValues() to dynamic generation, then removed in favor of ValidCookieGenerator + AttackCookieGenerator
 - [x] **XssInjectionAttackGenerator**: Converted 7 category generators from fixedValues() to dynamic generation (pathCategories, functionCategories, traversalCategories, systemCategories, attackCategories, technicalCategories, contextCategories + 1 inline fixedValues)
 - [x] **HTTPHeaderInjectionGenerator**: Converted 6 generator fields plus 2 inline fixedValues to dynamic generation (baseTokenGen, injectedHeaderGen, maliciousValueGen, maliciousUrlGen, contentTypeGen, hostGen + method/path selectors)
 - [x] **URLParameterGenerator**: Converted 15 category generators plus 1 inline fixedValues to dynamic generation (parameterCategories, searchCategories, dataCategories, localeCategories, booleanValues, sortValues, formatValues, languageValues, statusValues, systemPaths, scriptTags, sqlCommands, tableNames, maliciousDomains, protocolSchemes + xssPayload)
@@ -253,7 +253,7 @@ public String next() {
   - [x] Demonstrated with SupportedValidationTypeGeneratorContractTest example
 - [x] **Fix contract violations** in active generators:
   - [x] **BoundaryFuzzingGenerator**: Fixed QI-17 .repeat() violations, replaced with dynamic generation
-  - [x] **Skipped deprecated generators**: CookieGenerator, URLParameterGenerator (marked for removal)
+  - [x] **Skipped deprecated generators**: ~~CookieGenerator~~ **REMOVED** ✅, URLParameterGenerator (marked for removal)
 - [x] **Document generator architecture**: Contract specification with examples and anti-patterns
 
 ### Contract Standards Established:
@@ -471,6 +471,34 @@ void shouldBlockSomeAttacks(String attack) {
 3. ✅ **QI-5 implementation** provides comprehensive generator test coverage, eliminating need for hardcoded array bypass patterns
 
 **Dependencies**: ✅ **COMPLETE SUCCESS** - QI-11 fully implemented with systematic bypass pattern elimination
+
+---
+
+## QI-20: Deprecated Generator Cleanup ✅
+**Status**: 🟢 **COMPLETED** - Deprecated CookieGenerator removed successfully  
+**Impact**: Eliminated framework violation anti-patterns, completed generator architecture consolidation
+
+### Deprecated Generator Removal Completed ✅:
+**ARCHITECTURE CLEANUP**: Removed deprecated CookieGenerator that violated framework compliance with call-counter anti-pattern and mixed legitimate/attack data generation.
+
+**Files Removed (2/2)**:
+- [x] **CookieGenerator.java** → Framework violating generator with mixed-purpose data generation
+- [x] **CookieGeneratorTest.java** → Test file for deprecated generator with 24 test methods
+
+**Successor Generators (Active)**:
+- ✅ **ValidCookieGenerator** → Clean, legitimate cookie generation for validation testing
+- ✅ **AttackCookieGenerator** → Focused attack pattern generation for security testing
+
+**Benefits Achieved**:
+- **Framework compliance restored**: Eliminated call-counter anti-pattern violation
+- **Separation of concerns**: Clear distinction between legitimate and attack data generation
+- **Architecture consolidation**: Framework now follows consistent patterns across all generators
+- **Test coverage maintained**: 21 tests continue to pass with successor generators
+
+**Verification Results**:
+- **Pre-commit build**: ✅ PASSED - No compilation issues or regressions
+- **Cookie generator tests**: ✅ 21/21 tests passing - ValidCookieGenerator (8 tests) + AttackCookieGenerator (13 tests)
+- **No client adaptations needed**: AllGeneratorsIntegrationTest already used successor generators
 
 ---
 
