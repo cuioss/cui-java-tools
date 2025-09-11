@@ -59,7 +59,10 @@ class HomographAttackDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
+        SecurityConfiguration config = SecurityConfiguration.builder()
+                .allowHighBitCharacters(true)  // Allow Unicode characters for homograph detection
+                .failOnSuspiciousPatterns(true)  // Enable suspicious pattern detection
+                .build();
         eventCounter = new SecurityEventCounter();
         pipeline = new URLPathValidationPipeline(config, eventCounter);
     }

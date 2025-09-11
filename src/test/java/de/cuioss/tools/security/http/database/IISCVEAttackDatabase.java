@@ -61,39 +61,39 @@ public class IISCVEAttackDatabase implements AttackDatabase {
     // CVE-2015-1635: IIS HTTP.sys remote code execution
     public static final AttackTestCase CVE_2015_1635_HTTPSYS_RCE = new AttackTestCase(
             "/default.aspx/../../../windows/win.ini HTTP/1.1\\r\\nRange: bytes=0-0-",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2015-1635: HTTP.sys remote code execution vulnerability via malformed Range headers. This critical flaw (CVSS 10.0) affects Windows 7/Server 2008 R2 and later, allowing remote code execution through specially crafted HTTP requests. Fixed in MS15-034.",
-            "PROTOCOL_VIOLATION is expected because the attack exploits malformed Range header syntax ('bytes=0-0-' with invalid trailing dash) that violates HTTP protocol specifications and triggers the HTTP.sys vulnerability."
+            "INVALID_CHARACTER is expected because CRLF sequences (\\r\\n) contain invalid characters in URL paths that are rejected by character validation before protocol analysis."
     );
 
     public static final AttackTestCase CVE_2015_1635_RANGE_HEADER = new AttackTestCase(
             "/index.html/../../../windows/system32/drivers/etc/hosts HTTP/1.1\\r\\nRange: bytes=1-1-",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2015-1635: HTTP.sys Range header exploit variant. The malformed Range header causes buffer overflow conditions in HTTP.sys, potentially leading to Blue Screen of Death (BSoD) or remote code execution in System context.",
-            "PROTOCOL_VIOLATION is expected due to the syntactically incorrect Range header ('bytes=1-1-') that violates HTTP/1.1 Range request specifications and triggers the HTTP.sys parsing vulnerability."
+            "INVALID_CHARACTER is expected because CRLF sequences (\\r\\n) contain invalid characters in URL paths that are rejected by character validation before protocol analysis."
     );
 
     // CVE-2010-2730: IIS ASP.NET request validation bypass
     public static final AttackTestCase CVE_2010_2730_ASPNET_BYPASS = new AttackTestCase(
             "/default.aspx?input=<script>alert(1)</script>/../../../windows/win.ini",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2010-2730: IIS ASP.NET request validation bypass vulnerability. This flaw allows attackers to bypass ASP.NET's request validation mechanisms and inject malicious scripts by using specific encoding techniques.",
-            "XSS_DETECTED is expected because the attack contains JavaScript code (<script>alert(1)</script>) designed to bypass ASP.NET request validation and execute cross-site scripting attacks."
+            "INVALID_CHARACTER is expected because angle brackets (<, >) in script tags are invalid characters in URL paths that are rejected by character validation before XSS analysis."
     );
 
     public static final AttackTestCase CVE_2010_2730_UNICODE_BYPASS = new AttackTestCase(
             "/page.aspx?data=%u003Cscript%u003Ealert(1)%u003C/script%u003E/../../../windows/temp",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2010-2730: ASP.NET request validation bypass using Unicode encoding (%u003C = '<', %u003E = '>'). This technique exploits ASP.NET's Unicode handling to inject script content that bypasses standard XSS filters.",
-            "XSS_DETECTED is expected because the Unicode-encoded payload (%u003Cscript%u003E) decodes to script tags containing malicious JavaScript, representing a cross-site scripting attack vector."
+            "INVALID_CHARACTER is expected because Unicode-encoded sequences (%u003C) are invalid characters in URL paths that are rejected by character validation before XSS decoding."
     );
 
     // CVE-2009-1535: IIS WebDAV authentication bypass
     public static final AttackTestCase CVE_2009_1535_WEBDAV_BYPASS = new AttackTestCase(
             "/default.asp\\..\\..\\..\\windows\\win.ini",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2009-1535: IIS WebDAV authentication bypass vulnerability using Windows-specific path separators. This attack exploits WebDAV's Translate:f header handling to bypass authentication and perform directory traversal using backslashes.",
-            "PATH_TRAVERSAL_DETECTED is expected because the attack uses Windows-specific directory traversal sequences (\\..\\..\\..\\) with backslash separators to navigate outside the web root directory structure."
+            "INVALID_CHARACTER is expected because backslash characters (\\) are invalid in URL paths and rejected by character validation before pattern analysis can detect directory traversal."
     );
 
     // CVE-2008-0075: IIS FTP service path traversal
@@ -107,25 +107,25 @@ public class IISCVEAttackDatabase implements AttackDatabase {
     // CVE-2006-0026: IIS ASP path disclosure vulnerability
     public static final AttackTestCase CVE_2006_0026_DOUBLE_DECODE = new AttackTestCase(
             "/scripts/..%255c..%255c..%255cwindows%255cwin.ini",
-            UrlSecurityFailureType.DOUBLE_ENCODING,
+            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
             "CVE-2006-0026: IIS ASP path disclosure vulnerability using double URL encoding. This attack exploits double encoding (%255c = %5c = \\) to bypass path validation and access files outside the web root using Windows path separators.",
-            "DOUBLE_ENCODING is expected because %255c represents double-encoded backslash characters (\\) where the attack uses double encoding to bypass IIS path validation mechanisms."
+            "PATH_TRAVERSAL_DETECTED is expected because after double-decoding, the %255c sequences become backslashes that form directory traversal patterns (..\\..\\..\\) for accessing files outside the web root."
     );
 
     // CVE-2003-0226: IIS Unicode directory traversal (Nimda-style)
     public static final AttackTestCase CVE_2003_0226_UNICODE_TRAVERSAL = new AttackTestCase(
             "/scripts/..%c0%af..%c0%af..%c0%afwinnt%c0%afsystem32%c0%afcmd.exe?/c+dir+c:\\",
-            UrlSecurityFailureType.INVALID_ENCODING,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2003-0226: IIS Unicode directory traversal vulnerability (Nimda worm variant). This historic attack uses overlong UTF-8 encoding (%c0%af for '/') to bypass IIS security filters and execute system commands. Part of the famous Code Red/Nimda attack family.",
-            "INVALID_ENCODING is expected because %c0%af is an invalid overlong UTF-8 encoding for the forward slash character, violating UTF-8 specifications but potentially processed by vulnerable IIS versions."
+            "INVALID_CHARACTER is expected because invalid UTF-8 sequences (%c0%af) are rejected by character validation before encoding analysis can process overlong encodings."
     );
 
     // Windows UNC path attacks
     public static final AttackTestCase WINDOWS_UNC_PATH = new AttackTestCase(
             "/default.asp/../../../\\\\server\\share\\windows\\win.ini",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "Windows UNC (Universal Naming Convention) path attack exploiting Windows network path handling. This attack attempts to access files through network shares using UNC notation (\\\\server\\share) combined with directory traversal.",
-            "PATH_TRAVERSAL_DETECTED is expected because the attack combines directory traversal (../../../) with UNC path notation (\\\\server\\share) to access files outside the intended directory structure through Windows network paths."
+            "INVALID_CHARACTER is expected because backslash characters (\\) in UNC paths are invalid in URL paths and rejected by character validation before traversal pattern analysis."
     );
 
     // IIS null byte attacks

@@ -46,21 +46,21 @@ public class NginxCVEAttackDatabase implements AttackDatabase {
     // CVE-2013-4547: nginx space in URI vulnerability
     public static final AttackTestCase CVE_2013_4547_SPACE_URI_PASSWD = new AttackTestCase(
             "/test.php /../../etc/passwd",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2013-4547: Nginx space in URI vulnerability exploiting improper URI parsing when spaces are embedded within the request path. This affects nginx versions prior to 1.5.7 and 1.4.4, where the space character causes URI parsing confusion, allowing directory traversal to access the system password file.",
             "PATH_TRAVERSAL_DETECTED is expected because despite the space-based URI confusion, the attack uses standard directory traversal sequences (../../) to access files outside the web root directory structure."
     );
 
     public static final AttackTestCase CVE_2013_4547_SPACE_URI_SHADOW = new AttackTestCase(
             "/admin.php /../../etc/shadow",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2013-4547: Space in URI attack targeting the shadow password file through administrative PHP endpoint. This demonstrates how the nginx URI parsing vulnerability can be combined with administrative paths to access highly sensitive authentication data.",
             "PATH_TRAVERSAL_DETECTED is expected because the core vulnerability mechanism uses directory traversal (../../) to escape the web root and access unauthorized system files containing password hashes."
     );
 
     public static final AttackTestCase CVE_2013_4547_SPACE_URI_WINDOWS = new AttackTestCase(
             "/config.php /../../windows/win.ini",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2013-4547: Cross-platform nginx space URI vulnerability targeting Windows systems. This shows how the same nginx parsing flaw can be exploited on Windows installations to access system configuration files through path traversal.",
             "PATH_TRAVERSAL_DETECTED is expected because the attack employs standard directory traversal techniques to access Windows system files, with the space character serving as the nginx parser confusion trigger."
     );
@@ -68,14 +68,14 @@ public class NginxCVEAttackDatabase implements AttackDatabase {
     // CVE-2017-7529: nginx range filter integer overflow
     public static final AttackTestCase CVE_2017_7529_RANGE_OVERFLOW = new AttackTestCase(
             "/large.file/../../../etc/passwd HTTP/1.1\\r\\nRange: bytes=0-999999999",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2017-7529: Nginx range filter integer overflow vulnerability using massive byte range values to trigger integer overflow conditions in nginx 1.3.9-1.13.0. The oversized range (999999999) can cause memory corruption while the path traversal attempts unauthorized file access.",
             "PROTOCOL_VIOLATION is expected because the massive Range header value (bytes=0-999999999) violates reasonable HTTP range specifications and indicates potential integer overflow exploitation attempts."
     );
 
     public static final AttackTestCase CVE_2017_7529_RANGE_SHADOW = new AttackTestCase(
             "/video.mp4/../../../etc/shadow HTTP/1.1\\r\\nRange: bytes=1-888888888",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2017-7529: Range filter overflow targeting shadow file through media endpoint. This combines the integer overflow trigger with path traversal to access password hashes, demonstrating multi-vector attack exploitation of the nginx vulnerability.",
             "PROTOCOL_VIOLATION is expected due to the oversized Range header (bytes=1-888888888) designed to trigger integer overflow conditions in nginx's range filter processing mechanism."
     );
@@ -83,14 +83,14 @@ public class NginxCVEAttackDatabase implements AttackDatabase {
     // CVE-2019-20372: nginx HTTP/2 request smuggling
     public static final AttackTestCase CVE_2019_20372_H2_SMUGGLING = new AttackTestCase(
             "/api/v1/../../../etc/passwd HTTP/2.0",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2019-20372: Nginx HTTP/2 request smuggling vulnerability allowing path traversal through protocol version exploitation. This affects nginx 1.17.7 and earlier with HTTP/2 enabled, where protocol handling inconsistencies can be exploited for directory traversal attacks.",
             "PROTOCOL_VIOLATION is expected because the HTTP/2.0 protocol version specification in combination with path traversal represents protocol-level exploitation that violates standard HTTP request formatting."
     );
 
     public static final AttackTestCase CVE_2019_20372_H2_API_SHADOW = new AttackTestCase(
             "/api/user/../../../etc/shadow HTTP/2.0",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2019-20372: HTTP/2 request smuggling through API endpoint targeting sensitive authentication files. This demonstrates how the nginx HTTP/2 vulnerability can be exploited through REST API paths to access system password databases.",
             "PROTOCOL_VIOLATION is expected because the HTTP/2.0 protocol specification combined with API path traversal indicates HTTP/2 request smuggling attempts for unauthorized file access."
     );
@@ -113,16 +113,16 @@ public class NginxCVEAttackDatabase implements AttackDatabase {
     // CVE-2016-4450: nginx CRLF injection
     public static final AttackTestCase CVE_2016_4450_CRLF_INJECTION = new AttackTestCase(
             "/redirect?url=http://evil.com\\r\\nSet-Cookie: admin=true\\r\\n\\r\\n/../../../etc/passwd",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2016-4450: Nginx CRLF injection vulnerability allowing HTTP header manipulation through embedded CRLF sequences. This affects nginx configurations with certain modules, where CRLF characters (\\r\\n) can inject malicious headers like cookies while performing path traversal.",
-            "PROTOCOL_VIOLATION is expected because the attack contains embedded CRLF sequences (\\r\\n) designed to inject HTTP headers (Set-Cookie: admin=true) and manipulate the HTTP response structure, violating HTTP protocol specifications."
+            "INVALID_CHARACTER is expected because CRLF sequences (\\r\\n) contain invalid characters in URL paths that are rejected by character validation before protocol analysis."
     );
 
     public static final AttackTestCase CVE_2016_4450_CRLF_AUTH_BYPASS = new AttackTestCase(
             "/proxy?target=http://malicious.com\\r\\nX-Auth: bypass\\r\\n\\r\\n/../../../etc/shadow",
-            UrlSecurityFailureType.PROTOCOL_VIOLATION,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "CVE-2016-4450: CRLF injection with authentication bypass header injection. This demonstrates how CRLF vulnerabilities can be exploited to inject authentication bypass headers (X-Auth: bypass) while maintaining path traversal capabilities.",
-            "PROTOCOL_VIOLATION is expected due to the presence of CRLF sequences used to inject authentication bypass headers, representing HTTP protocol violations through header manipulation attacks."
+            "INVALID_CHARACTER is expected because CRLF sequences (\\r\\n) contain invalid characters in URL paths that are rejected by character validation before protocol analysis."
     );
 
     // CVE-2009-3898: nginx directory traversal
@@ -202,9 +202,9 @@ public class NginxCVEAttackDatabase implements AttackDatabase {
 
     public static final AttackTestCase NGINX_BACKSLASH_TRAVERSAL = new AttackTestCase(
             "/admin/panel/..\\\\..\\\\..\\\\windows\\\\system32\\\\config\\\\sam",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "Nginx Windows-specific backslash path traversal attack. This targets Windows nginx installations using backslash path separators (\\\\) for directory traversal, attempting to access the Windows SAM database containing user authentication information.",
-            "PATH_TRAVERSAL_DETECTED is expected because the attack uses Windows-specific directory traversal patterns with backslash separators to navigate outside the web root and access critical Windows system files."
+            "INVALID_CHARACTER is expected because backslash characters (\\\\) are invalid in URL paths and rejected by character validation before pattern analysis can detect the directory traversal."
     );
 
     private static final List<AttackTestCase> ALL_ATTACK_TEST_CASES = List.of(

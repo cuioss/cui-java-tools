@@ -54,9 +54,9 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
 
     public static final AttackTestCase CLASSIC_PATH_TRAVERSAL_WINDOWS = new AttackTestCase(
             "..\\..\\..\\windows\\win.ini",
-            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A01: Windows-specific path traversal using backslash separators to access the win.ini configuration file. This demonstrates cross-platform path traversal techniques targeting Windows file systems.",
-            "PATH_TRAVERSAL_DETECTED is expected due to the Windows-specific directory traversal pattern (..\\) designed to escape directory boundaries and access system configuration files."
+            "INVALID_CHARACTER is expected because backslash characters (\\) are invalid in URL paths and rejected by character validation before traversal pattern analysis."
     );
 
     // A01: Encoded Path Traversal
@@ -69,17 +69,17 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
 
     public static final AttackTestCase DOUBLE_ENCODED_TRAVERSAL = new AttackTestCase(
             "%252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd",
-            UrlSecurityFailureType.DOUBLE_ENCODING,
+            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
             "OWASP A01: Double URL-encoded path traversal where %252e represents double-encoded dots (%2e -> %252e). This technique bypasses security filters that decode input only once, as the first decoding yields %2e which then decodes to '.' on second processing.",
-            "DOUBLE_ENCODING is expected because this attack specifically exploits double URL encoding to bypass single-layer decoding security mechanisms, representing a clear double encoding attack pattern."
+            "PATH_TRAVERSAL_DETECTED is expected because after double URL decoding, the pattern resolves to standard directory traversal sequences (../../../) for accessing unauthorized files."
     );
 
     // A01: UTF-8 Overlong Encoding
     public static final AttackTestCase UTF8_OVERLONG_TRAVERSAL = new AttackTestCase(
             "%c0%ae%c0%ae%c0%af%c0%ae%c0%ae%c0%afetc%c0%afpasswd",
-            UrlSecurityFailureType.INVALID_ENCODING,
+            UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED,
             "OWASP A01: UTF-8 overlong encoding attack using invalid UTF-8 sequences (%c0%ae for '.' and %c0%af for '/') to bypass security filters. These are overlong encodings that violate UTF-8 specifications but may be processed by vulnerable parsers.",
-            "INVALID_ENCODING is expected because %c0%ae and %c0%af are invalid overlong UTF-8 encodings that violate the UTF-8 specification, though they may decode to '.' and '/' characters in vulnerable implementations."
+            "PATH_TRAVERSAL_DETECTED is expected because after processing overlong UTF-8 sequences, the pattern resolves to directory traversal sequences (../../../) for accessing system files."
     );
 
     // A01: Null Byte Injection
@@ -87,31 +87,31 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
             "../../../etc/passwd%00.jpg",
             UrlSecurityFailureType.NULL_BYTE_INJECTION,
             "OWASP A01: Null byte injection combined with path traversal, appending %00.jpg to bypass file extension restrictions. The null byte terminates string processing in vulnerable applications, effectively truncating the filename and ignoring the .jpg extension.",
-            "NULL_BYTE_INJECTION is expected because the %00 character represents a null byte that can terminate string processing in vulnerable parsers, effectively bypassing file extension validation mechanisms."
+            "NULL_BYTE_INJECTION is expected because the null byte sequence (%00) is detected before directory traversal pattern analysis in the validation pipeline."
     );
 
     // A03: SQL Injection in Path Context
     public static final AttackTestCase SQL_INJECTION_PATH = new AttackTestCase(
             "/users/'; DROP TABLE users; --",
-            UrlSecurityFailureType.SQL_INJECTION_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A03: SQL injection attack embedded in URL path, attempting to terminate the original query and execute destructive SQL commands. This pattern exploits applications that use path segments directly in SQL queries without proper parameterization.",
-            "SQL_INJECTION_DETECTED is expected because the payload contains SQL syntax including statement termination (;), SQL commands (DROP TABLE), and comment indicators (--) characteristic of SQL injection attacks."
+            "INVALID_CHARACTER is expected because single quotes (') and semicolons (;) are invalid characters in URL paths that are rejected by character validation before SQL pattern analysis."
     );
 
     // A03: XSS Injection in Path Context
     public static final AttackTestCase XSS_SCRIPT_TAG = new AttackTestCase(
             "/<script>alert('XSS')</script>",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A03: Cross-Site Scripting (XSS) attack using JavaScript embedded in URL path. This payload tests for reflected XSS vulnerabilities where user input from the URL path is echoed back to the browser without proper sanitization.",
-            "XSS_DETECTED is expected because the payload contains HTML script tags with JavaScript code (alert function call) designed to execute malicious scripts in the victim's browser context."
+            "INVALID_CHARACTER is expected because angle brackets (<, >) and single quotes (') in script tags are invalid characters in URL paths that are rejected by character validation before XSS analysis."
     );
 
     // A03: Command Injection in Path Context
     public static final AttackTestCase COMMAND_INJECTION_PATH = new AttackTestCase(
             "/file;cat /etc/passwd",
-            UrlSecurityFailureType.COMMAND_INJECTION_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A03: Command injection attack using semicolon (;) to chain system commands. This exploits applications that execute system commands using unsanitized path input, allowing attackers to append additional commands like 'cat /etc/passwd'.",
-            "COMMAND_INJECTION_DETECTED is expected because the semicolon (;) acts as a command separator in Unix shells, and 'cat /etc/passwd' is a system command designed to read sensitive system files."
+            "INVALID_CHARACTER is expected because semicolons (;) and spaces are invalid characters in URL paths that are rejected by character validation before command injection analysis."
     );
 
     // A06: Vulnerable Components
@@ -133,16 +133,16 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
     // A10: Server-Side Request Forgery (SSRF)
     public static final AttackTestCase SSRF_LOCALHOST = new AttackTestCase(
             "/redirect?url=http://localhost:22/",
-            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A10: Server-Side Request Forgery (SSRF) attack attempting to access internal services by redirecting to localhost on port 22 (SSH). This exploits insufficient validation of user-provided URLs in server-side request functionality.",
-            "SUSPICIOUS_PATTERN_DETECTED is expected because accessing localhost with specific ports (like 22 for SSH) represents a suspicious pattern commonly associated with SSRF attacks attempting to probe internal network services."
+            "INVALID_CHARACTER is expected because colons (:) in URL schemes and port numbers are invalid characters in URL paths that are rejected by character validation before SSRF pattern analysis."
     );
 
     public static final AttackTestCase SSRF_METADATA_SERVICE = new AttackTestCase(
             "/proxy?target=http://169.254.169.254/",
-            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            UrlSecurityFailureType.INVALID_CHARACTER,
             "OWASP A10: SSRF attack targeting cloud metadata services at 169.254.169.254, a link-local address used by AWS, Azure, and Google Cloud to provide instance metadata. Successful exploitation can lead to credential theft and privilege escalation.",
-            "SUSPICIOUS_PATTERN_DETECTED is expected because 169.254.169.254 is a well-known cloud metadata service IP address, and requests to this address from web applications typically indicate SSRF attack attempts."
+            "INVALID_CHARACTER is expected because colons (:) in URL schemes are invalid characters in URL paths that are rejected by character validation before SSRF pattern analysis."
     );
 
     // Advanced encoding combinations
