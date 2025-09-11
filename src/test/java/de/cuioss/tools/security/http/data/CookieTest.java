@@ -321,7 +321,7 @@ class CookieTest {
 
         // String representation should contain the cookie name if present
         if (cookie.name() != null && !cookie.name().isEmpty()) {
-            assertTrue(string.contains(cookie.name()) || string.contains("name"), "toString should include cookie name or 'name' keyword");
+            assertTrue(string.contains(cookie.name()), "toString should include the actual cookie name when present");
         }
 
         // String representation should contain some representation of the cookie

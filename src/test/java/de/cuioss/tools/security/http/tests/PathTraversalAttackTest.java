@@ -225,17 +225,18 @@ class PathTraversalAttackTest {
         assertThrows(UrlSecurityException.class, () -> pipeline.validate("../../../etc/passwd"));
         long pathTraversalCount = eventCounter.getCount(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED);
 
-        // Test encoding attack
+        // Test encoded path traversal attack (gets decoded then detected as path traversal)
         assertThrows(UrlSecurityException.class, () -> pipeline.validate("%2e%2e%2f%2e%2e%2fetc%2fpasswd"));
-        long encodingAttackCount = eventCounter.getCount(UrlSecurityFailureType.DOUBLE_ENCODING);
+        long encodedPathTraversalCount = eventCounter.getCount(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED);
 
-        // Test malicious pattern  
+        // Test malicious pattern (double slash pattern is likely detected as path traversal)
         assertThrows(UrlSecurityException.class, () -> pipeline.validate("....//....//etc/passwd"));
-        long maliciousPatternCount = eventCounter.getCount(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
+        long finalPathTraversalCount = eventCounter.getCount(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED);
 
-        // At least one of these should be incremented
-        assertTrue(pathTraversalCount > 0 || encodingAttackCount > 0 || maliciousPatternCount > 0,
-                "At least one security event type should be recorded");
+        // Each attack type should increment its corresponding counter
+        assertTrue(pathTraversalCount > 0, "Path traversal attack should be detected");
+        assertTrue(encodedPathTraversalCount > pathTraversalCount, "Encoded path traversal should also increment path traversal counter");
+        assertTrue(finalPathTraversalCount > encodedPathTraversalCount, "Malicious pattern should also increment path traversal counter");
     }
 
     /**

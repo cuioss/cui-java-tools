@@ -159,10 +159,14 @@ class OWASPTop10AttackTest {
                     () -> pipeline.validate(pattern),
                     "Classic path traversal should be blocked: " + pattern);
 
-            assertTrue(exception.getFailureType().isPathTraversalAttack() ||
-                    exception.getFailureType().isCharacterAttack() ||
-                    exception.getFailureType().isEncodingIssue(),
-                    "Should be classified as path traversal, character, or encoding attack: " + pattern);
+            // Pattern-dependent detection: backslashes trigger INVALID_CHARACTER, forward slashes trigger PATH_TRAVERSAL_DETECTED
+            if (pattern.contains("\\")) {
+                assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                        "Path traversal with backslashes should be detected as invalid character: " + pattern);
+            } else {
+                assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType(),
+                        "Path traversal with forward slashes should be detected as path traversal: " + pattern);
+            }
 
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
                     "Security event should be recorded for: " + pattern);
@@ -224,9 +228,14 @@ class OWASPTop10AttackTest {
                     () -> pipeline.validate(pattern),
                     "Null byte path traversal should be blocked: " + pattern);
 
-            assertTrue(exception.getFailureType().isCharacterAttack() ||
-                    exception.getFailureType().isPathTraversalAttack(),
-                    "Should be classified as character or path traversal attack: " + pattern);
+            // Pattern-dependent detection: backslashes trigger INVALID_CHARACTER, forward slashes allow null byte detection
+            if (pattern.contains("\\")) {
+                assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                        "Null byte patterns with backslashes should be detected as invalid character: " + pattern);
+            } else {
+                assertEquals(UrlSecurityFailureType.NULL_BYTE_INJECTION, exception.getFailureType(),
+                        "Null byte patterns with forward slashes should be detected as null byte injection: " + pattern);
+            }
         }
     }
 

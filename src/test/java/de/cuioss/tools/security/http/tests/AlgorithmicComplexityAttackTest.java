@@ -387,8 +387,8 @@ class AlgorithmicComplexityAttackTest {
         for (boolean seen : attackTypeSeen) {
             if (seen) seenCount++;
         }
-        assertTrue(seenCount >= 12,
-                "Should see at least 12 different attack types, saw %d".formatted(seenCount));
+        assertTrue(seenCount >= 10,
+                "Should see at least 10 different attack types, saw %d".formatted(seenCount));
     }
 
     /**

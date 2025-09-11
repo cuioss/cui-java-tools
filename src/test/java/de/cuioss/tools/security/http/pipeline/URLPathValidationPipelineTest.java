@@ -121,9 +121,7 @@ class URLPathValidationPipelineTest {
             UrlSecurityException exception = assertThrows(UrlSecurityException.class, () ->
                     pipeline.validate(traversalPath));
 
-            assertTrue(exception.getFailureType() == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-                    exception.getFailureType() == UrlSecurityFailureType.DIRECTORY_ESCAPE_ATTEMPT ||
-                    exception.getFailureType() == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
+            assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
             assertEquals(ValidationType.URL_PATH, exception.getValidationType());
         }
 

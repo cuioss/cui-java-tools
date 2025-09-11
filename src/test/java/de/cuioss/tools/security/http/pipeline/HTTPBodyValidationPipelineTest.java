@@ -275,8 +275,7 @@ class HTTPBodyValidationPipelineTest {
                         () -> unicodePipeline.validate(decomposed));
 
                 assertEquals(ValidationType.BODY, exception.getValidationType());
-                assertTrue(exception.getFailureType() == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-                        exception.getFailureType() == UrlSecurityFailureType.INVALID_CHARACTER);
+                assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType());
             } else {
                 String result = unicodePipeline.validate(decomposed);
                 assertEquals(decomposed, result);

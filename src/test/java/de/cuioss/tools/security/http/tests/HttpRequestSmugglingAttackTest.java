@@ -133,42 +133,29 @@ class HttpRequestSmugglingAttackTest {
      * <p>
      * Tests attacks where the front-end server processes the Content-Length
      * header while the back-end server processes the Transfer-Encoding header,
-     * creating desynchronization opportunities.
+     * creating desynchronization opportunities. Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 25)
     @DisplayName("CL.TE smuggling attacks must be blocked")
-    void shouldBlockClTeSmuggling() {
-        String[] clTeAttacks = {
-                // Basic CL.TE with chunked encoding bypass
-                "/search?q=test%0d%0aContent-Length: 6%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0a0%0d%0a%0d%0aG",
-
-                // CL.TE with admin access attempt
-                "/api/data?param=value%0d%0aContent-Length: 4%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0a5c%0d%0aGET /admin HTTP/1.1",
-
-                // CL.TE with authentication bypass
-                "/login?user=guest%0d%0aContent-Length: 13%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0a0%0d%0a%0d%0aGET /secure HTTP/1.1%0d%0aAuthorization: admin",
-
-                // CL.TE with cache poisoning
-                "/public/image.jpg%0d%0aContent-Length: 44%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0a0%0d%0a%0d%0aGET /evil HTTP/1.1%0d%0aHost: attacker.com",
-
-                // CL.TE with response splitting
-                "/redirect?url=safe%0d%0aContent-Length: 30%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0a0%0d%0a%0d%0aHTTP/1.1 302 Found%0d%0aLocation: http://evil.com"
-        };
-
-        for (String attack : clTeAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "CL.TE smuggling attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "CL.TE smuggling should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for CL.TE attack");
+    void shouldBlockClTeSmuggling(String clTeAttack) {
+        // Filter to test only CL.TE patterns (Content-Length + Transfer-Encoding)
+        if (!clTeAttack.contains("Content-Length:") || !clTeAttack.contains("Transfer-Encoding:")) {
+            return; // Skip non-CL.TE patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(clTeAttack),
+                "CL.TE smuggling attack should be rejected: " + clTeAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "CL.TE smuggling should trigger INVALID_CHARACTER detection for: " + clTeAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for CL.TE attack");
     }
 
     /**
@@ -177,41 +164,29 @@ class HttpRequestSmugglingAttackTest {
      * <p>
      * Tests attacks where the front-end server processes the Transfer-Encoding
      * header while the back-end server processes the Content-Length header.
+     * Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 25)
     @DisplayName("TE.CL smuggling attacks must be blocked")
-    void shouldBlockTeClSmuggling() {
-        String[] teClAttacks = {
-                // Basic TE.CL with chunk manipulation
-                "/api?data=test%0d%0aTransfer-Encoding: chunked%0d%0aContent-Length: 6%0d%0a%0d%0a3c%0d%0aGET /admin HTTP/1.1%0d%0aHost: backend",
-
-                // TE.CL with POST data manipulation
-                "/form?submit=data%0d%0aTransfer-Encoding: chunked%0d%0aContent-Length: 4%0d%0a%0d%0a87%0d%0aPOST /admin/delete HTTP/1.1%0d%0aContent-Length: 15",
-
-                // TE.CL with cookie injection
-                "/page?id=123%0d%0aTransfer-Encoding: chunked%0d%0aContent-Length: 8%0d%0a%0d%0a5e%0d%0aGET /secure HTTP/1.1%0d%0aCookie: admin=true",
-
-                // TE.CL with header manipulation
-                "/resource?type=json%0d%0aTransfer-Encoding: chunked%0d%0aContent-Length: 12%0d%0a%0d%0a42%0d%0aGET /config HTTP/1.1%0d%0aX-Forwarded-For: 127.0.0.1",
-
-                // TE.CL with method override
-                "/update?item=1%0d%0aTransfer-Encoding: chunked%0d%0aContent-Length: 9%0d%0a%0d%0a35%0d%0aDELETE /users/admin HTTP/1.1%0d%0aAuthorization: Bearer token"
-        };
-
-        for (String attack : teClAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "TE.CL smuggling attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "TE.CL smuggling should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for TE.CL attack");
+    void shouldBlockTeClSmuggling(String teClAttack) {
+        // Filter to test only TE.CL patterns (Transfer-Encoding + Content-Length, TE first)
+        if (!teClAttack.contains("Transfer-Encoding:") || !teClAttack.contains("Content-Length:")) {
+            return; // Skip non-TE.CL patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(teClAttack),
+                "TE.CL smuggling attack should be rejected: " + teClAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "TE.CL smuggling should trigger INVALID_CHARACTER detection for: " + teClAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for TE.CL attack");
     }
 
     /**
@@ -220,41 +195,30 @@ class HttpRequestSmugglingAttackTest {
      * <p>
      * Tests attacks using Transfer-Encoding header obfuscation to create
      * parsing differences between front-end and back-end servers.
+     * Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 30)
     @DisplayName("TE.TE smuggling attacks must be blocked")
-    void shouldBlockTeTeSmuggling() {
-        String[] teTeAttacks = {
-                // TE.TE with header obfuscation
-                "/search?q=data%0d%0aTransfer-Encoding: chunked%0d%0aTransfer-Encoding: identity%0d%0a%0d%0a2e%0d%0aGET /admin HTTP/1.1",
-
-                // TE.TE with case variation
-                "/api/call%0d%0aTransfer-Encoding: chunked%0d%0aTransfer-encoding: gzip%0d%0a%0d%0a41%0d%0aGET /backdoor HTTP/1.1%0d%0aHost: internal",
-
-                // TE.TE with space obfuscation
-                "/service?cmd=run%0d%0aTransfer-Encoding: chunked%0d%0aTransfer-Encoding : deflate%0d%0a%0d%0a33%0d%0aPOST /execute HTTP/1.1",
-
-                // TE.TE with tab obfuscation
-                "/endpoint?mode=test%0d%0aTransfer-Encoding: chunked%0d%0aTransfer-Encoding%09: compress%0d%0a%0d%0a28%0d%0aGET /shell HTTP/1.1",
-
-                // TE.TE with multiple values
-                "/process?id=42%0d%0aTransfer-Encoding: chunked, gzip%0d%0aTransfer-Encoding: identity%0d%0a%0d%0a1f%0d%0aDELETE /data HTTP/1.1"
-        };
-
-        for (String attack : teTeAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "TE.TE smuggling attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "TE.TE smuggling should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for TE.TE attack");
+    void shouldBlockTeTeSmuggling(String teTeAttack) {
+        // Filter to test patterns that might be TE.TE (multiple Transfer-Encoding headers)
+        // Note: Generator covers this in its TE.TE method, but we test all generator output
+        if (!teTeAttack.contains("Transfer-Encoding:")) {
+            return; // Skip non-Transfer-Encoding patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(teTeAttack),
+                "TE.TE smuggling attack should be rejected: " + teTeAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "TE.TE smuggling should trigger INVALID_CHARACTER detection for: " + teTeAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for TE.TE attack");
     }
 
     /**
@@ -262,42 +226,29 @@ class HttpRequestSmugglingAttackTest {
      * 
      * <p>
      * Tests attacks that attempt to poison HTTP connection pipelines
-     * to affect subsequent requests from other users.
+     * to affect subsequent requests from other users. Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 30)
     @DisplayName("HTTP pipeline poisoning attacks must be blocked")
-    void shouldBlockPipelinePoisoning() {
-        String[] pipelinePoisoningAttacks = {
-                // Basic pipeline poisoning
-                "/normal?param=value%0d%0a%0d%0aGET /admin HTTP/1.1%0d%0aHost: backend%0d%0a%0d%0a",
-
-                // Pipeline poisoning with authentication
-                "/public/file.css%0d%0a%0d%0aGET /secure HTTP/1.1%0d%0aAuthorization: Bearer admin-token%0d%0a%0d%0a",
-
-                // Pipeline poisoning with POST injection
-                "/image.png%0d%0a%0d%0aPOST /api/admin HTTP/1.1%0d%0aContent-Length: 25%0d%0a%0d%0a{\"action\":\"delete_all\"}",
-
-                // Pipeline poisoning with header injection
-                "/static/script.js%0d%0a%0d%0aGET /config HTTP/1.1%0d%0aX-Admin-Override: true%0d%0a%0d%0a",
-
-                // Pipeline poisoning with method smuggling
-                "/robots.txt%0d%0a%0d%0aDELETE /users/database HTTP/1.1%0d%0aAuthorization: admin%0d%0a%0d%0a"
-        };
-
-        for (String attack : pipelinePoisoningAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Pipeline poisoning attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "Pipeline poisoning should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for pipeline poisoning");
+    void shouldBlockPipelinePoisoning(String pipelinePoisoningAttack) {
+        // Pipeline poisoning typically uses CRLF injection patterns
+        if (!pipelinePoisoningAttack.contains("%0d%0a")) {
+            return; // Skip non-CRLF patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pipelinePoisoningAttack),
+                "Pipeline poisoning attack should be rejected: " + pipelinePoisoningAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "Pipeline poisoning should trigger INVALID_CHARACTER detection for: " + pipelinePoisoningAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for pipeline poisoning");
     }
 
     /**
@@ -305,42 +256,29 @@ class HttpRequestSmugglingAttackTest {
      * 
      * <p>
      * Tests attacks that use request smuggling to manipulate caching
-     * behavior and serve malicious content to other users.
+     * behavior and serve malicious content to other users. Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 25)
     @DisplayName("Cache deception attacks must be blocked")
-    void shouldBlockCacheDeception() {
-        String[] cacheDeceptionAttacks = {
-                // Cache poisoning with static resource mimicry
-                "/api/user/profile%0d%0a%0d%0aGET /evil.css HTTP/1.1%0d%0aHost: attacker.com%0d%0a%0d%0a",
-
-                // Cache poisoning with JavaScript injection
-                "/secure/data.json%0d%0a%0d%0aGET /malicious.js HTTP/1.1%0d%0aContent-Type: application/javascript%0d%0a%0d%0aalert('xss')",
-
-                // Cache poisoning with image replacement
-                "/user/avatar.jpg%0d%0a%0d%0aGET /fake-image.png HTTP/1.1%0d%0aLocation: http://evil.com/malware.exe%0d%0a%0d%0a",
-
-                // Cache poisoning with redirect manipulation
-                "/public/logo.png%0d%0a%0d%0aGET /redirect HTTP/1.1%0d%0aLocation: javascript:alert(document.cookie)%0d%0a%0d%0a",
-
-                // Cache poisoning with content-type confusion
-                "/assets/style.css%0d%0a%0d%0aGET /payload HTTP/1.1%0d%0aContent-Type: text/html%0d%0a%0d%0a<script>steal_data()</script>"
-        };
-
-        for (String attack : cacheDeceptionAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Cache deception attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "Cache deception should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for cache deception");
+    void shouldBlockCacheDeception(String cacheDeceptionAttack) {
+        // Cache deception through HTTP request smuggling uses CRLF patterns
+        if (!cacheDeceptionAttack.contains("%0d%0a")) {
+            return; // Skip non-CRLF patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(cacheDeceptionAttack),
+                "Cache deception attack should be rejected: " + cacheDeceptionAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "Cache deception should trigger INVALID_CHARACTER detection for: " + cacheDeceptionAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for cache deception");
     }
 
     /**
@@ -348,42 +286,29 @@ class HttpRequestSmugglingAttackTest {
      * 
      * <p>
      * Tests attacks using multiple Content-Length headers to create
-     * parsing inconsistencies between servers.
+     * parsing inconsistencies between servers. Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 25)
     @DisplayName("Double Content-Length header attacks must be blocked")
-    void shouldBlockDoubleContentLength() {
-        String[] doubleContentLengthAttacks = {
-                // Double Content-Length with different values
-                "/upload?file=data%0d%0aContent-Length: 13%0d%0aContent-Length: 6%0d%0a%0d%0aGET /admin HTTP/1.1",
-
-                // Double Content-Length with smuggling
-                "/form?data=test%0d%0aContent-Length: 8%0d%0aContent-Length: 44%0d%0a%0d%0aGET /backdoor HTTP/1.1%0d%0aAuthorization: Bearer token",
-
-                // Double Content-Length with zero bypass
-                "/api/call%0d%0aContent-Length: 0%0d%0aContent-Length: 15%0d%0a%0d%0aDELETE /secure HTTP/1.1",
-
-                // Double Content-Length with large value
-                "/service?cmd=run%0d%0aContent-Length: 999999%0d%0aContent-Length: 25%0d%0a%0d%0aPOST /admin/execute HTTP/1.1",
-
-                // Double Content-Length with negative value
-                "/endpoint?id=42%0d%0aContent-Length: -1%0d%0aContent-Length: 18%0d%0a%0d%0aGET /config HTTP/1.1"
-        };
-
-        for (String attack : doubleContentLengthAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Double Content-Length attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
-                    "Double Content-Length should trigger INVALID_CHARACTER detection for: " + attack);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for double Content-Length");
+    void shouldBlockDoubleContentLength(String doubleContentLengthAttack) {
+        // Double Content-Length attacks use Content-Length headers with CRLF
+        if (!doubleContentLengthAttack.contains("Content-Length:") || !doubleContentLengthAttack.contains("%0d%0a")) {
+            return; // Skip non-Content-Length CRLF patterns
         }
+
+        long initialEventCount = eventCounter.getTotalCount();
+
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(doubleContentLengthAttack),
+                "Double Content-Length attack should be rejected: " + doubleContentLengthAttack);
+
+        assertNotNull(exception);
+        assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, exception.getFailureType(),
+                "Double Content-Length should trigger INVALID_CHARACTER detection for: " + doubleContentLengthAttack);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for double Content-Length");
     }
 
     /**
@@ -430,40 +355,23 @@ class HttpRequestSmugglingAttackTest {
      * 
      * <p>
      * Tests various edge cases and corner conditions that might be
-     * exploited in request smuggling attacks.
+     * exploited in request smuggling attacks. Uses generator for dynamic patterns.
      * </p>
      */
-    @Test
+    @ParameterizedTest
+    @TypeGeneratorSource(value = HttpRequestSmugglingAttackGenerator.class, count = 35)
     @DisplayName("Request smuggling edge cases must be handled")
-    void shouldHandleRequestSmugglingEdgeCases() {
-        String[] edgeCaseAttacks = {
-                // Chunked encoding with malformed chunks
-                "/test?data=sample%0d%0aTransfer-Encoding: chunked%0d%0a%0d%0aZZ%0d%0aGET /admin HTTP/1.1%0d%0a%0d%0a",
+    void shouldHandleRequestSmugglingEdgeCases(String edgeCaseAttack) {
+        // Test all generator patterns as potential edge cases
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // HTTP version manipulation
-                "/page?id=1%0d%0a%0d%0aGET /secret HTTP/2.0%0d%0aHost: internal%0d%0a%0d%0a",
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(edgeCaseAttack),
+                "Request smuggling edge case should be rejected: " + edgeCaseAttack);
 
-                // Protocol downgrade attack
-                "/resource%0d%0a%0d%0aGET /admin HTTP/1.0%0d%0aConnection: keep-alive%0d%0a%0d%0a",
-
-                // Mixed line endings
-                "/api/endpoint%0a%0aGET /backdoor HTTP/1.1%0aHost: target%0a%0a",
-
-                // Extremely long smuggled request
-                "/normal" + "%0d%0a%0d%0aGET /" + generateLongPath(1000) + " HTTP/1.1%0d%0aHost: evil%0d%0a%0d%0a"
-        };
-
-        for (String attack : edgeCaseAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Request smuggling edge case should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded for edge case");
-        }
+        assertNotNull(exception);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount,
+                "Security event should be recorded for edge case");
     }
 
     /**

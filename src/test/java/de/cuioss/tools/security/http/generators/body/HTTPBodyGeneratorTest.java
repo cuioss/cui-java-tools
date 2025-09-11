@@ -141,8 +141,14 @@ class HTTPBodyGeneratorTest {
             // Test toString method works (records auto-generate this)
             String toString = body.toString();
             assertTrue(toString.contains("HTTPBody"), "toString should contain record name");
-            assertTrue(toString.contains(body.content()) || body.content().length() > 100,
-                    "toString should contain content or content is very long");
+            if (body.content().length() <= 100) {
+                assertTrue(toString.contains(body.content()),
+                        "toString should contain content when content is short");
+            } else {
+                // For very long content, just verify toString is meaningful
+                assertTrue(toString.length() > 20,
+                        "toString should be meaningful for long content");
+            }
 
             // Test equals and hashCode work (records auto-generate these)
             HTTPBody duplicate = new HTTPBody(body.content(), body.contentType(), body.encoding());

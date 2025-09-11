@@ -247,9 +247,8 @@ class UnicodeNormalizationAttackTest {
                             "Security event should be recorded for normalization change: " + test);
 
                     // Should specifically detect normalization changes
-                    assertTrue(e.getFailureType() == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-                            isUnicodeNormalizationSpecificFailure(e.getFailureType(), test),
-                            "Should detect normalization change for: " + test);
+                    assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, e.getFailureType(),
+                            "Should detect normalization as invalid character for: " + test);
                 }
             }
         }
@@ -485,9 +484,8 @@ class UnicodeNormalizationAttackTest {
 
                 // Should detect if normalization would change the input
                 if (!testCase.equals(nfc)) {
-                    assertTrue(e.getFailureType() == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-                            isUnicodeNormalizationSpecificFailure(e.getFailureType(), testCase),
-                            "Should detect normalization change for: " + testCase);
+                    assertEquals(UrlSecurityFailureType.INVALID_CHARACTER, e.getFailureType(),
+                            "Should detect normalization as invalid character for: " + testCase);
                 }
             }
         }
