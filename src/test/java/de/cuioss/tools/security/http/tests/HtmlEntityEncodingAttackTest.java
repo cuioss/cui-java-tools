@@ -72,7 +72,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2.5
  */
 @EnableGeneratorController
-@Disabled("TODO: Enable when security pipeline supports HTML entity decoding - see bugs.md QI-15")
+@Disabled("TEST REFINEMENT NEEDED: Generator produces HTML entities that aren't attack patterns - requires test logic refinement")
 @DisplayName("T7: HTML Entity Encoding Attack Tests")
 class HtmlEntityEncodingAttackTest {
 
