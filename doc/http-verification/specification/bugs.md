@@ -140,14 +140,14 @@ pattern + "?" + "field=" + "K".repeat(65536) // 64KB parameter (!!)
 #### ❌ NOT SUITABLE: Critical Security Databases
 Generators containing curated databases of proven attack vectors from real-world exploits, CVEs, and OWASP guidelines. Each pattern represents specific vulnerability exploitation where exact byte sequences are critical.
 
-**Documented as PRESERVATION REQUIRED**:
-- [x] **OWASPTop10AttackGenerator** - 173 proven OWASP attack patterns (UTF-8 overlong encoding, double URL encoding, etc.)
-- [x] **NginxCVEAttackGenerator** - CVE exploit database (CVE-2013-4547, CVE-2017-7529, etc.)
-- [x] **IISCVEAttackGenerator** - Microsoft IIS CVE patterns (CVE-2017-7269, CVE-2015-1635, etc.)
-- [x] **IPv6AddressAttackGenerator** - IPv6 protocol attack patterns (IPv4-mapped bypass, scope injection, etc.)
-- [x] **IDNAttackGenerator** - IDN/homograph attack patterns (Cyrillic homographs, punycode exploits, etc.)
-- [x] **HomographAttackGenerator** - Unicode homograph attacks (precise character relationships for visual deception)
-- [x] **ApacheCVEAttackGenerator** - Apache CVE exploit database (CVE-2021-41773, CVE-2021-42013, CVE-2019-0230, etc.)
+**Documented as PRESERVATION REQUIRED** (NOTE: CVE generators have since been removed in favor of AttackDatabase approach):
+- [x] ~~**OWASPTop10AttackGenerator**~~ **REMOVED** ✅ → Replaced by OWASPTop10AttackDatabase
+- [x] ~~**NginxCVEAttackGenerator**~~ **REMOVED** ✅ → Replaced by NginxCVEAttackDatabase
+- [x] ~~**IISCVEAttackGenerator**~~ **REMOVED** ✅ → Replaced by IISCVEAttackDatabase
+- [x] ~~**IPv6AddressAttackGenerator**~~ **REMOVED** ✅ → Replaced by IPv6AttackDatabase
+- [x] ~~**IDNAttackGenerator**~~ **REMOVED** ✅ → Replaced by IDNAttackDatabase
+- [x] ~~**HomographAttackGenerator**~~ **REMOVED** ✅ → Replaced by HomographAttackDatabase
+- [x] ~~**ApacheCVEAttackGenerator**~~ **REMOVED** ✅ → Replaced by ApacheCVEAttackDatabase
 - [x] **NullByteURLGenerator** - Null byte injection attacks (position and encoding critical for effectiveness)
 
 #### ✅ ALREADY COMPLIANT: Dynamic Generation
@@ -494,7 +494,7 @@ void shouldBlockSomeAttacks(String attack) {
 ### **✅ QI-5 MAJOR SUCCESS ACHIEVED**:
 
 **New Generator Tests Created (COMPREHENSIVE COVERAGE)**:
-- ✅ **Injection Attack Generators**: AlgorithmicComplexityAttackGenerator, CompressionBombAttackGenerator, HttpRequestSmugglingAttackGenerator, OWASPTop10AttackGenerator, XssInjectionAttackGenerator, SqlInjectionAttackGenerator
+- ✅ **Injection Attack Generators**: AlgorithmicComplexityAttackGenerator, CompressionBombAttackGenerator, HttpRequestSmugglingAttackGenerator, ~~OWASPTop10AttackGenerator~~ **REMOVED**, ~~XssInjectionAttackGenerator~~ **REMOVED**, SqlInjectionAttackGenerator
 - ✅ **Validation Generators**: ValidHTTPBodyContentGenerator, ValidHTTPHeaderNameGenerator, ValidURLParameterGenerator, ValidURLPathGenerator
 - ✅ **URL Generators**: URLLengthLimitAttackGenerator, PathTraversalParameterGenerator, PathTraversalURLGenerator, NullByteURLGenerator
 - ✅ **Cookie Generators**: CookieInjectionAttackGenerator
@@ -502,7 +502,7 @@ void shouldBlockSomeAttacks(String attack) {
 - ✅ **Header Generators**: HTTPHeaderInjectionGenerator, InvalidHTTPHeaderNameGenerator
 
 ### **CVE Database Generators** (Preserved as Database-Driven):
-**CVE Generators**: ApacheCVEAttackGenerator, IISCVEAttackGenerator, NginxCVEAttackGenerator, HomographAttackGenerator, IDNAttackGenerator, IPv6AddressAttackGenerator - These generators contain curated CVE databases and are tested through their respective database test classes rather than lightweight generator tests
+**CVE Generators** (NOTE: **REMOVED** ✅ - Replaced by AttackDatabase approach): ~~ApacheCVEAttackGenerator, IISCVEAttackGenerator, NginxCVEAttackGenerator, HomographAttackGenerator, IDNAttackGenerator, IPv6AddressAttackGenerator~~ - These generators contained curated CVE databases and have been replaced by their corresponding AttackDatabase implementations with superior documentation and testing structure
 
 ### **Simple Testing Strategy** (Following cui-test-generator patterns):
 
@@ -992,7 +992,33 @@ assertNotNull(exception.getMessage());
 - **Generators**: Use `fixedValues()` with hardcoded arrays, part of QI-6 "NOT SUITABLE" category
 - **Databases**: Provide structured `AttackTestCase` objects with comprehensive documentation, expected failure types, attack descriptions, and detection rationale
 
-**Recommendation**: Consider consolidating to database-driven approach for consistency, eliminating generator maintenance burden while preserving comprehensive attack documentation.
+### Duplicate Attack Generators Removed ✅:
+**ARCHITECTURE CONSOLIDATION COMPLETED**: All duplicate attack generators and their tests have been removed in favor of the superior AttackDatabase approach.
+
+**Generators Removed (8/8)**:
+- [x] **ApacheCVEAttackGenerator.java** → Replaced by ApacheCVEAttackDatabase.java
+- [x] **NginxCVEAttackGenerator.java** → Replaced by NginxCVEAttackDatabase.java  
+- [x] **IISCVEAttackGenerator.java** → Replaced by IISCVEAttackDatabase.java
+- [x] **IDNAttackGenerator.java** → Replaced by IDNAttackDatabase.java
+- [x] **IPv6AddressAttackGenerator.java** → Replaced by IPv6AttackDatabase.java
+- [x] **HomographAttackGenerator.java** → Replaced by HomographAttackDatabase.java
+- [x] **OWASPTop10AttackGenerator.java** → Replaced by OWASPTop10AttackDatabase.java
+- [x] **XssInjectionAttackGenerator.java** → Replaced by XssInjectionAttackDatabase.java
+
+**Generator Tests Removed (2/2)**:
+- [x] **XssInjectionAttackGeneratorTest.java** 
+- [x] **OWASPTop10AttackGeneratorTest.java**
+
+**Architecture Benefits Achieved**:
+- **Eliminated maintenance burden**: No more hardcoded `fixedValues()` arrays to maintain across generators
+- **Unified documentation approach**: All attack patterns now have comprehensive CVE documentation, expected failure types, and detection rationale
+- **Consistent testing architecture**: Database-driven parameterized tests provide superior structure vs generator-based approaches
+- **Code reduction**: Removed additional duplicate code while maintaining 100% attack pattern coverage
+
+**Verification Results**:
+- **Pre-commit build**: ✅ PASSED - No compilation issues or regressions
+- **Attack database tests**: ✅ 162/162 tests passing - All attack patterns continue to work perfectly
+- **Code consolidation**: Successfully eliminated architectural duplication between generators and databases
 
 ### Execution Results:
 - **162 total tests** across all attack database test suites (after duplicate removal)
