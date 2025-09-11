@@ -1183,10 +1183,31 @@ Based on this layer analysis, the following tasks must be completed:
 
 **Impact**: Successfully enforced architectural layer boundaries by removing 21 files containing application-layer attack patterns that don't belong in HTTP/URL security validation, plus systematic cleanup of remaining code to focus exclusively on HTTP/URL layer responsibilities.
 
-#### 🟡 **REVIEW: Mixed Attack Databases**  
-- [ ] **Review OWASPTop10AttackDatabase patterns** - Separate HTTP layer patterns from application layer patterns
-- [ ] **Document retained patterns** - Only keep HTTP/URL specific OWASP patterns
-- [ ] **Create application layer documentation** - Guidance for developers on proper layer for removed attacks
+#### ✅ **COMPLETED: Mixed Attack Database Review**  
+**Status**: 🟢 **COMPLETED** - OWASPTop10AttackDatabase architectural layer separation enforced  
+**Impact**: Removed 5 application-layer attack patterns, maintained 9 HTTP/URL-layer appropriate patterns
+
+**Application-Layer Patterns Removed from OWASPTop10AttackDatabase**:
+- [x] **SQL_INJECTION_PATH** - Database query logic is application responsibility
+- [x] **XSS_SCRIPT_TAG** - Content interpretation is application responsibility  
+- [x] **COMMAND_INJECTION_PATH** - OS command execution is application responsibility
+- [x] **SSRF_LOCALHOST** - Server-side request logic is application responsibility
+- [x] **SSRF_METADATA_SERVICE** - Server-side request logic is application responsibility
+
+**HTTP/URL-Layer Patterns Retained (9 patterns)**:
+- [x] **Path Traversal Attacks** (6 patterns): CLASSIC_PATH_TRAVERSAL_UNIX/WINDOWS, URL_ENCODED_TRAVERSAL, DOUBLE_ENCODED_TRAVERSAL, UTF8_OVERLONG_TRAVERSAL, MIXED_ENCODING_BYPASS
+- [x] **Null Byte Injection**: NULL_BYTE_TRAVERSAL - URL structure attack
+- [x] **Framework Traversal**: STRUTS2_COMPONENT_TRAVERSAL - HTTP framework attack
+- [x] **Authentication Bypass**: AUTH_BYPASS_TRAVERSAL - URL path manipulation attack
+
+**Architectural Documentation Updated**:
+- [x] **Class documentation updated** - Clear scope definition for HTTP/URL layer only
+- [x] **Architectural notes added** - Explains why application-layer patterns were removed
+- [x] **Description updated** - Focused on HTTP/URL security rather than broad OWASP coverage
+
+**Test Results**: ✅ 9/9 tests passing (reduced from 14 tests after removing 5 application-layer patterns)
+
+**Layer Separation Guidance**: Application developers should implement SQL injection, XSS, command injection, and SSRF detection at the application layer where they have the appropriate context for content interpretation and business logic validation.
 
 #### ✅ **PRESERVE: HTTP/URL Layer Attacks**
 All path traversal, encoding, protocol, and URL structure attacks remain appropriate for this layer.

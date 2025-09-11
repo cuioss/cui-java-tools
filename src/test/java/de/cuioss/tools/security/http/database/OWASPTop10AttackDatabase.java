@@ -31,14 +31,17 @@ import java.util.List;
  * and authentication bypasses that are commonly used by attackers and security researchers
  * to test web application security controls.</p>
  * 
- * <h3>OWASP Top 10 2021 Coverage</h3>
+ * <h3>OWASP Top 10 2021 Coverage (HTTP/URL Layer Scope)</h3>
  * <ul>
  *   <li><strong>A01: Broken Access Control</strong> - Path traversal with various encoding techniques</li>
- *   <li><strong>A03: Injection</strong> - SQL, XSS, Command, LDAP, NoSQL injection patterns</li>
  *   <li><strong>A06: Vulnerable Components</strong> - Framework-specific traversal attacks</li>
  *   <li><strong>A07: Authentication Failures</strong> - Directory traversal authentication bypasses</li>
- *   <li><strong>A10: Server-Side Request Forgery</strong> - SSRF via path manipulation</li>
  * </ul>
+ * 
+ * <p><strong>Architectural Note:</strong> Application-layer attacks (SQL injection, XSS, Command injection, SSRF) 
+ * are intentionally excluded as they should be handled by application security validation, not HTTP/URL 
+ * security validation. This maintains proper separation of concerns between HTTP protocol security 
+ * and application logic security.</p>
  * 
  * @since 2.5
  */
@@ -90,29 +93,9 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
             "NULL_BYTE_INJECTION is expected because the null byte sequence (%00) is detected before directory traversal pattern analysis in the validation pipeline."
     );
 
-    // A03: SQL Injection in Path Context
-    public static final AttackTestCase SQL_INJECTION_PATH = new AttackTestCase(
-            "/users/'; DROP TABLE users; --",
-            UrlSecurityFailureType.INVALID_CHARACTER,
-            "OWASP A03: SQL injection attack embedded in URL path, attempting to terminate the original query and execute destructive SQL commands. This pattern exploits applications that use path segments directly in SQL queries without proper parameterization.",
-            "INVALID_CHARACTER is expected because single quotes (') and semicolons (;) are invalid characters in URL paths that are rejected by character validation before SQL pattern analysis."
-    );
-
-    // A03: XSS Injection in Path Context
-    public static final AttackTestCase XSS_SCRIPT_TAG = new AttackTestCase(
-            "/<script>alert('XSS')</script>",
-            UrlSecurityFailureType.INVALID_CHARACTER,
-            "OWASP A03: Cross-Site Scripting (XSS) attack using JavaScript embedded in URL path. This payload tests for reflected XSS vulnerabilities where user input from the URL path is echoed back to the browser without proper sanitization.",
-            "INVALID_CHARACTER is expected because angle brackets (<, >) and single quotes (') in script tags are invalid characters in URL paths that are rejected by character validation before XSS analysis."
-    );
-
-    // A03: Command Injection in Path Context
-    public static final AttackTestCase COMMAND_INJECTION_PATH = new AttackTestCase(
-            "/file;cat /etc/passwd",
-            UrlSecurityFailureType.INVALID_CHARACTER,
-            "OWASP A03: Command injection attack using semicolon (;) to chain system commands. This exploits applications that execute system commands using unsanitized path input, allowing attackers to append additional commands like 'cat /etc/passwd'.",
-            "INVALID_CHARACTER is expected because semicolons (;) and spaces are invalid characters in URL paths that are rejected by character validation before command injection analysis."
-    );
+    // NOTE: SQL injection, XSS script tags, and Command injection patterns removed 
+    // as they represent application-layer security concerns that should be handled
+    // by application security validation, not HTTP/URL security validation
 
     // A06: Vulnerable Components
     public static final AttackTestCase STRUTS2_COMPONENT_TRAVERSAL = new AttackTestCase(
@@ -130,20 +113,9 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
             "PATH_TRAVERSAL_DETECTED is expected because the attack uses directory traversal (../) to navigate from a restricted admin directory to bypass access controls and reach unauthorized resources."
     );
 
-    // A10: Server-Side Request Forgery (SSRF)
-    public static final AttackTestCase SSRF_LOCALHOST = new AttackTestCase(
-            "/redirect?url=http://localhost:22/",
-            UrlSecurityFailureType.INVALID_CHARACTER,
-            "OWASP A10: Server-Side Request Forgery (SSRF) attack attempting to access internal services by redirecting to localhost on port 22 (SSH). This exploits insufficient validation of user-provided URLs in server-side request functionality.",
-            "INVALID_CHARACTER is expected because colons (:) in URL schemes and port numbers are invalid characters in URL paths that are rejected by character validation before SSRF pattern analysis."
-    );
-
-    public static final AttackTestCase SSRF_METADATA_SERVICE = new AttackTestCase(
-            "/proxy?target=http://169.254.169.254/",
-            UrlSecurityFailureType.INVALID_CHARACTER,
-            "OWASP A10: SSRF attack targeting cloud metadata services at 169.254.169.254, a link-local address used by AWS, Azure, and Google Cloud to provide instance metadata. Successful exploitation can lead to credential theft and privilege escalation.",
-            "INVALID_CHARACTER is expected because colons (:) in URL schemes are invalid characters in URL paths that are rejected by character validation before SSRF pattern analysis."
-    );
+    // NOTE: SSRF (Server-Side Request Forgery) patterns removed as they represent 
+    // application-layer logic where the application decides what external requests to make
+    // HTTP/URL layer should only validate URL structure, not application request logic
 
     // Advanced encoding combinations
     public static final AttackTestCase MIXED_ENCODING_BYPASS = new AttackTestCase(
@@ -154,20 +126,18 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
     );
 
     private static final List<AttackTestCase> ALL_ATTACK_TEST_CASES = List.of(
+            // HTTP/URL Layer Appropriate Attacks Only
             CLASSIC_PATH_TRAVERSAL_UNIX,
-            CLASSIC_PATH_TRAVERSAL_WINDOWS,
+            CLASSIC_PATH_TRAVERSAL_WINDOWS, 
             URL_ENCODED_TRAVERSAL,
             DOUBLE_ENCODED_TRAVERSAL,
             UTF8_OVERLONG_TRAVERSAL,
             NULL_BYTE_TRAVERSAL,
-            SQL_INJECTION_PATH,
-            XSS_SCRIPT_TAG,
-            COMMAND_INJECTION_PATH,
             STRUTS2_COMPONENT_TRAVERSAL,
             AUTH_BYPASS_TRAVERSAL,
-            SSRF_LOCALHOST,
-            SSRF_METADATA_SERVICE,
             MIXED_ENCODING_BYPASS
+            // Application-layer patterns (SQL injection, XSS script tags, Command injection, SSRF) 
+            // removed - these should be handled by application security validation
     );
 
     @Override
@@ -182,7 +152,7 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
 
     @Override
     public String getDescription() {
-        return "Comprehensive database of OWASP Top 10 2021 attack patterns including broken access control, injection attacks, vulnerable components, authentication failures, and SSRF exploits";
+        return "HTTP/URL-layer OWASP Top 10 2021 attack patterns including broken access control via path traversal, vulnerable components, and authentication bypasses using URL manipulation techniques";
     }
 
     /**
