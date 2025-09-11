@@ -30,8 +30,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 6);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
-    private final TypedGenerator<String> apiPathGen = Generators.fixedValues("api", "files", "admin", "users", "docs", "backup", "upload", "download", "data", "content");
-    private final TypedGenerator<String> targetGen = Generators.fixedValues("admin", "etc/passwd", "config", "windows", "etc/shadow", "etc/hosts", "var/log", "system32", "root", "root/.ssh");
+    private final TypedGenerator<Integer> apiPathSelector = Generators.integers(1, 10);
+    private final TypedGenerator<Integer> targetSelector = Generators.integers(1, 10);
     private final TypedGenerator<Boolean> mixedEncodingGen = Generators.booleans();
 
     @Override
@@ -48,8 +48,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateBasicEncodedTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
@@ -62,8 +62,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateWindowsStyleTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
@@ -76,8 +76,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateDoubleEncodedTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
@@ -90,8 +90,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateMixedEncodingTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
@@ -116,8 +116,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateLowercaseEncodedTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
         int depth = depthGen.next();
 
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/");
@@ -130,8 +130,8 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
     }
 
     private String generateMultipleDepthTraversal() {
-        String apiPath = apiPathGen.next();
-        String target = targetGen.next();
+        String apiPath = generateApiPath();
+        String target = generateTarget();
 
         // Generate deep traversal pattern
         StringBuilder pattern = new StringBuilder("/" + apiPath + "/users/");
@@ -144,6 +144,40 @@ public class PathTraversalURLGenerator implements TypedGenerator<String> {
         pattern.append(target);
 
         return pattern.toString();
+    }
+
+    // QI-6: Dynamic API path generation
+    private String generateApiPath() {
+        return switch (apiPathSelector.next()) {
+            case 1 -> "api";
+            case 2 -> "files";
+            case 3 -> "admin";
+            case 4 -> "users";
+            case 5 -> "docs";
+            case 6 -> "backup";
+            case 7 -> "upload";
+            case 8 -> "download";
+            case 9 -> "data";
+            case 10 -> "content";
+            default -> "api";
+        };
+    }
+
+    // QI-6: Dynamic target generation
+    private String generateTarget() {
+        return switch (targetSelector.next()) {
+            case 1 -> "admin";
+            case 2 -> "etc/passwd";
+            case 3 -> "config";
+            case 4 -> "windows";
+            case 5 -> "etc/shadow";
+            case 6 -> "etc/hosts";
+            case 7 -> "var/log";
+            case 8 -> "system32";
+            case 9 -> "root";
+            case 10 -> "root/.ssh";
+            default -> "etc/passwd";
+        };
     }
 
     @Override

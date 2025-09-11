@@ -31,7 +31,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
     // QI-6: Dynamic generation components
     private final TypedGenerator<Integer> attackTypeGen = Generators.integers(1, 8);
     private final TypedGenerator<Integer> depthGen = Generators.integers(1, 4);
-    private final TypedGenerator<String> targetFileGen = Generators.fixedValues("etc/passwd", "config", "windows", "root", "shadow", "etc/hosts", "boot.ini", "var/log/auth.log", "windows/system32/config/sam", "root/.ssh/id_rsa");
+    private final TypedGenerator<Integer> targetFileSelector = Generators.integers(1, 10);
     private final TypedGenerator<Integer> pathSepSelector = Generators.integers(1, 2);
     private final TypedGenerator<Boolean> caseVariationGen = Generators.booleans();
 
@@ -52,7 +52,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateBasicEncodedTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         for (int i = 0; i < depth; i++) {
@@ -68,7 +68,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateDoubleEncodedTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         for (int i = 0; i < depth; i++) {
@@ -83,7 +83,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateMixedEncodingTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         for (int i = 0; i < depth; i++) {
@@ -102,7 +102,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateWindowsStyleTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         for (int i = 0; i < depth; i++) {
@@ -120,7 +120,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
     }
 
     private String generateDeepTraversal() {
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         // Generate deep path (3-6 levels)
@@ -137,7 +137,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateQuadDotBypass() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         // Use quad-dots as bypass technique
@@ -153,7 +153,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateUtf8OverlongTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         for (int i = 0; i < depth; i++) {
@@ -172,7 +172,7 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
 
     private String generateTripleEncodedTraversal() {
         int depth = depthGen.next();
-        String targetFile = targetFileGen.next();
+        String targetFile = generateTargetFile();
         StringBuilder pattern = new StringBuilder();
 
         // Triple URL encoding (%252e = double encoded %2e)
@@ -184,6 +184,23 @@ public class PathTraversalParameterGenerator implements TypedGenerator<String> {
         pattern.append(encodedTarget);
 
         return pattern.toString();
+    }
+
+    // QI-6: Dynamic target file generation
+    private String generateTargetFile() {
+        return switch (targetFileSelector.next()) {
+            case 1 -> "etc/passwd";
+            case 2 -> "config";
+            case 3 -> "windows";
+            case 4 -> "root";
+            case 5 -> "shadow";
+            case 6 -> "etc/hosts";
+            case 7 -> "boot.ini";
+            case 8 -> "var/log/auth.log";
+            case 9 -> "windows/system32/config/sam";
+            case 10 -> "root/.ssh/id_rsa";
+            default -> "etc/passwd";
+        };
     }
 
     private String generatePathSeparator() {
