@@ -21,11 +21,11 @@ import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import de.cuioss.tools.security.http.generators.encoding.UnicodeAttackGenerator;
+import de.cuioss.tools.security.http.generators.encoding.UnicodeNormalizationAttackGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,31 +123,19 @@ class UnicodePathTraversalAttackTest {
      * patterns are consistently blocked.
      * </p>
      */
-    @Test
+    @ParameterizedTest
     @DisplayName("High-risk Unicode patterns must be blocked")
-    void shouldBlockHighRiskUnicodePatterns() {
-        String[] highRiskPatterns = {
-                "\u002e\u002e\u002f../../../etc/passwd",     // Unicode + traditional traversal
-                "\u2024\u2024\u2215etc/passwd",              // Lookalike character attack
-                "\u202epasswd/cte/../../",                  // RTL override attack
-                "\u200b../\u200b../\u200betc/passwd",       // Zero-width space injection
-                "\uFEFF../etc/passwd",                      // BOM character attack
-                "\u0000../etc/passwd",                       // Null byte + traversal
-                "/\u202e/../../etc/passwd",                 // RTL in path
-                "index.html\u202e../../../etc/passwd"       // RTL spoofing
-        };
+    @TypeGeneratorSource(value = UnicodeAttackGenerator.class, count = 25)
+    void shouldBlockHighRiskUnicodePatterns(String pattern) {
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String pattern : highRiskPatterns) {
-            long initialEventCount = eventCounter.getTotalCount();
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pattern),
+                "High-risk Unicode pattern should be rejected: " + pattern);
 
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "High-risk Unicode pattern should be rejected: " + pattern);
-
-            assertNotNull(exception);
-            assertTrue(isUnicodePathTraversalSpecificFailure(exception.getFailureType(), pattern));
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        assertNotNull(exception);
+        assertTrue(isUnicodePathTraversalSpecificFailure(exception.getFailureType(), pattern));
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -158,27 +146,18 @@ class UnicodePathTraversalAttackTest {
      * differences (NFC, NFD, NFKC, NFKD forms).
      * </p>
      */
-    @Test
+    @ParameterizedTest
     @DisplayName("Unicode normalization attacks must be blocked")
-    void shouldBlockUnicodeNormalizationAttacks() {
-        String[] normalizationAttacks = {
-                "\u002E\u002E\u002F",                       // Fullwidth period/slash
-                "\uFF0E\uFF0E\uFF0F",                       // Fullwidth equivalents
-                "\u2024\u2024\u2215",                       // Bullet/division lookalikes
-                "\u0430\u0435/../../etc/passwd",            // Cyrillic lookalikes (ae)
-                "\u043e\u0440/../../etc/passwd"             // Cyrillic lookalikes (op)
-        };
+    @TypeGeneratorSource(value = UnicodeNormalizationAttackGenerator.class, count = 22)
+    void shouldBlockUnicodeNormalizationAttacks(String attack) {
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String attack : normalizationAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(attack),
+                "Unicode normalization attack should be rejected: " + attack);
 
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Unicode normalization attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        assertNotNull(exception);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -189,33 +168,18 @@ class UnicodePathTraversalAttackTest {
      * detected and blocked.
      * </p>
      */
-    @Test
+    @ParameterizedTest
     @DisplayName("Unicode control character attacks must be blocked")
-    void shouldBlockUnicodeControlCharacterAttacks() {
-        String[] controlCharAttacks = {
-                "\u0000../etc/passwd",                       // NULL (NUL)
-                "\u0001../etc/passwd",                       // Start of Heading
-                "\u0002../etc/passwd",                       // Start of Text
-                "\u0008../etc/passwd",                       // Backspace
-                "\\u000A../etc/passwd",                      // Line Feed (escaped)
-                "\\u000D../etc/passwd",                      // Carriage Return (escaped)
-                "\u001B../etc/passwd",                       // Escape
-                "\u007F../etc/passwd",                       // Delete
-                "\u0085../etc/passwd",                       // Next Line
-                "\u2028../etc/passwd",                       // Line Separator
-                "\u2029../etc/passwd"                        // Paragraph Separator
-        };
+    @TypeGeneratorSource(value = UnicodeAttackGenerator.class, count = 22)
+    void shouldBlockUnicodeControlCharacterAttacks(String attack) {
+        long initialEventCount = eventCounter.getTotalCount();
 
-        for (String attack : controlCharAttacks) {
-            long initialEventCount = eventCounter.getTotalCount();
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(attack),
+                "Unicode control character attack should be rejected: " + attack);
 
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Unicode control character attack should be rejected: " + attack);
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        assertNotNull(exception);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**

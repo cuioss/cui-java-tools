@@ -129,28 +129,42 @@ class DecodingStageTest {
         assertEquals("/admin%2Fusers", result); // First layer decoded
     }
 
-    @Test
+    /**
+     * QI-14/QI-10: Converted hardcoded String[] to dynamic parameterized test.
+     * Tests invalid URL encoding patterns that should trigger validation failures.
+     */
+    @ParameterizedTest
+    @MethodSource("invalidEncodingPatterns")
     @DisplayName("Should detect invalid encoding sequences")
-    void shouldDetectInvalidEncoding() {
-        String[] invalidInputs = {
-                "%Z1", // Invalid hex character
-                "%1", // Incomplete encoding
-                "%", // Incomplete encoding
-                "%2G", // Invalid hex character
-                "%%20" // Double percent without proper hex
-        };
+    void shouldDetectInvalidEncoding(String invalidInput) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pathDecoder.validate(invalidInput),
+                "Should detect invalid encoding in: " + invalidInput);
 
-        for (String invalidInput : invalidInputs) {
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> pathDecoder.validate(invalidInput),
-                    "Should detect invalid encoding in: " + invalidInput);
+        assertEquals(UrlSecurityFailureType.INVALID_ENCODING, exception.getFailureType());
+        assertEquals(invalidInput, exception.getOriginalInput());
+        assertNotNull(exception.getCause());
+        assertTrue(exception.getDetail().isPresent());
+        assertTrue(exception.getDetail().get().contains("URL decoding failed"));
+    }
 
-            assertEquals(UrlSecurityFailureType.INVALID_ENCODING, exception.getFailureType());
-            assertEquals(invalidInput, exception.getOriginalInput());
-            assertNotNull(exception.getCause());
-            assertTrue(exception.getDetail().isPresent());
-            assertTrue(exception.getDetail().get().contains("URL decoding failed"));
-        }
+    /**
+     * QI-14/QI-10: Dynamic data source for invalid encoding patterns.
+     * Replaces hardcoded array with method-based generation for better maintainability.
+     */
+    private static Stream<String> invalidEncodingPatterns() {
+        return Stream.of(
+                "%Z1",    // Invalid hex character (Z)
+                "%1",     // Incomplete encoding (single digit)
+                "%",      // Incomplete encoding (no digits)
+                "%2G",    // Invalid hex character (G)
+                "%%20",   // Double percent without proper hex
+                "%XY",    // Invalid hex characters (X, Y)
+                "%0",     // Incomplete encoding
+                "%GH",    // Invalid hex characters
+                "%2Z",    // Invalid second hex character
+                "%W1"     // Invalid first hex character
+        );
     }
 
     @Test

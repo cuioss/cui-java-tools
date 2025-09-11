@@ -517,14 +517,16 @@ class LengthValidationStageTest {
 
     /**
      * QI-17: Generate realistic test strings instead of using .repeat().
-     * Creates varied content for length validation boundary testing.
+     * QI-14/QI-10: Creates varied content for length validation boundary testing.
+     * Replaced hardcoded char array with dynamic generation for better maintainability.
      */
     private String generateTestString(int length) {
         StringBuilder result = new StringBuilder();
-        String[] chars = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
 
+        // QI-14: Use algorithmic character generation instead of hardcoded array
         for (int i = 0; i < length; i++) {
-            result.append(chars[i % chars.length]);
+            char c = (char) ('a' + (i % 26)); // Generate a-z cyclically
+            result.append(c);
         }
         return result.toString();
     }

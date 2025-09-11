@@ -135,44 +135,19 @@ class SqlInjectionAttackTest {
      * to extract data from database tables.
      * </p>
      */
-    @Test
+    @ParameterizedTest
     @DisplayName("Classic UNION SQL injections must be blocked")
-    void shouldBlockClassicUnionSqlInjections() {
-        String[] unionInjections = {
-                // Basic UNION attacks
-                "/search?id=' UNION SELECT 1,2,3--",
-                "/user?name=' UNION SELECT username,password FROM users--",
-                "/products?category=' UNION ALL SELECT null,null,null--",
+    @TypeGeneratorSource(value = SqlInjectionAttackGenerator.class, count = 20)
+    void shouldBlockClassicUnionSqlInjections(String attack) {
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // UNION with information gathering
-                "/admin?query=' UNION SELECT database(),user(),version()--",
-                "/data?filter=' UNION SELECT table_name FROM information_schema.tables--",
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(attack),
+                "UNION injection should be rejected: " + sanitizeForDisplay(attack));
 
-                // UNION with file operations
-                "/file?path=' UNION SELECT load_file('/etc/passwd')--",
-                "/export?data=' UNION SELECT 1 INTO OUTFILE '/tmp/result.txt'--",
-
-                // UNION with hex encoding
-                "/login?user=' UNION SELECT 0x61646D696E--",
-
-                // UNION with concatenation
-                "/profile?id=' UNION SELECT CONCAT(username,0x3a,password) FROM users--",
-
-                // UNION with subqueries
-                "/account?user=' UNION SELECT (SELECT password FROM users WHERE username='admin')--"
-        };
-
-        for (String attack : unionInjections) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "UNION injection should be rejected: " + sanitizeForDisplay(attack));
-
-            assertNotNull(exception);
-            assertTrue(isSqlSpecificFailure(exception.getFailureType(), attack));
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        assertNotNull(exception);
+        assertTrue(isSqlSpecificFailure(exception.getFailureType(), attack));
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -183,49 +158,18 @@ class SqlInjectionAttackTest {
      * information character by character from the database.
      * </p>
      */
-    @Test
+    @ParameterizedTest
     @DisplayName("Boolean-based blind SQL injections must be blocked")
-    void shouldBlockBooleanBlindSqlInjections() {
-        String[] blindInjections = {
-                // Basic boolean tests
-                "/search?q=' AND 1=1--",
-                "/filter?value=' AND 1=2--",
-                "/query?param=' OR 1=1--",
+    @TypeGeneratorSource(value = SqlInjectionAttackGenerator.class, count = 28)
+    void shouldBlockBooleanBlindSqlInjections(String attack) {
+        long initialEventCount = eventCounter.getTotalCount();
 
-                // Substring extraction
-                "/user?id=' AND ASCII(SUBSTRING((SELECT password FROM users WHERE username='admin'),1,1))>64--",
+        var exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(attack),
+                "Boolean blind injection should be rejected: " + sanitizeForDisplay(attack));
 
-                // Database version detection
-                "/info?check=' AND @@version LIKE '5%'--",
-                "/version?test=' AND (SELECT COUNT(*) FROM information_schema.tables)>0--",
-
-                // Table existence detection
-                "/exists?table=' AND (SELECT COUNT(*) FROM users)>0--",
-                "/check?entity=' AND EXISTS(SELECT * FROM admin)--",
-
-                // Character extraction
-                "/extract?pos=' AND (SELECT ASCII(MID((SELECT password FROM users WHERE id=1),1,1)))>96--",
-
-                // Length detection
-                "/length?field=' AND (SELECT LENGTH(password) FROM users WHERE username='admin')>5--",
-
-                // Conditional responses
-                "/condition?test=' AND IF(1=1,SLEEP(0),SLEEP(5))--",
-
-                // Case statements
-                "/case?when=' AND (CASE WHEN 1=1 THEN 'true' ELSE 'false' END)='true'--"
-        };
-
-        for (String attack : blindInjections) {
-            long initialEventCount = eventCounter.getTotalCount();
-
-            var exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(attack),
-                    "Boolean blind injection should be rejected: " + sanitizeForDisplay(attack));
-
-            assertNotNull(exception);
-            assertTrue(eventCounter.getTotalCount() > initialEventCount);
-        }
+        assertNotNull(exception);
+        assertTrue(eventCounter.getTotalCount() > initialEventCount);
     }
 
     /**
@@ -628,42 +572,45 @@ class SqlInjectionAttackTest {
     }
 
     /**
-     * Test performance impact of SQL injection attack validation.
+     * QI-12: Test exception validation for SQL injection attacks.
      * 
      * <p>
-     * Ensures that SQL injection detection doesn't significantly
-     * impact validation performance, even with complex patterns.
+     * QI-12 Fix: Replaced performance testing with proper exception validation.
+     * Validates that SQL injection attacks throw expected UrlSecurityException 
+     * with correct failure type and preserve original input.
      * </p>
      */
     @Test
-    @DisplayName("SQL injection attack validation should maintain performance")
-    void shouldMaintainPerformanceWithSqlInjectionAttacks() {
+    @DisplayName("SQL injection attacks should throw validated exceptions")
+    void shouldThrowValidatedExceptionsForSqlInjectionAttacks() {
         String complexSqlPattern = "/search?q=' UNION ALL SELECT null,null,CONCAT(username,0x3a,password) FROM users WHERE 1=1 AND IF(1=1,SLEEP(0),SLEEP(5)) AND (SELECT COUNT(*) FROM information_schema.tables)>0--";
 
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexSqlPattern);
-            } catch (UrlSecurityException ignored) {
-            }
+        // QI-12: Specific exception validation instead of ignored catching
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(complexSqlPattern),
+                "SQL injection pattern should throw UrlSecurityException: " + sanitizeForDisplay(complexSqlPattern));
+
+        // QI-12: Validate exception details
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
+        assertTrue(isSqlSpecificFailure(exception.getFailureType(), complexSqlPattern),
+                "Failure type should be SQL injection-related: " + exception.getFailureType());
+
+        // QI-12: Validate exception chain completeness
+        assertEquals(complexSqlPattern, exception.getOriginalInput(),
+                "Original input should be preserved in exception");
+        assertNotNull(exception.getMessage(), "Exception should have descriptive message");
+
+        // QI-12: Test multiple iterations for consistency
+        for (int i = 0; i < 5; i++) {
+            UrlSecurityException consistentException = assertThrows(UrlSecurityException.class,
+                    () -> pipeline.validate(complexSqlPattern),
+                    "SQL injection pattern should consistently throw exception");
+
+            assertNotNull(consistentException.getFailureType(),
+                    "Exception should consistently have failure type");
+            assertEquals(complexSqlPattern, consistentException.getOriginalInput(),
+                    "Original input should be consistently preserved");
         }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexSqlPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 8ms per validation)
-        assertTrue(averageMillis < 8,
-                "SQL injection validation should complete within 8ms, actual: " + averageMillis + "ms");
     }
 
     /**

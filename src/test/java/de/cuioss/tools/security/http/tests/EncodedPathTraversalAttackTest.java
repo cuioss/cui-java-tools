@@ -20,7 +20,9 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import de.cuioss.tools.security.http.generators.encoding.ComplexEncodingCombinationGenerator;
+import de.cuioss.tools.security.http.generators.encoding.DoubleEncodingAttackGenerator;
 import de.cuioss.tools.security.http.generators.encoding.EncodingCombinationGenerator;
+import de.cuioss.tools.security.http.generators.url.PathTraversalParameterGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,91 +60,49 @@ class EncodedPathTraversalAttackTest {
         generator = new EncodingCombinationGenerator();
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Should block basic URL-encoded path traversal patterns")
-    void shouldBlockBasicEncodedPatterns() {
-        String[] basicEncodedPatterns = {
-                "/api/users%2F..%2F..%2Fadmin",        // ../.. encoded
-                "/files%2F..%2F..%2Fetc%2Fpasswd",    // ../../etc/passwd encoded
-                "%2E%2E%2F",                          // ../ fully encoded
-                "%2e%2e%2f",                          // ../ lowercase encoded
-                "%2E%2E%5C",                          // ..\ with backslash encoded
-                "%2e%2e%5c",                          // ..\ lowercase encoded
-                "/path%2F%2E%2E%2Fconfig",            // /path/../config encoded
-                "/data%5C%2E%2E%5Cadmin",             // \data\..\admin encoded
-        };
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 25)
+    void shouldBlockBasicEncodedPatterns(String pattern) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pattern),
+                "Basic encoded pattern should be rejected: " + pattern);
 
-        for (String pattern : basicEncodedPatterns) {
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "Basic encoded pattern should be rejected: " + pattern);
-
-            assertNotNull(exception.getFailureType(), "Exception should have failure type");
-            assertEquals(pattern, exception.getOriginalInput(), "Should preserve original input");
-        }
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
+        assertEquals(pattern, exception.getOriginalInput(), "Should preserve original input");
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Should block double-encoded path traversal patterns")
-    void shouldBlockDoubleEncodedPatterns() {
-        String[] doubleEncodedPatterns = {
-                "/api%252F..%252F..%252Fadmin",        // %2F double-encoded to %252F
-                "%252E%252E%252F",                    // ../ double-encoded
-                "%252e%252e%252f",                    // ../ double-encoded lowercase
-                "%252E%252E%255C",                    // ..\ double-encoded
-                "/data%255C%252E%252E%255Cadmin",     // \..\ double-encoded
-                "%2525252E%2525252E%2525252F",        // ../ triple-encoded
-        };
+    @TypeGeneratorSource(value = DoubleEncodingAttackGenerator.class, count = 22)
+    void shouldBlockDoubleEncodedPatterns(String pattern) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pattern),
+                "Double-encoded pattern should be rejected: " + pattern);
 
-        for (String pattern : doubleEncodedPatterns) {
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "Double-encoded pattern should be rejected: " + pattern);
-
-            assertNotNull(exception.getFailureType(), "Exception should have failure type");
-        }
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Should block mixed-case encoded patterns")
-    void shouldBlockMixedCaseEncodedPatterns() {
-        String[] mixedCasePatterns = {
-                "%2E%2e%2F",                          // Mixed case ../
-                "%2e%2E%2f",                          // Mixed case ../
-                "%2E%2E%2f",                          // Mixed case ../
-                "%2e%2e%2F",                          // Mixed case ../
-                "/path%2F%2E%2e%2F%2E%2E%2fconfig",   // Mixed encoding in sequence
-                "%2E%2E%5c",                          // Mixed case ..\
-                "%2e%2E%5C",                          // Mixed case ..\
-        };
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 24)
+    void shouldBlockMixedCaseEncodedPatterns(String pattern) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pattern),
+                "Mixed-case encoded pattern should be rejected: " + pattern);
 
-        for (String pattern : mixedCasePatterns) {
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "Mixed-case encoded pattern should be rejected: " + pattern);
-
-            assertNotNull(exception.getFailureType(), "Exception should have failure type");
-        }
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Should block UTF-8 overlong encoded patterns")
-    void shouldBlockUTF8OverlongPatterns() {
-        String[] utf8OverlongPatterns = {
-                "/path%c0%ae%c0%ae%c0%af",            // ../ UTF-8 overlong
-                "%c0%ae%c0%ae%c0%af",                 // ../ UTF-8 overlong start
-                "/data%c1%9c",                        // \ UTF-8 overlong
-                "%c0%ae%c0%ae%c1%9c",                 // ..\ UTF-8 overlong mixed
-                "/files%c0%ae%c0%ae%c0%afconfig",    // ../config UTF-8 overlong
-        };
+    @TypeGeneratorSource(value = PathTraversalParameterGenerator.class, count = 20)
+    void shouldBlockUTF8OverlongPatterns(String pattern) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(pattern),
+                "UTF-8 overlong pattern should be rejected: " + pattern);
 
-        for (String pattern : utf8OverlongPatterns) {
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> pipeline.validate(pattern),
-                    "UTF-8 overlong pattern should be rejected: " + pattern);
-
-            assertNotNull(exception.getFailureType(), "Exception should have failure type");
-        }
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
     }
 
     @ParameterizedTest
@@ -159,7 +119,7 @@ class EncodedPathTraversalAttackTest {
 
     @ParameterizedTest
     @DisplayName("Should reject complex encoding combinations")
-    @TypeGeneratorSource(value = ComplexEncodingCombinationGenerator.class, count = 7)
+    @TypeGeneratorSource(value = ComplexEncodingCombinationGenerator.class, count = 27)
     void shouldRejectComplexEncodingCombinations(String complexPattern) {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(complexPattern),

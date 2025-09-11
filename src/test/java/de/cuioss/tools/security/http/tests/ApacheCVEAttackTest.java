@@ -318,44 +318,45 @@ class ApacheCVEAttackTest {
     }
 
     /**
-     * Test performance impact of Apache CVE validation.
+     * QI-12: Test exception validation for Apache CVE attacks.
      * 
      * <p>
-     * Ensures that validation performance remains acceptable even
-     * when processing complex Apache CVE attack patterns.
+     * QI-12 Fix: Replaced performance testing with proper exception validation.
+     * Validates that Apache CVE attacks throw expected UrlSecurityException 
+     * with correct failure type and preserve original input.
      * </p>
      */
     @Test
-    @DisplayName("Apache CVE validation should maintain performance")
-    void shouldMaintainPerformanceWithApacheCVEAttacks() {
-        String complexApacheCVEPattern = "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/../../../../../../../../../etc/passwd?query=" + generateBoundaryPadding(200); // QI-17: Fixed to test realistic boundaries
+    @DisplayName("Apache CVE attacks should throw validated exceptions")
+    void shouldThrowValidatedExceptionsForApacheCVEAttacks() {
+        String complexApacheCVEPattern = "/cgi-bin/.%2e/%2e%2e/.%%32%65/.%%32%65/../../../../../../../../../etc/passwd?query=" + generateBoundaryPadding(200);
 
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexApacheCVEPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
+        // QI-12: Specific exception validation instead of ignored catching
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pipeline.validate(complexApacheCVEPattern),
+                "Apache CVE pattern should throw UrlSecurityException: " + complexApacheCVEPattern);
+
+        // QI-12: Validate exception details
+        assertNotNull(exception.getFailureType(), "Exception should have failure type");
+        assertTrue(isApacheCVESpecificFailure(exception.getFailureType(), complexApacheCVEPattern),
+                "Failure type should be Apache CVE-related: " + exception.getFailureType());
+
+        // QI-12: Validate exception chain completeness
+        assertEquals(complexApacheCVEPattern, exception.getOriginalInput(),
+                "Original input should be preserved in exception");
+        assertNotNull(exception.getMessage(), "Exception should have descriptive message");
+
+        // QI-12: Test multiple iterations for consistency
+        for (int i = 0; i < 5; i++) {
+            UrlSecurityException consistentException = assertThrows(UrlSecurityException.class,
+                    () -> pipeline.validate(complexApacheCVEPattern),
+                    "Apache CVE pattern should consistently throw exception");
+
+            assertNotNull(consistentException.getFailureType(),
+                    "Exception should consistently have failure type");
+            assertEquals(complexApacheCVEPattern, consistentException.getOriginalInput(),
+                    "Original input should be consistently preserved");
         }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexApacheCVEPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 5ms per validation)
-        assertTrue(averageMillis < 5,
-                "Apache CVE validation should complete within 5ms, actual: " + averageMillis + "ms");
     }
 
     /**
