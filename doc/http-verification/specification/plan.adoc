@@ -501,17 +501,17 @@ Implement → Test → Verify → Document Progress → Commit
 |T31
 |Test legitimate path patterns
 |High
-|[ ]
+|[x]
 
 |T32
 |Test legitimate special characters
 |High
-|[ ]
+|[x]
 
 |T33
 |Test edge case valid URLs
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.11: Performance Validation Tests
