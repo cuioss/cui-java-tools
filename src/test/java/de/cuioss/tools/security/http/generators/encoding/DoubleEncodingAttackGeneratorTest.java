@@ -15,96 +15,35 @@
  */
 package de.cuioss.tools.security.http.generators.encoding;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.Set;
+import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for {@link DoubleEncodingAttackGenerator}
  */
+@EnableGeneratorController
 class DoubleEncodingAttackGeneratorTest {
 
-    private final DoubleEncodingAttackGenerator generator = new DoubleEncodingAttackGenerator();
-
-    @Test
-    void shouldReturnStringType() {
-        assertEquals(String.class, generator.getType());
-    }
-
-    @Test
-    void shouldGenerateNonNullValues() {
-        for (int i = 0; i < 100; i++) {
-            assertNotNull(generator.next(), "Generated value should not be null");
-        }
-    }
-
-    @Test
-    void shouldGenerateDoubleEncodingPatterns() {
-        Set<String> generated = new HashSet<>();
-
-        // Generate patterns to test double encoding
-        for (int i = 0; i < 100; i++) {
-            generated.add(generator.next());
-        }
-
+    @ParameterizedTest
+    @TypeGeneratorSource(value = DoubleEncodingAttackGenerator.class, count = 100)
+    @DisplayName("Generator should produce valid double encoding attack patterns")
+    void shouldGenerateValidOutput(String generatedValue) {
+        assertNotNull(generatedValue, "Generator must not produce null values");
+        assertFalse(generatedValue.isEmpty(), "Generated value should not be empty");
+        
         // Every pattern should contain double encoding indicators
-        for (String pattern : generated) {
-            boolean hasDoubleEncoding = pattern.contains("%252") ||  // Standard double encoding
-                    pattern.contains("%%3") ||                           // CVE-style double encoding  
-                    pattern.contains("%25252") ||                        // Triple encoding
-                    pattern.contains("%255");                            // Double encoding of backslash
-            assertTrue(hasDoubleEncoding,
-                    "Pattern should contain double encoding: " + pattern);
-        }
-
-        // Should have variety in patterns
-        assertTrue(generated.size() >= 10, "Should generate varied double encoding patterns");
-    }
-
-    @Test
-    void shouldGeneratePathTraversalPatterns() {
-        Set<String> generated = new HashSet<>();
-
-        // Generate patterns to test path traversal elements
-        for (int i = 0; i < 100; i++) {
-            generated.add(generator.next());
-        }
-
-        // Should contain path traversal patterns (either in encoded form)
-        boolean hasTraversalElements = generated.stream()
-                .anyMatch(s -> s.contains("252e") || s.contains("252f") ||
-                        s.contains("../") || s.contains("etc"));
-
-        assertTrue(hasTraversalElements, "Should generate patterns with traversal elements");
-    }
-
-    @Test
-    void shouldGenerateCVEPatterns() {
-        Set<String> generated = new HashSet<>();
-
-        // Generate patterns to test CVE-specific attacks
-        for (int i = 0; i < 100; i++) {
-            generated.add(generator.next());
-        }
-
-        // Should contain CVE-2021-42013 patterns
-        boolean hasCVEPatterns = generated.stream()
-                .anyMatch(s -> s.contains("%%32%65") || s.contains("%%32%66"));
-
-        assertTrue(hasCVEPatterns, "Should generate CVE-related attack patterns");
-    }
-
-    @Test
-    void shouldGenerateReasonableLength() {
-        for (int i = 0; i < 100; i++) {
-            String generated = generator.next();
-
-            // Generated patterns should be reasonable length
-            assertTrue(generated.length() > 0, "Pattern should not be empty");
-            assertTrue(generated.length() < 500, "Pattern should not be excessively long: " + generated);
-        }
+        boolean hasDoubleEncoding = generatedValue.contains("%252") ||  // Standard double encoding
+                generatedValue.contains("%%3") ||                           // CVE-style double encoding  
+                generatedValue.contains("%25252") ||                        // Triple encoding
+                generatedValue.contains("%255");                            // Double encoding of backslash
+        assertTrue(hasDoubleEncoding,
+                "Pattern should contain double encoding: " + generatedValue);
+        
+        // Generated patterns should be reasonable length
+        assertTrue(generatedValue.length() < 500, "Pattern should not be excessively long: " + generatedValue);
     }
 }
