@@ -20,7 +20,6 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
 import de.cuioss.tools.security.http.generators.encoding.BoundaryFuzzingGenerator;
-import de.cuioss.tools.security.http.generators.encoding.ComplexEncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.encoding.DoubleEncodingAttackGenerator;
 import de.cuioss.tools.security.http.generators.encoding.EncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.url.PathTraversalParameterGenerator;
@@ -120,7 +119,7 @@ class EncodedPathTraversalAttackTest {
 
     @ParameterizedTest
     @DisplayName("Should reject complex encoding combinations")
-    @TypeGeneratorSource(value = ComplexEncodingCombinationGenerator.class, count = 27)
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 27)
     void shouldRejectComplexEncodingCombinations(String complexPattern) {
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> pipeline.validate(complexPattern),

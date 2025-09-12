@@ -20,7 +20,6 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
-import de.cuioss.tools.security.http.generators.encoding.ComplexEncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.encoding.DoubleEncodingAttackGenerator;
 import de.cuioss.tools.security.http.generators.encoding.EncodingCombinationGenerator;
 import de.cuioss.tools.security.http.generators.url.ValidURLPathGenerator;
@@ -158,15 +157,15 @@ class DoubleEncodingAttackTest {
      * Test complex encoding combination patterns.
      * 
      * <p>
-     * Uses ComplexEncodingCombinationGenerator which provides sophisticated
-     * mixed encoding patterns including UTF-8 overlong encoding and various
+     * Uses EncodingCombinationGenerator which provides HTTP protocol-layer
+     * encoding patterns including URL encoding combinations and various
      * bypass techniques used in real-world attacks.
      * </p>
      * 
      * @param complexEncodingPattern A complex encoding attack pattern
      */
     @ParameterizedTest
-    @TypeGeneratorSource(value = ComplexEncodingCombinationGenerator.class, count = 20)
+    @TypeGeneratorSource(value = EncodingCombinationGenerator.class, count = 20)
     @DisplayName("Complex encoding attacks should be rejected")
     void shouldRejectComplexEncodingAttacks(String complexEncodingPattern) {
         // Given: A complex encoding pattern from the generator
