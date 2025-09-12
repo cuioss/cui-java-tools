@@ -95,13 +95,8 @@ de.cuioss.tools.security.http/
 ├── ValidationType.java                # Input type classification
 │
 ├── config/
-│   ├── ConfigStageProvider.java      # Stage provider interface
-│   ├── UrlSecurityConfig.java        # Base configuration with defaults
-│   ├── URLPathConfig.java            # URL path specific config
-│   ├── URLParameterConfig.java       # Parameter validation config
-│   ├── HTTPHeaderConfig.java         # HTTP header config
-│   ├── HTTPBodyConfig.java           # HTTP body validation config
-│   └── CookieConfig.java              # Cookie validation config
+│   ├── SecurityConfiguration.java    # Main security configuration record
+│   └── SecurityConfigurationBuilder.java # Builder for security config
 │
 ├── security/
 │   ├── SecurityEventCounter.java     # Thread-safe event counting
@@ -115,8 +110,11 @@ de.cuioss.tools.security.http/
 │   └── PatternMatchingStage.java     # Attack pattern detection
 │
 └── pipeline/
-    ├── UnifiedValidationPipeline.java # Single pipeline for all types
-    └── ValidationFactory.java         # Factory for creating validators
+    ├── URLPathValidationPipeline.java        # URL path validation pipeline
+    ├── URLParameterValidationPipeline.java   # URL parameter validation pipeline  
+    ├── HTTPHeaderValidationPipeline.java     # HTTP header validation pipeline
+    ├── HTTPBodyValidationPipeline.java       # HTTP body validation pipeline
+    └── PipelineFactory.java                  # Factory for creating validation pipelines
 ----
 
 == Core Components
@@ -350,81 +348,112 @@ public record HTTPBody(
 
 Configuration follows the embedded constants pattern from `ParserConfig`:
 
-=== ConfigStageProvider Interface
+=== Security Configuration Architecture
+
+The HTTP security framework uses a single immutable configuration record that contains all security policies:
 
 [source,java]
 ----
 package de.cuioss.tools.security.http.config;
 
 /**
- * Provides factory methods for creating pre-configured validation stages.
- * This interface decouples pipelines from concrete configuration implementations.
- * All methods return HttpSecurityValidator for flexibility.
+ * Immutable record representing comprehensive security configuration for HTTP validation.
+ * Provides type-safe, immutable configuration object shared across multiple validation operations.
  */
-public interface ConfigStageProvider {
+public record SecurityConfiguration(
+    // Path Security Settings
+    int maxPathLength,
+    boolean pathTraversalDetectionEnabled,
+    Set<String> allowedPathPatterns,
+    
+    // Parameter Security Settings  
+    int maxParameterNameLength,
+    int maxParameterValueLength,
+    boolean parameterInjectionDetectionEnabled,
+    
+    // Header Security Settings
+    int maxHeaderNameLength, 
+    int maxHeaderValueLength,
+    boolean headerInjectionDetectionEnabled,
+    
+    // Body Security Settings
+    long maxBodySize,
+    boolean bodyInjectionDetectionEnabled,
+    
+    // Encoding Security Settings
+    boolean doubleEncodingDetectionEnabled,
+    boolean unicodeNormalizationEnabled,
+    
+    // General Security Policies
+    boolean strictModeEnabled,
+    SecurityLevel securityLevel
+) {
     
     /**
-     * @return The type of validation this configuration is for
+     * Creates a SecurityConfiguration with secure defaults.
+     * All security features enabled, strict limits applied.
      */
-    ValidationType getValidationType();
+    public static SecurityConfiguration defaults() {
+        return builder()
+            .maxPathLength(1024)
+            .maxParameterNameLength(256)
+            .maxParameterValueLength(4096)
+            .maxHeaderNameLength(256)
+            .maxHeaderValueLength(8192)
+            .maxBodySize(1048576L) // 1MB
+            .pathTraversalDetectionEnabled(true)
+            .parameterInjectionDetectionEnabled(true) 
+            .headerInjectionDetectionEnabled(true)
+            .bodyInjectionDetectionEnabled(true)
+            .doubleEncodingDetectionEnabled(true)
+            .unicodeNormalizationEnabled(true)
+            .strictModeEnabled(true)
+            .securityLevel(SecurityLevel.STRICT)
+            .build();
+    }
     
-    /**
-     * @return Pre-configured length validation stage
-     */
-    HttpSecurityValidator getLengthValidationStage();
-    
-    /**
-     * @return Pre-configured character validation stage appropriate for the ValidationType
-     */
-    HttpSecurityValidator getCharacterValidationStage();
-    
-    /**
-     * @return Pre-configured decoding stage with security checks
-     */
-    HttpSecurityValidator getDecodingStage();
-    
-    /**
-     * @return Pre-configured normalization stage
-     */
-    HttpSecurityValidator getNormalizationStage();
-    
-    /**
-     * @return Pre-configured pattern matching stage
-     */
-    HttpSecurityValidator getPatternMatchingStage();
-    
-    /**
-     * @return List of stages to use in the pipeline, in the correct order
-     */
-    List<HttpSecurityValidator> getStages();
+    public static SecurityConfigurationBuilder builder() {
+        return new SecurityConfigurationBuilder();
+    }
 }
 ----
 
-=== Configuration Implementations
+=== Security Levels
 
 [source,java]
 ----
-package de.cuioss.tools.security.http.config;
-
-import lombok.Builder;
-import lombok.Value;
-
 /**
- * Base configuration with security defaults.
- * All defaults are based on OWASP guidelines and RFC specifications.
- * Implemented by: link:plan.adoc#_phase_3_configuration_system[Tasks C1-C2]
+ * Security levels that determine the strictness of validation policies.
  */
-@Builder
-@Value
-public class UrlSecurityConfig {
+enum SecurityLevel {
+    /** Maximum security - All validation enabled, strict limits */
+    STRICT,
     
-    /**
-     * Maximum URL path length in characters.
-     * Default: 2048 based on RFC 3986 Section 3.3 and common browser limits.
-     * @see <a href="https://datatracker.ietf.org/doc/html/rfc3986#section-3.3">RFC 3986</a>
-     * @see <a href="https://owasp.org/www-community/vulnerabilities/Buffer_Overflow">OWASP Buffer Overflow</a>
-     */
-    public static final int DEFAULT_MAX_PATH_LENGTH = 2048;
+    /** Balanced security - Most validation enabled, moderate limits */  
+    DEFAULT,
+    
+    /** Relaxed security - Basic validation only, lenient limits */
+    LENIENT
+}
+----
+
+=== Configuration Builder Pattern
+
+The SecurityConfiguration uses a builder pattern for flexible configuration creation:
+
+[source,java]
+----
+// Create configuration with custom settings
+SecurityConfiguration config = SecurityConfiguration.builder()
+    .maxPathLength(2048)
+    .maxParameterValueLength(8192)
+    .securityLevel(SecurityLevel.DEFAULT)
+    .pathTraversalDetectionEnabled(true)
+    .doubleEncodingDetectionEnabled(true)
+    .build();
+
+// Or use secure defaults
+SecurityConfiguration defaultConfig = SecurityConfiguration.defaults();
     
     /**
      * Maximum directory traversal depth.
@@ -1333,6 +1362,11 @@ public class PatternMatchingStage implements HttpSecurityValidator {
 
 == Pipeline Architecture
 
+[NOTE]
+====
+For detailed pipeline selection guidelines and architecture standards, see link:pipeline-architecture-standards.adoc[Pipeline Architecture Standards].
+====
+
 === Unified Validation Pipeline
 
 A single pipeline implementation handles all validation types through configuration:
@@ -1349,13 +1383,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Unified validation pipeline that works with any ConfigStageProvider.
- * The validation type and stage selection is determined by the configuration.
- * Implemented by: link:plan.adoc#_phase_6_pipeline_implementation[Tasks P1-P5]
+ * Specialized validation pipelines for different HTTP component types.
+ * Each pipeline is optimized for its specific validation context.
  */
-@EqualsAndHashCode
-@ToString
-public final class UnifiedValidationPipeline implements HttpSecurityValidator {
+public abstract class AbstractValidationPipeline implements HttpSecurityValidator {
     
     private final @NonNull ConfigStageProvider config;
     private final @NonNull List<HttpSecurityValidator> stages;
@@ -1446,24 +1477,16 @@ public final class UnifiedValidationPipeline implements HttpSecurityValidator {
                 String[] parts = input.split("=", 2);
                 yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
             }
-            case HEADER_VALUE -> {
-                // Sanitize header values (especially Authorization)
-                if (input.toLowerCase().startsWith("authorization:") ||
-                    input.toLowerCase().startsWith("x-api-key:")) {
-                    int colonPos = input.indexOf(':');
-                    yield STR."\{input.substring(0, colonPos + 1)} ***";
-                }
-                yield input;
-            }
-            case COOKIE_VALUE -> {
-                // Sanitize cookie values
-                String[] parts = input.split("=", 2);
-                yield parts.length == 2 ? STR."\{parts[0]}=***" : input;
-            }
-            case URL_PATH, BODY, PARAMETER_NAME, HEADER_NAME, COOKIE_NAME -> input; // These are generally safe to log
-        };
     }
 }
+
+// Specialized pipeline architecture ensures each HTTP component
+// uses validation stages optimized for its security requirements
+//
+// - URLPathValidationPipeline: Path traversal, encoding attacks
+// - URLParameterValidationPipeline: XSS, injection via parameters  
+// - HTTPHeaderValidationPipeline: Header injection, CRLF attacks
+// - HTTPBodyValidationPipeline: Content-based attacks, DoS patterns
 ----
 
 == Security Event Tracking
@@ -1583,91 +1606,104 @@ public final class URLSecurityLogMessages {
 
 [source,java]
 ----
-// Create base configuration with secure defaults
-UrlSecurityConfig baseConfig = UrlSecurityConfig.builder()
-    .maxPathLength(2048)  // Uses DEFAULT_MAX_PATH_LENGTH
-    .build();
-
-// Create specific configurations for different validation types
-ConfigStageProvider pathConfig = new URLPathConfig(baseConfig);
-ConfigStageProvider paramNameConfig = new URLParameterNameConfig(baseConfig);
-ConfigStageProvider paramValueConfig = new URLParameterValueConfig(baseConfig);
-ConfigStageProvider headerNameConfig = new HTTPHeaderNameConfig(baseConfig);
-ConfigStageProvider headerValueConfig = new HTTPHeaderValueConfig(baseConfig);
-
-// Create unified pipelines with different configurations
+// Create security configuration with defaults
+SecurityConfiguration config = SecurityConfiguration.defaults();
 SecurityEventCounter eventCounter = new SecurityEventCounter();
 
-HttpSecurityValidator pathValidator = new UnifiedValidationPipeline(
-    pathConfig,    // URL_PATH configuration
-    eventCounter
-);
+// Create specialized validation pipelines using PipelineFactory
+HttpSecurityValidator pathValidator = PipelineFactory.createUrlPathPipeline(config, eventCounter);
+HttpSecurityValidator paramValidator = PipelineFactory.createUrlParameterPipeline(config, eventCounter);
+HttpSecurityValidator headerNameValidator = PipelineFactory.createHeaderNamePipeline(config, eventCounter);
+HttpSecurityValidator headerValueValidator = PipelineFactory.createHeaderValuePipeline(config, eventCounter);
+HttpSecurityValidator bodyValidator = PipelineFactory.createBodyPipeline(config, eventCounter);
 
-HttpSecurityValidator paramNameValidator = new UnifiedValidationPipeline(
-    paramNameConfig,   // PARAMETER_NAME configuration  
-    eventCounter
-);
+// Or use generic factory method with ValidationType
+HttpSecurityValidator genericValidator = PipelineFactory.createPipeline(
+    ValidationType.URL_PATH, config, eventCounter);
 
-HttpSecurityValidator paramValueValidator = new UnifiedValidationPipeline(
-    paramValueConfig,  // PARAMETER_VALUE configuration
-    eventCounter
-);
+// Convenience method for common pipeline set
+PipelineFactory.PipelineSet pipelines = PipelineFactory.createCommonPipelines(config, eventCounter);
 
-HttpSecurityValidator headerNameValidator = new UnifiedValidationPipeline(
-    headerNameConfig,  // HEADER_NAME configuration
-    eventCounter
-);
-
-HttpSecurityValidator headerValueValidator = new UnifiedValidationPipeline(
-    headerValueConfig, // HEADER_VALUE configuration
-    eventCounter
-);
-
-// Use validators - they all share the same pipeline implementation
+// Use specialized validators for different HTTP components
 try {
     String safePath = pathValidator.validate("/api/users/123");
-    
-    // Validate parameter name and value separately
-    String safeParamName = paramNameValidator.validate("search");
-    String safeParamValue = paramValueValidator.validate("test%20query");
-    
-    // Validate header name and value separately  
+    String safeParam = paramValidator.validate("test%20query");
     String safeHeaderName = headerNameValidator.validate("Authorization");
     String safeHeaderValue = headerValueValidator.validate("Bearer abc123");
+    String safeBody = bodyValidator.validate("{\"user\":\"test\"}");
 } catch (UrlSecurityException e) {
-    // Exception now includes ValidationType
-    log.warn("Security violation in {}: {} - {}", 
-        e.getValidationType(), 
+    // Exception includes failure type and original input
+    log.warn("Security violation: {} - {}", 
         e.getFailureType(), 
         e.getOriginalInput());
 }
 
-// Alternative: Factory pattern for cleaner creation
-public class ValidationFactory {
+// PipelineFactory provides type-safe pipeline creation
+// Each specialized pipeline optimizes validation stages for its HTTP component:
+//
+// URLPathValidationPipeline:
+//   - DecodingStage (URL decoding, path normalization)
+//   - PatternMatchingStage (path traversal patterns: ../, ..\ variations)
+//   - LengthValidationStage (path length limits)
+//   - CharacterValidationStage (valid path characters)
+//
+// URLParameterValidationPipeline:
+//   - DecodingStage (URL parameter decoding)
+//   - PatternMatchingStage (XSS, injection patterns)
+//   - LengthValidationStage (parameter value limits)
+//   - CharacterValidationStage (parameter character restrictions)
+//
+// HTTPHeaderValidationPipeline:
+//   - NormalizationStage (header name/value normalization)
+//   - PatternMatchingStage (header injection, CRLF patterns)
+//   - LengthValidationStage (header length limits per RFC 7230)
+//   - CharacterValidationStage (valid header characters)
+//
+// HTTPBodyValidationPipeline:
+//   - DecodingStage (content encoding handling)
+//   - PatternMatchingStage (content-based attack patterns)
+//   - LengthValidationStage (body size limits, DoS prevention)
+//   - CharacterValidationStage (content character validation)
+----
+
+=== Pipeline Factory Pattern
+
+The `PipelineFactory` provides centralized creation of all HTTP security validation pipelines:
+
+[source,java]
+----
+/**
+ * Factory class for creating HTTP security validation pipelines.
+ * Provides centralized creation with consistent configuration and monitoring.
+ */
+public final class PipelineFactory {
     
-    private final @NonNull UrlSecurityConfig baseConfig;
-    private final @NonNull SecurityEventCounter eventCounter;
+    // Specialized factory methods for common use cases
+    public static HttpSecurityValidator createUrlPathPipeline(
+            SecurityConfiguration config, SecurityEventCounter eventCounter);
     
-    /**
-     * Creates a validator for the specified type using exhaustive switch.
-     * Java 21 ensures all enum cases are covered.
-     */
-    @NonNull
-    public HttpSecurityValidator createValidator(@NonNull ValidationType type) {
-        ConfigStageProvider config = switch (type) {
-            case URL_PATH -> new URLPathConfig(baseConfig);
-            case PARAMETER_NAME -> new URLParameterNameConfig(baseConfig);
-            case PARAMETER_VALUE -> new URLParameterValueConfig(baseConfig);
-            case HEADER_NAME -> new HTTPHeaderNameConfig(baseConfig);
-            case HEADER_VALUE -> new HTTPHeaderValueConfig(baseConfig);
-            case BODY -> new HTTPBodyConfig(baseConfig);
-            case COOKIE_NAME -> new CookieNameConfig(baseConfig);
-            case COOKIE_VALUE -> new CookieValueConfig(baseConfig);
-            // No default needed - exhaustive enum coverage
-        };
-        
-        return new UnifiedValidationPipeline(config, eventCounter);
-    }
+    public static HttpSecurityValidator createUrlParameterPipeline(
+            SecurityConfiguration config, SecurityEventCounter eventCounter);
+    
+    public static HttpSecurityValidator createHeaderNamePipeline(
+            SecurityConfiguration config, SecurityEventCounter eventCounter);
+    
+    public static HttpSecurityValidator createHeaderValuePipeline(
+            SecurityConfiguration config, SecurityEventCounter eventCounter);
+    
+    public static HttpSecurityValidator createBodyPipeline(
+            SecurityConfiguration config, SecurityEventCounter eventCounter);
+    
+    // Generic factory method based on validation type
+    public static HttpSecurityValidator createPipeline(
+            ValidationType validationType, 
+            SecurityConfiguration config, 
+            SecurityEventCounter eventCounter);
+    
+    // Convenience method for common pipeline set
+    public static PipelineSet createCommonPipelines(
+            SecurityConfiguration config, 
+            SecurityEventCounter eventCounter);
 }
 ----
 

@@ -20,358 +20,189 @@ For HOW the system architecture works, see link:specification.adoc[Architecture 
 . **Comprehensive Coverage**: 36 explicit test cases covering all attack categories
 . **Performance Validation**: Sub-millisecond requirement verification
 . **False Positive Prevention**: Ensuring legitimate URLs pass validation
+. **Mixed Responsibility Integration Testing**: Security framework tests intentionally validate both attack detection AND monitoring verification as architectural design - this provides comprehensive validation of security pipeline behavior rather than fragmented coverage
 
 == Test Framework Structure
 
 ----
 src/test/java/de/cuioss/tools/security/http/
-├── generators/                              # Test data generators
-│   ├── PathTraversalGenerator.java         # Path traversal patterns
-│   ├── EncodingCombinationGenerator.java   # Encoding combinations
-│   ├── UnicodeAttackGenerator.java         # Unicode attacks
-│   ├── BoundaryFuzzingGenerator.java       # Boundary conditions
-│   ├── ValidURLGenerator.java              # Valid URLs
-│   ├── InvalidURLGenerator.java            # Malformed URLs
-│   ├── URLParameterGenerator.java          # URL parameters
-│   ├── CookieGenerator.java                # Cookie data
-│   ├── HTTPBodyGenerator.java              # HTTP body content
-│   └── GeneratorTestSuite.java             # Generator tests
+├── config/                                  # Configuration tests
+│   ├── SecurityConfigurationTest.java
+│   ├── SecurityConfigurationBuilderTest.java
+│   └── SecurityDefaultsTest.java
 │
-├── attacks/                                 # Attack test cases
+├── core/                                    # Core component tests
+│   ├── HttpSecurityValidatorTest.java
+│   ├── UrlSecurityFailureTypeTest.java
+│   └── ValidationTypeTest.java
+│
+├── database/                                # Attack pattern databases
+│   ├── AttackDatabase.java                 # Database interface
+│   ├── AttackTestCase.java                 # Test case record
+│   ├── ApacheCVEAttackDatabase.java        # Apache CVE patterns
+│   ├── HomographAttackDatabase.java        # Unicode homograph attacks
+│   ├── IDNAttackDatabase.java              # Internationalized domain attacks
+│   ├── IISCVEAttackDatabase.java           # IIS CVE patterns
+│   ├── IPv6AttackDatabase.java             # IPv6 address exploits
+│   ├── NginxCVEAttackDatabase.java         # Nginx CVE patterns
+│   ├── OWASPTop10AttackDatabase.java       # OWASP Top 10 patterns
+│   └── ProtocolHandlerAttackDatabase.java  # Protocol handler exploits
+│
+├── exceptions/                              # Exception handling tests
+│   └── UrlSecurityExceptionTest.java
+│
+├── generators/                              # Test data generators (organized by type)
+│   ├── AllGeneratorsIntegrationTest.java   # Generator integration tests
+│   ├── SupportedValidationTypeGenerator.java
+│   ├── body/                               # HTTP body generators
+│   │   ├── HTTPBodyGenerator.java
+│   │   └── ValidHTTPBodyContentGenerator.java
+│   ├── cookie/                             # Cookie generators
+│   │   ├── AttackCookieGenerator.java
+│   │   └── ValidCookieGenerator.java
+│   ├── encoding/                           # Encoding attack generators
+│   │   ├── BoundaryFuzzingGenerator.java
+│   │   ├── DoubleEncodingAttackGenerator.java
+│   │   ├── EncodingCombinationGenerator.java
+│   │   ├── PathTraversalGenerator.java
+│   │   ├── UnicodeAttackGenerator.java
+│   │   ├── UnicodeControlCharacterAttackGenerator.java
+│   │   └── UnicodeNormalizationAttackGenerator.java
+│   ├── header/                             # HTTP header generators
+│   │   ├── HttpHeaderInjectionAttackGenerator.java
+│   │   ├── HTTPHeaderInjectionGenerator.java
+│   │   ├── InvalidHTTPHeaderNameGenerator.java
+│   │   ├── ValidHTTPHeaderNameGenerator.java
+│   │   └── ValidHTTPHeaderValueGenerator.java
+│   ├── injection/                          # Protocol injection generators
+│   │   ├── HttpRequestSmugglingAttackGenerator.java
+│   │   └── ProtocolHandlerAttackGenerator.java
+│   └── url/                                # URL-specific generators
+│       ├── AttackURLParameterGenerator.java
+│       ├── InvalidURLGenerator.java
+│       ├── NullByteInjectionParameterGenerator.java
+│       ├── NullByteURLGenerator.java
+│       ├── PathTraversalParameterGenerator.java
+│       ├── PathTraversalURLGenerator.java
+│       ├── URLLengthLimitAttackGenerator.java
+│       ├── URLParameterGenerator.java
+│       ├── ValidURLGenerator.java
+│       ├── ValidURLParameterGenerator.java
+│       ├── ValidURLParameterStringGenerator.java
+│       └── ValidURLPathGenerator.java
+│
+├── monitoring/                              # Security monitoring tests
+│   └── SecurityEventCounterTest.java
+│
+├── pipeline/                                # Validation pipeline tests
+│   ├── HTTPBodyValidationPipelineTest.java
+│   ├── HTTPHeaderValidationPipelineTest.java
+│   ├── PipelineFactoryTest.java
+│   ├── URLParameterValidationPipelineTest.java
+│   └── URLPathValidationPipelineTest.java
+│
+├── tests/                                   # Attack-specific test classes
+│   ├── ApacheCVEAttackDatabaseTest.java    # Apache CVE database tests
+│   ├── DoubleEncodingAttackTest.java       # Double encoding attacks
+│   ├── EncodedPathTraversalAttackTest.java # Encoded traversal tests
+│   ├── HomographAttackDatabaseTest.java    # Homograph database tests
+│   ├── HttpHeaderInjectionAttackTest.java  # Header injection tests
+│   ├── HttpRequestSmugglingAttackTest.java # Request smuggling tests
+│   ├── IDNAttackDatabaseTest.java          # IDN database tests
+│   ├── IISCVEAttackDatabaseTest.java       # IIS CVE database tests
+│   ├── IPv6AttackDatabaseTest.java         # IPv6 database tests
+│   ├── MixedEncodingAttackTest.java        # Mixed encoding tests
+│   ├── NginxCVEAttackDatabaseTest.java     # Nginx CVE database tests
+│   ├── NullBytePathTraversalAttackTest.java # Null byte traversal tests
+│   ├── OWASPTop10AttackDatabaseTest.java   # OWASP database tests
 │   ├── PathTraversalAttackTest.java        # Path traversal tests
-│   ├── EncodingAttackTest.java             # Encoding attack tests
-│   ├── UnicodeAttackTest.java              # Unicode attack tests
-│   ├── InjectionAttackTest.java            # Injection tests
-│   ├── HTTPAttackTest.java                 # HTTP-specific tests
-│   ├── DoSAttackTest.java                  # DoS attack tests
-│   ├── ProtocolEdgeCaseTest.java           # Protocol edge cases
-│   ├── CVEValidationTest.java              # Known CVE tests
-│   ├── OWASPComplianceTest.java            # OWASP compliance
-│   ├── FalsePositiveTest.java              # False positive tests
-│   └── PerformanceValidationTest.java      # Performance tests
+│   ├── ProtocolHandlerAttackTest.java      # Protocol handler tests
+│   ├── UnicodeControlCharacterAttackTest.java # Unicode control tests
+│   ├── UnicodeNormalizationAttackTest.java # Unicode normalization tests
+│   ├── UnicodePathTraversalAttackTest.java # Unicode traversal tests
+│   └── URLLengthLimitAttackTest.java       # URL length limit tests
 │
-├── database/                                # Attack patterns
-│   ├── AttackPatternDatabase.java          # Pattern repository
-│   ├── CVEPatterns.java                    # CVE patterns
-│   └── OWASPPatterns.java                  # OWASP patterns
-│
-└── harness/                                 # Test orchestration
-    ├── SecurityTestSuite.java              # Main test suite
-    ├── TestReporter.java                   # Report generation
-    └── SecurityCoverageAnalyzer.java       # Coverage analysis
+└── validation/                              # Validation stage tests
+    ├── CharacterValidationStageTest.java
+    ├── DecodingStageTest.java
+    ├── LengthValidationStageTest.java
+    ├── NormalizationStageTest.java
+    └── PatternMatchingStageTest.java
 ----
 
 == Test Data Generators
 
-=== G1: PathTraversalGenerator
+The test framework uses a hierarchical generator architecture organized by attack type and validation context. All generators implement the `TypedGenerator<T>` interface from cui-test-generator.
 
-[source,java]
-----
-package de.cuioss.tools.security.http.generators;
+[NOTE]
+====
+For complete generator contract requirements and implementation standards, see link:generator-contract.adoc[Generator Contract Specification].
+====
 
-import de.cuioss.test.generator.TypedGenerator;
-import de.cuioss.test.generator.Generators;
+=== Generator Architecture
 
-/**
- * Generates path traversal attack patterns.
- * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G1]
- */
-public class PathTraversalGenerator implements TypedGenerator<String> {
-    
-    private static final TypedGenerator<String> BASE_PATTERNS = Generators.fixedValues(
-        "../", ".../", "..\\", "..\\\\",
-        ".%2e/", "%2e%2e/", "%2e%2e%2f",
-        "..;/", "..\\../", "..//..//"
-    );
-    
-    private static final TypedGenerator<String> TARGET_FILES = Generators.fixedValues(
-        "etc/passwd", "etc/shadow", "etc/hosts",
-        "windows/system32/config/sam",
-        "windows/win.ini", "boot.ini"
-    );
-    
-    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 10);
-    
-    @Override
-    public String next() {
-        int depth = depthGen.next();
-        String pattern = BASE_PATTERNS.next();
-        String target = TARGET_FILES.next();
-        
-        StringBuilder attack = new StringBuilder();
-        for (int i = 0; i < depth; i++) {
-            attack.append(pattern);
-        }
-        attack.append(target);
-        
-        return attack.toString();
-    }
-    
-    @Override
-    public Class<String> getType() {
-        return String.class;
-    }
-}
-----
+**Design Principle**: Generator/Database separation
+- **Generators**: Create dynamic, varied test data using algorithmic generation
+- **Databases**: Store curated collections of documented attack patterns (CVEs, OWASP)
 
-=== G2: EncodingCombinationGenerator
+**Generator Naming Convention**:
+- `Valid*Generator`: Generates legitimate input that should pass validation
+- `Attack*Generator` / `Invalid*Generator`: Generates malicious/malformed input that should be rejected
 
-[source,java]
-----
-package de.cuioss.tools.security.http.generators;
+=== Generator Categories
 
-import de.cuioss.test.generator.TypedGenerator;
-import de.cuioss.test.generator.Generators;
+==== Encoding Attack Generators (`generators/encoding/`)
+- **`PathTraversalGenerator`**: Dynamic path traversal patterns with configurable depth
+- **`EncodingCombinationGenerator`**: Multi-level URL encoding combinations  
+- **`DoubleEncodingAttackGenerator`**: Double/triple encoding bypass attempts
+- **`UnicodeAttackGenerator`**: Unicode-based bypass patterns
+- **`UnicodeControlCharacterAttackGenerator`**: Control character injection
+- **`UnicodeNormalizationAttackGenerator`**: Normalization-based attacks
+- **`BoundaryFuzzingGenerator`**: Boundary condition and length-based attacks
 
-/**
- * Generates various encoding combinations for bypass attempts.
- * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G2]
- */
-public class EncodingCombinationGenerator implements TypedGenerator<String> {
-    
-    private final TypedGenerator<Integer> encodingLevelGen = Generators.integers(1, 3);
-    private final TypedGenerator<Boolean> mixedCaseGen = Generators.booleans();
-    
-    @Override
-    public String next() {
-        int level = encodingLevelGen.next();
-        boolean mixedCase = mixedCaseGen.next();
-        
-        String encoded = "../";
-        
-        // Apply encoding levels
-        for (int i = 0; i < level; i++) {
-            encoded = urlEncode(encoded);
-        }
-        
-        // Apply mixed case if selected
-        if (mixedCase) {
-            encoded = applyMixedCase(encoded);
-        }
-        
-        return encoded;
-    }
-    
-    private String urlEncode(String input) {
-        // URL encode with %25 for % in multi-level
-        return input.replace(".", "%2e")
-                   .replace("/", "%2f")
-                   .replace("%", "%25");
-    }
-    
-    private String applyMixedCase(String input) {
-        // Mix uppercase and lowercase in hex encoding
-        return input.replaceAll("%2e", "%2E")
-                   .replaceAll("%2f", "%2F");
-    }
-    
-    @Override
-    public Class<String> getType() {
-        return String.class;
-    }
-}
-----
+==== URL/Path Generators (`generators/url/`)
+- **`ValidURLGenerator`**: RFC-compliant URLs for positive testing
+- **`ValidURLPathGenerator`**: Valid path components
+- **`ValidURLParameterGenerator`**: Valid URL parameters
+- **`InvalidURLGenerator`**: Malformed URLs for negative testing
+- **`PathTraversalURLGenerator`**: Path traversal in URL context
+- **`NullByteURLGenerator`**: Null byte injection in URLs
+- **`URLLengthLimitAttackGenerator`**: Length-based DoS attacks
 
-=== G3: UnicodeAttackGenerator
+==== HTTP Header Generators (`generators/header/`)
+- **`ValidHTTPHeaderNameGenerator`**: RFC-compliant header names
+- **`ValidHTTPHeaderValueGenerator`**: Valid header values
+- **`InvalidHTTPHeaderNameGenerator`**: Malformed header names
+- **`HttpHeaderInjectionAttackGenerator`**: CRLF injection attacks
 
-[source,java]
-----
-package de.cuioss.tools.security.http.generators;
+==== Cookie Generators (`generators/cookie/`)  
+- **`ValidCookieGenerator`**: RFC-compliant cookies
+- **`AttackCookieGenerator`**: Cookie-based attack patterns
 
-import de.cuioss.test.generator.TypedGenerator;
-import de.cuioss.test.generator.Generators;
+==== Protocol Injection Generators (`generators/injection/`)
+- **`HttpRequestSmugglingAttackGenerator`**: HTTP smuggling patterns
+- **`ProtocolHandlerAttackGenerator`**: Protocol handler exploits
 
-/**
- * Generates Unicode-based attack patterns.
- * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G3]
- */
-public class UnicodeAttackGenerator implements TypedGenerator<String> {
-    
-    private static final TypedGenerator<String> UNICODE_ATTACKS = Generators.fixedValues(
-        "\u002e\u002e\u002f",           // Unicode dots and slash
-        "\u2024\u2024\u2215",           // Lookalike characters
-        "\u202e",                       // Right-to-left override
-        "\u200b",                       // Zero-width space
-        "\uFEFF",                       // Zero-width no-break space
-        "\u0000"                        // Null character
-    );
-    
-    private final TypedGenerator<Boolean> combineGen = Generators.booleans();
-    
-    @Override
-    public String next() {
-        String attack = UNICODE_ATTACKS.next();
-        
-        if (combineGen.next()) {
-            // Combine with path traversal
-            return attack + "../etc/passwd";
-        }
-        
-        return attack;
-    }
-    
-    @Override
-    public Class<String> getType() {
-        return String.class;
-    }
-}
-----
+==== HTTP Body Generators (`generators/body/`)
+- **`ValidHTTPBodyContentGenerator`**: Valid body content
+- **`HTTPBodyGenerator`**: Various body formats and structures
 
-=== G4: BoundaryFuzzingGenerator
+=== Attack Pattern Databases
 
-[source,java]
-----
-package de.cuioss.tools.security.http.generators;
+The framework includes curated databases of documented attack patterns organized by source:
 
-import de.cuioss.test.generator.TypedGenerator;
-import de.cuioss.test.generator.Generators;
+**CVE-Based Databases**:
+- `ApacheCVEAttackDatabase`: Apache HTTP Server vulnerabilities (CVE-2021-41773, CVE-2021-42013)
+- `NginxCVEAttackDatabase`: Nginx vulnerabilities (CVE-2013-4547, CVE-2017-7529)  
+- `IISCVEAttackDatabase`: Microsoft IIS vulnerabilities
 
-/**
- * Generates boundary condition test cases.
- * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G4]
- */
-public class BoundaryFuzzingGenerator implements TypedGenerator<String> {
-    
-    private final TypedGenerator<Integer> lengthGen = Generators.integers(1000, 10000);
-    private final TypedGenerator<Integer> nestingGen = Generators.integers(50, 200);
-    private final TypedGenerator<Integer> typeGen = Generators.integers(0, 5);
-    
-    @Override
-    public String next() {
-        int type = typeGen.next();
-        
-        return switch (type) {
-            case 0 -> generateLongPath();
-            case 1 -> generateDeepNesting();
-            case 2 -> generateNullBytes();
-            case 3 -> generateControlCharacters();
-            case 4 -> generateMixedBoundaryAttacks();
-            default -> generateSpecialChars();
-        };
-    }
-    
-    private String generateLongPath() {
-        int length = lengthGen.next();
-        StringBuilder path = new StringBuilder("/");
-        while (path.length() < length) {
-            path.append("verylongpathsegment/");
-        }
-        return path.toString();
-    }
-    
-    private String generateDeepNesting() {
-        int depth = nestingGen.next();
-        return "dir/".repeat(depth);
-    }
-    
-    private String generateNullBytes() {
-        TypedGenerator<String> patterns = Generators.fixedValues(
-            "/file\u0000.txt",              // Raw null byte
-            "/admin%00.php",                // Encoded null byte  
-            "../etc/passwd%00.jpg",         // Path traversal with null
-            "file.jsp%00.png",              // Extension bypass
-            "%00../../etc/shadow"           // Leading null byte
-        );
-        return patterns.next();
-    }
-    
-    private String generateControlCharacters() {
-        // Various control characters that should be rejected
-        TypedGenerator<String> controls = Generators.fixedValues(
-            "/file\r\n.txt",                // CRLF injection
-            "/path\t\tfile",                // Tab characters
-            "/dir\b\bfile",                 // Backspace
-            "/test\u001Ffile"               // Unit separator
-        );
-        return controls.next();
-    }
-    
-    private String generateMixedBoundaryAttacks() {
-        // Combine multiple boundary issues
-        TypedGenerator<Integer> attackGen = Generators.integers(0, 3);
-        int attack = attackGen.next();
-        return switch (attack) {
-            case 0 -> "../".repeat(100) + "etc/passwd";  // Excessive traversal
-            case 1 -> "/a".repeat(2000);                  // Near max length
-            case 2 -> "/%00" + "../".repeat(10);          // Null + traversal
-            default -> "/\u0000/../\u0000/../file";       // Multiple nulls
-        };
-    }
-    
-    private String generateSpecialChars() {
-        // Other special characters
-        TypedGenerator<String> specials = Generators.fixedValues(
-            "/file|command",                // Pipe character
-            "/file;command",                // Semicolon
-            "/file`command`",               // Backticks
-            "/file$variable",               // Variable expansion
-            "/file>output"                  // Redirection
-        );
-        return specials.next();
-    }
-    
-    @Override
-    public Class<String> getType() {
-        return String.class;
-    }
-}
-----
+**Standards-Based Databases**:
+- `OWASPTop10AttackDatabase`: OWASP Top 10 attack patterns
+- `IPv6AttackDatabase`: IPv6 address parsing exploits
+- `IDNAttackDatabase`: Internationalized Domain Name attacks
+- `HomographAttackDatabase`: Unicode homograph attacks
 
-=== G5: ValidURLGenerator
-
-[source,java]
-----
-package de.cuioss.tools.security.http.generators;
-
-import de.cuioss.test.generator.TypedGenerator;
-import de.cuioss.test.generator.Generators;
-import de.cuioss.tools.security.http.config.UrlSecurityConfig;
-
-/**
- * Generates legitimate URLs that should pass validation.
- * Implements: link:plan.adoc#_phase_1_test_infrastructure_and_generators[Task G5]
- */
-public class ValidURLGenerator implements TypedGenerator<String> {
-    
-    private static final TypedGenerator<String> VALID_PATHS = Generators.fixedValues(
-        "/api/v1/users",
-        "/static/css/style.css",
-        "/index.html",
-        "/docs/guide.pdf",
-        "/search?q=test&limit=10",
-        "/products/123/reviews",
-        "/admin/dashboard"
-    );
-    
-    private static final TypedGenerator<String> SORT_OPTIONS = Generators.fixedValues("asc", "desc");
-    
-    private final TypedGenerator<Boolean> paramGen = Generators.booleans();
-    private final TypedGenerator<Integer> pageGen = Generators.integers(1, 100);
-    
-    @Override
-    public String next() {
-        String path = VALID_PATHS.next();
-        
-        if (paramGen.next()) {
-            // Add valid parameters
-            path += "?page=" + pageGen.next();
-            path += "&sort=" + SORT_OPTIONS.next();
-        }
-        
-        // Ensure within DEFAULT_MAX_PATH_LENGTH (2048)
-        if (path.length() > UrlSecurityConfig.DEFAULT_MAX_PATH_LENGTH) {
-            path = path.substring(0, UrlSecurityConfig.DEFAULT_MAX_PATH_LENGTH);
-        }
-        
-        return path;
-    }
-    
-    @Override
-    public Class<String> getType() {
-        return String.class;
-    }
-}
-----
+Each database provides structured test cases with expected failure types and comprehensive attack documentation.
 
 == Attack Test Implementation
 
