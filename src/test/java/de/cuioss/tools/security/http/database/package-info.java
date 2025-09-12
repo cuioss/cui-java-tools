@@ -25,7 +25,7 @@
  * <h2>Core Concepts</h2>
  *
  * <h3>1. Attack Test Cases</h3>
- * <p>The {@link AttackTestCase} record serves as the foundation for all attack testing:</p>
+ * <p>The {@link de.cuioss.tools.security.http.database.AttackTestCase} record serves as the foundation for all attack testing:</p>
  * <ul>
  *   <li><strong>Attack String</strong>: The actual malicious payload to be tested</li>
  *   <li><strong>Expected Failure Type</strong>: The specific {@link de.cuioss.tools.security.http.core.UrlSecurityFailureType} expected</li>
@@ -34,7 +34,7 @@
  * </ul>
  *
  * <h3>2. Attack Databases</h3>
- * <p>Databases implement the {@link AttackDatabase} interface and provide:</p>
+ * <p>Databases implement the {@link de.cuioss.tools.security.http.database.AttackDatabase} interface and provide:</p>
  * <ul>
  *   <li><strong>Curated Attack Collections</strong>: Focused sets of related attack patterns</li>
  *   <li><strong>Public Constants</strong>: Individual test cases accessible for targeted testing</li>
@@ -46,14 +46,14 @@
  *
  * <h4>CVE-Based Databases</h4>
  * <ul>
- *   <li><strong>{@link ApacheCVEAttackDatabase}</strong>: Apache HTTP Server and Tomcat CVE exploits</li>
- *   <li><strong>{@link IISCVEAttackDatabase}</strong>: Microsoft IIS and Windows-specific vulnerabilities</li>
+ *   <li><strong>{@link de.cuioss.tools.security.http.database.ApacheCVEAttackDatabase}</strong>: Apache HTTP Server and Tomcat CVE exploits</li>
+ *   <li><strong>{@link de.cuioss.tools.security.http.database.IISCVEAttackDatabase}</strong>: Microsoft IIS and Windows-specific vulnerabilities</li>
  *   <li><strong>NginxCVEAttackDatabase</strong>: Nginx server CVE attack patterns (planned)</li>
  * </ul>
  *
  * <h4>Standards-Based Databases</h4>
  * <ul>
- *   <li><strong>{@link OWASPTop10AttackDatabase}</strong>: OWASP Top 10 2021 attack vectors</li>
+ *   <li><strong>{@link de.cuioss.tools.security.http.database.OWASPTop10AttackDatabase}</strong>: OWASP Top 10 2021 attack vectors</li>
  *   <li><strong>HomographAttackDatabase</strong>: Unicode homograph attack patterns (planned)</li>
  *   <li><strong>IPv6AttackDatabase</strong>: IPv6-specific security attack patterns (planned)</li>
  * </ul>
