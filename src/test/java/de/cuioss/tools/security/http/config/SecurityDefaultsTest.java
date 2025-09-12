@@ -205,15 +205,8 @@ class SecurityDefaultsTest {
         assertTrue(SecurityDefaults.INJECTION_CHARACTERS.contains('\''));
     }
 
-    @Test
-    void shouldHaveXSSPatterns() {
-        assertNotNull(SecurityDefaults.XSS_PATTERNS);
-        assertFalse(SecurityDefaults.XSS_PATTERNS.isEmpty());
-
-        assertTrue(SecurityDefaults.XSS_PATTERNS.contains("<script"));
-        assertTrue(SecurityDefaults.XSS_PATTERNS.contains("javascript:"));
-        assertTrue(SecurityDefaults.XSS_PATTERNS.contains("alert("));
-    }
+    // XSS patterns removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
     @Test
     void shouldHaveEncodingPatterns() {
@@ -312,7 +305,7 @@ class SecurityDefaultsTest {
         assertTrue(SecurityDefaults.DANGEROUS_CONTENT_TYPES.size() > 3);
         assertTrue(SecurityDefaults.PROBLEMATIC_CONTROL_CHARS.size() > 10);
         assertTrue(SecurityDefaults.INJECTION_CHARACTERS.size() > 5);
-        assertTrue(SecurityDefaults.XSS_PATTERNS.size() > 5);
+        // XSS patterns removed - application layer responsibility
     }
 
     @Test

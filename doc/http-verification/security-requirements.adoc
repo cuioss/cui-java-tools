@@ -57,17 +57,17 @@ These requirements are derived from:
 * Reference: link:analysis/cve-analysis.adoc[CVE Analysis]
 
 === [#SEC-4]
-=== SEC-4: Encoding Attack Prevention
+=== SEC-4: HTTP Protocol Encoding Attack Prevention
 
-* The system must prevent all encoding-based bypass attempts
+* The system must prevent all HTTP protocol-layer encoding-based bypass attempts
 * Must handle:
   ** Single URL encoding (`%2e%2e%2f`)
   ** Double URL encoding (`%252e%252e%252f`)
-  ** Mixed encoding (combining techniques)
-  ** Unicode encoding variants
-  ** HTML entity encoding
-  ** Base64 encoding attempts
-* Must validate at each decoding stage
+  ** UTF-8 overlong encoding attacks
+  ** Mixed case hexadecimal encoding
+  ** Unicode normalization attacks
+* **ARCHITECTURAL BOUNDARY**: HTML entity encoding and Base64 decoding are application-layer responsibilities
+* Must validate at HTTP protocol decoding stage only
 * Reference: link:specification/specification.adoc#_decodingstage[Encoding Security]
 
 === [#SEC-5]

@@ -192,33 +192,8 @@ class HTTPBodyValidationPipelineTest {
             assertEquals(ValidationType.BODY, exception.getValidationType());
         }
 
-        @Test
-        void shouldDetectXssAttacksWithStrictConfig() {
-            HTTPBodyValidationPipeline strictPipeline = new HTTPBodyValidationPipeline(strictConfig, eventCounter);
-
-            String xssAttack = "test <script>alert('xss')</script> stuff";
-
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> strictPipeline.validate(xssAttack));
-
-            assertEquals(ValidationType.BODY, exception.getValidationType());
-            assertEquals(xssAttack, exception.getOriginalInput());
-            assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
-        }
-
-        @Test
-        void shouldDetectXssWithStrictConfig() {
-            HTTPBodyValidationPipeline strictPipeline = new HTTPBodyValidationPipeline(strictConfig, eventCounter);
-
-            String xssContent = "content with <script>alert(1)</script> in it";
-
-            UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                    () -> strictPipeline.validate(xssContent));
-
-            assertEquals(ValidationType.BODY, exception.getValidationType());
-            assertEquals(xssContent, exception.getOriginalInput());
-            assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
-        }
+        // XSS detection tests removed - application layer responsibility.
+        // HTTP protocol layer focuses on URL/percent-encoding, not HTML/JS content.
     }
 
     @Nested
@@ -389,7 +364,7 @@ class HTTPBodyValidationPipelineTest {
 
         @Test
         void shouldPreserveOriginalInputInException() {
-            String originalInput = "<script>alert('test')</script>";
+            String originalInput = "content\u0000with null byte";
 
             UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                     () -> pipeline.validate(originalInput));

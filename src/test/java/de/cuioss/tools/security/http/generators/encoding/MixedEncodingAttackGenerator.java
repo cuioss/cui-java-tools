@@ -18,7 +18,6 @@ package de.cuioss.tools.security.http.generators.encoding;
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.TypedGenerator;
 
-import java.util.Base64;
 
 /**
  * Generates mixed encoding attack patterns that combine different encoding schemes.
@@ -38,7 +37,6 @@ import java.util.Base64;
  *   <li>URL encoding mixed with Unicode escapes (\\u sequences)</li>
  *   <li>URL encoding mixed with JavaScript escape sequences</li>
  *   <li>HTML entities mixed with Unicode escapes</li>
- *   <li>Base64 encoded payloads with URL encoding wrapper</li>
  *   <li>UTF-8 overlong encoding mixed with standard URL encoding</li>
  *   <li>Different URL encoding formats (% vs + for spaces)</li>
  * </ul>
@@ -63,7 +61,7 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
     private final TypedGenerator<Integer> depthGen = Generators.integers(2, 6);
     private final TypedGenerator<Integer> scriptTagSelector = Generators.integers(1, 4);
     private final TypedGenerator<Integer> protocolSelector = Generators.integers(1, 4);
-    private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 7);
+    private final TypedGenerator<Integer> encodingTypeGen = Generators.integers(1, 6);
 
     @Override
     public String next() {
@@ -75,9 +73,8 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
             case 2 -> mixUrlWithUnicodeEscapes(basePattern);
             case 3 -> mixUrlWithJavaScriptEscapes(basePattern);
             case 4 -> mixHtmlWithUnicodeEscapes(basePattern);
-            case 5 -> mixBase64WithUrl(basePattern);
-            case 6 -> mixUtf8OverlongWithUrl(basePattern);
-            case 7 -> mixDifferentUrlFormats(basePattern);
+            case 5 -> mixUtf8OverlongWithUrl(basePattern);
+            case 6 -> mixDifferentUrlFormats(basePattern);
             default -> basePattern;
         };
     }
@@ -199,18 +196,6 @@ public class MixedEncodingAttackGenerator implements TypedGenerator<String> {
                 .replace("\\", "\\\\u005c");
     }
 
-    /**
-     * Mix Base64 encoding with URL encoding.
-     */
-    private String mixBase64WithUrl(String pattern) {
-        // Base64 encode the pattern
-        String base64 = Base64.getEncoder().encodeToString(pattern.getBytes());
-
-        // Then URL encode some special characters from the base64 result
-        return base64.replace("+", "%2B")
-                .replace("/", "%2F")
-                .replace("=", "%3D");
-    }
 
     /**
      * Mix UTF-8 overlong encoding with standard URL encoding.

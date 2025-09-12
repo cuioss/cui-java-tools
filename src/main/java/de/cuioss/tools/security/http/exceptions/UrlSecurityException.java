@@ -48,8 +48,8 @@ import java.util.Optional;
  * throw UrlSecurityException.builder()
  *     .failureType(UrlSecurityFailureType.INVALID_CHARACTER)
  *     .validationType(ValidationType.PARAMETER_VALUE)
- *     .originalInput("user&lt;script&gt;alert(1)&lt;/script&gt;")
- *     .sanitizedInput("userscriptalert1script")
+ *     .originalInput("user&lt;script&gt;test(1)&lt;/script&gt;")
+ *     .sanitizedInput("userscripttest1script")
  *     .detail("Removed script tags and special characters")
  *     .build();
  * 

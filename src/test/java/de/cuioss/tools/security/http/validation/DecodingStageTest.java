@@ -399,118 +399,120 @@ class DecodingStageTest {
     // QI-2: New tests for enhanced multi-layer decoding capabilities
 
     @Test
-    @DisplayName("QI-2: Should decode HTML entities")
-    void shouldDecodeHtmlEntities() {
-        // Named entities
-        assertEquals("</script>", pathDecoder.validate("&lt;/script&gt;"));
-        assertEquals("path/../admin", pathDecoder.validate("path&sol;..&sol;admin"));
-        assertEquals("alert('xss')", pathDecoder.validate("alert(&apos;xss&apos;)"));
-        assertEquals("data=\"value\"", pathDecoder.validate("data=&quot;value&quot;"));
-        assertEquals("user & admin", pathDecoder.validate("user &amp; admin"));
+    @DisplayName("Should NOT decode HTML entities - application layer responsibility")
+    void shouldNotDecodeHtmlEntities() {
+        // HTML entities should pass through unchanged - they are application-layer encodings
+        assertEquals("&lt;/script&gt;", pathDecoder.validate("&lt;/script&gt;"));
+        assertEquals("path&sol;..&sol;admin", pathDecoder.validate("path&sol;..&sol;admin"));
+        assertEquals("alert(&apos;xss&apos;)", pathDecoder.validate("alert(&apos;xss&apos;)"));
+        assertEquals("data=&quot;value&quot;", pathDecoder.validate("data=&quot;value&quot;"));
+        assertEquals("user &amp; admin", pathDecoder.validate("user &amp; admin"));
 
-        // Decimal numeric entities
-        assertEquals("/admin", pathDecoder.validate("&#47;admin"));
-        assertEquals("<script>", pathDecoder.validate("&#60;script&#62;"));
-        assertEquals("'attack'", pathDecoder.validate("&#39;attack&#39;"));
-        assertEquals("\"injection\"", pathDecoder.validate("&#34;injection&#34;"));
+        // Decimal numeric entities should pass through unchanged
+        assertEquals("&#47;admin", pathDecoder.validate("&#47;admin"));
+        assertEquals("&#60;script&#62;", pathDecoder.validate("&#60;script&#62;"));
+        assertEquals("&#39;attack&#39;", pathDecoder.validate("&#39;attack&#39;"));
+        assertEquals("&#34;injection&#34;", pathDecoder.validate("&#34;injection&#34;"));
 
-        // Hexadecimal numeric entities
-        assertEquals("/", pathDecoder.validate("&#x2F;"));
-        assertEquals("<", pathDecoder.validate("&#x3C;"));
-        assertEquals(">", pathDecoder.validate("&#x3E;"));
-        assertEquals("'", pathDecoder.validate("&#x27;"));
-        assertEquals("\"", pathDecoder.validate("&#x22;"));
+        // Hexadecimal numeric entities should pass through unchanged
+        assertEquals("&#x2F;", pathDecoder.validate("&#x2F;"));
+        assertEquals("&#x3C;", pathDecoder.validate("&#x3C;"));
+        assertEquals("&#x3E;", pathDecoder.validate("&#x3E;"));
+        assertEquals("&#x27;", pathDecoder.validate("&#x27;"));
+        assertEquals("&#x22;", pathDecoder.validate("&#x22;"));
     }
 
     @Test
-    @DisplayName("QI-2: Should decode JavaScript escape sequences")
-    void shouldDecodeJavaScriptEscapes() {
-        // Hex escapes
-        assertEquals("</script>", pathDecoder.validate("\\x3c/script\\x3e"));
-        assertEquals("/admin", pathDecoder.validate("\\x2fadmin"));
-        assertEquals("'attack'", pathDecoder.validate("\\x27attack\\x27"));
-        assertEquals("\"injection\"", pathDecoder.validate("\\x22injection\\x22"));
+    @DisplayName("Should NOT decode JavaScript escapes - application layer responsibility")
+    void shouldNotDecodeJavaScriptEscapes() {
+        // JavaScript escapes should pass through unchanged - they are application-layer encodings
+        assertEquals("\\x3c/script\\x3e", pathDecoder.validate("\\x3c/script\\x3e"));
+        assertEquals("\\x2fadmin", pathDecoder.validate("\\x2fadmin"));
+        assertEquals("\\x27attack\\x27", pathDecoder.validate("\\x27attack\\x27"));
+        assertEquals("\\x22injection\\x22", pathDecoder.validate("\\x22injection\\x22"));
 
-        // Unicode escapes
-        assertEquals("<script>", pathDecoder.validate("\\u003cscript\\u003e"));
-        assertEquals("/path", pathDecoder.validate("\\u002fpath"));
-        assertEquals("'xss'", pathDecoder.validate("\\u0027xss\\u0027"));
-        assertEquals("\"sqli\"", pathDecoder.validate("\\u0022sqli\\u0022"));
+        // Unicode escapes should pass through unchanged
+        assertEquals("\\u003cscript\\u003e", pathDecoder.validate("\\u003cscript\\u003e"));
+        assertEquals("\\u002fpath", pathDecoder.validate("\\u002fpath"));
+        assertEquals("\\u0027xss\\u0027", pathDecoder.validate("\\u0027xss\\u0027"));
+        assertEquals("\\u0022sqli\\u0022", pathDecoder.validate("\\u0022sqli\\u0022"));
 
-        // Octal escapes
-        assertEquals("/", pathDecoder.validate("\\057"));
-        assertEquals("<", pathDecoder.validate("\\074"));
-        assertEquals(">", pathDecoder.validate("\\076"));
-        assertEquals("'", pathDecoder.validate("\\047"));
-        assertEquals("\"", pathDecoder.validate("\\042"));
+        // Octal escapes should pass through unchanged
+        assertEquals("\\057", pathDecoder.validate("\\057"));
+        assertEquals("\\074", pathDecoder.validate("\\074"));
+        assertEquals("\\076", pathDecoder.validate("\\076"));
+        assertEquals("\\047", pathDecoder.validate("\\047"));
+        assertEquals("\\042", pathDecoder.validate("\\042"));
     }
 
     @Test
-    @DisplayName("QI-2: Should handle mixed encoding combinations")
-    void shouldHandleMixedEncodingCombinations() {
-        // HTML entities + URL encoding
-        assertEquals("</script>", pathDecoder.validate("&lt;%2Fscript&gt;"));
-        assertEquals("path/../admin", pathDecoder.validate("path&sol;..%2Fadmin"));
+    @DisplayName("Should handle HTTP protocol encoding only - no cross-layer mixing")
+    void shouldHandleHttpProtocolEncodingOnly() {
+        // URL encoding should be decoded (HTTP protocol layer)
+        assertEquals("&lt;/script&gt;", pathDecoder.validate("&lt;%2Fscript&gt;"));
+        assertEquals("path&sol;../admin", pathDecoder.validate("path&sol;..%2Fadmin"));
 
-        // JavaScript escapes + URL encoding
-        assertEquals("</script>", pathDecoder.validate("\\x3c%2Fscript\\x3e"));
-        assertEquals("/admin", pathDecoder.validate("\\x2F%61dmin")); // %61 = 'a'
+        // JavaScript escapes should pass through, URL encoding should be decoded
+        assertEquals("\\x3c/script\\x3e", pathDecoder.validate("\\x3c%2Fscript\\x3e"));
+        assertEquals("\\x2Fadmin", pathDecoder.validate("\\x2F%61dmin")); // %61 = 'a'
 
-        // HTML entities + JavaScript escapes
-        assertEquals("<script>alert('xss')</script>", pathDecoder.validate("&lt;script&gt;alert(\\x27xss\\x27)&lt;/script&gt;"));
+        // HTML entities and JavaScript escapes should both pass through unchanged
+        assertEquals("&lt;script&gt;alert(\\x27xss\\x27)&lt;/script&gt;", pathDecoder.validate("&lt;script&gt;alert(\\x27xss\\x27)&lt;/script&gt;"));
 
-        // All three: HTML entities + JS escapes + URL encoding  
-        assertEquals("path/../admin", pathDecoder.validate("path&sol;..\\x2F%61dmin"));
+        // Only URL encoding should be decoded from mixed input  
+        assertEquals("path&sol;..\\x2Fadmin", pathDecoder.validate("path&sol;..\\x2F%61dmin"));
     }
 
     @Test
-    @DisplayName("QI-2: Should handle malformed entities gracefully")
-    void shouldHandleMalformedEntitiesGracefully() {
-        // Malformed HTML entities (should remain unchanged)
+    @DisplayName("Should pass through all application-layer encodings unchanged")
+    void shouldPassThroughApplicationLayerEncodingsUnchanged() {
+        // HTML entities should remain unchanged (application layer responsibility)
         assertEquals("&invalid;", pathDecoder.validate("&invalid;"));
         assertEquals("&#9999999;", pathDecoder.validate("&#9999999;")); // Invalid codepoint (too large)
         assertEquals("&#xZZZZ;", pathDecoder.validate("&#xZZZZ;")); // Invalid hex
 
-        // Malformed JavaScript escapes (should remain unchanged)
+        // JavaScript escapes should remain unchanged (application layer responsibility)
         assertEquals("\\xZZ", pathDecoder.validate("\\xZZ")); // Invalid hex
         assertEquals("\\uZZZZ", pathDecoder.validate("\\uZZZZ")); // Invalid unicode
         assertEquals("\\999", pathDecoder.validate("\\999")); // Invalid octal (> 255)
 
-        // Mixed with valid ones
-        assertEquals("valid/&invalid;", pathDecoder.validate("valid&sol;&invalid;"));
+        // Mixed with valid URL encoding (only URL encoding should be processed)
+        assertEquals("valid&sol;&invalid;", pathDecoder.validate("valid&sol;&invalid;"));
     }
 
     @Test
-    @DisplayName("QI-2: Should process decoding in correct order")
-    void shouldProcessDecodingInCorrectOrder() {
-        // Test order: HTML entities first, then JS escapes, then URL encoding
-        // This creates "/admin" through multi-layer decoding
-        String multiLayer = "&&#x23;x32F;"; // &amp; -> & -> &#x2F; -> /
-        
-        // Simpler test of processing order
-        String htmlFirst = "&lt;script&gt;"; // Should decode to <script>
-        assertEquals("<script>", pathDecoder.validate(htmlFirst));
+    @DisplayName("Should process only HTTP protocol-layer decoding")
+    void shouldProcessOnlyHttpProtocolLayerDecoding() {
+        // HTML entities should NOT be decoded - application layer responsibility
+        String htmlEntities = "&lt;script&gt;"; // Should remain unchanged
+        assertEquals("&lt;script&gt;", pathDecoder.validate(htmlEntities));
 
-        String jsFirst = "\\x3cscript\\x3e"; // Should decode to <script>
-        assertEquals("<script>", pathDecoder.validate(jsFirst));
+        // JavaScript escapes should NOT be decoded - application layer responsibility
+        String jsEscapes = "\\x3cscript\\x3e"; // Should remain unchanged
+        assertEquals("\\x3cscript\\x3e", pathDecoder.validate(jsEscapes));
 
-        String urlFirst = "%3Cscript%3E"; // Should decode to <script>
-        assertEquals("<script>", pathDecoder.validate(urlFirst));
+        // URL encoding SHOULD be decoded - HTTP protocol layer responsibility
+        String urlEncoding = "%3Cscript%3E"; // Should decode to <script>
+        assertEquals("<script>", pathDecoder.validate(urlEncoding));
+
+        // UTF-8 overlong encoding should be detected and blocked
+        assertThrows(UrlSecurityException.class,
+                () -> pathDecoder.validate("%c0%ae")); // UTF-8 overlong for '.'
     }
 
     @Test
-    @DisplayName("QI-2: Should maintain backward compatibility")
-    void shouldMaintainBackwardCompatibility() {
-        // Ensure existing URL decoding still works correctly
+    @DisplayName("Should maintain HTTP protocol-layer functionality")
+    void shouldMaintainHttpProtocolLayerFunctionality() {
+        // URL decoding should continue to work (HTTP protocol layer)
         assertEquals("/api/users/123", pathDecoder.validate("/api/users%2F123"));
         assertEquals("hello world", parameterDecoder.validate("hello%20world"));
         assertEquals("user@example.com", parameterDecoder.validate("user%40example.com"));
 
-        // Double encoding detection should still work
+        // Double encoding detection should still work (HTTP protocol layer)
         assertThrows(UrlSecurityException.class,
                 () -> pathDecoder.validate("/admin%252Fusers"));
 
-        // Unicode normalization should still work when enabled
+        // Unicode normalization should still work when enabled (HTTP protocol layer)
         SecurityConfiguration unicodeConfig = SecurityConfiguration.builder()
                 .normalizeUnicode(true)
                 .build();
@@ -518,45 +520,63 @@ class DecodingStageTest {
 
         String normalInput = "regular-path";
         assertEquals(normalInput, unicodeDecoder.validate(normalInput));
+
+        // UTF-8 overlong encoding detection should work (HTTP protocol layer)
+        assertThrows(UrlSecurityException.class,
+                () -> pathDecoder.validate("%c0%af")); // UTF-8 overlong for '/'
     }
 
     /**
-     * QI-2: Test data for complex mixed encoding attack scenarios
+     * Test data for HTTP protocol-layer encoding scenarios only
      */
-    static Stream<Arguments> mixedEncodingAttackScenarios() {
+    static Stream<Arguments> httpProtocolEncodingScenarios() {
         return Stream.of(
-                // HTML entity attacks
-                Arguments.of("&lt;script&gt;alert(1)&lt;/script&gt;", "<script>alert(1)</script>", "XSS via HTML entities"),
-                Arguments.of("javascript&#58;alert(1)", "javascript:alert(1)", "JavaScript protocol via decimal entity"),
-                Arguments.of("&#x6A;&#x61;&#x76;&#x61;&#x73;&#x63;&#x72;&#x69;&#x70;&#x74;&#x3A;", "javascript:", "JavaScript protocol via hex entities"),
+                // URL encoding scenarios (HTTP protocol layer - should be decoded)
+                Arguments.of("%3Cscript%3E", "<script>", "URL encoded script tags"),
+                Arguments.of("%2F..%2Fadmin", "/../admin", "URL encoded path traversal"),
+                Arguments.of("cmd%26%26echo%20test", "cmd&&echo test", "URL encoded command injection"),
+                Arguments.of("%27%20OR%201%3D1%20--", "' OR 1=1 --", "URL encoded SQL injection"),
 
-                // JavaScript escape attacks
-                Arguments.of("\\x3cimg src=x onerror=alert(1)\\x3e", "<img src=x onerror=alert(1)>", "XSS via hex escapes"),
-                Arguments.of("\\u003cscript\\u003ealert(1)\\u003c/script\\u003e", "<script>alert(1)</script>", "XSS via Unicode escapes"),
-                Arguments.of("\\74\\163\\143\\162\\151\\160\\164\\76", "<script>", "Script tag via octal escapes"),
+                // Application-layer encodings (should pass through unchanged)
+                Arguments.of("&lt;script&gt;alert(1)&lt;/script&gt;", "&lt;script&gt;alert(1)&lt;/script&gt;", "HTML entities pass through"),
+                Arguments.of("\\x3cimg src=x\\x3e", "\\x3cimg src=x\\x3e", "JS hex escapes pass through"),
+                Arguments.of("\\u003cscript\\u003e", "\\u003cscript\\u003e", "JS Unicode escapes pass through"),
 
-                // Path traversal attacks with mixed encoding
-                Arguments.of("&sol;..&sol;admin", "/../admin", "Path traversal via HTML entities"),
-                Arguments.of("\\x2F..\\x2Fadmin", "/../admin", "Path traversal via hex escapes"),
-                Arguments.of("..&#47;..&#47;etc&#47;passwd", "../../etc/passwd", "File access via mixed entities"),
-
-                // Command injection patterns
-                Arguments.of("cmd&amp;&amp;echo test", "cmd&&echo test", "Command injection via HTML ampersand"),
-                Arguments.of("cmd\\x7c\\x7cecho test", "cmd||echo test", "Command injection via hex pipes"),
-
-                // SQL injection patterns  
-                Arguments.of("&#39; OR 1=1 --", "' OR 1=1 --", "SQL injection via decimal entity"),
-                Arguments.of("\\x27 UNION SELECT * FROM users--", "' UNION SELECT * FROM users--", "SQL injection via hex escape")
+                // Mixed scenarios - only URL encoding should be processed
+                Arguments.of("&lt;script%3E", "&lt;script>", "HTML entity + URL encoding"),
+                Arguments.of("\\x3cscript%3E", "\\x3cscript>", "JS escape + URL encoding"),
+                Arguments.of("&lt;%2Fscript&gt;", "&lt;/script&gt;", "HTML entities with URL encoded slash")
         );
     }
 
     @ParameterizedTest
-    @DisplayName("QI-2: Should decode complex mixed encoding attack scenarios")
-    @MethodSource("mixedEncodingAttackScenarios")
-    void shouldDecodeComplexMixedEncodingAttackScenarios(String encoded, String expected, String description) {
-        String result = pathDecoder.validate(encoded);
+    @DisplayName("Should handle HTTP protocol-layer encoding scenarios correctly")
+    @MethodSource("httpProtocolEncodingScenarios")
+    void shouldHandleHttpProtocolEncodingScenarios(String input, String expected, String description) {
+        String result = pathDecoder.validate(input);
         assertEquals(expected, result, description);
     }
 
-    // QI-3: Base64 decoding removed - architectural decision: application layer responsibility
+    @ParameterizedTest
+    @DisplayName("Should detect UTF-8 overlong encoding attacks")
+    @ValueSource(strings = {
+            "%c0%ae",          // Overlong encoding for '.'
+            "%c0%af",          // Overlong encoding for '/'
+            "%c1%9c",          // Overlong encoding
+            "%c0%a0",          // Overlong encoding for space
+            "%e0%80%af",       // 3-byte overlong for '/'
+            "%f0%80%80%af"     // 4-byte overlong for '/'
+    })
+    void shouldDetectUtf8OverlongEncodingAttacks(String overlongInput) {
+        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
+                () -> pathDecoder.validate(overlongInput),
+                "Should detect UTF-8 overlong encoding in: " + overlongInput);
+
+        assertEquals(UrlSecurityFailureType.INVALID_ENCODING, exception.getFailureType());
+        assertTrue(exception.getDetail().isPresent());
+        assertTrue(exception.getDetail().get().contains("UTF-8 overlong encoding attack"));
+    }
+
+    // Architectural decision: Application-layer encodings (HTML entities, JS escapes, Base64) 
+    // are handled by higher application layers where they have proper context.
 }

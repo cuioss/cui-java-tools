@@ -96,10 +96,8 @@ public enum UrlSecurityFailureType {
     /** Known attack signatures from security databases */
     KNOWN_ATTACK_SIGNATURE("Known attack signature detected"),
 
-    // === Cross-Site Scripting (XSS) - HTTP Layer Appropriate ===
-    
-    /** Cross-site scripting (XSS) patterns detected */
-    XSS_DETECTED("XSS attack pattern detected"),
+    // XSS detection removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
     // === Structural Issues ===
     
@@ -205,14 +203,8 @@ public enum UrlSecurityFailureType {
                 this == KNOWN_ATTACK_SIGNATURE;
     }
 
-    /**
-     * Indicates whether this failure type represents a cross-site scripting attack.
-     * 
-     * @return true if this is an XSS attack failure type
-     */
-    public boolean isXSSAttack() {
-        return this == XSS_DETECTED;
-    }
+    // XSS attack detection removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
     /**
      * Indicates whether this failure type represents a structural issue.

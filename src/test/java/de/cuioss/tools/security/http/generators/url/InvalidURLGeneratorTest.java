@@ -59,8 +59,8 @@ class InvalidURLGeneratorTest {
     void shouldGenerateProtocolIssues() {
         Set<String> generated = new HashSet<>();
 
-        // Generate patterns to test protocol issues
-        for (int i = 0; i < 200; i++) {
+        // Generate patterns to test protocol issues (increased sample size for better coverage)
+        for (int i = 0; i < 500; i++) {
             generated.add(generator.next());
         }
 
@@ -80,8 +80,8 @@ class InvalidURLGeneratorTest {
     void shouldGenerateHostIssues() {
         Set<String> generated = new HashSet<>();
 
-        // Generate patterns to test host issues
-        for (int i = 0; i < 200; i++) {
+        // Generate patterns to test host issues - increased to ensure space pattern appears
+        for (int i = 0; i < 1000; i++) {
             generated.add(generator.next());
         }
 
@@ -271,8 +271,8 @@ class InvalidURLGeneratorTest {
     void shouldGenerateCombinedMalformations() {
         Set<String> generated = new HashSet<>();
 
-        // Generate patterns to test combined malformations
-        for (int i = 0; i < 200; i++) {
+        // Generate patterns to test combined malformations (increased sample size for better coverage)
+        for (int i = 0; i < 1000; i++) {
             generated.add(generator.next());
         }
 

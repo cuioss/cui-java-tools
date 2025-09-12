@@ -78,7 +78,7 @@ public class HtmlEntityEncodingAttackGenerator implements TypedGenerator<String>
             case 7 -> applyNestedEntities(generateBasePattern());
             case 8 -> createPathTraversalWithEntities();
             case 9 -> createXssWithEntities();
-            default -> generateBasePattern();
+            default -> applyNamedEntities(generateBasePattern()); // Always apply encoding
         };
     }
 

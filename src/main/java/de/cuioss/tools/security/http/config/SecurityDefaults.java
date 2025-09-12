@@ -108,11 +108,12 @@ public final class SecurityDefaults {
             "..%c0%af", "..%c1%9c", "%c0%ae%c0%ae%c0%af", "%c1%8s%c1%8s%c1%81"
     );
 
-    /** Patterns indicating potential directory traversal attempts */
+    /** Patterns indicating potential directory traversal attempts and protocol handler attacks */
     public static final Set<String> SUSPICIOUS_PATH_PATTERNS = Set.of(
             "/etc/", "/proc/", "/sys/", "/dev/", "/boot/", "/root/",
             "\\windows\\", "\\system32\\", "\\users\\", "\\program files\\",
-            "web.xml", "web.config", ".env", ".htaccess", ".htpasswd"
+            "web.xml", "web.config", ".env", ".htaccess", ".htpasswd",
+            "javascript:", "vbscript:", "data:", "file:"
     );
 
     // ========== PARAMETER SECURITY CONSTANTS ==========
@@ -277,12 +278,8 @@ public final class SecurityDefaults {
     );
 
 
-    /** XSS patterns to detect */
-    public static final Set<String> XSS_PATTERNS = Set.of(
-            "<script", "</script>", "javascript:", "vbscript:", "onload=",
-            "onerror=", "onclick=", "onmouseover=", "alert(", "eval(",
-            "document.cookie", "document.domain", "window.location"
-    );
+    // XSS patterns removed - application layer responsibility.
+    // Application layers have proper context for HTML escaping and validation.
 
     // ========== ENCODING CONSTANTS ==========
     

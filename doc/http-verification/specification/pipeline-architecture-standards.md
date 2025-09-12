@@ -61,11 +61,31 @@ This document establishes the authoritative standards for selecting appropriate 
 - **Script/HTML injection** → `HTTPBodyValidationPipeline`
 - **Path traversal/CVE exploits** → `URLPathValidationPipeline`
 
-### 3. Unicode Handling
+### 3. Encoding Layer Separation (HTTP Protocol vs Application Layer)
+
+#### HTTP Protocol Layer Scope
+**What BELONGS at HTTP validation layer:**
+- URL percent-encoding (`%XX` sequences)
+- UTF-8 overlong encoding detection
+- Double URL encoding (`%25XX` patterns) 
+- Unicode normalization for URL paths
+- HTTP protocol-specific malformations
+
+#### Application Layer Scope  
+**What DOES NOT BELONG at HTTP validation layer:**
+- ❌ HTML entity decoding (`&lt;`, `&#47;`, `&#x2F;`) - Presentation layer concern
+- ❌ JavaScript escape sequences (`\x2F`, `\u002F`, `\057`) - Code execution layer concern  
+- ❌ Base64 encoding/decoding - Application data layer concern
+- ❌ XML/JSON parsing - Application format layer concern
+
+#### Rationale
+HTTP security validation should focus exclusively on HTTP protocol violations and URL-specific attacks. Application-layer encoding schemes require proper context (HTML rendering, JavaScript execution, data format parsing) that only exists at higher application layers.
+
+### 4. Unicode Handling
 - **Unicode domains in full URLs** → `HTTPBodyValidationPipeline`
 - **Unicode characters in paths** → `URLPathValidationPipeline` with `allowHighBitCharacters(true)`
 
-### 4. Configuration Requirements
+### 5. Configuration Requirements
 
 #### URLPathValidationPipeline Configuration
 ```java
@@ -101,6 +121,7 @@ SecurityConfiguration config = SecurityConfiguration.defaults();
 ### Architecture Compliance Checklist
 - [ ] Attack patterns analyzed for protocol presence
 - [ ] Pipeline selection matches content type (path vs full URL)
+- [ ] **Encoding layer separation maintained** (HTTP protocol vs application layer)
 - [ ] Unicode handling configured appropriately
 - [ ] Expected failure types align with pipeline capabilities
 - [ ] Test documentation explains pipeline selection rationale

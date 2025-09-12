@@ -116,59 +116,8 @@ class PatternMatchingStageTest {
 
     // SQL keyword regex tests removed - application layer responsibility
 
-    // ========== XSS Detection Tests ==========
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "<script>alert('XSS')</script>",
-            "<script src='evil.js'></script>",
-            "javascript:alert('XSS')",
-            "vbscript:alert('XSS')",
-            "<img onerror='alert(1)' src=x>",
-            "<div onload='evil()'>",
-            "<body onmouseover='alert(1)'>",
-            "eval(document.cookie)",
-            "window.location"
-    })
-    void shouldDetectXSSPatterns(String xssPayload) {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate(xssPayload));
-
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
-        assertEquals(ValidationType.PARAMETER_VALUE, exception.getValidationType());
-        assertTrue(exception.getDetail().orElse("").contains("XSS"));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "<script>",
-            "</script>",
-            "<SCRIPT>",
-            "</SCRIPT>",
-            "javascript:",
-            "JAVASCRIPT:",
-            "vbscript:",
-            "VBSCRIPT:",
-            "onload=",
-            "ONLOAD=",
-            "onerror=",
-            "onclick=",
-            "onmouseover="
-    })
-    void shouldDetectXSSKeywordsWithRegex(String xssKeyword) {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-
-        String payload = "normal text " + xssKeyword + " more text";
-
-        UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate(payload));
-
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
-    }
+    // XSS detection tests removed - application layer responsibility.
+    // HTTP protocol layer focuses on URL/percent-encoding, not HTML/JS content.
 
     // ========== Command Injection Detection Tests ==========
     
@@ -272,12 +221,12 @@ class PatternMatchingStageTest {
         SecurityConfiguration config = SecurityConfiguration.builder()
                 .caseSensitiveComparison(false)
                 .build();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
+        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.URL_PATH);
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate("<script>alert('xss')</script>"));
+                () -> stage.validate("../etc/passwd"));
 
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
     }
 
     @Test
@@ -285,13 +234,12 @@ class PatternMatchingStageTest {
         SecurityConfiguration config = SecurityConfiguration.builder()
                 .caseSensitiveComparison(true)
                 .build();
-        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
+        PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.URL_PATH);
 
-        // Should still detect due to regex patterns being case-insensitive
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
-                () -> stage.validate("<script>alert('xss')</script>"));
+                () -> stage.validate("../etc/passwd"));
 
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
     }
 
     // ========== Validation Type Context Tests ==========
@@ -313,24 +261,7 @@ class PatternMatchingStageTest {
         assertThrows(UrlSecurityException.class, () -> nameStage.validate("../etc/passwd"));
     }
 
-    @Test
-    void shouldApplyXSSToAllTypes() {
-        SecurityConfiguration config = SecurityConfiguration.defaults();
-        String xssAttack = "<script>alert('xss')</script>";
-
-        // XSS should be detected across all validation types
-        PatternMatchingStage pathStage = new PatternMatchingStage(config, ValidationType.URL_PATH);
-        assertThrows(UrlSecurityException.class, () -> pathStage.validate(xssAttack));
-
-        PatternMatchingStage paramStage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
-        assertThrows(UrlSecurityException.class, () -> paramStage.validate(xssAttack));
-
-        PatternMatchingStage nameStage = new PatternMatchingStage(config, ValidationType.PARAMETER_NAME);
-        assertThrows(UrlSecurityException.class, () -> nameStage.validate(xssAttack));
-
-        PatternMatchingStage headerStage = new PatternMatchingStage(config, ValidationType.HEADER_VALUE);
-        assertThrows(UrlSecurityException.class, () -> headerStage.validate(xssAttack));
-    }
+    // XSS validation test removed - application layer responsibility.
 
     @Test
     void shouldApplySuspiciousParameterNamesOnlyToParameterNames() {
@@ -389,13 +320,13 @@ class PatternMatchingStageTest {
         SecurityConfiguration config = SecurityConfiguration.defaults();
         PatternMatchingStage stage = new PatternMatchingStage(config, ValidationType.PARAMETER_VALUE);
 
-        // Create very long input with attack pattern at the end
-        String longInput = generateRepeatedPattern("normal", 1000) + "<script>alert('xss')</script>";
+        // Create very long input with path traversal pattern at the end
+        String longInput = generateRepeatedPattern("normal", 1000) + "../etc/passwd";
 
         UrlSecurityException exception = assertThrows(UrlSecurityException.class,
                 () -> stage.validate(longInput));
 
-        assertEquals(UrlSecurityFailureType.XSS_DETECTED, exception.getFailureType());
+        assertEquals(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED, exception.getFailureType());
     }
 
     @Test

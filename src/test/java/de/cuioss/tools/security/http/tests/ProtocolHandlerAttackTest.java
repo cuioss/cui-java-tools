@@ -83,7 +83,9 @@ class ProtocolHandlerAttackTest {
 
     @BeforeEach
     void setUp() {
-        config = SecurityConfiguration.defaults();
+        config = SecurityConfiguration.builder()
+                .failOnSuspiciousPatterns(true)  // Enable failing on suspicious patterns
+                .build();
         eventCounter = new SecurityEventCounter();
         pipeline = new URLPathValidationPipeline(config, eventCounter);
     }
@@ -440,7 +442,7 @@ class ProtocolHandlerAttackTest {
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
                 failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS;

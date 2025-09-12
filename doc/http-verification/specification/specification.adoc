@@ -859,7 +859,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 /**
- * Multi-layer decoding with security checks.
+ * HTTP protocol-layer decoding with security checks.
+ * LIMITED SCOPE: URL encoding, UTF-8 overlong detection, Unicode normalization only.
+ * EXCLUDES: HTML entities, JavaScript escapes, Base64 (application-layer concerns).
  * Immutable and thread-safe.
  * Implemented by: link:plan.adoc#_phase_5_validation_stages[Task V1]
  */
@@ -1674,7 +1676,7 @@ public class ValidationFactory {
 === Attack Coverage
 
 - Path traversal: ../, ..\, encoded variants
-- Encoding attacks: Double/triple encoding, mixed encoding
+- HTTP protocol encoding attacks: Double/triple URL encoding, UTF-8 overlong encoding, mixed case hex encoding
 - Unicode attacks: Normalization, homographs, control characters
 - Injection: XSS, SQL, LDAP, command injection patterns
 - Protocol attacks: Header injection, request smuggling

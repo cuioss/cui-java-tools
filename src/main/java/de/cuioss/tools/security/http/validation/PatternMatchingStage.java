@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
  * <h3>Security Validations</h3>
  * <ul>
  *   <li><strong>Path Traversal</strong> - ../,..\\, and encoded variants</li>
- *   <li><strong>XSS Attacks</strong> - Script tags, event handlers, and JavaScript injection</li>
+ *   <li><strong>XSS Attacks</strong> - Script tags, event handlers, and JS injection</li>
  *   <li><strong>File Access</strong> - Attempts to access sensitive system files</li>
  *   <li><strong>Parameter Pollution</strong> - Suspicious parameter names and patterns</li>
  * </ul>
@@ -71,12 +71,11 @@ import java.util.regex.Pattern;
  *     logger.warn("Path traversal blocked: {}", e.getDetail());
  * }
  * 
- * // Detect XSS attack  
+ * // Path traversal detection
  * try {
- *     matcher.validate("<script>alert('xss')</script>");
- *     // Throws UrlSecurityException with XSS_DETECTED
+ *     matcher.validate("../../../etc/passwd");
  * } catch (UrlSecurityException e) {
- *     logger.warn("XSS attack blocked: {}", e.getDetail());
+ *     logger.warn("Path traversal blocked: {}", e.getDetail());
  * }
  * 
  * // Configurable sensitivity
@@ -136,13 +135,8 @@ public class PatternMatchingStage implements HttpSecurityValidator {
     );
 
 
-    /**
-     * Pre-compiled regex pattern for detecting XSS script injection.
-     * Matches script tags and JavaScript event handlers.
-     */
-    private static final Pattern XSS_SCRIPT_PATTERN = Pattern.compile(
-            "(?i)<script[^>]*>|</script>|javascript\\s*:|vbscript\\s*:|\\bon\\w+\\s*="
-    );
+    // XSS script pattern removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
 
     /**
@@ -171,7 +165,7 @@ public class PatternMatchingStage implements HttpSecurityValidator {
      * @throws UrlSecurityException if malicious patterns are detected:
      *         <ul>
      *           <li>PATH_TRAVERSAL_DETECTED - if path traversal patterns found</li>
-     *           <li>XSS_DETECTED - if XSS attack patterns found</li>
+     *           <!-- XSS detection removed - application layer responsibility -->
      *           <li>SUSPICIOUS_PATTERN_DETECTED - if suspicious patterns found and policy requires failure</li>
      *         </ul>
      */
@@ -192,8 +186,7 @@ public class PatternMatchingStage implements HttpSecurityValidator {
             checkPathTraversalPatterns(value, testValue);
         }
 
-        // Step 2: Check for XSS attack patterns (applies to all content types)
-        checkXSSPatterns(value, testValue);
+        // XSS pattern checking removed - application layer responsibility.
 
         // Step 3: Check for suspicious system paths (paths and parameters)
         if (validationType == ValidationType.URL_PATH || validationType == ValidationType.PARAMETER_VALUE) {
@@ -267,40 +260,8 @@ public class PatternMatchingStage implements HttpSecurityValidator {
         }
     }
 
-    /**
-     * Checks input for cross-site scripting (XSS) attack patterns.
-     * 
-     * <p>XSS detection is appropriate for the HTTP/URL layer as it involves
-     * HTTP-based content injection that can be detected without application context.</p>
-     * 
-     * @param originalValue The original input value
-     * @param testValue The value prepared for testing (case-normalized if needed)
-     * @throws UrlSecurityException if XSS patterns are detected
-     */
-    private void checkXSSPatterns(String originalValue, String testValue) {
-        // XSS patterns from SecurityDefaults
-        for (String pattern : SecurityDefaults.XSS_PATTERNS) {
-            String checkPattern = config.caseSensitiveComparison() ? pattern : pattern.toLowerCase();
-            if (testValue.contains(checkPattern)) {
-                throw UrlSecurityException.builder()
-                        .failureType(UrlSecurityFailureType.XSS_DETECTED)
-                        .validationType(validationType)
-                        .originalInput(originalValue)
-                        .detail("XSS pattern detected: " + pattern)
-                        .build();
-            }
-        }
-
-        // XSS script patterns using regex
-        if (XSS_SCRIPT_PATTERN.matcher(originalValue).find()) {
-            throw UrlSecurityException.builder()
-                    .failureType(UrlSecurityFailureType.XSS_DETECTED)
-                    .validationType(validationType)
-                    .originalInput(originalValue)
-                    .detail("XSS script pattern detected via regex")
-                    .build();
-        }
-    }
+    // XSS pattern checking removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
     /**
      * Checks input for suspicious system path patterns.

@@ -65,8 +65,8 @@ class AttackCookieGeneratorTest {
     void shouldGenerateAttackNames() {
         Set<Cookie> generated = new HashSet<>();
 
-        // Generate cookies to test malicious names
-        for (int i = 0; i < 200; i++) {
+        // Generate cookies to test malicious names - increased count for better coverage
+        for (int i = 0; i < 1000; i++) {
             generated.add(generator.next());
         }
 

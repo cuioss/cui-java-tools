@@ -507,9 +507,9 @@ class UnicodeNormalizationAttackTest {
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS ||
                 failureType == UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED ||
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
+                failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.MALFORMED_INPUT ||
                 failureType == UrlSecurityFailureType.INVALID_STRUCTURE ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||

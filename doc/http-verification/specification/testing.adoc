@@ -700,13 +700,13 @@ public class PerformanceValidationBenchmark {
     }
     
     @Benchmark
-    @Group("encoding_attacks")
-    public void benchmarkEncodingAttacks_T35() {
-        String encodedAttack = encodingGen.next();
+    @Group("http_encoding_attacks")
+    public void benchmarkHttpEncodingAttacks_T35() {
+        String encodedAttack = encodingGen.next(); // HTTP protocol-layer encoding only
         try {
             pathValidator.validate(encodedAttack);
         } catch (UrlSecurityException e) {
-            // Expected for encoding attacks
+            // Expected for HTTP protocol encoding attacks
         }
     }
     

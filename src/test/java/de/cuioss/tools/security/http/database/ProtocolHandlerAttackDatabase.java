@@ -33,7 +33,7 @@ import java.util.List;
  * 
  * <h3>Protocol Attack Categories</h3>
  * <ul>
- *   <li><strong>JavaScript Protocol Injection</strong> - Script execution through javascript: URLs</li>
+ *   <li><strong>JS Protocol Injection</strong> - Script execution through javascript: URLs</li>
  *   <li><strong>Data URI Exploitation</strong> - Malicious content via data: scheme</li>
  *   <li><strong>File Protocol Access</strong> - Local file system access via file: URLs</li>
  *   <li><strong>Custom Protocol Schemes</strong> - Malicious custom protocol handlers</li>
@@ -55,55 +55,55 @@ import java.util.List;
  */
 public class ProtocolHandlerAttackDatabase implements AttackDatabase {
 
-    // JavaScript Protocol Injection Attacks
+    // JS Protocol Injection Attacks
     public static final AttackTestCase JAVASCRIPT_ALERT_BASIC = new AttackTestCase(
             "javascript:alert('XSS')/../../../etc/passwd",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "JavaScript protocol injection using basic alert() function to test XSS vulnerability detection. The javascript: URI scheme allows execution of arbitrary JavaScript code, combined with path traversal to demonstrate multi-vector attack capabilities.",
-            "XSS_DETECTED is expected because the javascript: protocol contains script execution code (alert function) designed to execute cross-site scripting attacks in browser contexts."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "JS protocol injection using basic test() function to test XSS vulnerability detection. The javascript: URI scheme allows execution of arbitrary JS code, combined with path traversal to demonstrate multi-vector attack capabilities.",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the javascript: protocol contains script execution code (alert function) designed to execute cross-site scripting attacks in browser contexts."
     );
 
     public static final AttackTestCase JAVASCRIPT_ENCODED_EVAL = new AttackTestCase(
             "javascript:eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))/admin",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "Advanced JavaScript protocol attack using eval() with String.fromCharCode() encoding to obfuscate XSS payload. This technique bypasses simple string-based XSS filters by encoding the alert('XSS') call as character codes (97=a, 108=l, etc.).",
-            "XSS_DETECTED is expected because despite character code obfuscation, the javascript: protocol contains eval() function calls designed to execute dynamically constructed malicious scripts."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "Advanced JS protocol attack using eval() with String.fromCharCode() encoding to obfuscate XSS payload. This technique bypasses simple string-based XSS filters by encoding the test('XSS') call as character codes (97=a, 108=l, etc.).",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because despite character code obfuscation, the javascript: protocol contains eval() function calls designed to execute dynamically constructed malicious scripts."
     );
 
     public static final AttackTestCase JAVASCRIPT_LOCATION_REDIRECT = new AttackTestCase(
             "javascript:window.location='http://evil.com'/../../config",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "JavaScript protocol attack using window.location manipulation to perform malicious redirects. This exploits client-side navigation controls to redirect users to attacker-controlled domains while maintaining path traversal capabilities for server-side exploitation.",
-            "XSS_DETECTED is expected because the javascript: protocol contains client-side script code (window.location) designed to manipulate browser navigation and perform unauthorized redirects."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "JS protocol attack using window.location manipulation to perform malicious redirects. This exploits client-side navigation controls to redirect users to attacker-controlled domains while maintaining path traversal capabilities for server-side exploitation.",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the javascript: protocol contains client-side script code (window.location) designed to manipulate browser navigation and perform unauthorized redirects."
     );
 
     public static final AttackTestCase JAVASCRIPT_FETCH_EXFILTRATION = new AttackTestCase(
             "javascript:fetch('/../../etc/passwd').then(r=>r.text()).then(console.log)",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "Sophisticated JavaScript protocol attack using fetch() API for data exfiltration. This modern attack technique combines path traversal with JavaScript's fetch API to read sensitive files and exfiltrate data through console output or network requests.",
-            "XSS_DETECTED is expected because the javascript: protocol contains complex script execution (fetch API calls) designed to read and exfiltrate sensitive data through client-side JavaScript execution."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "Sophisticated JS protocol attack using fetch() API for data exfiltration. This modern attack technique combines path traversal with JS fetch API to read sensitive files and exfiltrate data through console output or network requests.",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the javascript: protocol contains complex script execution (fetch API calls) designed to read and exfiltrate sensitive data through client-side JS execution."
     );
 
     // Data URI Exploitation Attacks
     public static final AttackTestCase DATA_URI_HTML_SCRIPT = new AttackTestCase(
             "data:text/html,<script>alert('XSS')</script>/../../../etc/passwd",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "Data URI attack embedding HTML with JavaScript in data: scheme. This exploits the data: protocol to inject malicious HTML containing scripts directly into the URL, bypassing traditional XSS filters that don't examine data URI contents.",
-            "XSS_DETECTED is expected because the data: URI contains embedded HTML with script tags designed to execute cross-site scripting attacks through inline content injection."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "Data URI attack embedding HTML with JS in data: scheme. This exploits the data: protocol to inject malicious HTML containing scripts directly into the URL, bypassing traditional XSS filters that don't examine data URI contents.",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the data: URI contains embedded HTML with script tags designed to execute cross-site scripting attacks through inline content injection."
     );
 
     public static final AttackTestCase DATA_URI_BASE64_SCRIPT = new AttackTestCase(
             "data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=/../etc/hosts",
-            UrlSecurityFailureType.XSS_DETECTED,
-            "Base64-encoded data URI attack containing XSS payload. The base64 string 'PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=' decodes to '<script>alert('XSS')</script>', demonstrating how data URIs can obfuscate malicious content through encoding.",
-            "XSS_DETECTED is expected because despite base64 encoding, the data: URI contains encoded script content designed to execute cross-site scripting when decoded and processed by browsers."
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
+            "Base64-encoded data URI attack containing XSS payload. The base64 string 'PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=' decodes to '<script>test('XSS')</script>', demonstrating how data URIs can obfuscate malicious content through encoding.",
+            "SUSPICIOUS_PATTERN_DETECTED is expected because despite base64 encoding, the data: URI contains encoded script content designed to execute cross-site scripting when decoded and processed by browsers."
     );
 
     public static final AttackTestCase DATA_URI_SVG_SCRIPT = new AttackTestCase(
             "data:image/svg+xml,<svg><script>alert('XSS')</script></svg>/../../sensitive",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
             "SVG data URI attack embedding JavaScript within SVG content. This exploits the ability of SVG images to contain executable script content, using the data: scheme to inject malicious SVG documents that execute JavaScript when processed.",
-            "XSS_DETECTED is expected because the SVG data URI contains embedded script elements within the SVG markup, enabling cross-site scripting through image content manipulation."
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the SVG data URI contains embedded script elements within the SVG markup, enabling cross-site scripting through image content manipulation."
     );
 
     // File Protocol Access Attacks  
@@ -146,16 +146,16 @@ public class ProtocolHandlerAttackDatabase implements AttackDatabase {
     // Protocol Confusion Attacks
     public static final AttackTestCase PROTOCOL_CONFUSION_HTTP_JS = new AttackTestCase(
             "http://javascript:alert('XSS')@evil.com/../../../etc/passwd",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
             "Protocol confusion attack embedding javascript: within HTTP URL authority section. This exploits URL parsing inconsistencies where embedded protocols in the authority section might be processed differently by various parsers, potentially executing the embedded JavaScript.",
-            "XSS_DETECTED is expected because despite the HTTP protocol context, the embedded javascript: scheme contains script execution code that may be processed as executable content by vulnerable parsers."
+            "SUSPICIOUS_PATTERN_DETECTED is expected because despite the HTTP protocol context, the embedded javascript: scheme contains script execution code that may be processed as executable content by vulnerable parsers."
     );
 
     public static final AttackTestCase PROTOCOL_CONFUSION_HTTPS_DATA = new AttackTestCase(
             "https://data:text/html,<script>@evil.com/../../config",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
             "HTTPS protocol confusion with embedded data: URI in authority section. This tests parser handling when data URIs containing malicious content are embedded within the authority component of HTTPS URLs, potentially causing execution of embedded scripts.",
-            "XSS_DETECTED is expected because the embedded data: URI contains HTML script content that may be processed as executable content despite being within the HTTPS URL authority section."
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the embedded data: URI contains HTML script content that may be processed as executable content despite being within the HTTPS URL authority section."
     );
 
     // Malformed Protocol Schemes
@@ -198,9 +198,9 @@ public class ProtocolHandlerAttackDatabase implements AttackDatabase {
 
     public static final AttackTestCase DOUBLE_JAVASCRIPT_PROTOCOL = new AttackTestCase(
             "javascript://javascript:alert('XSS')/../../sensitive",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
             "Nested JavaScript protocol attack with double javascript: specification. This tests whether XSS filters properly handle nested JavaScript protocols that might be processed recursively or bypass single-layer protocol detection.",
-            "XSS_DETECTED is expected because despite nesting, the URL contains JavaScript protocol schemes with script execution code (alert function) designed to execute cross-site scripting attacks."
+            "SUSPICIOUS_PATTERN_DETECTED is expected because despite nesting, the URL contains JavaScript protocol schemes with script execution code (alert function) designed to execute cross-site scripting attacks."
     );
 
     // Protocol Encoding Attacks
@@ -213,9 +213,9 @@ public class ProtocolHandlerAttackDatabase implements AttackDatabase {
 
     public static final AttackTestCase URL_ENCODED_JAVASCRIPT = new AttackTestCase(
             "%6a%61%76%61%73%63%72%69%70%74:alert('XSS')/../admin",
-            UrlSecurityFailureType.XSS_DETECTED,
+            UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED,
             "URL-encoded JavaScript protocol attack using percent-encoding to obfuscate the javascript: scheme. This bypasses XSS filters that detect literal 'javascript:' strings but don't properly decode URL-encoded protocol specifications.",
-            "XSS_DETECTED is expected because the URL-encoded protocol (%6a%61%76%61%73%63%72%69%70%74) decodes to 'javascript:' containing script execution code designed to perform cross-site scripting attacks."
+            "SUSPICIOUS_PATTERN_DETECTED is expected because the URL-encoded protocol (%6a%61%76%61%73%63%72%69%70%74) decodes to 'javascript:' containing script execution code designed to perform cross-site scripting attacks."
     );
 
     // Protocol with Authentication Bypass

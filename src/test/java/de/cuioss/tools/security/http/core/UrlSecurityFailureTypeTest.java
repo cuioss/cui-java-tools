@@ -50,7 +50,7 @@ class UrlSecurityFailureTypeTest {
         assertNotNull(UrlSecurityFailureType.EXCESSIVE_NESTING);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED);
         assertNotNull(UrlSecurityFailureType.SUSPICIOUS_PARAMETER_NAME);
-        assertNotNull(UrlSecurityFailureType.XSS_DETECTED);
+        // XSS_DETECTED removed - application layer responsibility
         assertNotNull(UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE);
         assertNotNull(UrlSecurityFailureType.MALFORMED_INPUT);
         assertNotNull(UrlSecurityFailureType.INVALID_STRUCTURE);
@@ -59,10 +59,10 @@ class UrlSecurityFailureTypeTest {
     }
 
     @Test
-    void shouldHave23FailureTypes() {
-        // Verify we have the expected number of failure types (removed 2 application-layer types)
+    void shouldHave22FailureTypes() {
+        // Verify we have the expected number of failure types (removed 3 application-layer types: SQL, Command, XSS)
         UrlSecurityFailureType[] values = UrlSecurityFailureType.values();
-        assertEquals(23, values.length, "Should have 23 failure types after removing SQL and Command injection");
+        assertEquals(22, values.length, "Should have 22 failure types after removing SQL, Command, and XSS injection");
     }
 
     @ParameterizedTest
@@ -156,15 +156,8 @@ class UrlSecurityFailureTypeTest {
         assertFalse(UrlSecurityFailureType.NULL_BYTE_INJECTION.isPatternBased());
     }
 
-    @Test
-    void shouldCorrectlyIdentifyXSSAttacks() {
-        assertTrue(UrlSecurityFailureType.XSS_DETECTED.isXSSAttack());
-
-        // Non-XSS attacks should return false
-        assertFalse(UrlSecurityFailureType.PATH_TRAVERSAL_DETECTED.isXSSAttack());
-        assertFalse(UrlSecurityFailureType.INVALID_ENCODING.isXSSAttack());
-        assertFalse(UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED.isXSSAttack());
-    }
+    // XSS attack identification removed - application layer responsibility.
+    // Application layers have proper context for HTML/JS escaping and validation.
 
     @Test
     void shouldCorrectlyIdentifyStructuralIssues() {
@@ -198,7 +191,7 @@ class UrlSecurityFailureTypeTest {
         if (type.isCharacterAttack()) categoryCount++;
         if (type.isSizeViolation()) categoryCount++;
         if (type.isPatternBased()) categoryCount++;
-        if (type.isXSSAttack()) categoryCount++;
+        // XSS attack check removed - application layer responsibility
         if (type.isStructuralIssue()) categoryCount++;
         if (type.isProtocolViolation()) categoryCount++;
         if (type.isIPv6HostAttack()) categoryCount++;

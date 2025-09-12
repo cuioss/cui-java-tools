@@ -128,7 +128,7 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
     private static final List<AttackTestCase> ALL_ATTACK_TEST_CASES = List.of(
             // HTTP/URL Layer Appropriate Attacks Only
             CLASSIC_PATH_TRAVERSAL_UNIX,
-            CLASSIC_PATH_TRAVERSAL_WINDOWS, 
+            CLASSIC_PATH_TRAVERSAL_WINDOWS,
             URL_ENCODED_TRAVERSAL,
             DOUBLE_ENCODED_TRAVERSAL,
             UTF8_OVERLONG_TRAVERSAL,
@@ -136,8 +136,8 @@ public class OWASPTop10AttackDatabase implements AttackDatabase {
             STRUTS2_COMPONENT_TRAVERSAL,
             AUTH_BYPASS_TRAVERSAL,
             MIXED_ENCODING_BYPASS
-            // Application-layer patterns (SQL injection, XSS script tags, Command injection, SSRF) 
-            // removed - these should be handled by application security validation
+    // Application-layer patterns (SQL injection, XSS script tags, Command injection, SSRF) 
+    // removed - these should be handled by application security validation
     );
 
     @Override

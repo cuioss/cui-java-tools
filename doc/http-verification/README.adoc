@@ -68,9 +68,9 @@ Valid HTTP parameter names (RFC 7230):
 Primary attack vectors in HTTP/URL contexts:
 
 * **Percent-Encoded Traversal**: `%2e%2e%2f` → `../`
-* **Double Encoding**: `%252e%252e%252f` → `%2e%2e%2f` → `../`
-* **Unicode Variants**: `\u002e\u002e\u002f` → `../`
-* **Mixed Encoding**: Combining multiple encoding schemes
+* **Double Encoding**: `%252e%252e%252f` → `%2e%2e%2f` → `../`  
+* **UTF-8 Overlong**: Malformed UTF-8 encoding attacks
+* **HTTP Protocol Mixed Encoding**: Combining URL encoding schemes
 
 === Validation Pipeline
 
@@ -80,10 +80,12 @@ Input → Decode → Normalize → Validate → Verify → Output
 
 Each stage must handle:
 
-* Multiple encoding layers
-* Platform-specific separators
+* HTTP protocol-layer encoding only (URL encoding, UTF-8, Unicode normalization)
+* Platform-specific separators  
 * Context-aware validation
 * Performance optimization
+
+**Architectural Boundary**: Application-layer encodings (HTML entities, JavaScript escapes, Base64) handled by higher layers.
 
 
 == Contributing

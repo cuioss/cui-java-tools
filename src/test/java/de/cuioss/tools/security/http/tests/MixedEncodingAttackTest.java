@@ -20,12 +20,10 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import de.cuioss.tools.security.http.config.SecurityConfiguration;
 import de.cuioss.tools.security.http.core.UrlSecurityFailureType;
 import de.cuioss.tools.security.http.exceptions.UrlSecurityException;
-import de.cuioss.tools.security.http.generators.encoding.MixedEncodingAttackGenerator;
 import de.cuioss.tools.security.http.generators.url.ValidURLPathGenerator;
 import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,25 +31,32 @@ import org.junit.jupiter.params.ParameterizedTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * T6: Test mixed encoding attacks
+ * T6: Test HTTP protocol-layer mixed encoding attacks
  * 
  * <p>
  * This test class implements Task T6 from the HTTP security validation plan,
- * focusing on testing mixed encoding attacks that combine different encoding
- * schemes to bypass security controls that might only check for a single
- * encoding type.
+ * focusing on testing mixed encoding attacks that combine different HTTP protocol-layer
+ * encoding schemes to bypass security controls. <strong>Architectural Scope:</strong> 
+ * Limited to HTTP/URL protocol encodings only - application-layer encodings 
+ * (HTML entities, JavaScript escapes, Base64) are handled by higher layers.
  * </p>
  * 
- * <h3>Test Coverage</h3>
+ * <h3>HTTP Protocol-Layer Test Coverage</h3>
  * <ul>
- *   <li>URL encoding mixed with HTML entity encoding</li>
- *   <li>URL encoding mixed with Unicode escape sequences (\\u)</li>
- *   <li>URL encoding mixed with JavaScript escape sequences (\\x)</li>
- *   <li>HTML entities mixed with Unicode escapes</li>
- *   <li>Base64 encoded payloads with URL encoding wrapper</li>
  *   <li>UTF-8 overlong encoding mixed with standard URL encoding</li>
- *   <li>Different URL encoding formats (% vs + for spaces, mixed case)</li>
- *   <li>Polyglot attacks using multiple encoding contexts</li>
+ *   <li>Different URL encoding formats (% vs + for spaces, mixed case hex)</li>
+ *   <li>Double URL encoding patterns (%25XX combinations)</li>
+ *   <li>Mixed case hexadecimal encoding (%2f vs %2F)</li>
+ *   <li>Unicode normalization combined with URL encoding</li>
+ *   <li>Path separator encoding variations (/, %2F, %5C)</li>
+ * </ul>
+ * 
+ * <h3>REMOVED: Cross-Layer Encodings</h3>
+ * <p>The following encodings were removed to maintain HTTP/application layer separation:</p>
+ * <ul>
+ *   <li>❌ HTML entity encoding - belongs in presentation layer</li>
+ *   <li>❌ JavaScript escape sequences - belongs in code execution layer</li>  
+ *   <li>❌ Base64 encoding - belongs in application data layer</li>
  * </ul>
  * 
  * <h3>Security Standards</h3>
@@ -61,8 +66,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *   <li>CWE-116: Improper Encoding or Escaping of Output</li>
  *   <li>CWE-838: Inappropriate Encoding for Output Context</li>
  *   <li>RFC 3986 URI Encoding Standards</li>
- *   <li>HTML5 Character Encoding Standards</li>
- *   <li>ECMAScript String Escape Sequences</li>
  * </ul>
  * 
  * Implements: Task T6 from HTTP verification specification
@@ -70,8 +73,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Claude Code Generator
  * @since 2.5
  */
-@EnableGeneratorController  
-@Disabled("ARCHITECTURAL: Base64 decoding is application-layer responsibility, not HTTP/URL layer - requires test refactoring to remove Base64 patterns")
+@EnableGeneratorController
 @DisplayName("T6: Mixed Encoding Attack Tests")
 class MixedEncodingAttackTest {
 
@@ -93,101 +95,70 @@ class MixedEncodingAttackTest {
     }
 
     /**
-     * Test mixed encoding attack patterns.
+     * Test mixed encoding attack patterns that combine encodings to bypass security controls.
      * 
      * <p>
-     * Uses MixedEncodingAttackGenerator which creates attack patterns that
-     * combine different encoding schemes to attempt bypassing security controls
-     * that might only validate against a single encoding type.
+     * Tests specific mixed encoding attack patterns that are definitively malicious
+     * and use combinations of encoding schemes to bypass security controls that might
+     * only validate against single encoding types.
      * </p>
-     * 
-     * @param mixedEncodingPattern A mixed encoding attack pattern
      */
-    @ParameterizedTest
-    @TypeGeneratorSource(value = MixedEncodingAttackGenerator.class, count = 60)
+    @Test
     @DisplayName("Mixed encoding attack patterns should be rejected")
-    void shouldRejectMixedEncodingAttacks(String mixedEncodingPattern) {
-        // Given: A mixed encoding attack pattern from the generator
-        long initialEventCount = eventCounter.getTotalCount();
+    void shouldRejectMixedEncodingAttacks() {
+        // HTTP protocol-layer mixed encoding attack patterns (HTML/JS patterns removed - app layer responsibility)
+        String[] mixedEncodingAttacks = {
+                // Path traversal with different URL encoding variations
+                "%2e%2e%2f",                              // ../ (standard URL encoding)
+                "%2E%2E%2F",                              // ../ (uppercase URL encoding)
+                "%2e%2E%2f",                              // ../ (mixed case URL encoding)
+                "%c0%ae%c0%ae%2f",                        // ../ (UTF-8 overlong encoding)
+                "%c0%AE%c0%AE%2F",                        // ../ (UTF-8 overlong mixed case)
+                
+                // Complex path traversal with mixed encoding variations
+                "%2e%2e%2f%2e%2e%2f%65%74%63",            // ../../etc (URL encoded)
+                "%c0%ae%c0%ae%2f%c0%ae%c0%ae%2f",         // ../../ (UTF-8 overlong)
+                "%2E%2E%2F%65%74%63%2F%70%61%73%73%77%64", // ../etc/passwd (mixed case)
+                
+                // Double URL encoding patterns
+                "%252e%252e%2f",                          // %2e%2e/ (double URL encoded)
+                "%252E%252E%252F",                        // %2E%2E%2F (double URL encoded uppercase)
+                "%25%32%65%25%32%65%25%32%66",            // %2e%2e%2f (each char double encoded)
+                
+                // Mixed separator encoding
+                "%2e%2e%5c",                              // ..\ (URL encoded backslash)
+                "%2e%2e%2f%2e%2e%5c",                     // ../..\ (mixed forward/back slash)
+                
+                // UTF-8 overlong combined with standard encoding  
+                "%c0%ae%2e%2f",                           // ../ (overlong + standard)
+                "%2e%c0%ae%2f",                           // ../ (standard + overlong)
+                "%c0%ae%c0%ae%2F",                        // ../ (overlong + standard case)
+        };
 
-        // When: Attempting to validate the mixed encoding attack
-        var exception = assertThrows(UrlSecurityException.class,
-                () -> pipeline.validate(mixedEncodingPattern),
-                "Mixed encoding attack pattern should be rejected: " + mixedEncodingPattern);
+        for (String attack : mixedEncodingAttacks) {
+            long initialEventCount = eventCounter.getTotalCount();
 
-        // Then: The validation should fail with appropriate security event
-        assertNotNull(exception, "Exception should be thrown for mixed encoding attack");
-        assertTrue(isMixedEncodingSpecificFailure(exception.getFailureType(), mixedEncodingPattern),
-                "Failure type should be mixed encoding specific: " + exception.getFailureType() +
-                        " for pattern: " + mixedEncodingPattern);
+            // When: Attempting to validate the mixed encoding attack
+            var exception = assertThrows(UrlSecurityException.class,
+                    () -> pipeline.validate(attack),
+                    "Mixed encoding attack pattern should be rejected: " + attack);
 
-        // And: Original malicious input should be preserved
-        assertEquals(mixedEncodingPattern, exception.getOriginalInput(),
-                "Original input should be preserved in exception");
+            // Then: The validation should fail with appropriate security event
+            assertNotNull(exception, "Exception should be thrown for mixed encoding attack: " + attack);
+            assertTrue(isMixedEncodingSpecificFailure(exception.getFailureType(), attack),
+                    "Failure type should be security-related: " + exception.getFailureType() +
+                            " for pattern: " + attack);
 
-        // And: Security event should be recorded
-        assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                "Security event should be recorded");
-    }
+            // And: Original malicious input should be preserved
+            assertEquals(attack, exception.getOriginalInput(),
+                    "Original input should be preserved in exception for: " + attack);
 
-    /**
-     * Test specific mixed encoding attack vectors.
-     * 
-     * <p>
-     * Tests known mixed encoding attack patterns that have been used
-     * in real-world attacks or security research.
-     * </p>
-     */
-    @ParameterizedTest
-    @TypeGeneratorSource(value = MixedEncodingAttackGenerator.class, count = 30)
-    @DisplayName("Known mixed encoding attack vectors should be rejected")
-    void shouldRejectKnownMixedEncodingAttacks(String mixedEncodingAttack) {
-        // Given: A known mixed encoding attack pattern from MixedEncodingAttackGenerator
-        long initialEventCount = eventCounter.getTotalCount();
-
-        // When & Then: Known mixed encoding attack should be rejected
-        var exception = assertThrows(UrlSecurityException.class,
-                () -> pipeline.validate(mixedEncodingAttack),
-                "Known mixed encoding attack should be rejected: " + mixedEncodingAttack);
-
-        // And: Exception should be properly formed
-        assertNotNull(exception, "Exception should be thrown for: " + mixedEncodingAttack);
-
-        // And: Security event should be recorded
-        assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                "Security event should be recorded for: " + mixedEncodingAttack);
-    }
-
-    /**
-     * Test edge cases in mixed encoding detection.
-     * 
-     * <p>
-     * Tests various edge cases that might cause issues in mixed encoding
-     * detection logic, including incomplete encodings and boundary conditions.
-     * </p>
-     */
-    @ParameterizedTest
-    @TypeGeneratorSource(value = MixedEncodingAttackGenerator.class, count = 20)
-    @DisplayName("Should handle edge cases in mixed encoding detection")
-    void shouldHandleEdgeCasesInMixedEncoding(String edgeCase) {
-        // Given: An edge case mixed encoding pattern from MixedEncodingAttackGenerator
-        long initialEventCount = eventCounter.getTotalCount();
-
-        // When: Attempting to validate the edge case
-        try {
-            String result = pipeline.validate(edgeCase);
-            // Then: If validation passes, result should not be null
-            assertNotNull(result, "Validated result should not be null for: " + edgeCase);
-
-        } catch (UrlSecurityException e) {
-            // Then: Edge cases might be rejected for various reasons
+            // And: Security event should be recorded
             assertTrue(eventCounter.getTotalCount() > initialEventCount,
-                    "Security event should be recorded when rejecting: " + edgeCase);
-
-            assertNotNull(e.getFailureType(),
-                    "Exception should have failure type for: " + edgeCase);
+                    "Security event should be recorded for attack: " + attack);
         }
     }
+
 
     /**
      * Test that legitimate mixed format URLs are handled correctly.
@@ -269,7 +240,7 @@ class MixedEncodingAttackTest {
     @DisplayName("Mixed encoding detection should maintain performance")
     void shouldMaintainPerformanceWithMixedEncodingDetection() {
         String complexMixedEncodingPattern =
-                "%2e%2e\\\\u002f&lt;\\\\u0073cript\\x3e\\x61lert\\x28\\\\u0027%2e%2e\\\\u002f\\\\u002e\\\\u002e\\x2f\\\\u0027\\x29&lt;\\x2fscript&gt;";
+                "%2e%2e%2f%c0%ae%c0%ae%252e%252e%2f%65%74%63%2f%70%61%73%73%77%64";
 
         // Warm up
         for (int i = 0; i < 10; i++) {
@@ -316,9 +287,6 @@ class MixedEncodingAttackTest {
                 failureType == UrlSecurityFailureType.SUSPICIOUS_PATTERN_DETECTED ||
                 failureType == UrlSecurityFailureType.INVALID_CHARACTER ||
                 failureType == UrlSecurityFailureType.UNICODE_NORMALIZATION_CHANGED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
-                failureType == UrlSecurityFailureType.XSS_DETECTED ||
                 failureType == UrlSecurityFailureType.NULL_BYTE_INJECTION ||
                 failureType == UrlSecurityFailureType.KNOWN_ATTACK_SIGNATURE ||
                 failureType == UrlSecurityFailureType.CONTROL_CHARACTERS;

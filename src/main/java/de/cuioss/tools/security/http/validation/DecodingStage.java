@@ -25,20 +25,19 @@ import lombok.Value;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
-import java.util.Map;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Multi-layer decoding validation stage with security checks.
+ * HTTP protocol-layer decoding validation stage with security checks.
  * 
  * <p>This stage performs URL decoding with security validation to detect and prevent
- * encoding-based attacks such as double encoding and Unicode normalization attacks.
- * The stage processes input through multiple layers:</p>
+ * HTTP protocol-layer encoding attacks such as double encoding and overlong UTF-8 encoding.
+ * <strong>Architectural Scope:</strong> Limited to HTTP/URL protocol encodings only.</p>
  * 
  * <ol>
  *   <li><strong>Double Encoding Detection</strong> - Identifies %25XX patterns indicating double encoding</li>
+ *   <li><strong>Overlong UTF-8 Detection</strong> - Blocks malformed UTF-8 encoding attacks</li>
  *   <li><strong>URL Decoding</strong> - Performs standard URL percent-decoding</li>
  *   <li><strong>Unicode Normalization</strong> - Optionally normalizes Unicode and detects changes</li>
  * </ol>
@@ -54,8 +53,9 @@ import java.util.regex.Pattern;
  * <h3>Security Validations</h3>
  * <ul>
  *   <li><strong>Double Encoding</strong> - Detects %25XX patterns that could bypass filters</li>
+ *   <li><strong>Overlong UTF-8</strong> - Blocks malformed UTF-8 encoding attacks</li>
  *   <li><strong>Invalid Encoding</strong> - Catches malformed percent-encoded sequences</li>
- *   <li><strong>Unicode Attacks</strong> - Detects normalization changes that could alter meaning</li>
+ *   <li><strong>Unicode Normalization Attacks</strong> - Detects normalization changes that could alter meaning</li>
  * </ul>
  * 
  * <h3>Usage Examples</h3>
@@ -123,47 +123,6 @@ public class DecodingStage implements HttpSecurityValidator {
     );
 
     /**
-     * Pre-compiled pattern for detecting HTML entity patterns.
-     * Matches both named entities (&lt;, &gt;, etc.) and numeric entities (&#47;, &#x2F;).
-     */
-    private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile(
-            "&(?:([a-zA-Z][a-zA-Z0-9]{1,8})|#(?:([0-9]{1,7})|x([0-9a-fA-F]{1,6})));?"
-    );
-
-    /**
-     * Pre-compiled pattern for detecting JavaScript escape sequences.
-     * Matches hex escapes (\x2f), Unicode escapes (\u002f), and octal escapes (\057).
-     */
-    private static final Pattern JS_ESCAPE_PATTERN = Pattern.compile(
-            "\\\\(?:x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4})|([0-7]{1,3}))"
-    );
-
-
-    /**
-     * Map of common HTML entities to their character equivalents.
-     * Includes security-critical entities commonly used in attacks.
-     */
-    private static final Map<String, String> HTML_ENTITIES = createHtmlEntitiesMap();
-
-    /**
-     * Creates the HTML entities map. Separated to avoid Map.of() size limitations.
-     */
-    private static Map<String, String> createHtmlEntitiesMap() {
-        return Map.of(
-                "lt", "<",
-                "gt", ">",
-                "amp", "&",
-                "quot", "\"",
-                "apos", "'",
-                "nbsp", "\u00A0",
-                "sol", "/",
-                "bsol", "\\",
-                "colon", ":",
-                "semi", ";"
-        );
-    }
-
-    /**
      * Security configuration controlling validation behavior.
      */
     SecurityConfiguration config;
@@ -174,13 +133,16 @@ public class DecodingStage implements HttpSecurityValidator {
     ValidationType validationType;
 
     /**
-     * Validates input through multi-layer decoding with security checks.
+     * Validates input through HTTP protocol-layer decoding with security checks.
      * 
-     * <p>QI-2 Enhanced Processing stages:</p>
+     * <p><strong>Architectural Boundary:</strong> This stage operates strictly at the HTTP protocol layer,
+     * handling URL-specific encoding schemes. Application-layer encodings (HTML entities, JS escapes) 
+     * are handled by higher application layers where they have proper context.</p>
+     * 
+     * <p>HTTP Protocol Processing stages:</p>
      * <ol>
      *   <li>Double encoding detection - fails fast if %25XX patterns found</li>
-     *   <li>HTML entity decoding - decodes &lt;, &#47;, &#x2F;, etc.</li>
-     *   <li>JavaScript escape decoding - decodes \x2f, \u002f, \057, etc.</li>
+     *   <li>UTF-8 overlong encoding detection - blocks malformed UTF-8 attack patterns</li>
      *   <li>URL decoding - converts percent-encoded sequences to characters</li>
      *   <li>Unicode normalization - optionally normalizes and detects changes</li>
      * </ol>
@@ -220,15 +182,10 @@ public class DecodingStage implements HttpSecurityValidator {
                     .build();
         }
 
-        // QI-2 Step 2: HTML entity decoding - decode HTML entities first
-        String decoded = decodeHtmlEntities(value);
-
-        // QI-2 Step 3: JavaScript escape decoding - decode JS escapes after HTML entities  
-        decoded = decodeJavaScriptEscapes(decoded);
-
-        // Step 4: URL decode (original step 2)
+        // Step 2: URL decode (HTTP protocol-layer appropriate)
+        String decoded;
         try {
-            decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            decoded = URLDecoder.decode(value, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
             throw UrlSecurityException.builder()
                     .failureType(UrlSecurityFailureType.INVALID_ENCODING)
@@ -239,7 +196,7 @@ public class DecodingStage implements HttpSecurityValidator {
                     .build();
         }
 
-        // Step 5: Unicode normalization with change detection (original step 3)
+        // Step 3: Unicode normalization with change detection
         if (config.normalizeUnicode()) {
             String normalized = Normalizer.normalize(decoded, Normalizer.Form.NFC);
             if (!decoded.equals(normalized)) {
@@ -257,142 +214,6 @@ public class DecodingStage implements HttpSecurityValidator {
 
         return decoded;
     }
-
-    /**
-     * Decodes HTML entities in the input string.
-     * 
-     * <p>Supports both named entities (&lt;, &gt;, &amp;, etc.) and numeric entities 
-     * (&#47;, &#x2F;). Handles malformed entities gracefully by leaving them unchanged.</p>
-     * 
-     * @param input The input string that may contain HTML entities
-     * @return The string with HTML entities decoded
-     */
-    private String decodeHtmlEntities(String input) {
-        if (input == null || input.isEmpty()) {
-            return input;
-        }
-
-        Matcher matcher = HTML_ENTITY_PATTERN.matcher(input);
-        StringBuilder result = new StringBuilder();
-        int lastEnd = 0;
-
-        while (matcher.find()) {
-            result.append(input, lastEnd, matcher.start());
-
-            String namedEntity = matcher.group(1);
-            String decimalEntity = matcher.group(2);
-            String hexEntity = matcher.group(3);
-
-            if (namedEntity != null) {
-                // Named entity (e.g., &lt;)
-                String replacement = HTML_ENTITIES.get(namedEntity.toLowerCase());
-                if (replacement != null) {
-                    result.append(replacement);
-                } else {
-                    // Unknown entity, keep as-is
-                    result.append(matcher.group());
-                }
-            } else if (decimalEntity != null) {
-                // Decimal numeric entity (e.g., &#47;)
-                try {
-                    int codePoint = Integer.parseInt(decimalEntity);
-                    // Security: Only decode reasonable Unicode ranges to prevent abuse
-                    if (Character.isValidCodePoint(codePoint) && codePoint <= 0x10FFFF && codePoint >= 1) {
-                        result.append(Character.toChars(codePoint));
-                    } else {
-                        result.append(matcher.group());
-                    }
-                } catch (NumberFormatException e) {
-                    result.append(matcher.group());
-                }
-            } else if (hexEntity != null) {
-                // Hexadecimal numeric entity (e.g., &#x2F;)
-                try {
-                    int codePoint = Integer.parseInt(hexEntity, 16);
-                    // Security: Only decode reasonable Unicode ranges to prevent abuse
-                    if (Character.isValidCodePoint(codePoint) && codePoint <= 0x10FFFF && codePoint >= 1) {
-                        result.append(Character.toChars(codePoint));
-                    } else {
-                        result.append(matcher.group());
-                    }
-                } catch (NumberFormatException e) {
-                    result.append(matcher.group());
-                }
-            }
-
-            lastEnd = matcher.end();
-        }
-
-        result.append(input, lastEnd, input.length());
-        return result.toString();
-    }
-
-    /**
-     * Decodes JavaScript escape sequences in the input string.
-     * 
-     * <p>Supports hex escapes (\x2f), Unicode escapes (\u002f), and octal escapes (\057).
-     * Handles malformed escapes gracefully by leaving them unchanged.</p>
-     * 
-     * @param input The input string that may contain JavaScript escapes
-     * @return The string with JavaScript escapes decoded
-     */
-    private String decodeJavaScriptEscapes(String input) {
-        if (input == null || input.isEmpty()) {
-            return input;
-        }
-
-        Matcher matcher = JS_ESCAPE_PATTERN.matcher(input);
-        StringBuilder result = new StringBuilder();
-        int lastEnd = 0;
-
-        while (matcher.find()) {
-            result.append(input, lastEnd, matcher.start());
-
-            String hexEscape = matcher.group(1);
-            String unicodeEscape = matcher.group(2);
-            String octalEscape = matcher.group(3);
-
-            if (hexEscape != null) {
-                // Hex escape (e.g., \x2f)
-                try {
-                    int value = Integer.parseInt(hexEscape, 16);
-                    result.append((char) value);
-                } catch (NumberFormatException e) {
-                    result.append(matcher.group());
-                }
-            } else if (unicodeEscape != null) {
-                // Unicode escape (e.g., \u002f)
-                try {
-                    int value = Integer.parseInt(unicodeEscape, 16);
-                    if (Character.isValidCodePoint(value)) {
-                        result.append(Character.toChars(value));
-                    } else {
-                        result.append(matcher.group());
-                    }
-                } catch (NumberFormatException e) {
-                    result.append(matcher.group());
-                }
-            } else if (octalEscape != null) {
-                // Octal escape (e.g., \057)
-                try {
-                    int value = Integer.parseInt(octalEscape, 8);
-                    if (value <= 255) { // Valid byte value
-                        result.append((char) value);
-                    } else {
-                        result.append(matcher.group());
-                    }
-                } catch (NumberFormatException e) {
-                    result.append(matcher.group());
-                }
-            }
-
-            lastEnd = matcher.end();
-        }
-
-        result.append(input, lastEnd, input.length());
-        return result.toString();
-    }
-
 
     /**
      * Creates a conditional validator that only processes non-null, non-empty inputs.

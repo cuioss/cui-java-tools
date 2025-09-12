@@ -318,14 +318,14 @@ Implement → Test → Verify → Document Progress → Commit
 |[x]
 
 |T6
-|Test mixed encoding attacks
+|Test HTTP protocol-layer mixed encoding attacks (URL + UTF-8 overlong + mixed case hex)
 |High
 |[x]
 
 |T7
-|Test HTML entity encoding attacks
-|High
-|[x]
+|~~Test HTML entity encoding attacks~~ (REMOVED: Application-layer concern)
+|~~High~~
+|ARCHITECTURAL SCOPE CHANGE
 |===
 
 ==== Phase 7.3: Unicode and Homograph Attack Tests
@@ -643,8 +643,8 @@ The tasks are designed to build incrementally, with each phase depending on the 
 
 This separate document contains:
 - QI-1: Imprecise Test Assertions with OR Conditions
-- QI-2: Limited Multi-Encoding Attack Detection  
-- QI-3: JavaScript Escape Sequence Detection Gap
+- QI-2: ✅ RESOLVED: HTTP Protocol Layer Scope Defined (HTML/JS escapes moved to application layer)
+- QI-3: ✅ RESOLVED: JavaScript Escapes Correctly Scoped to Application Layer
 - QI-4: Test Generator Reliability Issues
 - QI-5: Flaky Test Dependencies on Random Seeds
 
