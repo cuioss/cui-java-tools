@@ -38,14 +38,14 @@ class ValidCookieGeneratorTest {
         assertNotNull(generatedValue.name(), "Cookie name should not be null");
         assertNotNull(generatedValue.value(), "Cookie value should not be null");
         assertNotNull(generatedValue.attributes(), "Cookie attributes should not be null");
-        
+
         // Validate name is not empty for valid cookies
         assertFalse(generatedValue.name().isEmpty(), "Cookie name should not be empty");
-        
+
         // Validate cookie structure
         String toString = generatedValue.toString();
         assertTrue(toString.contains("Cookie"), "toString should contain record name");
-        
+
         // Test equals and hashCode work (records auto-generate these)
         Cookie duplicate = new Cookie(generatedValue.name(), generatedValue.value(), generatedValue.attributes());
         assertEquals(generatedValue, duplicate, "Equal cookies should be equal");

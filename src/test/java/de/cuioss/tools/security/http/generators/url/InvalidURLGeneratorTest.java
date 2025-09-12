@@ -20,7 +20,7 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test for {@link InvalidURLGenerator}
@@ -33,7 +33,7 @@ class InvalidURLGeneratorTest {
     @DisplayName("Generator should produce invalid URLs")
     void shouldGenerateValidOutput(String generatedValue) {
         assertNotNull(generatedValue, "Generator must not produce null values");
-        
+
         // Invalid URLs can be empty strings, whitespace, or have various malformations
         
         // Since this is for testing invalid URLs, we simply verify it's not null

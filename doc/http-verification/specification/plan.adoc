@@ -484,12 +484,12 @@ Implement → Test → Verify → Document Progress → Commit
 |T29
 |Test OWASP ZAP active scan rules
 |High
-|[ ]
+|[x]
 
 |T30
 |Test ModSecurity CRS patterns
 |High
-|[ ]
+|[x]
 |===
 
 ==== Phase 7.10: False Positive Prevention Tests

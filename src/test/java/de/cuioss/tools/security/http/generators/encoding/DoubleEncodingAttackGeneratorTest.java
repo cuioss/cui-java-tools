@@ -34,7 +34,7 @@ class DoubleEncodingAttackGeneratorTest {
     void shouldGenerateValidOutput(String generatedValue) {
         assertNotNull(generatedValue, "Generator must not produce null values");
         assertFalse(generatedValue.isEmpty(), "Generated value should not be empty");
-        
+
         // Every pattern should contain double encoding indicators
         boolean hasDoubleEncoding = generatedValue.contains("%252") ||  // Standard double encoding
                 generatedValue.contains("%%3") ||                           // CVE-style double encoding  
@@ -42,7 +42,7 @@ class DoubleEncodingAttackGeneratorTest {
                 generatedValue.contains("%255");                            // Double encoding of backslash
         assertTrue(hasDoubleEncoding,
                 "Pattern should contain double encoding: " + generatedValue);
-        
+
         // Generated patterns should be reasonable length
         assertTrue(generatedValue.length() < 500, "Pattern should not be excessively long: " + generatedValue);
     }

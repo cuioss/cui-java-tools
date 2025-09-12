@@ -45,7 +45,7 @@ class SupportedValidationTypeGeneratorContractTest {
     @DisplayName("Generator should produce valid non-null validation types")
     void shouldGenerateValidOutput(ValidationType generatedValue) {
         assertNotNull(generatedValue, "Generator must not produce null values");
-        
+
         // Verify it's one of the supported types
         Set<ValidationType> supportedTypes = EnumSet.of(
                 ValidationType.URL_PATH,
@@ -54,7 +54,7 @@ class SupportedValidationTypeGeneratorContractTest {
                 ValidationType.HEADER_VALUE,
                 ValidationType.BODY
         );
-        
+
         assertTrue(supportedTypes.contains(generatedValue),
                 "Generated type must be one of the supported types. Got: " + generatedValue);
     }
@@ -63,7 +63,7 @@ class SupportedValidationTypeGeneratorContractTest {
     @DisplayName("Should generate all supported validation types")
     void shouldGenerateAllSupportedTypes() {
         SupportedValidationTypeGenerator generator = new SupportedValidationTypeGenerator();
-        
+
         Set<ValidationType> expectedTypes = EnumSet.of(
                 ValidationType.URL_PATH,
                 ValidationType.PARAMETER_VALUE,
@@ -71,21 +71,21 @@ class SupportedValidationTypeGeneratorContractTest {
                 ValidationType.HEADER_VALUE,
                 ValidationType.BODY
         );
-        
+
         Set<ValidationType> generatedTypes = EnumSet.noneOf(ValidationType.class);
-        
+
         // Generate enough values to likely cover all types
         for (int i = 0; i < 1000; i++) {
             ValidationType result = generator.next();
             assertNotNull(result, "Generator should never return null");
             generatedTypes.add(result);
         }
-        
+
         // Verify we generated all expected types
         assertEquals(expectedTypes, generatedTypes,
                 "Generator should eventually produce all supported types");
     }
-    
+
     @Test
     @DisplayName("Should return correct type")
     void shouldReturnCorrectType() {
@@ -93,21 +93,21 @@ class SupportedValidationTypeGeneratorContractTest {
         assertEquals(ValidationType.class, generator.getType(),
                 "Generator should return ValidationType.class");
     }
-    
+
     @Test
     @DisplayName("Should provide reasonable distribution")
     void shouldProvideReasonableDistribution() {
         SupportedValidationTypeGenerator generator = new SupportedValidationTypeGenerator();
-        
+
         // Use a map to count occurrences safely
         int urlPathCount = 0;
         int parameterValueCount = 0;
         int headerNameCount = 0;
         int headerValueCount = 0;
         int bodyCount = 0;
-        
+
         int total = 1000;
-        
+
         for (int i = 0; i < total; i++) {
             ValidationType type = generator.next();
             switch (type) {
@@ -119,7 +119,7 @@ class SupportedValidationTypeGeneratorContractTest {
                 default -> fail("Unexpected type: " + type);
             }
         }
-        
+
         // Check that no single type dominates (< 60%)
         assertTrue(urlPathCount < 600, "URL_PATH appeared " + urlPathCount + " times (< 600 expected)");
         assertTrue(parameterValueCount < 600, "PARAMETER_VALUE appeared " + parameterValueCount + " times (< 600 expected)");

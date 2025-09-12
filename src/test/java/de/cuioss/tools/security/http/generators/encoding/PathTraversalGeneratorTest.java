@@ -20,7 +20,8 @@ import de.cuioss.test.generator.junit.parameterized.TypeGeneratorSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test for {@link PathTraversalGenerator}
@@ -34,7 +35,7 @@ class PathTraversalGeneratorTest {
     void shouldGenerateValidOutput(String generatedValue) {
         assertNotNull(generatedValue, "Generator must not produce null values");
         assertFalse(generatedValue.isEmpty(), "Generated value should not be empty");
-        
+
         // Since this is for path traversal testing, any non-null, non-empty output serves
         // the security testing purpose
     }

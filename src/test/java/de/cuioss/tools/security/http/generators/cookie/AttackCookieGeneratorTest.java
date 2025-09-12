@@ -38,17 +38,17 @@ class AttackCookieGeneratorTest {
         assertNotNull(generatedValue.name(), "Cookie name should not be null");
         assertNotNull(generatedValue.value(), "Cookie value should not be null");
         assertNotNull(generatedValue.attributes(), "Cookie attributes should not be null");
-        
+
         // Attack cookies may have empty names for malicious testing
         // Validate cookie structure
         String toString = generatedValue.toString();
         assertTrue(toString.contains("Cookie"), "toString should contain record name");
-        
+
         // Test equals and hashCode work (records auto-generate these)
         Cookie duplicate = new Cookie(generatedValue.name(), generatedValue.value(), generatedValue.attributes());
         assertEquals(generatedValue, duplicate, "Equal cookies should be equal");
         assertEquals(generatedValue.hashCode(), duplicate.hashCode(), "Equal cookies should have same hash code");
-        
+
         // Since this is for attack cookie testing, any non-null output serves
         // the security testing purpose
     }

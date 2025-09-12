@@ -37,12 +37,12 @@ class HTTPBodyGeneratorTest {
         assertNotNull(generatedValue.content(), "HTTPBody content should not be null");
         assertNotNull(generatedValue.contentType(), "HTTPBody contentType should not be null");
         assertNotNull(generatedValue.encoding(), "HTTPBody encoding should not be null");
-        
+
         // Content can be empty (that's valid for HTTP bodies), just not null
         // Verify record structure works correctly
         String toString = generatedValue.toString();
         assertTrue(toString.contains("HTTPBody"), "toString should contain record name");
-        
+
         // Test equals and hashCode work (records auto-generate these)
         HTTPBody duplicate = new HTTPBody(generatedValue.content(), generatedValue.contentType(), generatedValue.encoding());
         assertEquals(generatedValue, duplicate, "Equal bodies should be equal");

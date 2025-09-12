@@ -34,11 +34,11 @@ class BoundaryFuzzingGeneratorTest {
     void shouldGenerateValidOutput(String generatedValue) {
         assertNotNull(generatedValue, "Generator must not produce null values");
         assertFalse(generatedValue.isEmpty(), "Generated value should not be empty");
-        
+
         // Boundary fuzzing patterns should have various characteristics
         // Could be very long, contain special characters, control characters, null bytes, etc.
         assertTrue(generatedValue.length() > 0, "Pattern should have content");
-        
+
         // Since this is for boundary fuzzing testing, any non-null, non-empty output serves
         // the security testing purpose
     }
