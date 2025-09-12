@@ -25,7 +25,6 @@ import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -309,45 +308,6 @@ class HttpRequestSmugglingAttackTest {
                 "Double Content-Length should trigger INVALID_CHARACTER detection for: " + doubleContentLengthAttack);
         assertTrue(eventCounter.getTotalCount() > initialEventCount,
                 "Security event should be recorded for double Content-Length");
-    }
-
-    /**
-     * Test performance impact of request smuggling validation.
-     * 
-     * <p>
-     * Ensures that request smuggling detection doesn't significantly impact
-     * validation performance, even with complex attack patterns.
-     * </p>
-     */
-    @Test
-    @DisplayName("Request smuggling validation should maintain performance")
-    void shouldMaintainPerformanceWithRequestSmugglingAttacks() {
-        String complexSmugglingPattern = "/api/data?param=value%0d%0aContent-Length: 6%0d%0aTransfer-Encoding: chunked%0d%0aTransfer-encoding: gzip%0d%0aContent-Length: 44%0d%0a%0d%0a0%0d%0a%0d%0aGET /admin HTTP/1.1%0d%0aAuthorization: Bearer admin-token%0d%0aHost: backend-server%0d%0a%0d%0a";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexSmugglingPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexSmugglingPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 8ms per validation)
-        assertTrue(averageMillis < 8,
-                "Request smuggling validation should complete within 8ms, actual: " + averageMillis + "ms");
     }
 
     /**

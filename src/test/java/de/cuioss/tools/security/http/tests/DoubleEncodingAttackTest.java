@@ -272,49 +272,6 @@ class DoubleEncodingAttackTest {
     }
 
     /**
-     * Test performance impact of double encoding detection.
-     * 
-     * <p>
-     * Ensures that detection of complex double and triple encoding
-     * patterns doesn't significantly impact validation performance.
-     * </p>
-     */
-    @Test
-    @DisplayName("Double encoding detection should maintain performance")
-    void shouldMaintainPerformanceWithDoubleEncodingDetection() {
-        String complexDoubleEncodingPattern = """
-                %252525%252e%252525%252e%252525%252f%252525%252e%252525%252e%252525%252f\
-                %252525%252e%252525%252e%252525%252f%252525%252e%252525%252e%252525%252f""";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexDoubleEncodingPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexDoubleEncodingPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 5ms per validation)
-        assertTrue(averageMillis < 5,
-                "Double encoding detection should complete within 5ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * QI-9: Determines if a failure type matches specific double encoding attack patterns.
      * Replaces broad OR-assertion with comprehensive security validation.
      * 

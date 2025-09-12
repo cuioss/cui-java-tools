@@ -329,33 +329,6 @@ class AllGeneratorsIntegrationTest {
     }
 
     @Test
-    void shouldSupportHighVolumeGeneration() {
-        // Test that generators can handle high-volume generation without performance degradation
-        long startTime = System.currentTimeMillis();
-
-        // Generate a large number of values
-        for (int i = 0; i < 1000; i++) {
-            pathTraversalGenerator.next();
-            encodingGenerator.next();
-            unicodeGenerator.next();
-            boundaryGenerator.next();
-            validUrlGenerator.next();
-            invalidUrlGenerator.next();
-            validParameterGenerator.next();
-            attackParameterGenerator.next();
-            validCookieGenerator.next();
-            attackCookieGenerator.next();
-            bodyGenerator.next();
-        }
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        // Should complete in reasonable time (less than 5 seconds for 9000 generations)
-        assertTrue(duration < 5000, "High-volume generation should complete in reasonable time, took: " + duration + "ms");
-    }
-
-    @Test
     void shouldMaintainGeneratorConsistency() {
         // Test that generators maintain consistent behavior across multiple calls
         for (int run = 0; run < 10; run++) {

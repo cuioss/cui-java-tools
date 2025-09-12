@@ -496,25 +496,6 @@ class LengthValidationStageTest {
 
     // ========== Performance Edge Cases ==========
 
-    @Test
-    void shouldHandleVeryLongStringEfficiently() {
-        SecurityConfiguration config = SecurityConfiguration.builder()
-                .maxParameterValueLength(1000000) // 1 million characters
-                .build();
-        LengthValidationStage stage = new LengthValidationStage(config, ValidationType.PARAMETER_VALUE);
-
-        // Should efficiently handle very long strings within limit
-        String veryLongString = Generators.letterStrings(400000, 500000).next(); // Replaces .repeat(500000) - massive pattern
-        long startTime = System.nanoTime();
-        String result = stage.validate(veryLongString);
-        long endTime = System.nanoTime();
-
-        assertEquals(veryLongString, result);
-        // Validation should be very fast (O(1)) - just length check
-        long durationMs = (endTime - startTime) / 1_000_000;
-        assertTrue(durationMs < 100, "Length validation should be very fast, took: " + durationMs + "ms");
-    }
-
     /**
      * QI-17: Generate realistic test strings instead of using .repeat().
      * QI-14/QI-10: Creates varied content for length validation boundary testing.

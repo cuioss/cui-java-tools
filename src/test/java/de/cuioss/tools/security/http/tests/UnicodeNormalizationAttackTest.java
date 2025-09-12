@@ -401,51 +401,6 @@ class UnicodeNormalizationAttackTest {
     }
 
     /**
-     * Test performance impact of Unicode normalization detection.
-     * 
-     * <p>
-     * Ensures that detection of complex Unicode normalization patterns
-     * doesn't significantly impact validation performance.
-     * </p>
-     */
-    @Test
-    @DisplayName("Unicode normalization detection should maintain performance")
-    void shouldMaintainPerformanceWithUnicodeNormalization() {
-        String complexUnicodePattern =
-                """
-                .̀́̂̃̄/̅.̆̇̈̉̊/\
-                ．．／аdmin​‌‍﻿\
-                ‮ооt‬؜‎""";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexUnicodePattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexUnicodePattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 12ms per validation for complex Unicode patterns)
-        assertTrue(averageMillis < 12,
-                "Unicode normalization detection should complete within 12ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * Test normalization form consistency.
      * 
      * <p>

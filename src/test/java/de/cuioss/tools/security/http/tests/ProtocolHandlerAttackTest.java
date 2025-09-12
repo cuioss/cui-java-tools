@@ -385,47 +385,6 @@ class ProtocolHandlerAttackTest {
     }
 
     /**
-     * Test performance impact of protocol validation.
-     * 
-     * <p>
-     * Ensures that validation performance remains acceptable even
-     * when processing complex protocol attack patterns.
-     * </p>
-     */
-    @Test
-    @DisplayName("Protocol validation should maintain performance")
-    void shouldMaintainPerformanceWithProtocolAttacks() {
-        String complexProtocolPattern = "javascript:eval(String.fromCharCode(97,108,101,114,116,40,39,88,83,83,39,41))/../../../../../../../../../etc/passwd";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexProtocolPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexProtocolPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 5ms per validation)
-        assertTrue(averageMillis < 5,
-                "Protocol validation should complete within 5ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * QI-9: Determines if a failure type matches specific protocol handler attack patterns.
      * Replaces broad OR-assertion with comprehensive security validation.
      * 

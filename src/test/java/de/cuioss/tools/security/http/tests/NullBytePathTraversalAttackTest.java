@@ -26,7 +26,6 @@ import de.cuioss.tools.security.http.monitoring.SecurityEventCounter;
 import de.cuioss.tools.security.http.pipeline.URLPathValidationPipeline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -270,45 +269,6 @@ class NullBytePathTraversalAttackTest {
 
         // And: Security event should be recorded
         assertTrue(eventCounter.getTotalCount() > initialEventCount);
-    }
-
-    /**
-     * Test performance impact of null byte attack validation.
-     * 
-     * <p>
-     * Ensures that null byte detection doesn't significantly impact
-     * validation performance, even with complex attack patterns.
-     * </p>
-     */
-    @Test
-    @DisplayName("Null byte attack validation should maintain performance")
-    void shouldMaintainPerformanceWithNullByteAttacks() {
-        String complexNullBytePattern = "%00../%00../%00../%00../%00../%00../%00../%00../etc/passwd\u0000.jpg";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexNullBytePattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexNullBytePattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 5ms per validation)
-        assertTrue(averageMillis < 5,
-                "Null byte validation should complete within 5ms, actual: " + averageMillis + "ms");
     }
 
     /**

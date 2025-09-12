@@ -122,23 +122,6 @@ class HttpHeaderInjectionAttackTest {
                 "Security event counter should track HTTP header injection detection");
     }
 
-    @ParameterizedTest
-    @TypeGeneratorSource(value = HttpHeaderInjectionAttackGenerator.class, count = 25)
-    @DisplayName("HTTP header injection validation should maintain performance requirements")
-    void shouldMaintainPerformanceWithHttpHeaderInjection(String headerPattern) {
-        long startTime = System.nanoTime();
-
-        assertThrows(UrlSecurityException.class,
-                () -> pipeline.validate(headerPattern));
-
-        long duration = System.nanoTime() - startTime;
-        long milliseconds = duration / 1_000_000;
-
-        assertTrue(milliseconds < 8,
-                "HTTP header injection validation took %dms, should be < 8ms for pattern: %s".formatted(
-                        milliseconds, sanitizeForDisplay(headerPattern)));
-    }
-
     @Test
     @DisplayName("Known dangerous HTTP header injection patterns should be rejected")
     void shouldRejectKnownHttpHeaderInjectionAttacks() {

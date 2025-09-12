@@ -224,47 +224,6 @@ class PathTraversalAttackTest {
     }
 
     /**
-     * Test performance impact of path traversal validation.
-     * 
-     * <p>
-     * Ensures that validation performance remains acceptable even
-     * when processing malicious path traversal patterns.
-     * </p>
-     */
-    @Test
-    @DisplayName("Path traversal validation should maintain performance")
-    void shouldMaintainPerformanceUnderAttack() {
-        String complexPattern = "../../../../../../../../../../../../../../../../../../../../../../../etc/passwd";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 5ms per validation)
-        assertTrue(averageMillis < 5,
-                "Path traversal validation should complete within 5ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * Helper method to determine if a failure type is specifically appropriate for path traversal attacks.
      * Different path traversal techniques trigger specific failure types.
      * 

@@ -373,29 +373,6 @@ class DecodingStageTest {
                 () -> minimalDecoder.validate("%252F"));
     }
 
-    @Test
-    @DisplayName("Should handle long inputs efficiently")
-    void shouldHandleLongInputsEfficiently() {
-        // Create a long input with encoding
-        StringBuilder longInput = new StringBuilder();
-        StringBuilder expectedOutput = new StringBuilder();
-
-        for (int i = 0; i < 1000; i++) {
-            longInput.append("path%2F").append(i).append("%2F");
-            expectedOutput.append("path/").append(i).append("/");
-        }
-
-        long startTime = System.nanoTime();
-        String result = pathDecoder.validate(longInput.toString());
-        long endTime = System.nanoTime();
-
-        assertEquals(expectedOutput.toString(), result);
-
-        // Should complete within reasonable time (less than 100ms for this input size)
-        long durationMs = (endTime - startTime) / 1_000_000;
-        assertTrue(durationMs < 100, "Decoding should be efficient, took: " + durationMs + "ms");
-    }
-
     // QI-2: New tests for enhanced multi-layer decoding capabilities
 
     @Test

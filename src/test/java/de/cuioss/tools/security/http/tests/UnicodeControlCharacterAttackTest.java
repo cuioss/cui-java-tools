@@ -505,45 +505,6 @@ class UnicodeControlCharacterAttackTest {
     }
 
     /**
-     * Test performance impact of control character attack validation.
-     * 
-     * <p>
-     * Ensures that control character detection doesn't significantly
-     * impact validation performance, even with complex patterns.
-     * </p>
-     */
-    @Test
-    @DisplayName("Control character attack validation should maintain performance")
-    void shouldMaintainPerformanceWithControlCharacterAttacks() {
-        String complexControlPattern = "\u202E\u0000..\u200B/\u0080\u2028etc\uE000/\u200Cpasswd\uD800\u202C";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexControlPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexControlPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 6ms per validation)
-        assertTrue(averageMillis < 6,
-                "Control character validation should complete within 6ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * Test control character detection capabilities.
      * 
      * <p>

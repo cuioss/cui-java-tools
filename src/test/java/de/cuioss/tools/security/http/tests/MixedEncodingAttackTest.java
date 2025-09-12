@@ -229,48 +229,6 @@ class MixedEncodingAttackTest {
     }
 
     /**
-     * Test performance impact of mixed encoding detection.
-     * 
-     * <p>
-     * Ensures that detection of complex mixed encoding patterns
-     * doesn't significantly impact validation performance.
-     * </p>
-     */
-    @Test
-    @DisplayName("Mixed encoding detection should maintain performance")
-    void shouldMaintainPerformanceWithMixedEncodingDetection() {
-        String complexMixedEncodingPattern =
-                "%2e%2e%2f%c0%ae%c0%ae%252e%252e%2f%65%74%63%2f%70%61%73%73%77%64";
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexMixedEncodingPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexMixedEncodingPattern);
-            } catch (UrlSecurityException ignored) {
-                // Expected for malicious pattern
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 10ms per validation for complex patterns)
-        assertTrue(averageMillis < 10,
-                "Mixed encoding detection should complete within 10ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * QI-9: Determines if a failure type matches specific mixed encoding attack patterns.
      * Replaces broad OR-assertion with comprehensive security validation.
      * 

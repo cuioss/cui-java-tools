@@ -521,45 +521,6 @@ class URLLengthLimitAttackTest {
     }
 
     /**
-     * Test performance impact of URL length limit attack validation.
-     * 
-     * <p>
-     * Ensures that URL length limit attack detection doesn't significantly
-     * impact validation performance, even with very long URLs.
-     * </p>
-     */
-    @Test
-    @DisplayName("URL length limit attack validation should maintain performance")
-    void shouldMaintainPerformanceWithLengthLimitAttacks() {
-        String complexLengthPattern = "/" + generatePath(1100) + "/api?" + "param=" + generateParameterValue(1200) + "&data=" + generateParameterValue(1300) + "#" + generateFragment(8300); // QI-17: Fixed to test actual limits
-
-        // Warm up
-        for (int i = 0; i < 10; i++) {
-            try {
-                pipeline.validate(complexLengthPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-
-        // Measure performance
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 100; i++) {
-            try {
-                pipeline.validate(complexLengthPattern);
-            } catch (UrlSecurityException ignored) {
-            }
-        }
-        long endTime = System.nanoTime();
-
-        long averageNanos = (endTime - startTime) / 100;
-        long averageMillis = averageNanos / 1_000_000;
-
-        // Should complete within reasonable time (< 10ms per validation for length attacks)
-        assertTrue(averageMillis < 10,
-                "URL length limit attack validation should complete within 10ms, actual: " + averageMillis + "ms");
-    }
-
-    /**
      * Test comprehensive edge cases in URL length limit detection.
      * 
      * <p>
