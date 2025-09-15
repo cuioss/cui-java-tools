@@ -136,11 +136,19 @@ Common Maven commands for CUI projects:
 - Avoid premature optimization
 - See Lombok Usage section for annotation patterns
 
+### JSpecify Null-Handling
+**Reference**: `{STANDARDS_BASE_URL}/standards/java/java-code-standards.adoc#null-safety-and-api-design`
+- Use `@Nullable` for fields, parameters, and returns that may be null
+- Use `@NonNull` for explicit non-null guarantees
+- Default assumption is non-null unless marked `@Nullable`
+- Apply `@NullMarked` at package level for consistent null-safety
+- Validate null constraints at API boundaries
+- Prefer Optional over nullable return types where appropriate
+
 ### Lombok Usage
 **Reference**: `{STANDARDS_BASE_URL}/standards/java/java-code-standards.adoc`
 - Use `@Builder` for complex object creation
 - Use `@Value` for immutable objects
-- Use `@NonNull` for required parameters
 - Use `@ToString` and `@EqualsAndHashCode` for value objects
 - Use `@UtilityClass` for utility classes
 - Make proper use of `lombok.config` settings
