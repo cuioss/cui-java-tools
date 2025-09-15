@@ -356,7 +356,7 @@ The HTTP security framework uses a single immutable configuration record that co
 ----
 package de.cuioss.tools.security.http.config;
 
-/**
+import de.cuioss.http.security.config.SecurityConfigurationBuilder; /**
  * Immutable record representing comprehensive security configuration for HTTP validation.
  * Provides type-safe, immutable configuration object shared across multiple validation operations.
  */
@@ -1050,7 +1050,7 @@ public final class CharacterValidationConstants {
 ----
 package de.cuioss.tools.security.http.validation;
 
-import lombok.EqualsAndHashCode;
+import de.cuioss.http.security.validation.CharacterValidationConstants;import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Getter;
 import java.util.BitSet;
