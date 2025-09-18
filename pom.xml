@@ -89,37 +89,11 @@
         <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
-            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Create separate generators artifact for security testing utilities -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generators</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>generators</classifier>
-                            <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
-                            <includes>
-                                <include>**/security/http/generators/**</include>
-                                <include>**/security/http/database/**</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/security/http/generators/**/*Test.class</exclude>
-                            </excludes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Configure Surefire to run tests on classpath to bypass JPMS module restrictions -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
