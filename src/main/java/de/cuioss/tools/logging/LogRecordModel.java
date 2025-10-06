@@ -172,7 +172,7 @@ public class LogRecordModel implements LogRecord {
     @Override
     public String format(Object... parameter) {
         return resolveIdentifierString() + AFTER_PREFIX +
-            lenientFormat(getParsedMessageTemplate(), parameter);
+                lenientFormat(getParsedMessageTemplate(), parameter);
     }
 
     @Override

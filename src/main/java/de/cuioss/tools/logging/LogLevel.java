@@ -19,7 +19,6 @@ import de.cuioss.tools.collect.CollectionLiterals;
 import de.cuioss.tools.reflect.MoreReflection;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 

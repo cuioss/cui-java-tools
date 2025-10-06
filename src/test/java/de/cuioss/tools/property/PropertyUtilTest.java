@@ -42,14 +42,14 @@ class PropertyUtilTest {
         assertNotNull(readProperty(underTest, ATTRIBUTE_DEFAULT_VALUE));
 
         Integer number = 4;
-        assertNotNull(writeProperty(underTest, ATTRIBUTE_READ_WRITE, number));
+        setProperty(underTest, ATTRIBUTE_READ_WRITE, number);
         assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE));
 
         assertNull(readProperty(underTest, ATTRIBUTE_READ_WRITE_WITH_BUILDER));
-        assertNotNull(writeProperty(underTest, ATTRIBUTE_READ_WRITE_WITH_BUILDER, number));
+        setProperty(underTest, ATTRIBUTE_READ_WRITE_WITH_BUILDER, number);
         assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE));
 
-        assertNotNull(writeProperty(underTest, ATTRIBUTE_READ_WRITE, null));
+        setProperty(underTest, ATTRIBUTE_READ_WRITE, null);
         assertNull(readProperty(underTest, ATTRIBUTE_READ_WRITE));
     }
 
@@ -60,15 +60,15 @@ class PropertyUtilTest {
         assertNull(readProperty(underTest, PROPERTY_NAME));
 
         Integer number = 4;
-        assertNotNull(writeProperty(underTest, PROPERTY_NAME, number));
+        setProperty(underTest, PROPERTY_NAME, number);
         assertEquals(number, readProperty(underTest, PROPERTY_NAME));
 
-        assertNotNull(writeProperty(underTest, PROPERTY_NAME, "5"));
+        setProperty(underTest, PROPERTY_NAME, "5");
         assertEquals(5, readProperty(underTest, PROPERTY_NAME));
 
         var propertyValue = new ArrayList<>();
         assertThrows(IllegalArgumentException.class, () ->
-                writeProperty(underTest, PROPERTY_NAME, propertyValue));
+                setProperty(underTest, PROPERTY_NAME, propertyValue));
     }
 
     @Test
@@ -79,8 +79,8 @@ class PropertyUtilTest {
         assertEquals(0, readProperty(underTest, PROPERTY_PRIMITIVE_NAME));
 
         Integer number = 4;
-        assertNotNull(writeProperty(underTest, PROPERTY_NAME, number));
-        assertNotNull(writeProperty(underTest, PROPERTY_PRIMITIVE_NAME, number));
+        setProperty(underTest, PROPERTY_NAME, number);
+        setProperty(underTest, PROPERTY_PRIMITIVE_NAME, number);
         assertEquals(4, readProperty(underTest, PROPERTY_PRIMITIVE_NAME));
 
     }
@@ -93,9 +93,9 @@ class PropertyUtilTest {
         assertThrows(IllegalArgumentException.class, () ->
                 readProperty(underTest, ATTRIBUTE_WRITE_ONLY));
         assertThrows(IllegalArgumentException.class, () ->
-                writeProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, ""));
+                setProperty(underTest, ATTRIBUTE_NOT_ACCESSIBLE, ""));
         assertThrows(IllegalArgumentException.class, () ->
-                writeProperty(underTest, ATTRIBUTE_READ_ONLY, ""));
+                setProperty(underTest, ATTRIBUTE_READ_ONLY, ""));
     }
 
     @Test
@@ -106,7 +106,7 @@ class PropertyUtilTest {
         assertThrows(IllegalStateException.class, () ->
                 readProperty(underTest, PROPERTY_NAME));
         assertThrows(IllegalStateException.class, () ->
-                writeProperty(underTest, PROPERTY_NAME, ""));
+                setProperty(underTest, PROPERTY_NAME, ""));
     }
 
     @Test
@@ -117,7 +117,7 @@ class PropertyUtilTest {
         assertNull(readProperty(underTest, name));
 
         var value = Generators.nonEmptyStrings().next();
-        writeProperty(underTest, name, value);
+        setProperty(underTest, name, value);
         assertEquals(value, readProperty(underTest, name));
     }
 
