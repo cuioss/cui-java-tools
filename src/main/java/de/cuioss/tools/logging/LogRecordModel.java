@@ -154,9 +154,13 @@ public class LogRecordModel implements LogRecord {
     @Getter
     private final String template;
 
-    /** Tiniest of optimization. Needs to be verified. */
-    private @Nullable String parsedMessageTemplate;
-    private @Nullable String parsedIdentifier;
+    /**
+     * Tiniest of optimization. Needs to be verified.
+     */
+    @Nullable
+    private String parsedMessageTemplate;
+    @Nullable
+    private String parsedIdentifier;
 
     protected String getParsedMessageTemplate() {
         if (null == parsedMessageTemplate) {
@@ -168,7 +172,7 @@ public class LogRecordModel implements LogRecord {
     @Override
     public String format(Object... parameter) {
         return resolveIdentifierString() + AFTER_PREFIX +
-                lenientFormat(getParsedMessageTemplate(), parameter);
+            lenientFormat(getParsedMessageTemplate(), parameter);
     }
 
     @Override
