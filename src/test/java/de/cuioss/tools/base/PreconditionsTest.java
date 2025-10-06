@@ -23,7 +23,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
 import static de.cuioss.tools.base.Preconditions.checkState;
@@ -166,8 +171,7 @@ class PreconditionsTest {
 
             var message = ex.getMessage();
             assertNotNull(message);
-            // cui-rewrite:disable CuiLoggerStandardsRecipe
-            LOGGER.debug("Actual message: {}", message);
+            LOGGER.debug("Actual message: %s", message);
             // The message should start with the format string prefix
             assertTrue(message.startsWith("Complex format: "), "Message should start with 'Complex format: ' but was: " + message);
             // The complex object's toString() is inserted verbatim
@@ -196,8 +200,7 @@ class PreconditionsTest {
 
             // Extra arguments are appended in square brackets
             var message = ex.getMessage();
-            // cui-rewrite:disable CuiLoggerStandardsRecipe
-            LOGGER.debug("Actual message: {}", message);
+            LOGGER.debug("Actual message: %s", message);
             assertTrue(message.startsWith("one two"), "Message should start with 'one two' but was: " + message);
             assertTrue(message.contains("[three]"), "Message should contain [three] but was: " + message);
         }
@@ -214,8 +217,7 @@ class PreconditionsTest {
 
             // The nested template is evaluated before being passed to lenientFormat
             var message = ex.getMessage();
-            // cui-rewrite:disable CuiLoggerStandardsRecipe
-            LOGGER.debug("Actual message: {}", message);
+            LOGGER.debug("Actual message: %s", message);
             assertEquals("Outer{Inner{value}}", message);
         }
     }

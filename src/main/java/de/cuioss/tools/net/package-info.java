@@ -53,8 +53,5 @@
  * @see de.cuioss.tools.net.UrlParameter
  * @see de.cuioss.tools.net.IDNInternetAddress
  * @see de.cuioss.tools.net.ssl.KeyStoreProvider
- * @see de.cuioss.http.client.handler.HttpHandler
- * @see de.cuioss.http.client.handler.HttpStatusFamily
- * @see de.cuioss.http.client.handler.SecureSSLContextProvider
  */
 package de.cuioss.tools.net;
