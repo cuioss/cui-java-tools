@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static de.cuioss.tools.ToolsLogMessages.WARN;
 import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
 import static java.util.Objects.requireNonNull;
 
@@ -269,8 +270,7 @@ public final class MoreReflection {
             case "double" -> Double.class;
             case "float" -> Float.class;
             default -> {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn("Unable to determine wrapper type for '%s', ", check);
+                LOGGER.warn(WARN.WRAPPER_TYPE_DETERMINATION_FAILED.format(check));
                 yield check;
             }
         };
@@ -454,8 +454,7 @@ public final class MoreReflection {
                 yield extractGenericTypeCovariantly(parameterizedType.getRawType());
             }
             default -> {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn("Unable to determines generic-type for %s", type);
+                LOGGER.warn(WARN.GENERIC_TYPE_DETERMINATION_FAILED.format(type));
                 yield Optional.empty();
             }
         };

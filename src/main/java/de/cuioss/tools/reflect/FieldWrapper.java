@@ -23,6 +23,8 @@ import lombok.NonNull;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static de.cuioss.tools.ToolsLogMessages.WARN;
+
 /**
  * Wraps a field and provides type-safe access to its value.
  * <p>
@@ -87,9 +89,7 @@ public class FieldWrapper {
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(e, "Reading from field '%s' with accessible='%s' and parameter ='%s' could not complete",
-                        field, initialAccessible, source);
+                LOGGER.warn(e, WARN.FIELD_READ_FAILED.format(field, initialAccessible, source));
                 return Optional.empty();
             } finally {
                 if (!initialAccessible) {

@@ -30,6 +30,8 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static de.cuioss.tools.ToolsLogMessages.ERROR;
+import static de.cuioss.tools.ToolsLogMessages.WARN;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -45,9 +47,6 @@ public final class MorePaths {
 
     /** ".backup" */
     public static final String BACKUP_DIR_NAME = ".backup";
-
-    /** "File or Directory %s is not accessible, reason: %s". */
-    public static final String MSG_DIRECTORY_NOT_ACCESSIBLE = "File or Directory %s is not accessible, reason: %s";
 
     /** The prefix to be attached to a backup-file */
     public static final String BACKUP_FILE_SUFFIX = ".bck_";
@@ -66,9 +65,7 @@ public final class MorePaths {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            // cui-rewrite:disable CuiLogRecordPatternRecipe
-            LOGGER.warn(
-                    e, "Unable to resolve real path for '%s', due to '%s'. Returning absolutePath.", path, e.getMessage());
+            LOGGER.warn(e, WARN.REAL_PATH_RESOLUTION_FAILED.format(path, e.getMessage()));
             return path.toAbsolutePath();
         }
     }
@@ -119,8 +116,7 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.canWrite()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Writable");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Writable"));
             }
             return false;
         }
@@ -145,30 +141,26 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Existing"));
             }
             return false;
         }
         if (checkForDirectory) {
             if (!pathFile.isDirectory()) {
                 if (verbose) {
-                    // cui-rewrite:disable CuiLogRecordPatternRecipe
-                    LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a directory");
+                    LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a directory"));
                 }
                 return false;
             }
         } else if (!pathFile.isFile()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a file"));
             }
             return false;
         }
         if (!pathFile.canRead()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Readable");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Readable"));
             }
             return false;
         }
@@ -190,22 +182,19 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Existing");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Existing"));
             }
             return false;
         }
         if (!pathFile.isFile()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not a file");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a file"));
             }
             return false;
         }
         if (!pathFile.canExecute()) {
             if (verbose) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.warn(MSG_DIRECTORY_NOT_ACCESSIBLE, absolutePath, "Not Executable");
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Executable"));
             }
             return false;
         }
@@ -522,8 +511,7 @@ public final class MorePaths {
             try {
                 return Files.isSameFile(path, path2);
             } catch (final IOException e) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-               LOGGER.error(e, "Unable to compare path_a=%s and path_b=%s", path, path2);
+                LOGGER.error(e, ERROR.PATH_COMPARISON_FAILED.format(path, path2));
             }
         } else {
             LOGGER.trace("at least one path is null: path_a=%s, path_b=%s", path, path2);

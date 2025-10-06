@@ -84,6 +84,7 @@
  * <h2>Getting Started</h2>
  * <p>
  * Add the following Maven dependency to your project:
+ * </p>
  * <pre>
  * &lt;dependency&gt;
  *     &lt;groupId&gt;de.cuioss&lt;/groupId&gt;
@@ -91,7 +92,6 @@
  *     &lt;version&gt;[current-version]&lt;/version&gt;
  * &lt;/dependency&gt;
  * </pre>
- * </p>
  *
  * <h2>Related Projects</h2>
  * <ul>

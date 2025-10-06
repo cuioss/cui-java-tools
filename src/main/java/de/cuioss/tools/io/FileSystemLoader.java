@@ -32,6 +32,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static de.cuioss.tools.ToolsLogMessages.ERROR;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static java.util.Objects.requireNonNull;
 
@@ -125,8 +126,7 @@ public class FileSystemLoader implements FileReaderWriter {
                 newPathName = new File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
-                // cui-rewrite:disable CuiLogRecordPatternRecipe
-                LOGGER.error(e, "Retrieving the current dir failed: ");
+                LOGGER.error(e, ERROR.CURRENT_DIR_RETRIEVAL_FAILED::format);
             }
         }
 

@@ -1,0 +1,54 @@
+= Log Messages for cui-java-tools
+:toc: left
+:toclevels: 2
+
+== Overview
+
+All messages follow the format: [Module-Prefix]-[identifier]: [message]
+
+Module Prefix: `CUI_TOOLS`
+
+This document catalogs all structured log messages used in the cui-java-tools module. Each message has a unique identifier within its severity level range and is documented with its component, template, and usage description.
+
+== INFO Level (001-099)
+
+[cols="1,1,2,2", options="header"]
+|===
+|ID |Component |Message |Description
+|CUI_TOOLS-1 |IO |Unable to resolve '%s' from classpath |Logged when a resource cannot be resolved from the classpath. Parameter: resource path
+|===
+
+== WARN Level (100-199)
+
+[cols="1,1,2,2", options="header"]
+|===
+|ID |Component |Message |Description
+|CUI_TOOLS-100 |IO |Unable to resolve real path for '%s', due to '%s'. Returning absolutePath. |Logged when real path resolution fails and the system falls back to absolute path. Parameters: path, error message
+|CUI_TOOLS-101 |IO |File or Directory %s is not accessible, reason: %s |Logged when a file or directory accessibility check fails. Parameters: path, reason (e.g., "Not Writable", "Not Existing", "Not a directory")
+|CUI_TOOLS-102 |REFLECT |Reading from field '%s' with accessible='%s' and parameter ='%s' could not complete |Logged when reflection-based field reading fails. Parameters: field, accessible flag, source object
+|CUI_TOOLS-103 |REFLECT |Unable to determine wrapper type for '%s' |Logged when wrapper type determination fails for a primitive type. Parameter: type name
+|CUI_TOOLS-104 |REFLECT |Unable to determine generic-type for %s |Logged when generic type extraction fails for a given type. Parameter: type
+|===
+
+== ERROR Level (200-299)
+
+[cols="1,1,2,2", options="header"]
+|===
+|ID |Component |Message |Description
+|CUI_TOOLS-200 |IO |Unable to compare path_a=%s and path_b=%s |Logged when path comparison via Files.isSameFile() fails due to IOException. Parameters: first path, second path
+|CUI_TOOLS-201 |IO |Retrieving the current dir failed |Logged when retrieving the current directory fails during external file path resolution
+|CUI_TOOLS-202 |PROPERTY |Failed to read property '%s' from bean of type '%s' |Logged when property reading via reflection fails. Parameters: property name, bean type
+|CUI_TOOLS-203 |PROPERTY |Failed to write property '%s' to bean of type '%s' |Logged when property writing via reflection fails. Parameters: property name, bean type
+|===
+
+== Component Mapping
+
+* *IO*: `de.cuioss.tools.io.*` - File I/O, path operations, and classpath loading
+* *REFLECT*: `de.cuioss.tools.reflect.*` - Reflection utilities and field/type operations
+* *PROPERTY*: `de.cuioss.tools.property.*` - Bean property access and manipulation
+
+== Notes
+
+* DEBUG and TRACE level messages are not documented here as they use direct logging without LogRecords
+* All messages use '%s' for parameter placeholders
+* Exception parameters always come first in the logging method call, followed by the formatted message
