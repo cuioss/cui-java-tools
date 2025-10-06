@@ -17,12 +17,7 @@ package de.cuioss.tools.property;
 
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
-import de.cuioss.tools.property.support.BeanForTestingTypeResolving;
-import de.cuioss.tools.property.support.BeanWithMethodOverload;
-import de.cuioss.tools.property.support.BeanWithPrimitives;
-import de.cuioss.tools.property.support.BeanWithReadWriteProperties;
-import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
-import de.cuioss.tools.property.support.ExplodingBean;
+import de.cuioss.tools.property.support.*;
 import de.cuioss.tools.support.StringCaseShuffler;
 import org.junit.jupiter.api.Test;
 

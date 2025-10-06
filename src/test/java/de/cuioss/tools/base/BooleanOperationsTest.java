@@ -196,7 +196,7 @@ class BooleanOperationsTest {
     @Nested
     @DisplayName("handle random arrays with correctness verification")
     class RandomArrayTest {
-        
+
         // Helper methods to calculate expected results
         private boolean calculateIsAnyTrue(boolean[] array) {
             if (array == null || array.length == 0) {
@@ -207,7 +207,7 @@ class BooleanOperationsTest {
             }
             return false;
         }
-        
+
         private boolean calculateIsAnyFalse(boolean[] array) {
             if (array == null || array.length == 0) {
                 return false;
@@ -217,7 +217,7 @@ class BooleanOperationsTest {
             }
             return false;
         }
-        
+
         private boolean calculateAreAllTrue(boolean[] array) {
             if (array == null || array.length == 0) {
                 return true; // Empty arrays return true for areAllTrue
@@ -227,7 +227,7 @@ class BooleanOperationsTest {
             }
             return true;
         }
-        
+
         private boolean calculateAreAllFalse(boolean[] array) {
             if (array == null || array.length == 0) {
                 return false; // Empty arrays return false for areAllFalse
@@ -246,35 +246,35 @@ class BooleanOperationsTest {
                 // Generate realistic size (1-5 elements, typical for varargs)
                 var size = Generators.integers(1, 6).next();
                 var testArray = new boolean[size];
-                
+
                 // Fill with random values
                 for (int i = 0; i < size; i++) {
                     testArray[i] = Generators.booleans().next();
                 }
-                
+
                 // Verify isAnyTrue
                 var expectedAnyTrue = calculateIsAnyTrue(testArray);
                 var actualAnyTrue = isAnyTrue(testArray);
-                assertEquals(expectedAnyTrue, actualAnyTrue, 
-                    "isAnyTrue failed for array: " + Arrays.toString(testArray));
-                
+                assertEquals(expectedAnyTrue, actualAnyTrue,
+                        "isAnyTrue failed for array: " + Arrays.toString(testArray));
+
                 // Verify isAnyFalse
                 var expectedAnyFalse = calculateIsAnyFalse(testArray);
                 var actualAnyFalse = isAnyFalse(testArray);
                 assertEquals(expectedAnyFalse, actualAnyFalse,
-                    "isAnyFalse failed for array: " + Arrays.toString(testArray));
-                
+                        "isAnyFalse failed for array: " + Arrays.toString(testArray));
+
                 // Verify areAllTrue
                 var expectedAllTrue = calculateAreAllTrue(testArray);
                 var actualAllTrue = areAllTrue(testArray);
                 assertEquals(expectedAllTrue, actualAllTrue,
-                    "areAllTrue failed for array: " + Arrays.toString(testArray));
-                
+                        "areAllTrue failed for array: " + Arrays.toString(testArray));
+
                 // Verify areAllFalse
                 var expectedAllFalse = calculateAreAllFalse(testArray);
                 var actualAllFalse = areAllFalse(testArray);
                 assertEquals(expectedAllFalse, actualAllFalse,
-                    "areAllFalse failed for array: " + Arrays.toString(testArray));
+                        "areAllFalse failed for array: " + Arrays.toString(testArray));
             }
         }
 
@@ -287,7 +287,7 @@ class BooleanOperationsTest {
             // Test finding single true at end (worst case for isAnyTrue)
             var singleTrueAtEnd = new boolean[size];
             singleTrueAtEnd[size - 1] = true;
-            
+
             assertTrue(isAnyTrue(singleTrueAtEnd), "Should find single true at end");
             assertTrue(isAnyFalse(singleTrueAtEnd), "Should find falses before the true");
             assertFalse(areAllTrue(singleTrueAtEnd), "Not all values are true");
@@ -297,21 +297,21 @@ class BooleanOperationsTest {
             var singleFalseAtEnd = new boolean[size];
             Arrays.fill(singleFalseAtEnd, true);
             singleFalseAtEnd[size - 1] = false;
-            
+
             assertTrue(isAnyTrue(singleFalseAtEnd), "Should find trues before the false");
             assertTrue(isAnyFalse(singleFalseAtEnd), "Should find single false at end");
             assertFalse(areAllTrue(singleFalseAtEnd), "Not all values are true");
             assertFalse(areAllFalse(singleFalseAtEnd), "Not all values are false");
-            
+
             // Test with all true
             var allTrue = new boolean[size];
             Arrays.fill(allTrue, true);
-            
+
             assertTrue(isAnyTrue(allTrue), "Should find true values");
             assertFalse(isAnyFalse(allTrue), "Should not find any false");
             assertTrue(areAllTrue(allTrue), "All values are true");
             assertFalse(areAllFalse(allTrue), "Not all values are false");
-            
+
             // Test with all false
             var allFalse = new boolean[size];
             // Arrays are false by default

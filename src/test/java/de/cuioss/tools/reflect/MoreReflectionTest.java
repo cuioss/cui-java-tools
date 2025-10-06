@@ -16,13 +16,7 @@
 package de.cuioss.tools.reflect;
 
 import de.cuioss.tools.property.support.BeanWithUnusualAttributeCasing;
-import de.cuioss.tools.reflect.support.ChildAnnotatedClass;
-import de.cuioss.tools.reflect.support.FieldNameClass;
-import de.cuioss.tools.reflect.support.MethodNameClass;
-import de.cuioss.tools.reflect.support.NestedGenericBaseClass;
-import de.cuioss.tools.reflect.support.NestedGenericSample;
-import de.cuioss.tools.reflect.support.NotAnnotatedClass;
-import de.cuioss.tools.reflect.support.StringTypedArrayList;
+import de.cuioss.tools.reflect.support.*;
 import de.cuioss.tools.support.StringCaseShuffler;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;

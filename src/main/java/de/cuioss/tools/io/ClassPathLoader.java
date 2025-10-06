@@ -26,6 +26,7 @@ import java.io.Serial;
 import java.net.URL;
 import java.util.Optional;
 
+import static de.cuioss.tools.ToolsLogMessages.INFO;
 import static de.cuioss.tools.base.Preconditions.checkState;
 import static de.cuioss.tools.string.MoreStrings.isEmpty;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmpty;
@@ -141,7 +142,7 @@ public class ClassPathLoader implements FileLoader {
                 return url;
             }
         }
-        LOGGER.info("Unable to resolve '%s' from classpath", path);
+        LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED.format(path));
         return null;
     }
 

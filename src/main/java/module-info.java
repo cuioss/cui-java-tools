@@ -15,6 +15,7 @@
  */
 module de.cuioss.java.tools {
     requires static lombok;
+    requires static org.jspecify;
     requires transitive java.desktop;
     requires transitive java.logging;
     requires java.net.http;
@@ -27,7 +28,6 @@ module de.cuioss.java.tools {
     exports de.cuioss.tools.formatting.template;
     exports de.cuioss.tools.formatting.template.lexer;
     exports de.cuioss.tools.formatting.template.token;
-    exports de.cuioss.tools.net.http;
     exports de.cuioss.tools.io;
     exports de.cuioss.tools.lang;
     exports de.cuioss.tools.logging;

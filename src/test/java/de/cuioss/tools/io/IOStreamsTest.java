@@ -18,12 +18,7 @@ package de.cuioss.tools.io;
 import de.cuioss.tools.support.TestDataGenerator;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import static de.cuioss.tools.io.IOStreams.contentEquals;

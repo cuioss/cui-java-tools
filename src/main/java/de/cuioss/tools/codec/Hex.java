@@ -163,7 +163,8 @@ public class Hex {
      * @throws DecoderException Thrown if an odd number or illegal of characters is
      *                          supplied
      */
-    @SuppressWarnings("squid:ForLoopCounterChangedCheck") // owolff: original code
+    // owolff: original code
+    @SuppressWarnings("squid:ForLoopCounterChangedCheck")
     public static byte[] decodeHex(final char[] data) throws DecoderException {
 
         final var len = data.length;
@@ -265,7 +266,8 @@ public class Hex {
      * @return A char[] containing the appropriate characters from the alphabet For
      * best results, this should be either upper- or lower-case hex.
      */
-    @SuppressWarnings("squid:ForLoopCounterChangedCheck") // owolff: original code
+    // owolff: original code
+    @SuppressWarnings("squid:ForLoopCounterChangedCheck")
     protected static char[] encodeHex(final byte[] data, final char[] toDigits) {
         final var l = data.length;
         final var out = new char[l << 1];

@@ -23,8 +23,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Random;
@@ -46,7 +48,7 @@ class HexTest {
             final var bytes = source.getBytes(name);
             final var str = new String(bytes, name);
             return source.equals(str);
-        } catch (Exception e) {
+        } catch (UnsupportedCharsetException | IllegalCharsetNameException | UnsupportedEncodingException e) {
             return false;
         }
     }

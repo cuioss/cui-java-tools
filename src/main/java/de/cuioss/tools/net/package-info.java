@@ -46,13 +46,6 @@
  *       <li>{@link de.cuioss.tools.net.ssl.KeyStoreType} - KeyStore types</li>
  *     </ul>
  *   </li>
- *   <li><b>HTTP Utilities</b>
- *     <ul>
- *       <li>{@link de.cuioss.tools.net.http.HttpHandler} - HTTP request/response handling</li>
- *       <li>{@link de.cuioss.tools.net.http.HttpStatusFamily} - HTTP status family detection</li>
- *       <li>{@link de.cuioss.tools.net.http.SecureSSLContextProvider} - Secure SSL context for HTTP</li>
- *     </ul>
- *   </li>
  * </ul>
  *
  * @author Oliver Wolff
@@ -60,8 +53,8 @@
  * @see de.cuioss.tools.net.UrlParameter
  * @see de.cuioss.tools.net.IDNInternetAddress
  * @see de.cuioss.tools.net.ssl.KeyStoreProvider
- * @see de.cuioss.tools.net.http.HttpHandler
- * @see de.cuioss.tools.net.http.HttpStatusFamily
- * @see de.cuioss.tools.net.http.SecureSSLContextProvider
+ * @see de.cuioss.http.client.handler.HttpHandler
+ * @see de.cuioss.http.client.handler.HttpStatusFamily
+ * @see de.cuioss.http.client.handler.SecureSSLContextProvider
  */
 package de.cuioss.tools.net;

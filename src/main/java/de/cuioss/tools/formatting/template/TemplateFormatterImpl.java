@@ -222,7 +222,8 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
     /**
      * @return a newly created {@link TemplateBuilder}
      */
-    @SuppressWarnings("squid:S2440") // owolff: False positive
+    // owolff: False positive
+    @SuppressWarnings("squid:S2440")
     public static TemplateBuilder builder() {
         return new TemplateBuilder();
     }

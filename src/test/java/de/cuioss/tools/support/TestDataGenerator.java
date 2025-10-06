@@ -30,7 +30,7 @@ public class TestDataGenerator implements TypedGenerator<byte[]> {
 
     /**
      * Creates a generator for byte arrays of specified size.
-     * 
+     *
      * @param size the size of the byte array to generate
      */
     public TestDataGenerator(long size) {
@@ -44,7 +44,7 @@ public class TestDataGenerator implements TypedGenerator<byte[]> {
             generateTestData(baout, size);
             return baout.toByteArray();
         } catch (final IOException ioe) {
-            throw new RuntimeException("This should never happen: " + ioe.getMessage());
+            throw new IllegalStateException("This should never happen: " + ioe.getMessage());
         }
     }
 
@@ -62,7 +62,7 @@ public class TestDataGenerator implements TypedGenerator<byte[]> {
 
     /**
      * Convenience factory method to create test data of specified size.
-     * 
+     *
      * @param size the size of the byte array
      * @return a byte array with test data
      */

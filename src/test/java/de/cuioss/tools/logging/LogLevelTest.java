@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class LogLevelTest {
 
     private static final String TEST_MESSAGE = "test message";
+    // cui-rewrite:disable InvalidExceptionUsageRecipe
     private static final RuntimeException TEST_EXCEPTION = new RuntimeException("test exception");
     private final Logger logger = Logger.getLogger(LogLevelTest.class.getName());
 

@@ -151,7 +151,8 @@ class ConcurrentToolsTest {
     /**
      * Interrupts the current thread after sleeping for the specified delay.
      */
-    @SuppressWarnings("squid:S2925") // owolff: ok for testing
+    // owolff: ok for testing
+    @SuppressWarnings("squid:S2925")
     static void requestInterruptIn() {
         final var interruptee = Thread.currentThread();
         new Thread(() -> {
@@ -169,7 +170,8 @@ class ConcurrentToolsTest {
      * assertTrue(Thread.interrupted())} except that this version tolerates late
      * interrupts.
      */
-    @SuppressWarnings("squid:S2925") // owolff: ok for testing
+    // owolff: ok for testing
+    @SuppressWarnings("squid:S2925")
     private static void assertInterrupted() {
         try {
             /*

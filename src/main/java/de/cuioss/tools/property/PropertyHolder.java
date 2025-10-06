@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
+import static de.cuioss.tools.ToolsLogMessages.ERROR;
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
 import static de.cuioss.tools.string.MoreStrings.requireNotEmptyTrimmed;
 import static java.util.Objects.requireNonNull;
@@ -135,7 +136,7 @@ public class PropertyHolder {
         try {
             return readMethod.invoke(source);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            LOGGER.error("Failed to read property '{}' from bean of type '{}'", name, source.getClass().getName(), e);
+            LOGGER.error(e, ERROR.PROPERTY_READ_FAILED.format(name, source.getClass().getName()));
             throw new IllegalStateException("Failed to read property: " + name, e);
         }
     }
@@ -171,7 +172,7 @@ public class PropertyHolder {
                 var result = writeMethod.invoke(target, value);
                 return Objects.requireNonNullElse(result, target);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LOGGER.error("Failed to write property '{}' to bean of type '{}'", name, target.getClass().getName(), e);
+                LOGGER.error(e, ERROR.PROPERTY_WRITE_FAILED.format(name, target.getClass().getName()));
                 throw new IllegalStateException("Failed to write property: " + name, e);
             }
         }

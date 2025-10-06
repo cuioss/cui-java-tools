@@ -47,7 +47,8 @@ public class MoreObjects {
      * @throws IllegalArgumentException if the given type is either null or not the
      *                                  expected type
      */
-    @SuppressWarnings("unchecked") // owolff: It is actually checked before.
+    // owolff: Number of parameters match to the use-case
+    @SuppressWarnings("unchecked")
     public static <T> T requireType(final Object underCheck, Class<T> expectedType) {
         checkArgument(null != underCheck, "Object to be checked must not be null");
         checkArgument(null != expectedType, "expectedType must not be null");
