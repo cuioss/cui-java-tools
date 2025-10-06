@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@NullMarked
 /**
  * Provides enhanced logging utilities built on top of Java's logging framework.
  *
@@ -88,6 +87,7 @@
  * @see de.cuioss.tools.logging.LogLevel
  * @see de.cuioss.tools.logging.LogRecord
  */
+@NullMarked
 package de.cuioss.tools.logging;
 
 import org.jspecify.annotations.NullMarked;
