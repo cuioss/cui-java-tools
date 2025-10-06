@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
@@ -93,7 +94,7 @@ public enum LogLevel {
      * @param message   must not be null
      * @param throwable to be logged, may be null
      */
-    void handleActualLog(final Logger logger, final String message, final Throwable throwable) {
+    void handleActualLog(final Logger logger, final String message, final @Nullable Throwable throwable) {
         if (!isEnabled(logger)) {
             return;
         }
@@ -101,10 +102,10 @@ public enum LogLevel {
     }
 
     /**
-     * @param juliLevel
+     * @param juliLevel the Java Util Logging level to convert
      * @return CUI log level
      */
-    public static LogLevel from(@NonNull final Level juliLevel) {
+    public static LogLevel from(final Level juliLevel) {
         // highest value first, i.e. OFF, ERROR, WARN, INFO, DEBUG, TRACE
         List<LogLevel> sortedCuiLevels = CollectionLiterals.mutableList(values());
         sortedCuiLevels.sort(Comparator.comparing(logLevel -> logLevel.getJuliLevel().intValue()));
@@ -120,7 +121,7 @@ public enum LogLevel {
         return TRACE;
     }
 
-    private void doLog(final Logger logger, final String message, final Throwable throwable) {
+    private void doLog(final Logger logger, final String message, final @Nullable Throwable throwable) {
         // We go up the stack-trace until we found the call from CuiLogger.
         final var caller = MoreReflection.findCallerElement(throwable, MARKER_CLASS_NAMES);
         if (caller.isPresent()) {
@@ -147,7 +148,7 @@ public enum LogLevel {
 
     @SuppressWarnings("squid:S2629")
     // Sonar false positive: The supplier IS lazy - we only call get() after checking isEnabled()
-    void log(final Logger logger, Supplier<String> message, final Throwable throwable) {
+    void log(final Logger logger, Supplier<String> message, final @Nullable Throwable throwable) {
         if (isEnabled(logger)) {
             doLog(logger, message.get(), throwable);
         }
@@ -157,7 +158,7 @@ public enum LogLevel {
     // Sonar false positive: "Logging arguments should be lazy" - but we DO check isEnabled()
     // before any string formatting, making this effectively lazy. The formatting only happens
     // if the log level is enabled, which is the intent of the rule.
-    void log(final Logger logger, final Throwable throwable, final String template, final Object... parameter) {
+    void log(final Logger logger, final @Nullable Throwable throwable, final String template, final Object... parameter) {
         if (isEnabled(logger)) {
             final var replacedTemplate = CuiLogger.SLF4J_PATTERN.matcher(nullToEmpty(template))
                     .replaceAll("%s");
@@ -202,7 +203,7 @@ public enum LogLevel {
      */
     @SuppressWarnings("squid:S2629")
     // Sonar false positive: The formatting only happens if the log level is enabled
-    void log(final Logger logger, final Throwable throwable, final LogRecord template, final Object... parameter) {
+    void log(final Logger logger, final @Nullable Throwable throwable, final LogRecord template, final Object... parameter) {
         if (isEnabled(logger)) {
             doLog(logger, template.format(parameter), throwable);
         }
@@ -215,7 +216,7 @@ public enum LogLevel {
      * @param throwable to be logged, may be null
      * @param template  the LogRecord template containing the message pattern
      */
-    void log(final Logger logger, final Throwable throwable, final LogRecord template) {
+    void log(final Logger logger, final @Nullable Throwable throwable, final LogRecord template) {
         if (isEnabled(logger)) {
             doLog(logger, template.format(), throwable);
         }
