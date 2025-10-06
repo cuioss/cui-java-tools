@@ -324,6 +324,234 @@ class CuiLoggerTest {
         }
     }
 
+    @Nested
+    @DisplayName("LogRecord Integration Tests")
+    class LogRecordIntegrationTests {
+
+        private LogRecord testLogRecord;
+        private LogRecord logRecordWithParams;
+
+        @BeforeEach
+        void setUp() {
+            testLogRecord = LogRecordModel.builder()
+                    .identifier(100)
+                    .prefix("TEST")
+                    .template("Simple log message")
+                    .build();
+
+            logRecordWithParams = LogRecordModel.builder()
+                    .identifier(200)
+                    .prefix("TEST")
+                    .template("Formatted log: {}, {}")
+                    .build();
+        }
+
+        @Test
+        @DisplayName("Should handle INFO level LogRecord without parameters")
+        void shouldHandleInfoLogRecordWithoutParams() {
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled");
+
+            underTest.info(testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.INFO);
+        }
+
+        @Test
+        @DisplayName("Should handle INFO level LogRecord with parameters")
+        void shouldHandleInfoLogRecordWithParams() {
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled");
+
+            underTest.info(logRecordWithParams, "value1", "value2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: value1, value2", Level.INFO);
+        }
+
+        @Test
+        @DisplayName("Should handle INFO level LogRecord with throwable")
+        void shouldHandleInfoLogRecordWithThrowable() {
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled");
+
+            underTest.info(throwable, testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.INFO, throwable);
+        }
+
+        @Test
+        @DisplayName("Should handle INFO level LogRecord with throwable and parameters")
+        void shouldHandleInfoLogRecordWithThrowableAndParams() {
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled");
+
+            underTest.info(throwable, logRecordWithParams, "error1", "error2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: error1, error2", Level.INFO, throwable);
+        }
+
+        @Test
+        @DisplayName("Should handle WARN level LogRecord without parameters")
+        void shouldHandleWarnLogRecordWithoutParams() {
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled");
+
+            underTest.warn(testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.WARNING);
+        }
+
+        @Test
+        @DisplayName("Should handle WARN level LogRecord with parameters")
+        void shouldHandleWarnLogRecordWithParams() {
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled");
+
+            underTest.warn(logRecordWithParams, "value1", "value2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: value1, value2", Level.WARNING);
+        }
+
+        @Test
+        @DisplayName("Should handle WARN level LogRecord with throwable")
+        void shouldHandleWarnLogRecordWithThrowable() {
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled");
+
+            underTest.warn(throwable, testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.WARNING, throwable);
+        }
+
+        @Test
+        @DisplayName("Should handle WARN level LogRecord with throwable and parameters")
+        void shouldHandleWarnLogRecordWithThrowableAndParams() {
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled");
+
+            underTest.warn(throwable, logRecordWithParams, "warn1", "warn2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: warn1, warn2", Level.WARNING, throwable);
+        }
+
+        @Test
+        @DisplayName("Should handle ERROR level LogRecord without parameters")
+        void shouldHandleErrorLogRecordWithoutParams() {
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
+
+            underTest.error(testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.SEVERE);
+        }
+
+        @Test
+        @DisplayName("Should handle ERROR level LogRecord with parameters")
+        void shouldHandleErrorLogRecordWithParams() {
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
+
+            underTest.error(logRecordWithParams, "value1", "value2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: value1, value2", Level.SEVERE);
+        }
+
+        @Test
+        @DisplayName("Should handle ERROR level LogRecord with throwable")
+        void shouldHandleErrorLogRecordWithThrowable() {
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
+
+            underTest.error(throwable, testLogRecord);
+
+            handler.assertMessagePresent("TEST-100: Simple log message", Level.SEVERE, throwable);
+        }
+
+        @Test
+        @DisplayName("Should handle ERROR level LogRecord with throwable and parameters")
+        void shouldHandleErrorLogRecordWithThrowableAndParams() {
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
+
+            underTest.error(throwable, logRecordWithParams, "error1", "error2");
+
+            handler.assertMessagePresent("TEST-200: Formatted log: error1, error2", Level.SEVERE, throwable);
+        }
+
+        @Test
+        @DisplayName("Should only format LogRecord when log level is enabled")
+        void shouldLazilyFormatLogRecord() {
+            // Given a log record that would fail if formatted
+            LogRecord failingRecord = new LogRecord() {
+                @Override
+                public String getPrefix() {
+                    return "FAIL";
+                }
+
+                @Override
+                public Integer getIdentifier() {
+                    return 999;
+                }
+
+                @Override
+                public String getTemplate() {
+                    return "Should not be called";
+                }
+
+                @Override
+                public Supplier<String> supplier(Object... parameter) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public String format(Object... parameter) {
+                    throw new IllegalStateException("Format should not be called when level is disabled");
+                }
+
+                @Override
+                public String resolveIdentifierString() {
+                    return "FAIL-999";
+                }
+            };
+
+            // When logging is disabled
+            underTest.getWrapped().setLevel(Level.OFF);
+
+            // Then no exception should be thrown
+            assertDoesNotThrow(() -> underTest.info(failingRecord));
+            assertDoesNotThrow(() -> underTest.info(failingRecord, "param"));
+            assertDoesNotThrow(() -> underTest.info(throwable, failingRecord));
+            assertDoesNotThrow(() -> underTest.info(throwable, failingRecord, "param"));
+        }
+
+        @Test
+        @DisplayName("Should handle optimized String + Throwable methods")
+        void shouldHandleOptimizedStringThrowableMethods() {
+            String message = "Optimized message";
+
+            // TRACE level
+            assumeTrue(underTest.isTraceEnabled(), "Trace logging must be enabled");
+            underTest.trace(throwable, message);
+            handler.assertMessagePresent(message, Level.FINER, throwable);
+
+            handler.clearRecords();
+
+            // DEBUG level
+            assumeTrue(underTest.isDebugEnabled(), "Debug logging must be enabled");
+            underTest.debug(throwable, message);
+            handler.assertMessagePresent(message, Level.FINE, throwable);
+
+            handler.clearRecords();
+
+            // INFO level
+            assumeTrue(underTest.isInfoEnabled(), "Info logging must be enabled");
+            underTest.info(throwable, message);
+            handler.assertMessagePresent(message, Level.INFO, throwable);
+
+            handler.clearRecords();
+
+            // WARN level
+            assumeTrue(underTest.isWarnEnabled(), "Warn logging must be enabled");
+            underTest.warn(throwable, message);
+            handler.assertMessagePresent(message, Level.WARNING, throwable);
+
+            handler.clearRecords();
+
+            // ERROR level
+            assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
+            underTest.error(throwable, message);
+            handler.assertMessagePresent(message, Level.SEVERE, throwable);
+        }
+    }
+
     @SuppressWarnings("java:S1144") // owolff: used by tests using MethodSource
     private static Stream<Arguments> provideLogLevels() {
         return Stream.of(

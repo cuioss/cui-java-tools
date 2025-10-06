@@ -142,6 +142,6 @@ class LogLevelTest {
         // When/Then - no assertions needed as per logging rules
         LogLevel.INFO.handleActualLog(logger, null, null);
         LogLevel.ERROR.handleActualLog(logger, null, TEST_EXCEPTION);
-        assertDoesNotThrow(() -> LogLevel.WARN.log(logger, null, (Object[]) null));
+        assertDoesNotThrow(() -> LogLevel.WARN.log(logger, (String) null, (Object[]) null));
     }
 }

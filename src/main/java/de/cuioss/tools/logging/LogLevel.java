@@ -164,4 +164,60 @@ public enum LogLevel {
             doLog(logger, lenientFormat(replacedTemplate, parameter), throwable);
         }
     }
+
+    /**
+     * Logs a LogRecord with parameters
+     *
+     * @param logger    to be used, must not be null
+     * @param template  the LogRecord template containing the message pattern
+     * @param parameter optional parameters to be used for replacing placeholders
+     */
+    @SuppressWarnings("squid:S2629")
+    // Sonar false positive: The formatting only happens if the log level is enabled
+    void log(final Logger logger, final LogRecord template, final Object... parameter) {
+        if (isEnabled(logger)) {
+            doLog(logger, template.format(parameter), null);
+        }
+    }
+
+    /**
+     * Logs a LogRecord without parameters
+     *
+     * @param logger   to be used, must not be null
+     * @param template the LogRecord template containing the message pattern
+     */
+    void log(final Logger logger, final LogRecord template) {
+        if (isEnabled(logger)) {
+            doLog(logger, template.format(), null);
+        }
+    }
+
+    /**
+     * Logs a LogRecord with parameters and a throwable
+     *
+     * @param logger    to be used, must not be null
+     * @param throwable to be logged, may be null
+     * @param template  the LogRecord template containing the message pattern
+     * @param parameter optional parameters to be used for replacing placeholders
+     */
+    @SuppressWarnings("squid:S2629")
+    // Sonar false positive: The formatting only happens if the log level is enabled
+    void log(final Logger logger, final Throwable throwable, final LogRecord template, final Object... parameter) {
+        if (isEnabled(logger)) {
+            doLog(logger, template.format(parameter), throwable);
+        }
+    }
+
+    /**
+     * Logs a LogRecord with a throwable but no parameters
+     *
+     * @param logger    to be used, must not be null
+     * @param throwable to be logged, may be null
+     * @param template  the LogRecord template containing the message pattern
+     */
+    void log(final Logger logger, final Throwable throwable, final LogRecord template) {
+        if (isEnabled(logger)) {
+            doLog(logger, template.format(), throwable);
+        }
+    }
 }

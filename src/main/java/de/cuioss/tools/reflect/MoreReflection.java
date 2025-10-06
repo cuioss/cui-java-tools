@@ -270,7 +270,7 @@ public final class MoreReflection {
             case "double" -> Double.class;
             case "float" -> Float.class;
             default -> {
-                LOGGER.warn(WARN.WRAPPER_TYPE_DETERMINATION_FAILED.format(check));
+                LOGGER.warn(WARN.WRAPPER_TYPE_DETERMINATION_FAILED, check);
                 yield check;
             }
         };
@@ -454,7 +454,7 @@ public final class MoreReflection {
                 yield extractGenericTypeCovariantly(parameterizedType.getRawType());
             }
             default -> {
-                LOGGER.warn(WARN.GENERIC_TYPE_DETERMINATION_FAILED.format(type));
+                LOGGER.warn(WARN.GENERIC_TYPE_DETERMINATION_FAILED, type);
                 yield Optional.empty();
             }
         };

@@ -142,7 +142,7 @@ public class ClassPathLoader implements FileLoader {
                 return url;
             }
         }
-        LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED.format(path));
+        LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED, path);
         return null;
     }
 
