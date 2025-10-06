@@ -107,7 +107,7 @@ public final class ToolsLogMessages {
          * Parameters: field, accessible flag, source object
          */
         public static final LogRecord FIELD_READ_FAILED = LogRecordModel.builder()
-                .template("Reading from field '%s' with accessible='%s' and parameter ='%s' could not complete")
+                .template("Reading from field '%s' with accessible='%s' and parameter='%s' could not complete")
                 .prefix(PREFIX)
                 .identifier(102)
                 .build();
@@ -127,7 +127,7 @@ public final class ToolsLogMessages {
          * Parameters: type
          */
         public static final LogRecord GENERIC_TYPE_DETERMINATION_FAILED = LogRecordModel.builder()
-                .template("Unable to determine generic-type for %s")
+                .template("Unable to determine generic-type for '%s'")
                 .prefix(PREFIX)
                 .identifier(104)
                 .build();
@@ -145,7 +145,7 @@ public final class ToolsLogMessages {
          * Parameters: path1, path2
          */
         public static final LogRecord PATH_COMPARISON_FAILED = LogRecordModel.builder()
-                .template("Unable to compare path_a=%s and path_b=%s")
+                .template("Unable to compare path_a='%s' and path_b='%s'")
                 .prefix(PREFIX)
                 .identifier(200)
                 .build();
