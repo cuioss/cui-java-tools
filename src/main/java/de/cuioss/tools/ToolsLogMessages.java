@@ -38,13 +38,13 @@ import lombok.experimental.UtilityClass;
  * import static de.cuioss.tools.ToolsLogMessages.ERROR;
  *
  * // INFO level
- * LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED.format(path));
+ * LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED, path);
  *
  * // WARN level with exception
- * LOGGER.warn(e, WARN.REAL_PATH_RESOLUTION_FAILED.format(path, e.getMessage()));
+ * LOGGER.warn(e, WARN.REAL_PATH_RESOLUTION_FAILED, path, e.getMessage());
  *
  * // ERROR level
- * LOGGER.error(e, ERROR.PATH_COMPARISON_FAILED.format(path1, path2));
+ * LOGGER.error(e, ERROR.PATH_COMPARISON_FAILED, path1, path2);
  * </pre>
  *
  * @author Oliver Wolff

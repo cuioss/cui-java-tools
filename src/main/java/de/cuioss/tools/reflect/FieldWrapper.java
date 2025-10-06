@@ -89,7 +89,7 @@ public class FieldWrapper {
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                LOGGER.warn(e, WARN.FIELD_READ_FAILED.format(field, initialAccessible, source));
+                LOGGER.warn(e, WARN.FIELD_READ_FAILED, field, initialAccessible, source);
                 return Optional.empty();
             } finally {
                 if (!initialAccessible) {

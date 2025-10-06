@@ -65,7 +65,7 @@ public final class MorePaths {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            LOGGER.warn(e, WARN.REAL_PATH_RESOLUTION_FAILED.format(path, e.getMessage()));
+            LOGGER.warn(e, WARN.REAL_PATH_RESOLUTION_FAILED, path, e.getMessage());
             return path.toAbsolutePath();
         }
     }
@@ -116,7 +116,7 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.canWrite()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Writable"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not Writable");
             }
             return false;
         }
@@ -141,26 +141,26 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Existing"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
         }
         if (checkForDirectory) {
             if (!pathFile.isDirectory()) {
                 if (verbose) {
-                    LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a directory"));
+                    LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not a directory");
                 }
                 return false;
             }
         } else if (!pathFile.isFile()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a file"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canRead()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Readable"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not Readable");
             }
             return false;
         }
@@ -182,19 +182,19 @@ public final class MorePaths {
         final var absolutePath = pathFile.getAbsolutePath();
         if (!pathFile.exists()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Existing"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not Existing");
             }
             return false;
         }
         if (!pathFile.isFile()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not a file"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not a file");
             }
             return false;
         }
         if (!pathFile.canExecute()) {
             if (verbose) {
-                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE.format(absolutePath, "Not Executable"));
+                LOGGER.warn(WARN.PATH_NOT_ACCESSIBLE, absolutePath, "Not Executable");
             }
             return false;
         }
@@ -511,7 +511,7 @@ public final class MorePaths {
             try {
                 return Files.isSameFile(path, path2);
             } catch (final IOException e) {
-                LOGGER.error(e, ERROR.PATH_COMPARISON_FAILED.format(path, path2));
+                LOGGER.error(e, ERROR.PATH_COMPARISON_FAILED, path, path2);
             }
         } else {
             LOGGER.trace("at least one path is null: path_a=%s, path_b=%s", path, path2);

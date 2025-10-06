@@ -87,4 +87,7 @@
  * @see de.cuioss.tools.logging.LogLevel
  * @see de.cuioss.tools.logging.LogRecord
  */
+@NullMarked
 package de.cuioss.tools.logging;
+
+import org.jspecify.annotations.NullMarked;

@@ -250,6 +250,16 @@ public class CuiLogger {
     }
 
     /**
+     * Log a message at the trace level.
+     *
+     * @param throwable to be logged
+     * @param msg       the message string to be logged
+     */
+    public void trace(Throwable throwable, String msg) {
+        LogLevel.TRACE.handleActualLog(delegate, msg, throwable);
+    }
+
+    /**
      * Is the logger instance enabled for the debug level?
      *
      * @return {@code true} if this CuiLogger is enabled for the debug level, false
@@ -318,6 +328,16 @@ public class CuiLogger {
      */
     public void debug(String template, Object... parameter) {
         LogLevel.DEBUG.log(delegate, template, parameter);
+    }
+
+    /**
+     * Log a message at the debug level.
+     *
+     * @param throwable to be logged
+     * @param msg       the message string to be logged
+     */
+    public void debug(Throwable throwable, String msg) {
+        LogLevel.DEBUG.handleActualLog(delegate, msg, throwable);
     }
 
     /**
@@ -392,6 +412,56 @@ public class CuiLogger {
     }
 
     /**
+     * Log a message at the info level.
+     *
+     * @param throwable to be logged
+     * @param msg       the message string to be logged
+     */
+    public void info(Throwable throwable, String msg) {
+        LogLevel.INFO.handleActualLog(delegate, msg, throwable);
+    }
+
+    /**
+     * Log a message at the info level using a LogRecord.
+     *
+     * @param template the LogRecord containing the message template
+     */
+    public void info(LogRecord template) {
+        LogLevel.INFO.log(delegate, template);
+    }
+
+    /**
+     * Log a message at the info level using a LogRecord.
+     *
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void info(LogRecord template, Object... parameter) {
+        LogLevel.INFO.log(delegate, template, parameter);
+    }
+
+    /**
+     * Log a message at the info level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     */
+    public void info(Throwable throwable, LogRecord template) {
+        LogLevel.INFO.log(delegate, throwable, template);
+    }
+
+    /**
+     * Log a message at the info level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void info(Throwable throwable, LogRecord template, Object... parameter) {
+        LogLevel.INFO.log(delegate, throwable, template, parameter);
+    }
+
+    /**
      * Is the logger instance enabled for the warn level?
      *
      * @return {@code true} if this CuiLogger is enabled for the warn level, false
@@ -463,6 +533,56 @@ public class CuiLogger {
     }
 
     /**
+     * Log a message at the warn level.
+     *
+     * @param throwable to be logged
+     * @param msg       the message string to be logged
+     */
+    public void warn(Throwable throwable, String msg) {
+        LogLevel.WARN.handleActualLog(delegate, msg, throwable);
+    }
+
+    /**
+     * Log a message at the warn level using a LogRecord.
+     *
+     * @param template the LogRecord containing the message template
+     */
+    public void warn(LogRecord template) {
+        LogLevel.WARN.log(delegate, template);
+    }
+
+    /**
+     * Log a message at the warn level using a LogRecord.
+     *
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void warn(LogRecord template, Object... parameter) {
+        LogLevel.WARN.log(delegate, template, parameter);
+    }
+
+    /**
+     * Log a message at the warn level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     */
+    public void warn(Throwable throwable, LogRecord template) {
+        LogLevel.WARN.log(delegate, throwable, template);
+    }
+
+    /**
+     * Log a message at the warn level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void warn(Throwable throwable, LogRecord template, Object... parameter) {
+        LogLevel.WARN.log(delegate, throwable, template, parameter);
+    }
+
+    /**
      * Is the logger instance enabled for the error level?
      *
      * @return {@code true} if this CuiLogger is enabled for the error level, false
@@ -531,6 +651,56 @@ public class CuiLogger {
      */
     public void error(String template, Object... parameter) {
         LogLevel.ERROR.log(delegate, template, parameter);
+    }
+
+    /**
+     * Log a message at the error level.
+     *
+     * @param throwable to be logged
+     * @param msg       the message string to be logged
+     */
+    public void error(Throwable throwable, String msg) {
+        LogLevel.ERROR.handleActualLog(delegate, msg, throwable);
+    }
+
+    /**
+     * Log a message at the error level using a LogRecord.
+     *
+     * @param template the LogRecord containing the message template
+     */
+    public void error(LogRecord template) {
+        LogLevel.ERROR.log(delegate, template);
+    }
+
+    /**
+     * Log a message at the error level using a LogRecord.
+     *
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void error(LogRecord template, Object... parameter) {
+        LogLevel.ERROR.log(delegate, template, parameter);
+    }
+
+    /**
+     * Log a message at the error level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     */
+    public void error(Throwable throwable, LogRecord template) {
+        LogLevel.ERROR.log(delegate, throwable, template);
+    }
+
+    /**
+     * Log a message at the error level using a LogRecord.
+     *
+     * @param throwable to be logged
+     * @param template  the LogRecord containing the message template
+     * @param parameter to be used for replacing the placeholder
+     */
+    public void error(Throwable throwable, LogRecord template, Object... parameter) {
+        LogLevel.ERROR.log(delegate, throwable, template, parameter);
     }
 
     Logger getWrapped() {
