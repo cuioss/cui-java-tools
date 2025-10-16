@@ -160,6 +160,8 @@ public class PropertyUtil {
      * @deprecated Use {@link #setProperty(Object, String, Object)} for pure command operations
      */
     @Deprecated(since = "2.4.1", forRemoval = true)
+    @SuppressWarnings("java:S1133") // Sonar: "Do not forget to remove this deprecated code someday"
+    // Intentionally deprecated with forRemoval=true. Removal planned for version 3.0.
     public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
         return writePropertyWithChaining(bean, propertyName, propertyValue);
     }
