@@ -89,6 +89,7 @@ public class FieldWrapper {
             try {
                 return Optional.ofNullable(field.get(source));
             } catch (IllegalArgumentException | IllegalAccessException e) {
+                // cui-rewrite:disable CuiLogRecordPatternRecipe - Recipe bug: Cannot detect LogRecord through nested class
                 LOGGER.warn(e, WARN.FIELD_READ_FAILED, field, initialAccessible, source);
                 return Optional.empty();
             } finally {

@@ -129,4 +129,17 @@ class PropertyUtilTest {
         assertFalse(resolvePropertyType(BeanForTestingTypeResolving.class, "notThere").isPresent());
     }
 
+    @Test
+    @SuppressWarnings("deprecation")
+    void shouldSupportDeprecatedWriteProperty() {
+        var underTest = new BeanWithReadWriteProperties();
+        Integer number = 4;
+
+        // Test that deprecated writeProperty returns the bean instance
+        Object result = writeProperty(underTest, ATTRIBUTE_READ_WRITE, number);
+        assertNotNull(result);
+        assertEquals(underTest, result);
+        assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE));
+    }
+
 }
