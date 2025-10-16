@@ -146,6 +146,25 @@ public class PropertyUtil {
         writePropertyWithChaining(bean, propertyName, propertyValue);
     }
 
+    /**
+     * Writes a value to a property of a bean using reflection and returns the bean for method chaining.
+     * This method violates Command-Query Separation by both modifying state and returning a value.
+     * Consider using {@link #setProperty(Object, String, Object)} for pure command operations.
+     *
+     * @param bean          the bean to write to, must not be null
+     * @param propertyName  the name of the property to write, must not be null or empty
+     * @param propertyValue the value to write to the property
+     * @return the bean instance (for method chaining)
+     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @since 2.0
+     * @deprecated Use {@link #setProperty(Object, String, Object)} for pure command operations
+     */
+    @Deprecated(since = "2.4.1", forRemoval = true)
+    @SuppressWarnings("java:S1133") // Sonar: "Do not forget to remove this deprecated code someday"
+    // Intentionally deprecated with forRemoval=true. Removal planned for version 3.0.
+    public static Object writeProperty(Object bean, String propertyName, Object propertyValue) {
+        return writePropertyWithChaining(bean, propertyName, propertyValue);
+    }
 
     /**
      * Internal method for property writing with return value support.

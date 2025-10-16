@@ -142,6 +142,7 @@ public class ClassPathLoader implements FileLoader {
                 return url;
             }
         }
+        // cui-rewrite:disable CuiLogRecordPatternRecipe - Recipe bug: Cannot detect LogRecord through nested class
         LOGGER.info(INFO.CLASSPATH_RESOLUTION_FAILED, path);
         return null;
     }

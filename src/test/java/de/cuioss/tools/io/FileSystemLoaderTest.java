@@ -164,4 +164,21 @@ class FileSystemLoaderTest {
         assertNotNull(url);
         assertEquals(Path.of(NOT_EXISTING_FILE_PATH).toUri().toURL().getPath(), url.getPath());
     }
+
+    @Test
+    void shouldHandleExternalPathWithComplexScenarios() {
+        // Test external path handling - this exercises the code path with canonical path resolution
+        // Even though we can't easily trigger IOException in getCanonicalPath(), this test ensures
+        // the external path resolution logic is executed
+        var externalPath = "external:/pom.xml";
+        var result = FileSystemLoader.checkPathName(externalPath);
+        assertNotNull(result);
+        assertTrue(result.contains("pom.xml"));
+
+        // Also test that we can create a loader with this path - file should exist after resolution
+        var loader = new FileSystemLoader(externalPath);
+        assertNotNull(loader);
+        // The file should be readable since external:/pom.xml resolves to ./pom.xml
+        assertTrue(loader.isReadable(), "External path should resolve to readable pom.xml");
+    }
 }
