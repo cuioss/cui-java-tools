@@ -126,7 +126,8 @@ public class FileSystemLoader implements FileReaderWriter {
                 newPathName = new File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
                 LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
-                LOGGER.error(e, ERROR.CURRENT_DIR_RETRIEVAL_FAILED);
+                // Cannot reasonably test IOException from getCanonicalPath() - would require mocking File I/O
+                LOGGER.error(e, ERROR.CURRENT_DIR_RETRIEVAL_FAILED); // NOSONAR - Untestable IOException path
             }
         }
 
