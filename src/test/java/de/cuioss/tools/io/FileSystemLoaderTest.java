@@ -166,7 +166,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleExternalPathWithComplexScenarios() throws IOException {
+    void shouldHandleExternalPathWithComplexScenarios() {
         // Test external path handling - this exercises the code path with canonical path resolution
         // Even though we can't easily trigger IOException in getCanonicalPath(), this test ensures
         // the external path resolution logic is executed
