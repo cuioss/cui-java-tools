@@ -137,9 +137,9 @@ class PropertyUtilTest {
 
         // Test that deprecated writeProperty returns the bean instance
         Object result = writeProperty(underTest, ATTRIBUTE_READ_WRITE, number);
-        assertNotNull(result);
-        assertEquals(underTest, result);
-        assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE));
+        assertAll("Testing deprecated writeProperty",
+                () -> assertSame(underTest, result, "Should return the same bean instance for chaining"),
+                () -> assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE), "Property value should be set correctly"));
     }
 
 }
