@@ -140,6 +140,20 @@ class PropertyUtilTest {
         assertAll("Testing deprecated writeProperty",
                 () -> assertSame(underTest, result, "Should return the same bean instance for chaining"),
                 () -> assertEquals(number, readProperty(underTest, ATTRIBUTE_READ_WRITE), "Property value should be set correctly"));
+
+        // Test with null value
+        Object nullResult = writeProperty(underTest, ATTRIBUTE_READ_WRITE, null);
+        assertAll("Testing deprecated writeProperty with null",
+                () -> assertSame(underTest, nullResult, "Should return the bean instance even with null value"),
+                () -> assertNull(readProperty(underTest, ATTRIBUTE_READ_WRITE), "Property value should be null"));
+
+        // Test chaining multiple writes
+        Object chainResult = writeProperty(
+                writeProperty(underTest, ATTRIBUTE_READ_WRITE, 10),
+                ATTRIBUTE_READ_WRITE, 20);
+        assertAll("Testing method chaining",
+                () -> assertSame(underTest, chainResult, "Should return the bean for chaining"),
+                () -> assertEquals(20, readProperty(underTest, ATTRIBUTE_READ_WRITE), "Final value should be 20"));
     }
 
 }
