@@ -1,6 +1,23 @@
 name: cui-java-tools
-pages-reference: cui-java-tools
-sonar-project-key: cuioss_cui-java-tools
+
 release:
   current-version: 2.6.1
   next-version: 2.6-SNAPSHOT
+  create-github-release: true
+
+maven-build:
+  java-versions: '["21","25"]'
+  java-version: '21'
+  enable-snapshot-deploy: true
+  maven-profiles-snapshot: 'release-snapshot,javadoc'
+  maven-profiles-release: 'release,javadoc'
+  npm-cache: false
+
+sonar:
+  project-key: cuioss_cui-java-tools
+  enabled: true
+  skip-on-dependabot: true
+
+pages:
+  reference: cui-java-tools
+  deploy-at-release: true
