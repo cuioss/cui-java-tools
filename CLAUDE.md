@@ -96,4 +96,16 @@ This is a Maven project with standard structure:
 - Follow CUI standards as outlined in `doc/ai-rules.md`
 - Always run pre-commit checks before making changes
 - Use appropriate test coverage for all new code
-Document any new public APIs according to Javadoc standards
+- Document any new public APIs according to Javadoc standards
+
+## Git Workflow
+
+This repository has branch protection on `main`. Direct pushes to `main` are never allowed. Always use this workflow:
+
+1. Create a feature branch: `git checkout -b <branch-name>`
+2. Commit changes: `git add <files> && git commit -m "<message>"`
+3. Push the branch: `git push -u origin <branch-name>`
+4. Create a PR: `gh pr create --head <branch-name> --base main --title "<title>" --body "<body>"`
+5. Wait for CI: `gh pr checks --watch`
+6. Merge when checks pass: `gh pr merge --squash --delete-branch`
+7. Return to main: `git checkout main && git pull`
