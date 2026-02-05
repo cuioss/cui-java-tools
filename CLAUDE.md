@@ -106,6 +106,6 @@ This repository has branch protection on `main`. Direct pushes to `main` are nev
 2. Commit changes: `git add <files> && git commit -m "<message>"`
 3. Push the branch: `git push -u origin <branch-name>`
 4. Create a PR: `gh pr create --head <branch-name> --base main --title "<title>" --body "<body>"`
-5. Wait for CI: `gh pr checks --watch`
-6. Merge when checks pass: `gh pr merge --squash --delete-branch`
+5. Enable auto-merge: `gh pr merge --auto --squash --delete-branch`
+6. Wait for merge (check every ~60s): `while gh pr view --json state -q '.state' | grep -q OPEN; do sleep 60; done`
 7. Return to main: `git checkout main && git pull`
