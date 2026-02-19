@@ -24,3 +24,12 @@ pages:
 
 github-automation:
   auto-merge-build-versions: true
+
+consumers:
+  - cuioss-parent-pom:version.cui.java.tools
+  - nifi-extensions:version.cui.java.tools
+
+dependency-propagation:
+  group-id: de.cuioss
+  artifact-id: cui-java-tools
+  scope: dependency
