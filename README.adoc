@@ -50,7 +50,7 @@ For detailed documentation, please refer to:
 
 === Contributing
 
-Please refer to our link:CODE_OF_CONDUCT.md[Code of Conduct] for contribution guidelines.
+Contributions are welcome — please open an issue or pull request on https://github.com/cuioss/cui-java-tools[GitHub].
 
 === License
 
@@ -376,7 +376,7 @@ Some tooling for concurrent operations.
 
 [source,java]
 ----
-ConcurrentTools.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+ConcurrentTools.sleepUninterruptedly(500, TimeUnit.MILLISECONDS);
 ----
 
 Well, sends the thread to sleep while taking care of the possible
@@ -702,15 +702,7 @@ assertEquals("(Object[])null", MoreStrings.lenientFormat("%s", (Object[]) null))
 [[iocuiutilnet]]
 === de.cuioss.tools.net
 
-Provides utilities for network operations, including URL handling, internet address support, SSL, and HTTP helpers.
-
-==== de.cuioss.tools.net.http
-
-HTTP-related utilities, such as:
-
-* HttpHandler – HTTP request/response handling
-* HttpStatusFamily – HTTP status family detection
-* SecureSSLContextProvider – Secure SSL context for HTTP
+Provides utilities for network operations, including URL handling, internet address support, and SSL helpers.
 
 ==== de.cuioss.tools.net.ssl
 
