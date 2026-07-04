@@ -18,13 +18,12 @@ package de.cuioss.tools.reflect;
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
-import lombok.Synchronized;
 import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static de.cuioss.tools.ToolsLogMessages.WARN;
 import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
@@ -82,16 +81,33 @@ public final class MoreReflection {
     private static final CuiLogger LOGGER = new CuiLogger(MoreReflection.class);
 
     /**
-     * We use {@link WeakHashMap} in order to allow the garbage collector to do its
-     * job. The values are wrapped in {@link SoftReference}s because {@link Method}
-     * and {@link Field} instances strongly reference their declaring {@link Class}:
-     * a strongly referenced value would otherwise keep the weakly referenced key
-     * alive forever, preventing class unloading. Cleared values are simply
-     * recomputed on the next access.
+     * {@link ClassValue} associates the cached metadata directly with the
+     * {@link Class} without preventing class unloading ({@link Method} and
+     * {@link Field} instances strongly reference their declaring class, which
+     * defeats map-based weak caches). It is also fully thread-safe, so no
+     * additional synchronization is required.
      */
-    private static final Map<Class<?>, SoftReference<List<Method>>> publicObjectMethodCache = new WeakHashMap<>();
+    private static final ClassValue<List<Method>> publicObjectMethodCache = new ClassValue<>() {
+        @Override
+        protected List<Method> computeValue(Class<?> clazz) {
+            final List<Method> found = new ArrayList<>();
+            for (final Method method : clazz.getMethods()) {
+                final int modifiers = method.getModifiers();
+                if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
+                        && !"getClass".equals(method.getName())) {
+                    found.add(method);
+                }
+            }
+            return Collections.unmodifiableList(found);
+        }
+    };
 
-    private static final Map<Class<?>, SoftReference<Map<String, Field>>> fieldCache = new WeakHashMap<>();
+    private static final ClassValue<Map<String, Optional<Field>>> fieldCache = new ClassValue<>() {
+        @Override
+        protected Map<String, Optional<Field>> computeValue(Class<?> type) {
+            return new ConcurrentHashMap<>();
+        }
+    };
 
     /**
      * Tries to access a field on a given type. If none can be found it recursively
@@ -108,23 +124,10 @@ public final class MoreReflection {
      * @param fieldName to be checked, must not be null
      * @return an {@link Optional} {@link Field} if it can be found
      */
-    @Synchronized
-    // owolff: computeIfAbsent is not an option because we add null
-    // to the field
-    @SuppressWarnings("java:S3824")
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
-        final var reference = fieldCache.get(type);
-        Map<String, Field> typeMap = null != reference ? reference.get() : null;
-        if (null == typeMap) {
-            typeMap = new HashMap<>();
-            fieldCache.put(type, new SoftReference<>(typeMap));
-        }
-        if (!typeMap.containsKey(fieldName)) {
-            typeMap.put(fieldName, resolveField(type, fieldName).orElse(null));
-        }
-        return Optional.ofNullable(typeMap.get(fieldName));
+        return fieldCache.get(type).computeIfAbsent(fieldName, name -> resolveField(type, name));
     }
 
     private static Optional<Field> resolveField(final Class<?> type, final String fieldName) {
@@ -147,25 +150,9 @@ public final class MoreReflection {
      * @param clazz to be checked
      * @return the found public-methods.
      */
-    @Synchronized
     public static List<Method> retrievePublicObjectMethods(final Class<?> clazz) {
         requireNonNull(clazz);
-
-        final var reference = publicObjectMethodCache.get(clazz);
-        final List<Method> cached = null != reference ? reference.get() : null;
-        if (null != cached) {
-            return cached;
-        }
-        final List<Method> found = new ArrayList<>();
-        for (final Method method : clazz.getMethods()) {
-            final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
-                    && !"getClass".equals(method.getName())) {
-                found.add(method);
-            }
-        }
-        publicObjectMethodCache.put(clazz, new SoftReference<>(found));
-        return found;
+        return publicObjectMethodCache.get(clazz);
     }
 
     /**

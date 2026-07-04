@@ -196,19 +196,19 @@ public class PropertyUtil {
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
         var writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
-        var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
+        var expectedType = writeMethod.getParameterTypes()[0].getName();
         try {
             var result = writeMethod.invoke(bean, propertyValue);
             return Objects.requireNonNullElse(result, bean);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(
-                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), target), e);
+                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), expectedType), e);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), target), e);
+                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), expectedType), e);
         } catch (InvocationTargetException e) {
             throw new IllegalStateException(
-                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass(), target),
+                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass()),
                     e);
         }
     }
