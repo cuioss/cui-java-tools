@@ -60,6 +60,17 @@ import static de.cuioss.tools.string.MoreStrings.isEmpty;
  *     .splitToList("a,,c");
  * // result = ["a", "c"]
  * </pre>
+ * <p>
+ * Note: Following {@link String#split(String)} semantics, <em>trailing</em> empty
+ * strings are always removed from the result, whereas <em>leading</em> and inner
+ * empty strings are kept (unless {@link #omitEmptyStrings()} is used):
+ * </p>
+ * <pre>
+ * Splitter.on(',').splitToList(",a,,")  = ["", "a"]   // leading kept, trailing removed
+ * </pre>
+ * <p>
+ * This differs from Guava's Splitter, which keeps trailing empty strings by default.
+ * </p>
  *
  * <h3>3. Trimming Results</h3>
  * <pre>
@@ -87,6 +98,8 @@ import static de.cuioss.tools.string.MoreStrings.isEmpty;
  *       <li>Guava applies trim/omit first, then limit</li>
  *     </ul>
  *   </li>
+ *   <li>Note that trailing empty strings are always removed from the result
+ *   ({@link String#split(String)} semantics), while Guava keeps them by default</li>
  * </ol>
  *
  * @author Oliver Wolff
@@ -247,24 +260,31 @@ public final class Splitter {
     }
 
     /**
-     * Configures this splitter to use the separator string as a literal pattern without escaping special regex characters.
-     * This is useful when you want to split on a regular expression pattern.
+     * Configures this splitter to treat the separator string as a raw regular
+     * expression instead of quoting it. By default, separators given to
+     * {@link #on(String)} are treated as literal strings; with this option the
+     * separator is compiled as a regular expression as-is.
      *
      * <pre>
-     * Without doNotModifySeparatorString()
-     * Splitter.on("[").splitToList("[a][b]")      // Throws IllegalArgumentException
+     * // Without doNotModifySeparatorString(): separator is treated literally
+     * Splitter.on("[,.]").splitToList("a[,.]b")                             = ["a", "b"]
+     * Splitter.on("[,.]").splitToList("a,b.c")                              = ["a,b.c"]
      *
-     * With doNotModifySeparatorString()
-     * Splitter.on("[").doNotModifySeparatorString().splitToList("[a][b]")  = ["", "a", "[b]"]
+     * // With doNotModifySeparatorString(): separator is treated as a regex
+     * Splitter.on("[,.]").doNotModifySeparatorString().splitToList("a,b.c") = ["a", "b", "c"]
      * </pre>
      *
-     * @return a new {@link Splitter} instance with the same configuration but with doNotModifySeparatorString set to true
+     * @return a new {@link Splitter} instance with the same configuration but with the
+     * separator compiled as a raw regular expression
+     * @throws java.util.regex.PatternSyntaxException if the separator is not a valid
+     *                                                regular expression
      */
     public Splitter doNotModifySeparatorString() {
-        var separator = splitterConfig.getSeparator();
+        // Preserve the flags of a Pattern supplied via on(Pattern)
+        var existingFlags = null != splitterConfig.getPattern() ? splitterConfig.getPattern().flags() : 0;
         var newConfig = splitterConfig.copy()
                 .doNotModifySeparatorString(true)
-                .pattern(Pattern.compile(Pattern.quote(separator)))
+                .pattern(Pattern.compile(splitterConfig.getSeparator(), existingFlags))
                 .build();
         return new Splitter(newConfig);
     }
@@ -272,6 +292,15 @@ public final class Splitter {
     /**
      * Splits {@code sequence} into string components and returns them as an
      * immutable list.
+     * <p>
+     * Note: Following {@link String#split(String)} limit-0 semantics,
+     * <em>trailing</em> empty strings are always removed from the result, whereas
+     * <em>leading</em> and inner empty strings are kept (unless
+     * {@link #omitEmptyStrings()} is configured). This differs from Guava:
+     * </p>
+     * <pre>
+     * Splitter.on(',').splitToList(",a,,")  = ["", "a"]
+     * </pre>
      *
      * @param sequence the sequence of characters to split
      *
@@ -295,10 +324,12 @@ public final class Splitter {
 
         var pattern = splitterConfig.getPattern();
         if (pattern == null) {
-            pattern = Pattern.compile(Pattern.quote(splitterConfig.getSeparator()));
+            pattern = splitterConfig.isDoNotModifySeparatorString()
+                    ? Pattern.compile(splitterConfig.getSeparator())
+                    : Pattern.compile(Pattern.quote(splitterConfig.getSeparator()));
         }
 
-        var splitted = sequence.split(pattern.pattern(), splitterConfig.getMaxItems());
+        var splitted = pattern.split(sequence, splitterConfig.getMaxItems());
         if (0 == splitted.length) {
             LOGGER.trace("No content to be returned for input %s and configuration %s", sequence, splitterConfig);
             return Collections.emptyList();

@@ -105,20 +105,18 @@ public abstract class Lexer<T extends FormatterSupport> implements Serializable 
      * Supported expression language
      */
     public enum ExpressionLanguage {
-        /** {@code [attribute1][attribute2]..[attribute n]} */
+        /**
+         * {@code [attribute1][attribute2]..[attribute n]}
+         * <p>
+         * Note: the constant name contains a typo ("BRACKTES" instead of
+         * "BRACKETS"). It is kept as-is because renaming it would be a breaking
+         * API change.
+         */
         SIMPLE_SQUARED_BRACKTES,
         /** {attribute1}{attribute2}..{attribute n} */
         SIMPLE_CURLY_BRACKETS,
         /** {@code <attribute1><attribute2>..<attribute n>} */
-        SIMPLE_ANGLE_BRACKET,
-        /**
-         * usage of String Template Expression Language
-         *
-         * @see <a href=
-         *      "http://www.antlr.org/wiki/display/ST/StringTemplate+3+Documentation">
-         *      Documentation</a>
-         */
-        STEL
+        SIMPLE_ANGLE_BRACKET
     }
 
 }

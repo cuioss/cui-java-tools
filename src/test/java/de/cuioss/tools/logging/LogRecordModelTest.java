@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test class for {@link LogRecordModel} ensuring proper log message formatting
@@ -91,6 +92,30 @@ class LogRecordModelTest {
         var result = infoModel.format(null, null);
         assertEquals(PREFIX + ": null-null", result);
         LOGGER.info(infoModel.format(null, null));
+    }
+
+    @Test
+    void shouldProvideSupplierForLazyFormatting() {
+        var supplier = infoModel.supplier("A", 2);
+        assertEquals(PREFIX + ": A-2", supplier.get());
+
+        var errorSupplier = errorModel.supplier("Connection timeout");
+        assertEquals("ERROR-500: Operation failed: Connection timeout", errorSupplier.get());
+    }
+
+    @Test
+    void shouldValidateBuilderParametersForNull() {
+        var emptyBuilder = LogRecordModel.builder();
+        assertThrows(NullPointerException.class, emptyBuilder::build);
+
+        var builderWithoutPrefix = LogRecordModel.builder().identifier(1).template("template");
+        assertThrows(NullPointerException.class, builderWithoutPrefix::build);
+
+        var builderWithoutIdentifier = LogRecordModel.builder().prefix("PREFIX").template("template");
+        assertThrows(NullPointerException.class, builderWithoutIdentifier::build);
+
+        var builderWithoutTemplate = LogRecordModel.builder().prefix("PREFIX").identifier(1);
+        assertThrows(NullPointerException.class, builderWithoutTemplate::build);
     }
 
     @Test

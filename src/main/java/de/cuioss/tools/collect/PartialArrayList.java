@@ -15,7 +15,6 @@
  */
 package de.cuioss.tools.collect;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -33,10 +32,17 @@ import java.util.List;
  * <p>
  * See {@link PartialArrayList#of(List, int)}
  * </p>
+ * <h3>Equality</h3>
+ * <p>
+ * {@code equals} and {@code hashCode} are inherited from {@link ArrayList} and
+ * therefore follow the {@link List} contract: the {@link #isMoreAvailable()}
+ * flag is deliberately <em>not</em> part of {@code equals} / {@code hashCode},
+ * keeping equality symmetric with any other {@link List} containing the same
+ * elements.
+ * </p>
  *
  * @param <T> at least {@link Serializable}
  */
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class PartialArrayList<T extends Serializable> extends ArrayList<T> implements PartialCollection<T> {
 

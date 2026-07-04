@@ -22,6 +22,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TextSplitterTest {
 
+    @Test
+    void shouldRejectNonPositiveLengthSettings() {
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", 0, 10));
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", 10, 0));
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", -1, -1));
+    }
+
+    @Test
+    void shouldNotReportAbridgedForShortSourceEndingWithEllipsis() {
+        var splitter = new TextSplitter("short ...");
+        assertEquals("short ...", splitter.getAbridgedText());
+        assertFalse(splitter.isAbridged(),
+                "A source that naturally ends with '...' but was never truncated must not report abridged");
+    }
+
     private static final String TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG = "Text with enforced linebreaks is wrong.";
 
     private static final String ABRIDGED_TEXT_IS_WRONG = "Abridged text is wrong.";
@@ -94,6 +109,39 @@ class TextSplitterTest {
         textSplitter.setForceLengthBreak(valueOf(15));
 
         assertEquals(expected, textSplitter.getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+    }
+
+    @Test
+    void shouldComputeAbridgedStateWithoutPriorGetterCall() {
+        textSplitter = new TextSplitter("Myextremlylongtextwithsomeusefullinformation");
+        textSplitter.setAbridgedLength(valueOf(16));
+
+        // isAbridged() must not depend on getAbridgedText() having been called before
+        assertTrue(textSplitter.isAbridged());
+    }
+
+    @Test
+    void shouldHonorSetterCalledAfterGetterCall() {
+        final var text = "Myextremlylongtextwithsomeusefullinformation";
+        textSplitter = new TextSplitter(text);
+        textSplitter.setAbridgedLength(valueOf(16));
+
+        assertEquals("Myextremlylo ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertTrue(textSplitter.isAbridged());
+
+        // Setter after the first get must affect subsequent computations
+        textSplitter.setAbridgedLength(valueOf(50));
+        assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertFalse(textSplitter.isAbridged());
+    }
+
+    @Test
+    void shouldHandleNullSourceInThreeArgConstructor() {
+        textSplitter = new TextSplitter(null, 5, 10);
+
+        assertEquals("", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertEquals("", textSplitter.getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+        assertFalse(textSplitter.isAbridged());
     }
 
     @Test

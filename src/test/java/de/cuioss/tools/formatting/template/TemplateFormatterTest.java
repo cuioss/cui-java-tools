@@ -175,17 +175,54 @@ class TemplateFormatterTest {
         assertEquals(expected, formatter.format(object1));
     }
 
-    /**
-     * Test Idea : Separator should be added if both token are available: -
-     * [[token1], [token2]] than VALUE1, VALUE2 are displayed - if token 2 is
-     * missing no separator will be added : VALUE1 - if token 1 is missing no
-     * separator will be added : VALUE2
-     */
-    void shouldProvideConditionalFormatting() {
-        /*
-         * implementation idea : use Guava JOINER for String Tokens in between therefore
-         * tree graph is needed, no linear list is able to represent this
-         */
+    @Test
+    void shouldFormatTemplateWithStaticPrefix() {
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter("Name: [familyName]",
+                PersonName.class);
+
+        assertEquals("Name: FamilyName", formatter.format(personName));
+    }
+
+    @Test
+    void shouldFormatTemplateWithStaticSuffix() {
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl
+                .createFormatter("[familyName] is the family name", PersonName.class);
+
+        assertEquals("FamilyName is the family name", formatter.format(personName));
+    }
+
+    @Test
+    void shouldFormatTemplateWithStaticPrefixAndSuffix() {
+        final var personName = PersonName.builder().familyName("FamilyName").givenName("GivenName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl
+                .createFormatter("Prefix: [familyName] Suffix", PersonName.class);
+
+        assertEquals("Prefix: FamilyName Suffix", formatter.format(personName));
+    }
+
+    @Test
+    void shouldEmitTrailingStaticTextWhenEarlierAttributeHasValue() {
+        final var personName = PersonName.builder().familyName("FamilyName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl
+                .createFormatter("[familyName] [middleName] Suffix", PersonName.class);
+
+        assertEquals("FamilyName Suffix", formatter.format(personName));
+    }
+
+    @Test
+    void shouldSuppressStaticTextForMissingAttribute() {
+        final var personName = PersonName.builder().givenName("GivenName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl
+                .createFormatter("Prefix: [familyName] Suffix", PersonName.class);
+
+        assertEquals("", formatter.format(personName));
     }
 
     /* HELPER METHODS AND CLASSES */

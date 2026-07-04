@@ -40,8 +40,13 @@ public class Validator<F extends FormatterSupport> implements Serializable {
     }
 
     /**
-     * @param template must not be null if the template doesn't fit to el-expression or
-     *                 use tokens which are not supported.
+     * Validates the given template with the configured {@link Lexer}.
+     *
+     * @param template the template to validate, must not be null
+     * @throws NullPointerException     if template is null
+     * @throws IllegalArgumentException if the template doesn't fit the expression
+     *                                  language or uses tokens which are not
+     *                                  supported
      */
     public void validate(final String template) {
         requireNonNull(template, "Template must not be null.");
