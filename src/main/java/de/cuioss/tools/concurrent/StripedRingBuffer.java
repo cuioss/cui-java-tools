@@ -130,8 +130,10 @@ public class StripedRingBuffer {
             stripes[i] = new RingBuffer(sizePerStripe, timeUnit);
         }
 
-        // Each RingBuffer rounds its capacity up to the next power of 2
-        int actualTotalCapacity = nextPowerOfTwo(sizePerStripe) * stripeCount;
+        // Each RingBuffer rounds its capacity up to the next power of 2. Computed in
+        // long: the total across stripes may exceed Integer.MAX_VALUE even though
+        // every single stripe is within RingBuffer's capacity limit.
+        long actualTotalCapacity = (long) nextPowerOfTwo(sizePerStripe) * stripeCount;
         if (actualTotalCapacity != windowSize) {
             LOGGER.debug("Striped ring buffer capacity adjusted from %s to %s (distributed across %s stripes)",
                     windowSize, actualTotalCapacity, stripeCount);
