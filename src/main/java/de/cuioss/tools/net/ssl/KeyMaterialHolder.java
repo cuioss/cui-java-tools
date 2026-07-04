@@ -32,7 +32,7 @@ import java.util.Base64;
 // KeyMaterialHolder and KeyStoreProvider are in the SAME package (de.cuioss.tools.net.ssl).
 // This is an intentional design where these classes work together to manage SSL key material.
 @Builder
-@EqualsAndHashCode(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)
+@EqualsAndHashCode(exclude = "keyPassword", doNotUseGetters = true)
 @ToString(exclude = {"keyMaterial", "keyPassword"}, doNotUseGetters = true)
 public final class KeyMaterialHolder implements Serializable {
 

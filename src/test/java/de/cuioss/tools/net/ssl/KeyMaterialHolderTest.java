@@ -68,6 +68,25 @@ class KeyMaterialHolderTest {
     }
 
     @Test
+    void shouldIncludeKeyMaterialInEqualsAndHashCode() {
+        var material = new byte[]{1, 2, 3};
+        var differentMaterial = new byte[]{4, 5, 6};
+
+        var holder = KeyMaterialHolder.builder().keyMaterial(material).build();
+        var sameMaterial = KeyMaterialHolder.builder().keyMaterial(material.clone()).build();
+        var otherMaterial = KeyMaterialHolder.builder().keyMaterial(differentMaterial).build();
+
+        assertEquals(holder, sameMaterial);
+        assertEquals(holder.hashCode(), sameMaterial.hashCode());
+        assertNotEquals(holder, otherMaterial);
+
+        // keyPassword remains excluded from equals / hashCode
+        var withPassword = KeyMaterialHolder.builder().keyMaterial(material).keyPassword("secret").build();
+        assertEquals(holder, withPassword);
+        assertEquals(holder.hashCode(), withPassword.hashCode());
+    }
+
+    @Test
     void shouldBehaveWell() {
         ObjectMethodsAsserts.assertNiceObject(withRandomKeyMaterial()
                 .name(Generators.nonEmptyStrings().next())

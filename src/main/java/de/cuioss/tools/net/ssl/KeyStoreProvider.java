@@ -15,7 +15,6 @@
  */
 package de.cuioss.tools.net.ssl;
 
-import de.cuioss.tools.base.BooleanOperations;
 import de.cuioss.tools.io.MorePaths;
 import de.cuioss.tools.logging.CuiLogger;
 import lombok.Builder;
@@ -67,7 +66,7 @@ import static java.util.Objects.requireNonNull;
  *
  */
 @Builder
-@EqualsAndHashCode(of = {"keyStoreType", "location"}, doNotUseGetters = true)
+@EqualsAndHashCode(of = {"keyStoreType", "location", "keys"}, doNotUseGetters = true)
 @ToString(of = {"keyStoreType", "location"}, doNotUseGetters = true)
 public class KeyStoreProvider implements Serializable {
 
@@ -104,25 +103,25 @@ public class KeyStoreProvider implements Serializable {
 
     /**
      * Creates a new {@link KeyStore} using the configured parameters.
-     * If key materials are provided, they will be used to create the store.
+     * If key materials are provided, they will be used to create the store and a
+     * configured file location will be ignored.
      * Otherwise, the store will be loaded from the configured file location.
      *
-     * @return a new {@link KeyStore} instance
+     * @return a new {@link KeyStore} instance, or {@link Optional#empty()} if
+     *         neither a file location nor key material is configured
      * @throws IllegalStateException if the store cannot be created or loaded
      */
     public Optional<KeyStore> resolveKeyStore() {
-        if (BooleanOperations.areAllTrue(keys.isEmpty(), null == location)) {
-            LOGGER.debug("Neither file nor keyMaterial provided, returning Optional#empty");
-            return Optional.empty();
-        }
-        if (null != location) {
-            LOGGER.debug("Checking whether configured %s path is readable", location.getAbsolutePath());
-            checkState(MorePaths.checkReadablePath(location.toPath(), false, true),
-                    "'%s' is not readable check logs for reason", location.getAbsolutePath());
-        }
         if (!keys.isEmpty()) {
             return retrieveFromKeys();
         }
+        if (null == location) {
+            LOGGER.debug("Neither file nor keyMaterial provided, returning Optional#empty");
+            return Optional.empty();
+        }
+        LOGGER.debug("Checking whether configured %s path is readable", location.getAbsolutePath());
+        checkState(MorePaths.checkReadablePath(location.toPath(), false, true),
+                "'%s' is not readable check logs for reason", location.getAbsolutePath());
         return retrieveFromFile();
     }
 
@@ -182,8 +181,17 @@ public class KeyStoreProvider implements Serializable {
         } catch (KeyStoreException e) {
             throw new IllegalStateException("Unable to instantiate KeyStore", e);
         }
+        // For KeyHolderType#KEY_STORE the keyPassword of the holder is documented as
+        // being the store-password of the embedded keystore. Fall back to the
+        // provider's storePassword if the holder does not provide one.
+        char[] embeddedStorePassword;
+        if (isEmpty(key.getKeyPassword())) {
+            embeddedStorePassword = getStorePasswordAsCharArray();
+        } else {
+            embeddedStorePassword = key.getKeyPasswordAsCharArray();
+        }
         try (InputStream keyStoreStream = new ByteArrayInputStream(key.getKeyMaterial())) {
-            keyStore.load(keyStoreStream, getStorePasswordAsCharArray());
+            keyStore.load(keyStoreStream, embeddedStorePassword);
             return keyStore;
         } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
             throw new IllegalStateException(UNABLE_TO_CREATE_KEYSTORE, e);
