@@ -17,6 +17,8 @@ package de.cuioss.tools.io;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.URL;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClassPathLoaderTest {
@@ -74,6 +76,31 @@ class ClassPathLoaderTest {
     void shouldFailToLoadNotExistingFile() {
         var classPathLoader = new ClassPathLoader(NOT_EXISTING_CLASSPATH_FILE);
         assertThrows(IllegalStateException.class, classPathLoader::inputStream);
+    }
+
+    @Test
+    void shouldResolveFromContextClassLoader() {
+        var contextOnlyResource = "context-only-resource.txt";
+        var expected = ClassPathLoaderTest.class.getResource(EXISTING_FILE_PATH);
+        assertNotNull(expected);
+        var originalLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            // ClassLoader#getResource expects names without a leading slash
+            Thread.currentThread().setContextClassLoader(new ClassLoader(null) {
+                @Override
+                public URL getResource(String name) {
+                    if (contextOnlyResource.equals(name)) {
+                        return expected;
+                    }
+                    return null;
+                }
+            });
+            var loader = new ClassPathLoader(contextOnlyResource);
+            assertTrue(loader.isReadable());
+            assertEquals(expected, loader.getURL());
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalLoader);
+        }
     }
 
     @Test

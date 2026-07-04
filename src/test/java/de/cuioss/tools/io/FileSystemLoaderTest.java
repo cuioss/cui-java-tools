@@ -70,6 +70,15 @@ class FileSystemLoaderTest {
     }
 
     @Test
+    void shouldHandleExternalFileWithoutLeadingSeparator() throws IOException {
+        final var loader = new FileSystemLoader("external:" + EXISTING_FILE);
+        assertTrue(loader.isReadable(), "external: paths without leading separator should resolve "
+                + "relative to the working directory");
+        assertEquals(EXISTING_FILE, loader.getFileName().getOriginalName());
+        assertNotNull(loader.inputStream());
+    }
+
+    @Test
     void shouldHandleExistingDirectory() {
         final var loader = new FileSystemLoader(EXISTING_DIRECTORY_PATH);
         assertFalse(loader.isReadable());

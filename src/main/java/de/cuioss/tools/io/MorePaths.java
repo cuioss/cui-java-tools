@@ -238,7 +238,12 @@ public final class MorePaths {
      */
     public static Path backupFile(final Path path) throws IOException {
         assertAccessibleFile(path);
-        var backupDir = getBackupDirectoryForPath(path.getParent());
+        var parent = path.getParent();
+        if (null == parent) {
+            // Single-segment relative paths, e.g. Path.of("pom.xml"), have no parent
+            parent = path.toAbsolutePath().getParent();
+        }
+        var backupDir = getBackupDirectoryForPath(parent);
 
         var backupFile = createNonExistingPath(backupDir,
                 path.getFileName() + BACKUP_FILE_SUFFIX + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
@@ -286,7 +291,7 @@ public final class MorePaths {
         PathTraversalSecurity.validatePathSegment(suffix);
 
         // Use secure temp file creation from PathTraversalSecurity to ensure proper permissions
-        var tempFile = PathTraversalSecurity.createSecureTempFile(namePart, suffix);
+        var tempFile = PathTraversalSecurity.createSecureTempFile(namePart, null != suffix ? "." + suffix : null);
 
         Files.copy(realPath, tempFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         LOGGER.debug("Created temp-file from '%s' at '%s'", realPath.toFile().getAbsolutePath(),
@@ -356,11 +361,14 @@ public final class MorePaths {
         try {
             if (file.isDirectory()) {
                 LOGGER.trace("Path %s is directory, checking children", absolutePath);
-                for (String child : file.list()) {
-                    if (!deleteQuietly(path.resolve(child))) {
-                        recursiveSucceful = false;
+                // File#list() may return null on I/O errors, treat as not listable
+                var children = file.list();
+                if (null != children) {
+                    for (String child : children) {
+                        if (!deleteQuietly(path.resolve(child))) {
+                            recursiveSucceful = false;
+                        }
                     }
-
                 }
             }
         } catch (final SecurityException | UnsupportedOperationException e) {
@@ -453,7 +461,7 @@ public final class MorePaths {
      *
      * <h1>Usage</h1>
      * <p>
-     * PathUtils.saveAndBackup(myOriginalFilePath, targetPath ->
+     * MorePaths.saveAndBackup(myOriginalFilePath, targetPath ->
      * JdomHelper.writeJdomToFile(document, targetPath));
      * </p>
      *
@@ -466,16 +474,19 @@ public final class MorePaths {
     public static void saveAndBackup(final Path filePath, final FileWriteHandler fileWriteHandler) throws IOException {
         // Copy original file to temp
         final var temp = copyToTempLocation(filePath);
+        try {
+            // Save data to temp file
+            fileWriteHandler.write(temp);
 
-        // Save data to temp file
-        fileWriteHandler.write(temp);
+            // Create backup from original
+            backupFile(filePath);
 
-        // Create backup from original
-        backupFile(filePath);
-
-        // Replace original with temp file
-        Files.copy(temp, filePath, StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES);
+            // Replace original with temp file
+            Files.copy(temp, filePath, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES);
+        } finally {
+            deleteQuietly(temp);
+        }
     }
 
     /**

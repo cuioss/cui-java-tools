@@ -165,10 +165,39 @@ class MorePathsTest {
 
         assertFalse(Files.exists(playGroundBackup));
         var temp = copyToTempLocation(existing);
-        assertTrue(Files.exists(temp));
+        try {
+            assertTrue(Files.exists(temp));
+            assertTrue(temp.getFileName().toString().endsWith(".xml"),
+                    "Temp file should keep the '.xml' extension but was: " + temp.getFileName());
 
-        MorePaths.contentEquals(existing, temp);
+            assertTrue(MorePaths.contentEquals(existing, temp));
+        } finally {
+            deleteQuietly(temp);
+        }
+    }
 
+    @Test
+    void shouldBackupFileWithoutParent() throws IOException {
+        // Single-segment relative path -> Path#getParent() is null
+        var relativePath = Path.of(
+                "morePathsBackupTest" + FILE_SUFFIX_DATEFORMAT.format(new Date()) + ".txt");
+        Files.copy(TEST_FILE_SOURCE_PATH, relativePath, StandardCopyOption.REPLACE_EXISTING);
+        Path backup = null;
+        try {
+            backup = assertDoesNotThrow(() -> backupFile(relativePath));
+            assertTrue(Files.exists(backup));
+            assertTrue(MorePaths.contentEquals(relativePath, backup));
+        } finally {
+            deleteQuietly(relativePath);
+            if (null != backup) {
+                deleteQuietly(backup);
+                var backupDir = Path.of(BACKUP_DIR_NAME);
+                var children = backupDir.toFile().list();
+                if (null != children && 0 == children.length) {
+                    deleteQuietly(backupDir);
+                }
+            }
+        }
     }
 
     @Test
@@ -261,6 +290,11 @@ class MorePathsTest {
         assertTrue(deleteQuietly(playGroundBase));
         assertFalse(existingFile.toFile().exists());
 
+    }
+
+    @Test
+    void deleteQuietlyShouldNotThrowForEmptyPath() {
+        assertDoesNotThrow(() -> assertFalse(deleteQuietly(Path.of(""))));
     }
 
     @Test
