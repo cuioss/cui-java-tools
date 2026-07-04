@@ -143,6 +143,14 @@ class CollectionLiteralsTest {
         }
 
         @Test
+        @DisplayName("Should return empty mutable list for null single element")
+        void shouldReturnEmptyMutableListForNullElement() {
+            var list = mutableList((String) null);
+            assertTrue(list.isEmpty(), "null element must not be added");
+            assertMutable(list);
+        }
+
+        @Test
         @DisplayName("Should handle immutable list operations")
         void shouldHandleImmutableList() {
             assertImmutable(immutableList());
@@ -251,11 +259,25 @@ class CollectionLiteralsTest {
         @DisplayName("Should handle immutable map operations")
         void shouldHandleImmutableMap() {
             assertImmutable(immutableMap());
+            assertImmutable(immutableMap((Map<String, String>) null));
             assertImmutable(immutableMap(mutableMap("1", "2")));
             assertImmutable(immutableMap("1", "2"));
             assertImmutable(immutableMap("1", "1-1", "2", "2-2"));
             assertImmutable(immutableMap("1", "1-1", "2", "2-2", "3", "3-3"));
             assertImmutable(immutableMap("1", "1-1", "2", "2-2", "3", "3-3", "4", "4-4"));
+        }
+
+        @Test
+        @DisplayName("Should copy source map for immutable map")
+        void shouldCopySourceMapForImmutableMap() {
+            var source = mutableMap("1", "1-1");
+            var immutable = immutableMap(source);
+
+            source.put("2", "2-2");
+            source.remove("1");
+
+            assertEquals(1, immutable.size());
+            assertEquals("1-1", immutable.get("1"));
         }
 
         @Test

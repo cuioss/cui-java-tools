@@ -17,6 +17,7 @@ package de.cuioss.tools.collect;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -40,14 +41,11 @@ class MoreCollectionsTest {
         assertTrue(isEmpty((Object[]) null));
 
         requireNotEmpty("1");
-        requireNotEmpty(Integer.valueOf(0), MESSAGE);
-    }
-
-    void shouldDetermineEmptinessForArrays() {
-        assertFalse(isEmpty(new byte[]{Byte.MIN_VALUE}));
-        assertFalse(isEmpty(new byte[]{Byte.MIN_VALUE, Byte.MAX_VALUE}));
-        assertTrue(isEmpty((byte[]) null));
-        assertTrue(isEmpty(new byte[0]));
+        assertArrayEquals(new Integer[]{0, 1}, requireNotEmpty(Integer.valueOf(0), Integer.valueOf(1)));
+        assertThrows(IllegalArgumentException.class, () ->
+                requireNotEmpty((Object[]) null));
+        assertThrows(IllegalArgumentException.class, () ->
+                requireNotEmpty(new Object[0]));
     }
 
     @Test
@@ -223,6 +221,49 @@ class MoreCollectionsTest {
         assertTrue(diff.entriesInCommon().isEmpty());
         assertTrue(diff.entriesOnlyOnLeft().isEmpty());
         assertTrue(diff.entriesOnlyOnRight().isEmpty());
+    }
+
+    @Test
+    void differenceShouldImplementDocumentedEqualsAndHashCodeContract() {
+        Map<String, String> left = immutableMap("key", "value", "left", "leftOnly", "differing", "valueLeft");
+        Map<String, String> right = immutableMap("key", "value", "right", "rightOnly", "differing", "valueRight");
+
+        MapDifference<String, String> diff = difference(left, right);
+        MapDifference<String, String> sameDiff = difference(mutableMap("key", "value", "left", "leftOnly",
+                "differing", "valueLeft"), mutableMap("key", "value", "right", "rightOnly", "differing", "valueRight"));
+        MapDifference<String, String> otherDiff = difference(left, immutableMap("key", "value"));
+
+        assertEquals(diff, diff);
+        assertEquals(diff, sameDiff);
+        assertEquals(sameDiff, diff);
+        assertEquals(diff.hashCode(), sameDiff.hashCode());
+        assertEquals(Arrays.asList(diff.entriesOnlyOnLeft(), diff.entriesOnlyOnRight(), diff.entriesInCommon(),
+                diff.entriesDiffering()).hashCode(), diff.hashCode());
+
+        assertNotEquals(diff, otherDiff);
+        assertNotEquals(diff, "someString");
+        assertNotEquals(null, diff);
+    }
+
+    @Test
+    void valueDifferenceShouldImplementDocumentedEqualsAndHashCodeContract() {
+        var difference = difference(immutableMap("key", "value1"), immutableMap("key", "value2"))
+                .entriesDiffering().get("key");
+        var sameDifference = difference(immutableMap("key", "value1"), immutableMap("key", "value2"))
+                .entriesDiffering().get("key");
+        var otherDifference = difference(immutableMap("key", "value1"), immutableMap("key", "value3"))
+                .entriesDiffering().get("key");
+
+        assertEquals(difference, difference);
+        assertEquals(difference, sameDifference);
+        assertEquals(sameDifference, difference);
+        assertEquals(difference.hashCode(), sameDifference.hashCode());
+        assertEquals(Arrays.asList("value1", "value2").hashCode(), difference.hashCode());
+
+        assertNotEquals(difference, otherDifference);
+        assertNotEquals(difference, "someString");
+        assertNotEquals(null, difference);
+        assertNotNull(difference.toString());
     }
 
     @Test

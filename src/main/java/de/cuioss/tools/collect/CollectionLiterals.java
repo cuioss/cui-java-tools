@@ -120,12 +120,15 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code List} instance containing the given element
      *
-     * @param element to be added
+     * @param element to be added. If it is {@code null} it will not be added
      * @return the <i>mutable</i> {@link java.util.List} with the given element
      * @param <E> a E class
      */
     public static <E> List<E> mutableList(E element) {
         List<E> list = new ArrayList<>();
+        if (null == element) {
+            return list;
+        }
         list.add(element);
         return list;
     }
@@ -133,7 +136,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code List} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
@@ -150,7 +153,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code List} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
@@ -183,7 +186,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code List} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
@@ -214,7 +217,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
      */
@@ -230,7 +234,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * element.
      *
-     * @param element to be wrapped, must not be null
+     * @param element to be wrapped. If it is {@code null} an empty
+     *                <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
      */
@@ -245,7 +250,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
      */
@@ -260,7 +266,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements.
      *         It implicitly creates a copy
      * @param <E> a E class
@@ -277,7 +284,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * elements. <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
      */
@@ -292,7 +300,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code List} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.List} with the given elements
      * @param <E> a E class
      */
@@ -349,7 +358,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code Set} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -367,7 +376,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code Set} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -382,7 +391,7 @@ public class CollectionLiterals {
     /**
      * Creates a <i>mutable</i> {@code Set} instance containing the given elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -402,7 +411,7 @@ public class CollectionLiterals {
      * Creates a <i>mutable</i> {@code Set} instance containing the given elements.
      * <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i>
+     * @param elements to be added. If it is null, an empty <i>mutable</i>
      *                 {@link java.util.Set} will be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -419,7 +428,7 @@ public class CollectionLiterals {
     /**
      * Creates an empty immutable set.
      *
-     * @return a newly created empty {@link java.util.HashSet} Convenience method
+     * @return an empty <i>immutable</i> {@link java.util.Set}. Convenience method
      *         for {@link java.util.Collections#emptySet()}
      * @param <E> a E class
      */
@@ -431,7 +440,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code Set} instance containing the given
      * elements.
      *
-     * @param element to be wrapped, must not be null
+     * @param element to be wrapped. If it is {@code null} an empty
+     *                <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -446,7 +456,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code Set} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -477,7 +488,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code Set} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -492,7 +504,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code Set} instance containing the given
      * elements. <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -553,7 +566,7 @@ public class CollectionLiterals {
      * Creates a <i>mutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.TreeSet} with the given elements
      * @param <E> a E class
@@ -571,7 +584,7 @@ public class CollectionLiterals {
      * Creates a <i>mutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -591,7 +604,7 @@ public class CollectionLiterals {
      * Creates a <i>mutable</i> {@code SortedSet} instance containing the given
      * elements. <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be added. If it is null and empty <i>mutable</i> list will
+     * @param elements to be added. If it is null, an empty <i>mutable</i> list will
      *                 be returned
      * @return the <i>mutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
@@ -620,7 +633,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param element to be wrapped, must not be null
+     * @param element to be wrapped. If it is {@code null} an empty
+     *                <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -635,7 +649,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -648,7 +663,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -660,7 +676,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code SortedSet} instance containing the given
      * elements.
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -672,7 +689,8 @@ public class CollectionLiterals {
      * Creates an <i>immutable</i> {@code SortedSet} instance containing the given
      * elements. <em>Caution:</em> The stream will be consumed by this operation
      *
-     * @param elements to be wrapped, must not be null
+     * @param elements to be wrapped. If it is {@code null} an empty
+     *                 <i>immutable</i> instance will be returned
      * @return the <i>immutable</i> {@link java.util.Set} with the given elements
      * @param <E> a E class
      */
@@ -774,7 +792,8 @@ public class CollectionLiterals {
     /**
      * Creates an empty immutable map.
      *
-     * @return an empty <i>mutable</i> Map
+     * @return an empty <i>immutable</i> Map. Convenience method for
+     *         {@link java.util.Collections#emptyMap()}
      * @param <K> a K class
      * @param <V> a V class
      */
@@ -783,15 +802,22 @@ public class CollectionLiterals {
     }
 
     /**
-     * Shorthand to {@link java.util.Collections#unmodifiableMap(Map)}
+     * Creates an <i>immutable</i> {@code Map} instance containing the entries of
+     * the given map. The entries are copied into a new map which is then wrapped
+     * using {@link java.util.Collections#unmodifiableMap(Map)}, so later
+     * modifications of the given source do not affect the returned map.
      *
-     * @param source a {@link java.util.Map} object
+     * @param source a {@link java.util.Map} object. If it is {@code null} an
+     *               empty <i>immutable</i> Map will be returned
      * @return an <i>immutable</i> Map with the given elements
      * @param <K> a K class
      * @param <V> a V class
      */
     public static <K, V> Map<K, V> immutableMap(Map<K, V> source) {
-        return Collections.unmodifiableMap(source);
+        if (null == source) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(new HashMap<>(source));
     }
 
     /**

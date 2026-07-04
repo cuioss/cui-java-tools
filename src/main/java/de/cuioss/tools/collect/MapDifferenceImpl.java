@@ -16,12 +16,13 @@
 package de.cuioss.tools.collect;
 
 import de.cuioss.tools.collect.MapDifference.ValueDifference;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,9 +31,8 @@ import static java.util.Objects.requireNonNull;
  *
  */
 @RequiredArgsConstructor
-@EqualsAndHashCode
 @ToString
-class MapDiffenceImpl<K, V> implements MapDifference<K, V> {
+class MapDifferenceImpl<K, V> implements MapDifference<K, V> {
 
     private final Map<K, V> entriesOnlyOnRight;
     private final Map<K, V> entriesOnlyOnLeft;
@@ -62,6 +62,43 @@ class MapDiffenceImpl<K, V> implements MapDifference<K, V> {
     @Override
     public Map<K, ValueDifference<V>> entriesDiffering() {
         return entriesDiffering;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implemented as defined by {@link MapDifference#equals(Object)}: two
+     * instances are equal if the given object is also a {@link MapDifference}
+     * and the values returned by {@link #entriesOnlyOnLeft()},
+     * {@link #entriesOnlyOnRight()}, {@link #entriesInCommon()} and
+     * {@link #entriesDiffering()} of the two instances are equal.
+     * </p>
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof MapDifference<?, ?> other) {
+            return entriesOnlyOnLeft().equals(other.entriesOnlyOnLeft())
+                    && entriesOnlyOnRight().equals(other.entriesOnlyOnRight())
+                    && entriesInCommon().equals(other.entriesInCommon())
+                    && entriesDiffering().equals(other.entriesDiffering());
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implemented as defined by {@link MapDifference#hashCode()}:
+     * {@code Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering()).hashCode()}
+     * </p>
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering())
+                .hashCode();
     }
 
     /**
@@ -97,7 +134,7 @@ class MapDiffenceImpl<K, V> implements MapDifference<K, V> {
         sortEntriesToBucket(left, right, onlyLeft, common, entriesDiffering);
         // now from the other direction.
         sortEntriesToBucket(right, left, onlyRight, common, entriesDiffering);
-        return new MapDiffenceImpl<>(onlyRight.toImmutableMap(), onlyLeft.toImmutableMap(), common.toImmutableMap(),
+        return new MapDifferenceImpl<>(onlyRight.toImmutableMap(), onlyLeft.toImmutableMap(), common.toImmutableMap(),
                 entriesDiffering.toImmutableMap());
     }
 
@@ -149,5 +186,42 @@ class ValueDifferenceImpl<V> implements ValueDifference<V> {
     @Override
     public V rightValue() {
         return rightValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implemented as defined by {@link ValueDifference#equals(Object)}: two
+     * instances are considered equal if their {@link #leftValue()} values are
+     * equal and their {@link #rightValue()} values are also equal.
+     * </p>
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (other instanceof ValueDifference<?> otherDifference) {
+            return Objects.equals(leftValue, otherDifference.leftValue())
+                    && Objects.equals(rightValue, otherDifference.rightValue());
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implemented as defined by {@link ValueDifference#hashCode()}:
+     * {@code Arrays.asList(leftValue(), rightValue()).hashCode()}
+     * </p>
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.asList(leftValue, rightValue).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "(" + leftValue + ", " + rightValue + ")";
     }
 }
