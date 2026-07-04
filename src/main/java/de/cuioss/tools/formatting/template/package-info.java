@@ -32,7 +32,10 @@
  * 
  * <h2>Usage Example</h2>
  * <pre>{@code
- * // Example code here
+ * // Given a bean type PersonName implementing FormatterSupport:
+ * TemplateFormatter<PersonName> formatter = TemplateFormatterImpl.createFormatter(
+ *         "[givenName] [familyName]", PersonName.class);
+ * String formatted = formatter.format(personName);
  * }</pre>
  * 
  * @see de.cuioss.tools.formatting.template.FormatterSupport

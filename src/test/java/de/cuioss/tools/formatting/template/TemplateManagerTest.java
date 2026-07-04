@@ -38,22 +38,22 @@ class TemplateManagerTest {
         actual = manager.format(targetToFormat, Locale.GERMANY);
 
         // expected result givenName, familyName
-        assertEquals("Hans, M\00FCller", actual);
+        assertEquals("Hans, Müller", actual);
 
         final var resultUS = manager.format(targetToFormat, Locale.US);
         // expected result familyName, givenName
-        assertEquals("M\00FCller, Hans", resultUS);
+        assertEquals("Müller, Hans", resultUS);
 
         // expect fallback to default formatter
         final var resultDefault = manager.format(targetToFormat, Locale.CHINA);
         // expected result familyName
-        assertEquals("M\00FCller", resultDefault);
+        assertEquals("Müller", resultDefault);
 
     }
 
     private static PersonName anyPersonName() {
         final var person = new PersonName();
-        person.setFamilyName("M\00FCller");
+        person.setFamilyName("Müller");
         person.setGivenName("Hans");
         return person;
     }
@@ -86,7 +86,7 @@ class TemplateManagerTest {
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.FRENCH);
 
-        assertNotEquals("Hans, M\00FCller", actual);
+        assertNotEquals("Hans, Müller", actual);
     }
 
     @Test
@@ -102,7 +102,7 @@ class TemplateManagerTest {
         manager = templateManagerWithoutLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertNotEquals("Hans, M\00FCller", actual);
+        assertNotEquals("Hans, Müller", actual);
     }
 
     @Test
@@ -110,7 +110,7 @@ class TemplateManagerTest {
         manager = templateManagerWithoutOneLocation();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertEquals("Hans, M\00FCller", actual);
+        assertEquals("Hans, Müller", actual);
     }
 
     @Test
@@ -118,7 +118,7 @@ class TemplateManagerTest {
         manager = templateManagerWithoutLocation2();
         targetToFormat = anyPersonName();
         actual = manager.format(targetToFormat, Locale.GERMANY);
-        assertNotEquals("Hans, M\00FCller", actual);
+        assertNotEquals("Hans, Müller", actual);
     }
 
     private static TemplateManager<PersonName> templateManagerWithoutLocation() {

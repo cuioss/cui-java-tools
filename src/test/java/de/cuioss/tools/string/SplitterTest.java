@@ -18,6 +18,8 @@ package de.cuioss.tools.string;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import static de.cuioss.tools.collect.CollectionLiterals.immutableList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -252,32 +254,39 @@ class SplitterTest {
             var splitted = Splitter.on(special).splitToList(template);
             assertEquals(elements, splitted);
         }
-
-        var splitter = Splitter.on("[").doNotModifySeparatorString();
-        var result = splitter.splitToList("[boom]");
-        assertEquals(immutableList("", "boom]"), result);
     }
 
     @Test
-    void doNotModifySeparatorStringWithAllRegexMetacharacters() {
-        // Test all regex metacharacters work as literal separators when using doNotModifySeparatorString
-        String[] regexMetacharacters = {"[", "]", "{", "}", "(", ")", "*", "+", "?", "^", "$", "|", "\\", "."};
+    void doNotModifySeparatorStringShouldTreatSeparatorAsRegex() {
+        // With the flag: the separator is used as a raw regex, splitting on ',' and '.'
+        var result = Splitter.on("[,.]").doNotModifySeparatorString().splitToList("a,b.c");
+        assertEquals(immutableList("a", "b", "c"), result);
+    }
 
-        for (String metachar : regexMetacharacters) {
-            var splitter = Splitter.on(metachar).doNotModifySeparatorString();
-            var result = splitter.splitToList("test" + metachar + "data");
-            assertEquals(immutableList("test", "data"), result,
-                    "Regex metacharacter should work as literal separator: " + metachar);
-        }
+    @Test
+    void separatorShouldBeTreatedLiterallyWithoutDoNotModifySeparatorString() {
+        // Without the flag: the separator is the literal string "[,.]"
+        assertEquals(immutableList("a", "b"), Splitter.on("[,.]").splitToList("a[,.]b"));
+        assertEquals(immutableList("a,b.c"), Splitter.on("[,.]").splitToList("a,b.c"));
+    }
 
-        // Test that normal characters work fine
-        String[] normalSeparators = {",", ";", ":", "-", "_", "@", "#", "~"};
-        for (String separator : normalSeparators) {
-            var splitter = Splitter.on(separator).doNotModifySeparatorString();
-            var result = splitter.splitToList("test" + separator + "data");
-            assertEquals(immutableList("test", "data"), result,
-                    "Normal separator should work: " + separator);
-        }
+    @Test
+    void doNotModifySeparatorStringShouldFailOnInvalidRegex() {
+        var splitter = Splitter.on("[");
+        assertThrows(PatternSyntaxException.class, splitter::doNotModifySeparatorString);
+    }
+
+    @Test
+    void shouldHonorFlagsOfUserSuppliedPattern() {
+        var pattern = Pattern.compile("a", Pattern.CASE_INSENSITIVE);
+        var result = Splitter.on(pattern).splitToList("xAy");
+        assertEquals(immutableList("x", "y"), result);
+    }
+
+    @Test
+    void shouldKeepLeadingButRemoveTrailingEmptyStrings() {
+        // String#split limit-0 semantics: trailing empty strings are removed, leading kept
+        assertEquals(immutableList("", "a"), COMMA_SPLITTER.splitToList(",a,,"));
     }
 
     @Test

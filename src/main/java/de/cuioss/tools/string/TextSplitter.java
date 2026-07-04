@@ -17,7 +17,6 @@ package de.cuioss.tools.string;
 
 import de.cuioss.tools.collect.MapBuilder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -45,22 +44,28 @@ import static java.lang.Integer.valueOf;
  *
  * <h2>Key Features</h2>
  * <ul>
- *   <li>Immutable value object design</li>
- *   <li>Configurable length limits for abridging and line breaks</li>
+ *   <li>Configurable length limits for abridging and line breaks, adjustable via setters</li>
  *   <li>Smart handling of punctuation for line breaks</li>
  *   <li>Preservation of existing word boundaries</li>
  * </ul>
+ * <p>
+ * The derived values are computed on demand: every call of {@link #getAbridgedText()},
+ * {@link #getTextWithEnforcedLineBreaks()} or {@link #isAbridged()} reflects the
+ * currently configured length settings.
+ * </p>
  *
  * <h2>Usage Examples</h2>
  * <pre>
  * // Basic usage with defaults
  * TextSplitter splitter1 = new TextSplitter("This is a very long text that needs splitting");
- * String abridged = splitter1.getAbridgedText();          // "This is a very lon..."
+ * String abridged = splitter1.getAbridgedText();          // "This is a very ..."
  * String withBreaks = splitter1.getTextWithEnforcedLineBreaks();  // Adds zero-width spaces
  *
  * // Custom configuration
  * TextSplitter splitter2 = new TextSplitter("Long.Technical-ID#12345", 5, 10);
- * // Results in: "Long.⁠Technical-⁠ID#⁠12345" (⁠ represents zero-width space)
+ * splitter2.getTextWithEnforcedLineBreaks();
+ * // Results in "Long." + ZWSP + "Techn" + ZWSP + "ical-" + ZWSP + "ID#" + ZWSP + "12345"
+ * // (ZWSP represents the zero-width space character U+200B)
  * </pre>
  *
  * @author Eugen Fischer
@@ -110,27 +115,6 @@ public class TextSplitter implements Serializable {
     private final String source;
 
     /**
-     * Lazily initialized abridged version of the source text.
-     * Will be truncated with ellipsis if longer than the configured length.
-     */
-    @Getter(lazy = true)
-    private final String abridgedText = initAbridged();
-
-    /**
-     * Indicates whether the text was actually abridged.
-     * True if the text ends with ellipsis, false otherwise.
-     */
-    @Getter
-    private boolean abridged = false;
-
-    /**
-     * Lazily initialized version of the text with enforced line breaks.
-     * Contains zero-width spaces at appropriate break points.
-     */
-    @Getter(lazy = true)
-    private final String textWithEnforcedLineBreaks = initTextWithLineBreaks();
-
-    /**
      * Maximum length of text segments before forcing a line break.
      * If null, uses {@link #DEFAULT_FORCE_LENGTH_BREAK}.
      */
@@ -156,12 +140,12 @@ public class TextSplitter implements Serializable {
     /**
      * Creates a new TextSplitter with custom length settings.
      *
-     * @param source text to be processed
+     * @param source text to be processed, will be converted to empty string if null
      * @param forceLengthBreakCount maximum length before forcing line breaks
      * @param abridgedLengthCount maximum length before abridging with ellipsis
      */
     public TextSplitter(final String source, final int forceLengthBreakCount, final int abridgedLengthCount) {
-        this.source = source;
+        this.source = nullToEmpty(source);
         forceLengthBreak = valueOf(forceLengthBreakCount);
         abridgedLength = valueOf(abridgedLengthCount);
     }
@@ -174,7 +158,14 @@ public class TextSplitter implements Serializable {
         return abridgedLength != null ? abridgedLength : DEFAULT_ABRIDGED_LENGTH;
     }
 
-    private String initAbridged() {
+    /**
+     * Returns the abridged version of the source text, truncated with ellipsis if
+     * longer than the configured length. The value is computed on each call,
+     * reflecting the currently configured {@code abridgedLength}.
+     *
+     * @return the abridged text
+     */
+    public String getAbridgedText() {
         String result = "";
 
         if (!isEmpty(source)) {
@@ -184,12 +175,18 @@ public class TextSplitter implements Serializable {
                     : abridgeHumanProducedText(sourceSplitted);
         }
 
-        abridged = endsWith(result, TRADE_STR);
         return result.trim();
     }
 
-    private static boolean endsWith(final String str, final String suffix) {
-        return str.trim().endsWith(suffix);
+    /**
+     * Indicates whether the text gets abridged with the currently configured
+     * {@code abridgedLength}. The value is computed on each call and does not
+     * depend on {@link #getAbridgedText()} having been called before.
+     *
+     * @return {@code true} if the abridged text is truncated with ellipsis
+     */
+    public boolean isAbridged() {
+        return getAbridgedText().endsWith(TRADE_STR);
     }
 
     /**
@@ -229,7 +226,14 @@ public class TextSplitter implements Serializable {
         return builder.toString();
     }
 
-    private String initTextWithLineBreaks() {
+    /**
+     * Returns the source text with enforced line break opportunities, containing
+     * zero-width spaces at appropriate break points. The value is computed on each
+     * call, reflecting the currently configured {@code forceLengthBreak}.
+     *
+     * @return the text with enforced line breaks
+     */
+    public String getTextWithEnforcedLineBreaks() {
         if (isEmpty(source)) {
             return "";
         }

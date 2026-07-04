@@ -17,8 +17,17 @@ package de.cuioss.tools.formatting.template.token;
 
 import de.cuioss.test.generator.Generators;
 import de.cuioss.test.generator.junit.EnableGeneratorController;
+import de.cuioss.tools.formatting.template.FormatterSupport;
 import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @EnableGeneratorController
 class ActionTokenTest {
@@ -29,6 +38,39 @@ class ActionTokenTest {
         var token = Generators.letterStrings(5, 10).next();
         var template = "prefix" + token + "suffix";
         ObjectMethodsAsserts.assertNiceObject(new ActionToken(template, token));
+    }
+
+    @Test
+    void shouldTreatAttributeNameAsLiteralNotAsRegex() {
+        // '[a+b]' as a regex would be a character class, as a literal it is the attribute name
+        var actionToken = new ActionToken("<[a+b]>", "[a+b]");
+        assertEquals("<value>", actionToken.substituteAttribute(new MapBasedFormatterSupport("[a+b]", "value")));
+    }
+
+    @Test
+    void shouldFailOnTemplateNotContainingToken() {
+        assertThrows(IllegalArgumentException.class, () -> new ActionToken("someTemplate", "missing"));
+    }
+
+    private static class MapBasedFormatterSupport implements FormatterSupport {
+
+        private final Map<String, Serializable> values = new HashMap<>();
+
+        MapBasedFormatterSupport(final String attribute, final String value) {
+            values.put(attribute, value);
+            // second value in order to bypass the single-value special case
+            values.put("other", "otherValue");
+        }
+
+        @Override
+        public Map<String, Serializable> getAvailablePropertyValues() {
+            return values;
+        }
+
+        @Override
+        public List<String> getSupportedPropertyNames() {
+            return List.copyOf(values.keySet());
+        }
     }
 
 }

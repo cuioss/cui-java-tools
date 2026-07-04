@@ -97,6 +97,39 @@ class TextSplitterTest {
     }
 
     @Test
+    void shouldComputeAbridgedStateWithoutPriorGetterCall() {
+        textSplitter = new TextSplitter("Myextremlylongtextwithsomeusefullinformation");
+        textSplitter.setAbridgedLength(valueOf(16));
+
+        // isAbridged() must not depend on getAbridgedText() having been called before
+        assertTrue(textSplitter.isAbridged());
+    }
+
+    @Test
+    void shouldHonorSetterCalledAfterGetterCall() {
+        final var text = "Myextremlylongtextwithsomeusefullinformation";
+        textSplitter = new TextSplitter(text);
+        textSplitter.setAbridgedLength(valueOf(16));
+
+        assertEquals("Myextremlylo ...", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertTrue(textSplitter.isAbridged());
+
+        // Setter after the first get must affect subsequent computations
+        textSplitter.setAbridgedLength(valueOf(50));
+        assertEquals(text, textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertFalse(textSplitter.isAbridged());
+    }
+
+    @Test
+    void shouldHandleNullSourceInThreeArgConstructor() {
+        textSplitter = new TextSplitter(null, 5, 10);
+
+        assertEquals("", textSplitter.getAbridgedText(), ABRIDGED_TEXT_IS_WRONG);
+        assertEquals("", textSplitter.getTextWithEnforcedLineBreaks(), TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG);
+        assertFalse(textSplitter.isAbridged());
+    }
+
+    @Test
     void shouldProvideTextRepresentationForComputerCreatedTextSequence() {
         final var text = "shouldProvideTextRepresentationForComputerCreatedTextSequence";
         textSplitter = new TextSplitter(text);

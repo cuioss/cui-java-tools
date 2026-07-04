@@ -74,6 +74,11 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
     /**
      * replace attributes from template by attribute values from the map. missing
      * template attributes will be ignored and doesn't add to result at all.
+     * Literal (static) text appears as-is in the output: leading static text is
+     * emitted if the following attribute produces a value, trailing static text
+     * if the preceding attribute produced a value, and static text between two
+     * attributes only if the preceding attribute produced a value and a following
+     * attribute produces a value (separator suppression).
      *
      * @param reference must not be null
      *
@@ -91,8 +96,7 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
         for (var index = 0; index < tokenList.size(); index++) {
             final var token = tokenList.get(index);
             if (token.isStringToken()) {
-                if (lookUpLastTokenHasValue(tokenList, reference, index)
-                        && lookUpNextTokenHasValue(tokenList, reference, index)) {
+                if (shouldEmitStringToken(tokenList, reference, index)) {
                     buffer.append(token.substituteAttribute(reference));
                 }
             } else {
@@ -101,6 +105,32 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
         }
 
         return buffer.toString();
+    }
+
+    /**
+     * Determines whether the string token at the given index should be part of the
+     * output. A string token without a preceding attribute token (leading literal)
+     * only requires a following attribute with a value, a string token without a
+     * following attribute token (trailing literal) only requires a preceding
+     * attribute with a value. String tokens between attributes require both, in
+     * order to suppress useless separators.
+     */
+    private boolean shouldEmitStringToken(final List<Token> tokenList, final T reference, final int index) {
+        final var precedingHasValue = !containsAttributeToken(tokenList, 0, index)
+                || lookUpLastTokenHasValue(tokenList, reference, index);
+        final var followingHasValue = !containsAttributeToken(tokenList, index + 1, tokenList.size())
+                || lookUpNextTokenHasValue(tokenList, reference, index);
+        return precedingHasValue && followingHasValue;
+    }
+
+    private static boolean containsAttributeToken(final List<Token> tokenList, final int fromInclusive,
+            final int toExclusive) {
+        for (var index = fromInclusive; index < toExclusive; index++) {
+            if (!tokenList.get(index).isStringToken()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean lookUpNextTokenHasValue(final List<Token> tokenList, final T reference,

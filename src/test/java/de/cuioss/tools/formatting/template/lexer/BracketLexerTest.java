@@ -74,6 +74,16 @@ class BracketLexerTest {
     }
 
     @Test
+    void shouldPassValidationWithStaticPrefixOnly() {
+        Validator.validateTemplate("StaticPrefix: [familyName]", PersonName.class);
+    }
+
+    @Test
+    void shouldPassValidationWithStaticSuffixOnly() {
+        Validator.validateTemplate("[familyName] StaticSuffix", PersonName.class);
+    }
+
+    @Test
     void shouldPassValidationForAngleBrackets() {
         Validator.validateTemplate(PERSON_NAME_FORMAT_ANGLE_BRACKET,
                 LexerBuilder.withExpressionLanguage(ExpressionLanguage.SIMPLE_ANGLE_BRACKET).build(PersonName.class));

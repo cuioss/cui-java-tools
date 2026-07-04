@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.formatting;
 
+import de.cuioss.tools.string.MoreStrings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -108,7 +109,7 @@ public class SimpleFormatter implements Serializable {
         if (isEmpty(values)) {
             return null;
         }
-        var filtered = values.stream().filter(element -> !isEmpty(element)).toList();
+        var filtered = values.stream().filter(element -> !MoreStrings.isEmpty(element)).toList();
         if (isEmpty(filtered)) {
             return null;
         }
