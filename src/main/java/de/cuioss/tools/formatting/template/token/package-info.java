@@ -38,9 +38,9 @@
  * <pre>
  * // A template like "[firstName] [lastName]" would be tokenized into:
  * List&lt;Token&gt; tokens = Arrays.asList(
- *     new ActionToken("firstName"),
+ *     new ActionToken("firstName", "firstName"),
  *     new StringToken(" "),
- *     new ActionToken("lastName")
+ *     new ActionToken("lastName", "lastName")
  * );
  * </pre>
  * 

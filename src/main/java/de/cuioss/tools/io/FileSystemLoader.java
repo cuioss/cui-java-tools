@@ -64,10 +64,11 @@ public class FileSystemLoader implements FileReaderWriter {
 
     /**
      * @param pathName must not be null nor empty, must not start with the prefix
-     *                 "classpath:" but may start with the prefix "file:" and
-     *                 contain at least one character despite the prefix. On all
-     *                 other cases a {@link IllegalArgumentException} will be
-     *                 thrown.
+     *                 "classpath:" but may start with the prefix "file:" or
+     *                 "external:" and contain at least one character despite the
+     *                 prefix. Paths prefixed with "external:" are resolved
+     *                 relative to the current working directory. On all other
+     *                 cases a {@link IllegalArgumentException} will be thrown.
      */
     public FileSystemLoader(final String pathName) {
         requireNonNull(pathName);
@@ -105,10 +106,11 @@ public class FileSystemLoader implements FileReaderWriter {
      * Checks and modifies a given pathName
      *
      * @param pathName must not be null nor empty, must not start with the prefix
-     *                 "classpath:" but may start with the prefix "file:" and
-     *                 contain at least one character despite the prefix. On all
-     *                 other cases a {@link IllegalArgumentException} will be
-     *                 thrown.
+     *                 "classpath:" but may start with the prefix "file:" or
+     *                 "external:" and contain at least one character despite the
+     *                 prefix. Paths prefixed with "external:" are resolved
+     *                 relative to the current working directory. On all other
+     *                 cases a {@link IllegalArgumentException} will be thrown.
      *
      * @return the normalized pathname without prefix
      */
@@ -122,11 +124,21 @@ public class FileSystemLoader implements FileReaderWriter {
         if (pathName.startsWith(FileTypePrefix.FILE.getPrefix())) {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
+            var remainder = FileTypePrefix.EXTERNAL.removePrefix(pathName);
+            if (isEmpty(remainder)) {
+                throw new IllegalArgumentException("Filename " + pathName + " is invalid");
+            }
             try {
-                newPathName = new File(".").getCanonicalPath() + FileTypePrefix.EXTERNAL.removePrefix(pathName);
+                var currentDir = new File(".").getCanonicalPath();
+                if (!remainder.startsWith("/") && !remainder.startsWith(File.separator)) {
+                    remainder = File.separator + remainder;
+                }
+                newPathName = currentDir + remainder;
                 LOGGER.debug("Loading config file from external path: %s", newPathName);
             } catch (final IOException e) {
                 LOGGER.error(e, ERROR.CURRENT_DIR_RETRIEVAL_FAILED);
+                throw new IllegalArgumentException(
+                        "Unable to resolve current working directory for: " + pathName, e);
             }
         }
 
@@ -151,8 +163,11 @@ public class FileSystemLoader implements FileReaderWriter {
     }
 
     /**
-     * Truncate and overwrite an existing file, or create the file if it doesn't
-     * initially exist.
+     * Truncates and overwrites the existing file. The file must exist and be
+     * writable at construction time: {@link #isReadable()} and
+     * {@link #isWritable()} are snapshots taken at construction, and this method
+     * throws an {@link IllegalStateException} if the file was not writable at
+     * that point.
      */
     @Override
     public OutputStream outputStream() throws IOException {

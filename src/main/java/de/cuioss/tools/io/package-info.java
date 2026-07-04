@@ -53,7 +53,7 @@
  * <pre>
  * // Loading classpath resources
  * try {
- *     String content = ClassPathLoader.readFromClasspath("config/app.properties");
+ *     String content = FileLoaderUtility.toString(new ClassPathLoader("classpath:config/app.properties"));
  *     LOGGER.info("Loaded content: %s", content);
  * } catch (IOException e) {
  *     LOGGER.error(e, "Failed to load resource");
@@ -61,8 +61,8 @@
  *
  * // File operations
  * Path file = Paths.get("data.txt");
- * if (MorePaths.checkReadableFile(file)) {
- *     String content = FileLoaderUtility.loadFileFromPath(file);
+ * if (MorePaths.checkReadablePath(file, false, true)) {
+ *     String content = FileLoaderUtility.toStringUnchecked(new FileSystemLoader(file));
  *     LOGGER.info("Loaded file content: %s", content);
  * }
  *

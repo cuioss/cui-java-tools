@@ -51,6 +51,8 @@ class FileLoaderUtilityTest {
         final var copy = copyFileToTemp(LOADER_EXISTING_FILE_CLASSPATH, true);
         assertNotNull(copy);
         assertTrue(Files.exists(copy));
+        assertTrue(copy.getFileName().toString().endsWith(".txt"),
+                "Temp file should keep the '.txt' extension but was: " + copy.getFileName());
         final var size = Files.size(copy);
         assertTrue(size > 40);
     }

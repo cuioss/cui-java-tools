@@ -155,6 +155,15 @@ class CollectionBuilderTest {
             assertNotNull(builder.toArray(String.class));
             assertEquals(5, builder.toArray(String.class).length);
         }
+
+        @Test
+        @DisplayName("convert to array with the exact component type")
+        void shouldReturnTypedArray() {
+            final var builder = new CollectionBuilder<String>().add("1", "2");
+            final var array = builder.toArray(String.class);
+            assertEquals(String[].class, array.getClass());
+            assertArrayEquals(new String[]{"1", "2"}, array);
+        }
     }
 
     @Nested
@@ -208,6 +217,13 @@ class CollectionBuilderTest {
             final CollectionBuilder<String> builder = CollectionBuilder.copyFrom("1");
             builder.add("4");
             assertEquals(2, builder.toConcurrentNavigableSet().size());
+        }
+
+        @Test
+        @DisplayName("copy from null single parameter results in empty builder")
+        void shouldCreateEmptyBuilderFromNullSingleParam() {
+            final CollectionBuilder<String> builder = CollectionBuilder.copyFrom((String) null);
+            assertTrue(builder.isEmpty());
         }
     }
 

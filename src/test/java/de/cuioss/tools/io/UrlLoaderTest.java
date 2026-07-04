@@ -63,6 +63,37 @@ class UrlLoaderTest {
     }
 
     @Test
+    void shouldProvideInputStreamAfterIsReadable() throws IOException {
+        var url = UrlLoaderTest.class.getResource("/someTestFile.txt");
+        assertNotNull(url, "Test resource not found");
+        var loader = new UrlLoader(url);
+
+        assertTrue(loader.isReadable());
+        try (var stream = loader.inputStream()) {
+            assertTrue(IOStreams.toString(stream).contains("Hello"),
+                    "inputStream() after isReadable() must provide the full content");
+        }
+    }
+
+    @Test
+    void shouldProvideInputStreamMultipleTimes() throws IOException {
+        var url = UrlLoaderTest.class.getResource("/someTestFile.txt");
+        assertNotNull(url, "Test resource not found");
+        var loader = new UrlLoader(url);
+
+        String firstRead;
+        try (var stream = loader.inputStream()) {
+            firstRead = IOStreams.toString(stream);
+        }
+        String secondRead;
+        try (var stream = loader.inputStream()) {
+            secondRead = IOStreams.toString(stream);
+        }
+        assertTrue(firstRead.contains("Hello"));
+        assertEquals(firstRead, secondRead, "Repeated inputStream() calls must provide the same content");
+    }
+
+    @Test
     void shouldGetCorrectFileName() {
         var loader = new UrlLoader("file:/path/to/test.txt");
         var filename = loader.getFileName();

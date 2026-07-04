@@ -64,7 +64,7 @@ public enum IOCase {
     /**
      * The sensitivity flag.
      */
-    private final transient boolean sensitive;
+    private final boolean sensitive;
 
     // -----------------------------------------------------------------------
 
@@ -96,18 +96,6 @@ public enum IOCase {
         this.name = name;
         this.sensitive = sensitive;
     }
-
-    /**
-     * Replaces the enumeration from the stream with a real one. This ensures that
-     * the correct flag is set for SYSTEM.
-     *
-     * @return the resolved object
-     */
-    Object readResolve() {
-        return forName(name);
-    }
-
-    // -----------------------------------------------------------------------
 
     /**
      * Gets the name of the constant.

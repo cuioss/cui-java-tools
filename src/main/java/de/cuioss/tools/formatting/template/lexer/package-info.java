@@ -37,10 +37,10 @@
  * 
  * <h2>Usage Example</h2>
  * <pre>
- * Lexer lexer = LexerBuilder.create()
- *     .withTemplate("[firstName] [lastName]")
- *     .build();
- * List&lt;Token&gt; tokens = lexer.tokenize();
+ * // Given a bean type implementing FormatterSupport:
+ * Lexer&lt;PersonName&gt; lexer = LexerBuilder.useSimpleElWithSquaredBrackets()
+ *         .build(PersonName.class);
+ * List&lt;Token&gt; tokens = lexer.scan("[firstName] [lastName]");
  * </pre>
  * 
  * @author Eugen Fischer

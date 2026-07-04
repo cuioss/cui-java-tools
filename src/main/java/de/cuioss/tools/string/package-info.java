@@ -29,7 +29,7 @@
  *     <ul>
  *       <li>{@link de.cuioss.tools.string.MoreStrings} - Enhanced string utilities</li>
  *       <li>Null-safe string operations</li>
- *       <li>String formatting with '%s' and '{}' placeholders</li>
+ *       <li>Lenient string formatting with '%s' placeholders</li>
  *       <li>Common string transformations</li>
  *     </ul>
  *   </li>
@@ -61,7 +61,7 @@
  * // Null-safe operations
  * String nullString = null;
  * String empty = MoreStrings.nullToEmpty(nullString);      // Returns ""
- * String defaulted = MoreStrings.nullToDefault(nullString, "N/A");  // Returns "N/A"
+ * String defaulted = MoreStrings.firstNonEmpty(nullString, "N/A").orElse("");  // Returns "N/A"
  *
  * // String formatting with logging
  * try {
@@ -83,9 +83,8 @@
  *
  * // Advanced joining with configuration
  * String result = Joiner.on(" | ")
- *     .skipNulls()           // Skip null values
- *     .skipEmpty()           // Skip empty strings
  *     .useForNull("N/A")     // Replace nulls with "N/A"
+ *     .skipEmptyStrings()    // Skip empty strings
  *     .join(Arrays.asList("a", null, "", "b"));  // "a | N/A | b"
  * </pre>
  *

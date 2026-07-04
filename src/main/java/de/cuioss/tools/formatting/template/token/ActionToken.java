@@ -21,8 +21,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
@@ -49,23 +47,16 @@ public class ActionToken implements Token {
     private final String after;
 
     /**
-     * @param template
-     * @param token
+     * @param template the template chunk containing the attribute name, must contain {@code token}
+     * @param token    the attribute name, treated as a literal string, not as a
+     *                 regular expression
      */
     public ActionToken(final String template, final String token) {
-        checkArgument(template.contains(token), "'" + template + " must contain '" + token + "'");
-        final List<String> splitted = Arrays.asList(template.split(token));
-        before = extractSurrounding(splitted, 0);
+        final var tokenIndex = template.indexOf(token);
+        checkArgument(tokenIndex >= 0, "'" + template + "' must contain '" + token + "'");
+        before = template.substring(0, tokenIndex);
         attribute = token;
-        after = extractSurrounding(splitted, 1);
-    }
-
-    private static String extractSurrounding(final List<String> splitted, final int index) {
-        var result = "";
-        if (!splitted.isEmpty() && splitted.size() > index) {
-            result = splitted.get(index);
-        }
-        return result;
+        after = template.substring(tokenIndex + token.length());
     }
 
     @Override
