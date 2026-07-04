@@ -57,6 +57,12 @@ class LogLevelTest {
     }
 
     @Test
+    void shouldRejectNullJulLevel() {
+        assertThrows(NullPointerException.class, () -> LogLevel.from(null),
+                "LogLevel.from must reject null levels");
+    }
+
+    @Test
     void shouldHandleLogLevelEnabled() {
         // Given
         logger.setLevel(Level.ALL);

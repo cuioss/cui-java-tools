@@ -28,8 +28,6 @@ public class TestLogHandler extends Handler {
 
     List<LogRecord> records = new ArrayList<>();
 
-    Level lastLevel = Level.FINEST;
-
     @Override
     public void publish(LogRecord logRecord) {
         records.add(logRecord);

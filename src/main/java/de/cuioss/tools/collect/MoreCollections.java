@@ -57,6 +57,12 @@ public final class MoreCollections {
     /**
      * Simple check method for a {@code null} safe check of the emptiness of the
      * given varags-parameter.
+     * <p>
+     * <em>Caution:</em> Do not pass a primitive array (e.g. {@code byte[]})
+     * directly: it will be wrapped by the varargs mechanism as a single element
+     * of the {@code Object[]} and is therefore never considered empty, no matter
+     * how many elements the primitive array itself contains.
+     * </p>
      *
      * @param elements to be checked may be null
      * @return {@code true} is the given elements are {@code null} or {@code empty}
@@ -334,7 +340,7 @@ public final class MoreCollections {
     // This is proper encapsulation with a package-private implementation class.
     public static <K, V> MapDifference<K, V> difference(Map<? extends K, ? extends V> left,
             Map<? extends K, ? extends V> right) {
-        return MapDiffenceImpl.from(left, right);
+        return MapDifferenceImpl.from(left, right);
     }
 
 }

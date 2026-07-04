@@ -19,7 +19,7 @@
  * <h2>Overview</h2>
  * <p>
  * The cui-java-tools library provides essential utilities and tools for Java development.
- * Built on Java 17, it offers type-safe,
+ * Built on Java 21, it offers type-safe,
  * efficient implementations that integrate seamlessly with CUI's standards.
  * </p>
  *

@@ -18,8 +18,8 @@ module de.cuioss.java.tools {
     requires static org.jspecify;
     requires transitive java.desktop;
     requires transitive java.logging;
-    requires java.net.http;
 
+    exports de.cuioss.tools;
     exports de.cuioss.tools.base;
     exports de.cuioss.tools.codec;
     exports de.cuioss.tools.collect;

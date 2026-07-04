@@ -28,6 +28,9 @@
     </scm>
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
+        <!-- Required by the parent pom's maven-jar-plugin configuration; without it the
+             default derived from the artifactId ('de.cuioss.cui-java-tools') is not a
+             valid module name and the build fails. Ignored at runtime for this modular jar. -->
         <maven.jar.plugin.automatic.module.name>de.cuioss.java.tools</maven.jar.plugin.automatic.module.name>
     </properties>
 
@@ -89,7 +92,7 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
