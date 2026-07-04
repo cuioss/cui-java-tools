@@ -348,7 +348,9 @@ public final class MorePaths {
      */
     public static boolean deleteQuietly(final Path path) {
         LOGGER.trace("Deleting file %s", path);
-        if (path == null) {
+        if (path == null || path.toString().isEmpty()) {
+            // An empty path would resolve to the current working directory - never
+            // delete that implicitly
             return false;
         }
         var file = path.toFile();

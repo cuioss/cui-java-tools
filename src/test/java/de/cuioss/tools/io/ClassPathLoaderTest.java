@@ -85,14 +85,16 @@ class ClassPathLoaderTest {
         assertNotNull(expected);
         var originalLoader = Thread.currentThread().getContextClassLoader();
         try {
-            // ClassLoader#getResource expects names without a leading slash
-            Thread.currentThread().setContextClassLoader(new ClassLoader(null) {
+            // ClassLoader#getResource expects names without a leading slash. The custom
+            // loader keeps the original as parent so class loading through the context
+            // classloader stays intact while this test runs.
+            Thread.currentThread().setContextClassLoader(new ClassLoader(originalLoader) {
                 @Override
                 public URL getResource(String name) {
                     if (contextOnlyResource.equals(name)) {
                         return expected;
                     }
-                    return null;
+                    return super.getResource(name);
                 }
             });
             var loader = new ClassPathLoader(contextOnlyResource);

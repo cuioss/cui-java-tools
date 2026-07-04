@@ -79,6 +79,12 @@ class FileSystemLoaderTest {
     }
 
     @Test
+    void shouldRejectExternalPrefixWithoutPath() {
+        assertThrows(IllegalArgumentException.class, () -> new FileSystemLoader("external:"),
+                "'external:' without an actual path must be rejected");
+    }
+
+    @Test
     void shouldHandleExistingDirectory() {
         final var loader = new FileSystemLoader(EXISTING_DIRECTORY_PATH);
         assertFalse(loader.isReadable());

@@ -125,6 +125,9 @@ public class FileSystemLoader implements FileReaderWriter {
             newPathName = FileTypePrefix.FILE.removePrefix(pathName);
         } else if (pathName.startsWith(FileTypePrefix.EXTERNAL.getPrefix())) {
             var remainder = FileTypePrefix.EXTERNAL.removePrefix(pathName);
+            if (isEmpty(remainder)) {
+                throw new IllegalArgumentException("Filename " + pathName + " is invalid");
+            }
             try {
                 var currentDir = new File(".").getCanonicalPath();
                 if (!remainder.startsWith("/") && !remainder.startsWith(File.separator)) {
