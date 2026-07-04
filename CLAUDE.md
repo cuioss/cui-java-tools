@@ -12,7 +12,7 @@ cui-java-tools is a Java utility library providing essential tools for collectio
 - Type-safe property access and reflection helpers
 - Template-based formatting system
 - Custom logging framework wrapping java.util.logging
-- SSL/TLS and HTTP utilities
+- SSL/TLS utilities
 
 ## Build System
 
@@ -29,7 +29,7 @@ This is a Maven project with standard structure:
 - Main source: `src/main/java/de/cuioss/tools/`
 - Test source: `src/test/java/de/cuioss/tools/`
 - Maven module: `de.cuioss.java.tools`
-- Current version: 2.4.1-SNAPSHOT
+- Current version: see `<version>` in `pom.xml`
 
 ## Architecture
 
@@ -39,7 +39,7 @@ This is a Maven project with standard structure:
 - `de.cuioss.tools.string` - String utilities (Joiner, Splitter, MoreStrings)
 - `de.cuioss.tools.io` - I/O utilities (file loaders, path utilities)
 - `de.cuioss.tools.logging` - Custom logging framework (CuiLogger)
-- `de.cuioss.tools.net` - Network utilities (URL helpers, SSL, HTTP)
+- `de.cuioss.tools.net` - Network utilities (URL helpers, SSL)
 - `de.cuioss.tools.lang` - Language utilities (LocaleUtils, MoreObjects)
 - `de.cuioss.tools.concurrent` - Concurrency utilities (StopWatch, ConcurrentTools)
 - `de.cuioss.tools.formatting` - Template-based formatting system
@@ -66,7 +66,7 @@ This is a Maven project with standard structure:
 - JUnit 5 with extensive test coverage
 - Test support classes in `de.cuioss.tools.support`
 - All public APIs must be tested
-- Uses Hamcrest for assertions
+- Uses JUnit 5 assertions (Hamcrest and Mockito are forbidden, see `doc/ai-rules.md`)
 
 ### Logging
 - Custom logging framework in `de.cuioss.tools.logging`
@@ -75,10 +75,9 @@ This is a Maven project with standard structure:
 - Log levels: TRACE, DEBUG, INFO, WARN, ERROR
 
 ### Important Notes
-- This is a PRE-1.0 project - no backward compatibility guarantees
-- Clean APIs aggressively, remove unused code directly
-- No deprecation annotations - delete unnecessary code
-- Focus on final API design for post-1.0 stability
+- Published on Maven Central; public API changes need deliberate consideration
+- API removals go through a deprecation cycle: mark with `@Deprecated(since = ..., forRemoval = true)` and remove in the next major release
+- Remove unused internal code directly
 
 ## Special Considerations
 

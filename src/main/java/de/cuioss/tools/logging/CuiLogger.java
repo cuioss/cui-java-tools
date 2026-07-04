@@ -16,6 +16,7 @@
 package de.cuioss.tools.logging;
 
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -715,11 +716,23 @@ public class CuiLogger {
     }
 
     /**
-     * @return CUI log level derived from JUL log level. E.g. FINEST(300) matches
-     * TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches TRACE.
+     * @return CUI log level derived from the effective JUL log level. E.g. FINEST(300) matches
+     * TRACE(400), CONFIG(700) matches DEBUG(500), ALL matches TRACE. Since
+     * {@link Logger#getLevel()} returns {@code null} for loggers inheriting their level (the
+     * common case), the effective level is resolved by walking up {@link Logger#getParent()}
+     * until a configured level is found, falling back to {@link Level#INFO} if none is
+     * configured at all.
      */
     public LogLevel getLogLevel() {
-        return LogLevel.from(delegate.getLevel());
+        var current = delegate;
+        while (null != current) {
+            final var level = current.getLevel();
+            if (null != level) {
+                return LogLevel.from(level);
+            }
+            current = current.getParent();
+        }
+        return LogLevel.from(Level.INFO);
     }
 
 }

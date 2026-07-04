@@ -79,7 +79,9 @@ public class CuiLoggerFactory {
 
         final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
-        if (null == stackTraceElements || stackTraceElements.length < 5) {
+        // The minimal valid stack consists of four frames: Thread#getStackTrace,
+        // findCallerInternal, the marker method (e.g. getLogger) and the actual caller.
+        if (null == stackTraceElements || stackTraceElements.length < 4) {
             return Optional.empty();
         }
 
