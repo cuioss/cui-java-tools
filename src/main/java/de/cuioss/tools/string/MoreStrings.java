@@ -127,7 +127,7 @@ import java.util.logging.Logger;
  * <h3>4. String Search and Manipulation</h3>
  * <pre>
  * // Searching
- * assertEquals(2, countMatches("banana", "a"));
+ * assertEquals(3, countMatches("banana", "a"));
  * assertEquals(1, indexOf("hello", 'e'));
  *
  * // Manipulation
@@ -225,6 +225,7 @@ public final class MoreStrings {
      * <pre>
      * unquote(null)      = null
      * unquote("")        = ""
+     * unquote("'")       = "'"
      * unquote("'text'")  = "text"
      * unquote("\"text\"") = "text"
      * unquote("text")    = "text"
@@ -234,7 +235,7 @@ public final class MoreStrings {
      * @return the unquoted String, or the original if no quotes were found or input was null/empty
      */
     public static String unquote(final String original) {
-        if (isEmpty(original)) {
+        if (isEmpty(original) || original.length() < 2) {
             return original;
         }
         if (original.startsWith("\"") && original.endsWith("\"")
@@ -356,9 +357,10 @@ public final class MoreStrings {
      * </p>
      *
      * <pre>
-     * MoreStrings.isEmpty(null)      = false
-     * MoreStrings.isEmpty("")        = false
-     * MoreStrings.isEmpty(" ")       = true
+     * MoreStrings.isPresent(null)      = false
+     * MoreStrings.isPresent("")        = false
+     * MoreStrings.isPresent(" ")       = true
+     * MoreStrings.isPresent("bob")     = true
      * </pre>
      *
      * @param cs the CharSequence to check, may be null
@@ -391,8 +393,14 @@ public final class MoreStrings {
      * MoreStrings.isNumeric("")     = false
      * MoreStrings.isNumeric("  ")   = false
      * MoreStrings.isNumeric("123")  = true
-     * MoreStrings.isNumeric("१२३")  = true MoreStrings.isNumeric("12 3") = false MoreStrings.isNumeric("ab2c") = false MoreStrings.isNumeric("12-3") = false MoreStrings.isNumeric("12.3") = false MoreStrings.isNumeric("-123") = false MoreStrings.isNumeric("+123") = false
-     * </pre >
+     * MoreStrings.isNumeric("१२३")  = true
+     * MoreStrings.isNumeric("12 3") = false
+     * MoreStrings.isNumeric("ab2c") = false
+     * MoreStrings.isNumeric("12-3") = false
+     * MoreStrings.isNumeric("12.3") = false
+     * MoreStrings.isNumeric("-123") = false
+     * MoreStrings.isNumeric("+123") = false
+     * </pre>
      *
      * <p>
      * Inspired by Apache Commons Lang StringUtils.
@@ -463,11 +471,11 @@ public final class MoreStrings {
      * </p>
      *
      * <pre>
-     * MoreStrings.isBlank(null)      = false
-     * MoreStrings.isBlank("")        = false
-     * MoreStrings.isBlank(" ")       = false
-     * MoreStrings.isBlank("bob")     = true
-     * MoreStrings.isBlank("  bob  ") = true
+     * MoreStrings.isNotBlank(null)      = false
+     * MoreStrings.isNotBlank("")        = false
+     * MoreStrings.isNotBlank(" ")       = false
+     * MoreStrings.isNotBlank("bob")     = true
+     * MoreStrings.isNotBlank("  bob  ") = true
      * </pre>
      *
      * @param cs to be checked
@@ -1163,7 +1171,6 @@ public final class MoreStrings {
             }
             builder.append(']');
         }
-        LOGGER.log(Level.FINE, () -> "No args given, returning template " + templateString);
         return builder.toString();
     }
 
@@ -1173,8 +1180,6 @@ public final class MoreStrings {
      * @return value with suffix
      */
     public static String ensureEndsWith(@NonNull final String value, @NonNull final String suffix) {
-        Objects.requireNonNull(value, "value must not be null");
-        Objects.requireNonNull(suffix, "suffix must not be null");
         if (!value.endsWith(suffix)) {
             return value + suffix;
         }
@@ -1212,11 +1217,19 @@ public final class MoreStrings {
     }
 
     /**
-     * @param checker the predicate to check each given value against. it decides if
-     *                a value qualifies to be returned.
-     * @param values  to be evaluated
-     * @return first string that is accepted by the given {@link Predicate} or
-     * {@link Optional#empty()}
+     * Returns the first value that is <em>not rejected</em> by the given
+     * {@link Predicate}. The predicate acts as a rejector: a value qualifies if
+     * {@code checker.test(value)} returns {@code false}. E.g.
+     * {@link #firstNonEmpty(String...)} passes {@link #isEmpty(CharSequence)} as
+     * rejector in order to skip empty values.
+     *
+     * @param checker the rejecting predicate; a value is returned if the predicate
+     *                evaluates to {@code false} for it. Must not be null
+     * @param values  to be evaluated, may be null
+     * @return an {@link Optional} on the first value that is not rejected by the
+     * given {@link Predicate}, or {@link Optional#empty()} if all values are
+     * rejected or {@code values} is null. Note: if the first non-rejected
+     * value is {@code null}, {@link Optional#empty()} is returned as well
      */
     @NonNull
     public static Optional<String> coalesce(Predicate<String> checker, String... values) {
@@ -1224,7 +1237,7 @@ public final class MoreStrings {
         if (null != values) {
             for (String value : values) {
                 if (!checker.test(value)) {
-                    return Optional.of(value);
+                    return Optional.ofNullable(value);
                 }
             }
         }

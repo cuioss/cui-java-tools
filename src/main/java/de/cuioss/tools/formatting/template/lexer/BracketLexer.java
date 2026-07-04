@@ -78,10 +78,6 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
             rightBracket = right;
         }
 
-        List<String> splitByLeftBracket(final String input) {
-            return Splitter.on(leftBracket).omitEmptyStrings().splitToList(input);
-        }
-
         List<String> splitByRightBracket(final String input) {
             return Splitter.on(rightBracket).omitEmptyStrings().splitToList(input);
         }
@@ -136,18 +132,13 @@ class BracketLexer<T extends FormatterSupport> extends Lexer<T> {
 
         if (!isEmpty(input)) {
 
-            final var chunksSplitByLeftBracket = brackets.splitByLeftBracket(input);
-            final var chunksSplitByRightBracket = brackets.splitByRightBracket(input);
-            var leftBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.leftBracket));
-            var rightBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.rightBracket));
-            var chunkCountEven = chunksSplitByLeftBracket.size() == chunksSplitByRightBracket.size();
-            var bracketCountEven = leftBracketCount == rightBracketCount;
-            // Assumption: Static elements are implicitly filtered
-            checkArgument(chunkCountEven && bracketCountEven,
-                    "pattern '%s' is unbalanced for %s, left-hand:%s, right-hand:%s", input, brackets,
-                    chunksSplitByLeftBracket, chunksSplitByRightBracket);
+            final var leftBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.leftBracket));
+            final var rightBracketCount = MoreStrings.countMatches(input, String.valueOf(brackets.rightBracket));
+            checkArgument(leftBracketCount == rightBracketCount,
+                    "pattern '%s' is unbalanced for %s, left bracket count:%s, right bracket count:%s", input,
+                    brackets, leftBracketCount, rightBracketCount);
 
-            for (final String chunk : chunksSplitByRightBracket) {
+            for (final String chunk : brackets.splitByRightBracket(input)) {
                 if (!isEmpty(chunk)) {
                     parseChunk(chunk, tokens);
                 }
