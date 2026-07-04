@@ -28,14 +28,17 @@ class ParameterFilterTest {
 
     private static final String JAVAX_FACES = "javax.faces";
 
+    private static final String JAKARTA_FACES = "jakarta.faces";
+
     private static final List<String> EXCLUDES = immutableList("a", "b", "c");
     private static final List<String> INCLUDES = immutableList("d", "e", "f", "af", "fa");
 
     private static final List<String> FACES_INCLUDES = immutableList("d" + JAVAX_FACES, "e" + JAVAX_FACES,
-            "f" + JAVAX_FACES);
+            "f" + JAVAX_FACES, "d" + JAKARTA_FACES, "e" + JAKARTA_FACES);
 
     private static final List<String> FACES_EXCLUDES = immutableList(JAVAX_FACES + "a", JAVAX_FACES + "." + "b",
-            JAVAX_FACES + "-" + "c");
+            JAVAX_FACES + "-" + "c", JAKARTA_FACES + ".ViewState", JAKARTA_FACES + ".ClientWindow",
+            JAKARTA_FACES + "-" + "c");
 
     @Test
     void shouldExludeAndIncludeStrings() {
@@ -55,6 +58,14 @@ class ParameterFilterTest {
             assertTrue(filter.isExcluded(exclude));
         }
         for (final String include : FACES_INCLUDES) {
+            assertFalse(filter.isExcluded(include));
+        }
+    }
+
+    @Test
+    void shouldNotExcludeFacesStringsIfDisabled() {
+        final var filter = new ParameterFilter(EXCLUDES, false);
+        for (final String include : FACES_EXCLUDES) {
             assertFalse(filter.isExcluded(include));
         }
     }

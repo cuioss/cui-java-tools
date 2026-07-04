@@ -44,10 +44,14 @@ import java.util.regex.Pattern;
 @UtilityClass
 public class IDNInternetAddress {
 
+    /**
+     * RFC 5321 limits the local part to 64 octets, the domain may be up to 255
+     * octets. Display-name segments are not length-limited.
+     */
     private static final Pattern addressPatternWithDisplayName = Pattern
-            .compile("(.{0,64})<(.{1,64})@(.{1,64})>(.{0,64})");
+            .compile("(.*)<(.{1,64})@(.{1,255})>(.*)");
 
-    private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,64})");
+    private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,255})");
 
     /**
      * Encode the domain part of an email address
@@ -70,12 +74,12 @@ public class IDNInternetAddress {
      */
     public static String encode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 4) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
                     + sanitizer.apply(IDN.toASCII(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 2) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(IDN.toASCII(matcher.group(2)));
         }
         return sanitizer.apply(completeAddress);
@@ -103,12 +107,12 @@ public class IDNInternetAddress {
      */
     public static String decode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 4) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
                     + sanitizer.apply(IDN.toUnicode(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 2) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(IDN.toUnicode(matcher.group(2)));
         }
         return sanitizer.apply(completeAddress);

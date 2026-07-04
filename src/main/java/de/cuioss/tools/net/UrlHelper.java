@@ -139,16 +139,20 @@ public final class UrlHelper {
 
     /**
      * @param uri value to be verified if it is a valid URI.
-     * @return true, if the given value is a valid URI. False otherwise.
+     * @return true, if the given value is a valid URI. False otherwise, especially
+     *         for {@code null} or empty input, consistent with
+     *         {@link #tryParseUri(String)}.
      */
     public boolean isValidUri(final String uri) {
-        if (!MoreStrings.isEmpty(uri)) {
-            try {
-                new URI(uri);
-            } catch (URISyntaxException e) {
-                return false;
-            }
+        if (MoreStrings.isEmpty(uri)) {
+            return false;
         }
-        return true;
+        try {
+            new URI(uri);
+            return true;
+        } catch (URISyntaxException e) {
+            LOGGER.trace(e, "Invalid URI");
+            return false;
+        }
     }
 }

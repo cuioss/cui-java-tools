@@ -84,6 +84,33 @@ class UrlParameterTest {
     }
 
     @Test
+    void createParameterStringShouldSkipNullElements() {
+        final var parameter1 = new UrlParameter("name1", "value1");
+        final var parameter2 = new UrlParameter("name2", "value2");
+        assertEquals("", UrlParameter.createParameterString((UrlParameter[]) null));
+        assertEquals("", UrlParameter.createParameterString((UrlParameter) null));
+        assertEquals("?name2=value2", UrlParameter.createParameterString(null, parameter2));
+        assertEquals("?name1=value1", UrlParameter.createParameterString(parameter1, null));
+        assertEquals("?name1=value1&name2=value2",
+                UrlParameter.createParameterString(parameter1, null, parameter2));
+    }
+
+    @Test
+    void createParameterStringShouldSingleEncode() {
+        // Constructed with implicit encoding: fields are stored already encoded
+        final var encodedAtConstruction = new UrlParameter("b c", "v& 1");
+        assertEquals("b+c", encodedAtConstruction.getName());
+        assertEquals("v%26+1", encodedAtConstruction.getValue());
+        assertEquals("?b+c=v%26+1", UrlParameter.createParameterString(true, encodedAtConstruction));
+        // Constructed without encoding: fields are stored raw and encoded on demand
+        final var raw = new UrlParameter("b c", "v& 1", false);
+        assertEquals("?b+c=v%26+1", UrlParameter.createParameterString(true, raw));
+        // The encode=false path emits the stored fields unmodified
+        assertEquals("?b+c=v%26+1", UrlParameter.createParameterString(false, encodedAtConstruction));
+        assertEquals("?b c=v& 1", UrlParameter.createParameterString(false, raw));
+    }
+
+    @Test
     void testGetUrlParameterFromMap() {
         assertTrue(getUrlParameterFromMap(null, null, true).isEmpty());
         assertTrue(getUrlParameterFromMap(new HashMap<>(), null, true).isEmpty());
@@ -200,9 +227,27 @@ class UrlParameterTest {
         assertTrue(fromQueryString(null).isEmpty());
         assertTrue(fromQueryString("?").isEmpty());
         assertTrue(fromQueryString("=").isEmpty());
-        assertTrue(fromQueryString("a=b=c").isEmpty());
         assertTrue(fromQueryString("?=").isEmpty());
         assertTrue(fromQueryString("?&").isEmpty());
+        // Pairs without a name are invalid and therefore skipped
+        assertTrue(fromQueryString("=foo").isEmpty());
+        assertTrue(fromQueryString("?=foo").isEmpty());
+    }
+
+    @Test
+    void parseQueryParameterShouldHandleValueContainingEquals() {
+        var fromQueryString = fromQueryString("a=b=c");
+        assertEquals(1, fromQueryString.size());
+        var urlParameter = fromQueryString.getFirst();
+        assertEquals("a", urlParameter.getName());
+        assertEquals("b=c", urlParameter.getValue());
+
+        // Typical Base64 padding
+        fromQueryString = fromQueryString("token=YWJj0Q==");
+        assertEquals(1, fromQueryString.size());
+        urlParameter = fromQueryString.getFirst();
+        assertEquals("token", urlParameter.getName());
+        assertEquals("YWJj0Q==", urlParameter.getValue());
     }
 
     @Test

@@ -143,6 +143,46 @@ class KeyStoreProviderTest {
     }
 
     @Test
+    void shouldUseHolderKeyPasswordAsStorePasswordForEmbeddedKeyStore() throws Exception {
+
+        var keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null, null);
+
+        var os = new ByteArrayOutputStream();
+        keyStore.store(os, "holderPassword".toCharArray());
+
+        // The holder's keyPassword is documented as being the store-password for
+        // KeyHolderType#KEY_STORE. The provider's storePassword differs and must not
+        // be used for loading the embedded keystore.
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyHolderType(KeyHolderType.KEY_STORE)
+                .keyPassword("holderPassword").keyMaterial(os.toByteArray()).build();
+
+        var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE)
+                .storePassword("differentStorePassword").key(keyHolder).build();
+
+        var ky = assertDoesNotThrow(provider::resolveKeyStore);
+        assertTrue(ky.isPresent());
+        assertTrue(ky.get().size() < 1);
+    }
+
+    @Test
+    void shouldIgnoreLocationIfKeyMaterialIsPresent() throws Exception {
+
+        var x509Certificate = createX509Certificate("EC", 256, "SHA256withECDSA");
+
+        var keyHolder = KeyMaterialHolder.builder().keyAlias("EC256").keyAlgorithm(KeyAlgorithm.ECDSA_P_256)
+                .keyMaterial(x509Certificate.getEncoded()).build();
+
+        // The not-readable location must be ignored because key material is present
+        var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).storePassword("StorePassword")
+                .location(new File("notThere")).key(keyHolder).build();
+
+        var ky = assertDoesNotThrow(provider::resolveKeyStore);
+        assertTrue(ky.isPresent());
+        assertEquals(x509Certificate.getPublicKey(), ky.get().getCertificate("EC256").getPublicKey());
+    }
+
+    @Test
     void shouldFailOnEmptyKeyStores() {
         var keyHolder = KeyMaterialHolder.builder().keyAlias("KeyStore").keyAlgorithm(KeyAlgorithm.RSA_2048)
                 .keyHolderType(KeyHolderType.KEY_STORE).keyMaterial(new byte[1]).build();
@@ -275,6 +315,37 @@ class KeyStoreProviderTest {
 
         assertEquals(generatedStorePassword.length(), provider.getStorePasswordAsCharArray().length);
         assertEquals(0, provider.getKeyPasswordAsCharArray().length);
+    }
+
+    @Test
+    void shouldProvideKeyOrStorePassword() {
+        var provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).build();
+        assertEquals(0, provider.getKeyOrStorePassword().length);
+
+        provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("store").build();
+        assertArrayEquals("store".toCharArray(), provider.getKeyOrStorePassword());
+
+        provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).storePassword("store")
+                .keyPassword("key").build();
+        assertArrayEquals("key".toCharArray(), provider.getKeyOrStorePassword());
+
+        provider = KeyStoreProvider.builder().keyStoreType(KeyStoreType.KEY_STORE).keyPassword("key").build();
+        assertArrayEquals("key".toCharArray(), provider.getKeyOrStorePassword());
+    }
+
+    @Test
+    void shouldIncludeKeysInEqualsAndHashCode() {
+        var keyHolder1 = KeyMaterialHolder.builder().keyMaterial(new byte[]{1, 2, 3}).build();
+        var keyHolder2 = KeyMaterialHolder.builder().keyMaterial(new byte[]{4, 5, 6}).build();
+
+        var provider1 = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).key(keyHolder1).build();
+        var sameAsProvider1 = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).key(keyHolder1)
+                .build();
+        var provider2 = KeyStoreProvider.builder().keyStoreType(KeyStoreType.TRUST_STORE).key(keyHolder2).build();
+
+        assertEquals(provider1, sameAsProvider1);
+        assertEquals(provider1.hashCode(), sameAsProvider1.hashCode());
+        assertNotEquals(provider1, provider2);
     }
 
     @Test

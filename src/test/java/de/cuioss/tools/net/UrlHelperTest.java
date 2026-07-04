@@ -106,8 +106,8 @@ class UrlHelperTest {
 
     @Test
     void shouldHandleNullAndEmptyForUriValidation() {
-        assertTrue(assertDoesNotThrow(() -> isValidUri("")));
-        assertTrue(assertDoesNotThrow(() -> isValidUri(null)));
+        assertFalse(assertDoesNotThrow(() -> isValidUri("")));
+        assertFalse(assertDoesNotThrow(() -> isValidUri(null)));
 
         Optional<URI> emptyResult = assertDoesNotThrow(() -> tryParseUri(""));
         assertTrue(emptyResult.isEmpty());
