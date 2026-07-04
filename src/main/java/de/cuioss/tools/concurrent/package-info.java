@@ -35,7 +35,6 @@
  *     <ul>
  *       <li>{@link de.cuioss.tools.concurrent.StopWatch} - Time measurement utility</li>
  *       <li>Precise elapsed time tracking</li>
- *       <li>Support for split times</li>
  *     </ul>
  *   </li>
  * </ul>
@@ -43,16 +42,16 @@
  * <h2>Usage Examples</h2>
  * <pre>
  * // Using StopWatch for performance measurement
- * StopWatch watch = new StopWatch();
+ * StopWatch watch = StopWatch.createStarted();
  * try {
  *     // Perform operation
  *     someOperation();
  *
  *     LOGGER.info("Operation completed in %s ms",
- *         watch.getElapsedMilliseconds());
+ *         watch.elapsed(TimeUnit.MILLISECONDS));
  * } catch (Exception e) {
  *     LOGGER.error(e, "Operation failed after %s ms",
- *         watch.getElapsedMilliseconds());
+ *         watch.elapsed(TimeUnit.MILLISECONDS));
  *     throw e;
  * }
  *

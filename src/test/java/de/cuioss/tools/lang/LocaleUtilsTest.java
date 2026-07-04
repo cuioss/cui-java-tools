@@ -155,4 +155,48 @@ class LocaleUtilsTest {
         assertTrue(locale.getCountry().isEmpty());
         assertEquals(variant, locale.getVariant());
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "en_GB_POSIX,POSIX",
+            "en_GB_POSIX123,POSIX123"
+    })
+    void shouldHandleVariantLengthBoundaries(String localeString, String variant) {
+        var locale = LocaleUtils.toLocale(localeString);
+        assertNotNull(locale, "Should create valid locale");
+        assertEquals("en", locale.getLanguage());
+        assertEquals("GB", locale.getCountry());
+        assertEquals(variant, locale.getVariant());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "en_GB_POSI",       // 4-char variant, below minimum of 5
+            "en_GB_POSIX1234"   // 9-char variant, above maximum of 8
+    })
+    void shouldRejectVariantsOutsideLengthBoundaries(String invalidLocale) {
+        assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale(invalidLocale),
+                "Variant must be 5-8 alphanumeric characters");
+    }
+
+    @Test
+    void shouldHandleUnderscoreSeparatedMultiVariant() {
+        var locale = LocaleUtils.toLocale("en_GB_POSIX_LINUX");
+        assertNotNull(locale, "Should create valid locale");
+        assertEquals("en", locale.getLanguage());
+        assertEquals("GB", locale.getCountry());
+        assertEquals("POSIX_LINUX", locale.getVariant());
+    }
+
+    @Test
+    void shouldRejectNumericLanguageCode() {
+        assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale("12"),
+                "Numeric language codes must be rejected with IllegalArgumentException");
+    }
+
+    @Test
+    void shouldRejectTooShortVariantAfterCountryOnly() {
+        assertThrows(IllegalArgumentException.class, () -> LocaleUtils.toLocale("_EN_v"),
+                "Variant must be validated on the underscore-prefixed path");
+    }
 }

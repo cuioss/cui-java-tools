@@ -64,6 +64,13 @@ class RingBufferTest {
     }
 
     @Test
+    void shouldRejectCapacityAboveMaximum() {
+        // Capacities above 2^30 would overflow when rounding to the next power of 2
+        assertThrows(IllegalArgumentException.class, () -> new RingBuffer(RingBuffer.MAX_CAPACITY + 1));
+        assertThrows(IllegalArgumentException.class, () -> new RingBuffer(Integer.MAX_VALUE));
+    }
+
+    @Test
     void shouldRejectNegativeMeasurements() {
         RingBuffer buffer = new RingBuffer(10);
         assertThrows(IllegalArgumentException.class, () -> buffer.recordMeasurement(-1));

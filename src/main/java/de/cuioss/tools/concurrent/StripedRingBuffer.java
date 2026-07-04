@@ -84,6 +84,12 @@ public class StripedRingBuffer {
      * <p>
      * The window size will be distributed across all stripes. For example,
      * with 8 stripes and window size 100, each stripe will have capacity ~12.
+     * <p>
+     * <strong>Per-stripe retention:</strong> Each thread always writes to a single
+     * stripe (selected by its thread hash). Because a stripe only retains roughly
+     * {@code windowSize / stripeCount} samples, a single-threaded writer will
+     * retain only about that fraction of {@code windowSize} — the full window is
+     * only reached when writing threads are spread across all stripes.
      *
      * @param windowSize total number of samples to maintain across all stripes (must be positive)
      * @throws IllegalArgumentException if windowSize is not positive
@@ -97,6 +103,12 @@ public class StripedRingBuffer {
      * <p>
      * The window size will be distributed across all stripes. For example,
      * with 8 stripes and window size 100, each stripe will have capacity ~12.
+     * <p>
+     * <strong>Per-stripe retention:</strong> Each thread always writes to a single
+     * stripe (selected by its thread hash). Because a stripe only retains roughly
+     * {@code windowSize / stripeCount} samples, a single-threaded writer will
+     * retain only about that fraction of {@code windowSize} — the full window is
+     * only reached when writing threads are spread across all stripes.
      *
      * @param windowSize total number of samples to maintain across all stripes (must be positive)
      * @param timeUnit the time unit for measurement values (must not be null)
@@ -118,7 +130,8 @@ public class StripedRingBuffer {
             stripes[i] = new RingBuffer(sizePerStripe, timeUnit);
         }
 
-        int actualTotalCapacity = sizePerStripe * stripeCount;
+        // Each RingBuffer rounds its capacity up to the next power of 2
+        int actualTotalCapacity = nextPowerOfTwo(sizePerStripe) * stripeCount;
         if (actualTotalCapacity != windowSize) {
             LOGGER.debug("Striped ring buffer capacity adjusted from %s to %s (distributed across %s stripes)",
                     windowSize, actualTotalCapacity, stripeCount);
@@ -150,9 +163,10 @@ public class StripedRingBuffer {
     /**
      * Gets comprehensive statistics from all measurements across all stripes.
      * <p>
-     * This method computes a complete statistics snapshot including sample count,
-     * average, P95, and P99 in a single optimized pass. The result is eventually
-     * consistent and may include partial updates during concurrent write operations.
+     * This method computes a complete statistics snapshot including sample count
+     * and the P50 (median), P95, and P99 percentiles in a single optimized pass.
+     * The result is eventually consistent and may include partial updates during
+     * concurrent write operations.
      * <p>
      * The implementation is optimized for runtime performance by:
      * <ul>
@@ -162,7 +176,7 @@ public class StripedRingBuffer {
      *   <li>Avoiding boxing/unboxing overhead</li>
      * </ul>
      *
-     * @return immutable statistics snapshot containing sampleCount, average, p95, and p99
+     * @return immutable statistics snapshot containing sampleCount, p50, p95, and p99
      */
     public StripedRingBufferStatistics getStatistics() {
         return StripedRingBufferStatistics.computeFrom(stripes, timeUnit);

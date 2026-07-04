@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Immutable statistics snapshot from a ring buffer.
  * <p>
- * This record provides comprehensive statistics including sample count,
- * average, and key percentiles (P95, P99). All values are computed at
+ * This record provides comprehensive statistics including sample count
+ * and key percentiles (P50/median, P95, P99). All values are computed at
  * the time of creation and remain constant for the lifetime of the instance.
  * <p>
  * The implementation supports two creation patterns:
