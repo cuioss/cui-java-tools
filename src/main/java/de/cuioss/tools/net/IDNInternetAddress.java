@@ -49,7 +49,7 @@ public class IDNInternetAddress {
      * octets. Display-name segments are not length-limited.
      */
     private static final Pattern addressPatternWithDisplayName = Pattern
-            .compile("(.*)<(.{1,64})@(.{1,255})>(.*)");
+            .compile("([^<]*)<(.{1,64})@(.{1,255})>([^>]*)");
 
     private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,255})");
 
@@ -76,13 +76,27 @@ public class IDNInternetAddress {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
         if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
-                    + sanitizer.apply(IDN.toASCII(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
+                    + sanitizer.apply(toAsciiSafely(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
         if (matcher.matches()) {
-            return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(IDN.toASCII(matcher.group(2)));
+            return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(toAsciiSafely(matcher.group(2)));
         }
         return sanitizer.apply(completeAddress);
+    }
+
+    /**
+     * {@link IDN#toASCII(String)} throws an (undocumented) IllegalArgumentException
+     * for domains that match the address patterns but are invalid for IDN (e.g.
+     * empty labels like {@code domain..com}). Fall back to the unconverted domain
+     * in that case, keeping this utility robust against untrusted input.
+     */
+    private static String toAsciiSafely(final String domain) {
+        try {
+            return IDN.toASCII(domain);
+        } catch (IllegalArgumentException e) {
+            return domain;
+        }
     }
 
     /**

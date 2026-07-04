@@ -71,7 +71,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * Flag indicating whether name and value are stored in URL-encoded form. Used
      * to prevent double-encoding when creating encoded parameter-strings.
      */
-    private final boolean encoded;
+    private final Boolean encoded;
 
     /**
      * Constructor. Name and value are implicitly encoded using UTF-8.
@@ -311,7 +311,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * @return string representation of name + value
      */
     public String createNameValueString(final boolean encode) {
-        if (encode && !encoded) {
+        // Boolean (not boolean): instances serialized by older library versions
+        // deserialize with encoded == null; those were always stored encoded, so
+        // only re-encode when the flag is explicitly false.
+        if (encode && Boolean.FALSE.equals(encoded)) {
             var encodedName = encode(name, StandardCharsets.UTF_8);
             String encodedValue = null;
             if (null != value) {
