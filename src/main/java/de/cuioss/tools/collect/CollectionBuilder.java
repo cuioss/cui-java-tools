@@ -223,7 +223,7 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      * </p>
      *
      * @param o a {@link java.lang.Object} object
-     * @return see {@link java.util.Collection#isEmpty()}
+     * @return see {@link java.util.Collection#contains(Object)}
      */
     public boolean contains(Object o) {
         return collector.contains(o);
@@ -416,7 +416,7 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      *
      * @return an immutable {@link java.util.Set} representation of the builders
      *         content, the actual implementation calls
-     *         {@link java.util.Collections#unmodifiableList(List)}. The underlying
+     *         {@link java.util.Collections#unmodifiableSet(Set)}. The underlying
      *         {@link java.util.Collection} will be copied by calling
      *         {@link #toMutableSet()}
      */
@@ -503,7 +503,7 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      * @return an array representation of the builders content
      */
     @SuppressWarnings("unchecked")
-    public E[] toArray(Class<? super E> targetType) {
+    public E[] toArray(Class<E> targetType) {
         if (isEmpty()) {
             return (E[]) Array.newInstance(targetType, 0);
         }
@@ -598,7 +598,8 @@ public final class CollectionBuilder<E> implements Iterable<E> {
      * will be used as it is, there will be no filtering as defined within
      * {@link #addNullValues(boolean)}
      *
-     * @param source may be null
+     * @param source may be null. If it is {@code null} the resulting builder will
+     *               be empty
      * @return the newly created {@link de.cuioss.tools.collect.CollectionBuilder}
      * @param <E> a E class
      */

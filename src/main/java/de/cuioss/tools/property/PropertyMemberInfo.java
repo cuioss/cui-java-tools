@@ -47,16 +47,6 @@ public enum PropertyMemberInfo {
     DEFAULT,
 
     /**
-     * Defines a property that:
-     * <ul>
-     *   <li>Is not transient</li>
-     *   <li>Does not participate in object identity</li>
-     *   <li>Is excluded from equals and hashCode</li>
-     * </ul>
-     */
-    NO_IDENTITY,
-
-    /**
      * Defines a transient property that:
      * <ul>
      *   <li>Is marked as transient</li>
@@ -79,7 +69,6 @@ public enum PropertyMemberInfo {
      * Resolves {@link PropertyMemberInfo} for a given property using reflection.
      * This method can distinguish between {@link #UNDEFINED}, {@link #DEFAULT}
      * and {@link #TRANSIENT} states.
-     * must be defined by the caller if necessary.
      *
      * @param beanType     type to be checked, must not be null
      * @param propertyName name of property to be checked, must not be null

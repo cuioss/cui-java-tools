@@ -50,8 +50,8 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Oliver Wolff
  */
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(of = {"name", "value"})
+@ToString(of = {"name", "value"})
 public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
     private static final CuiLogger LOGGER = new CuiLogger(UrlParameter.class);
@@ -66,6 +66,12 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     /** The value of the parameter. */
     @Getter
     private final String value;
+
+    /**
+     * Flag indicating whether name and value are stored in URL-encoded form. Used
+     * to prevent double-encoding when creating encoded parameter-strings.
+     */
+    private final Boolean encoded;
 
     /**
      * Constructor. Name and value are implicitly encoded using UTF-8.
@@ -98,6 +104,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
             this.name = name;
             this.value = value;
         }
+        encoded = encode;
     }
 
     /**
@@ -112,8 +119,9 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
 
     /**
      * Creates a parameter String for a given number of {@link UrlParameter}.
+     * {@code null} elements will be skipped.
      *
-     * @param parameters to be appended, must not be null
+     * @param parameters to be appended, may be null
      * @return the concatenated ParameterString in the form
      *         "?parameter1Name=parameter1Value&amp;parameter2Name=parameter2Value"
      */
@@ -122,22 +130,24 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     }
 
     /**
-     * Create a String-representation of the URL-Parameter
+     * Create a String-representation of the URL-Parameter. {@code null} elements
+     * will be skipped.
      *
      * @param encode indicating whether the string elements should be encoded or not
-     * @param parameters to be appended, must not be null
+     * @param parameters to be appended, may be null
      * @return the created parameter String
      */
     public static String createParameterString(final boolean encode, final UrlParameter... parameters) {
         final var builder = new StringBuilder();
-        // First parameter to be treated specially.
-        if (null != parameters && parameters.length > 0 && null != parameters[0]) {
-            builder.append('?').append(parameters[0].createNameValueString(encode));
-            if (parameters.length > 1) {
-                // The other parameters are appended with '&'
-                for (var i = 1; i < parameters.length; i++) {
-                    builder.append('&').append(parameters[i].createNameValueString(encode));
+        if (null != parameters) {
+            var first = true;
+            for (final UrlParameter parameter : parameters) {
+                if (null == parameter) {
+                    continue;
                 }
+                // The first parameter is prefixed with '?', the others with '&'
+                builder.append(first ? '?' : '&').append(parameter.createNameValueString(encode));
+                first = false;
             }
         }
         return builder.toString();
@@ -211,8 +221,10 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
      * Create a parameterMap for a given list of {@link UrlParameter}
      *
      * @param urlParameters may be null or empty
-     * @return parameter Map, may be empty if urlParameters is empty. The list of
-     *         String will solely contain one element.
+     * @return parameter Map, may be empty if urlParameters is empty. For a
+     *         parameter providing a value, the corresponding list contains solely
+     *         that one element. For a parameter without a value ({@code null}) the
+     *         corresponding list is empty.
      */
     public static Map<String, List<String>> createParameterMap(final List<UrlParameter> urlParameters) {
         final Map<String, List<String>> result = new HashMap<>();
@@ -250,28 +262,21 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         var elements = Splitter.on(Pattern.compile("&")).trimResults().omitEmptyStrings().splitToList(cleaned);
         var builder = new CollectionBuilder<UrlParameter>();
         for (String element : elements) {
-            if (element.contains("=")) {
-                var splitted = Splitter.on(Pattern.compile("=")).omitEmptyStrings().splitToList(element);
-                switch (splitted.size()) {
-                    case 0:
-                        LOGGER.debug(
-                                "Unable to parse queryString '%s' correctly, unable to extract key-value-pair for element '%s'",
-                                queryString, element);
-                        break;
-                    case 1:
-                        builder.add(createDecoded(splitted.getFirst(), null));
-                        break;
-                    case 2:
-                        builder.add(createDecoded(splitted.getFirst(), splitted.getLast()));
-                        break;
-                    default:
-                        LOGGER.debug(
-                                "Unable to parse queryString '%s' correctly, multiple '=' symbols found at unexpected locations",
-                                queryString);
-                        break;
-                }
-            } else {
+            // Split on the first '=' only: values may contain literal '=' characters,
+            // e.g. Base64-encoded content
+            var separatorIndex = element.indexOf('=');
+            if (separatorIndex < 0) {
                 builder.add(createDecoded(element, null));
+            } else {
+                var name = element.substring(0, separatorIndex);
+                var value = element.substring(separatorIndex + 1);
+                if (MoreStrings.isEmpty(name)) {
+                    LOGGER.debug(
+                            "Unable to parse queryString '%s' correctly, element '%s' provides no parameter name, skipping",
+                            queryString, element);
+                } else {
+                    builder.add(createDecoded(name, MoreStrings.isEmpty(value) ? null : value));
+                }
             }
         }
         return builder.toImmutableList();
@@ -300,12 +305,22 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     }
 
     /**
-     * @param encode flag indicate if the result need to be encoded
-     * @return string representation of name + vale
+     * @param encode flag indicating whether the result needs to be encoded. If the
+     *               parameter was already encoded at construction time it will not
+     *               be encoded again, ensuring single-encoded output
+     * @return string representation of name + value
      */
     public String createNameValueString(final boolean encode) {
-        if (encode) {
-            return new UrlParameter(name, value).createNameValueString();
+        // Boolean (not boolean): instances serialized by older library versions
+        // deserialize with encoded == null; those were always stored encoded, so
+        // only re-encode when the flag is explicitly false.
+        if (encode && Boolean.FALSE.equals(encoded)) {
+            var encodedName = encode(name, StandardCharsets.UTF_8);
+            String encodedValue = null;
+            if (null != value) {
+                encodedValue = encode(value, StandardCharsets.UTF_8);
+            }
+            return Joiner.on('=').useForNull("").join(encodedName, encodedValue);
         }
         return Joiner.on('=').useForNull("").join(name, value);
     }

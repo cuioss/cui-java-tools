@@ -151,8 +151,8 @@ public class IOStreams {
     }
 
     /**
-     * Gets the contents of an <code>InputStream</code> as a String using the
-     * specified character encoding.
+     * Gets the contents of an <code>InputStream</code> as a String using UTF-8
+     * encoding.
      * <p>
      * This method buffers the input internally, so there is no need to use a
      * <code>BufferedInputStream</code>.
@@ -160,8 +160,8 @@ public class IOStreams {
      *
      * @param input the <code>InputStream</code> to read from, using UTF-8 encoding.
      * @return the requested String
-     * @throws NullPointerException if the input is null
-     * @throws IOException          if an I/O error occurs
+     * @throws IllegalArgumentException if the input is null
+     * @throws IOException              if an I/O error occurs
      */
     public static String toString(final InputStream input) throws IOException {
         return toString(input, StandardCharsets.UTF_8);

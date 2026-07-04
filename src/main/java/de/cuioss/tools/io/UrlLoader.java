@@ -25,7 +25,6 @@ import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
 import static de.cuioss.tools.base.Preconditions.checkArgument;
@@ -33,8 +32,9 @@ import static de.cuioss.tools.base.Preconditions.checkArgument;
 /**
  * This {@link FileLoader} takes a {@link URL} as its parameter which is useful
  * when e.g. iterating over an enumeration of URLs from
- * {@link ClassLoader#getResources(String)}. It converts the given URL to a
- * {@code String} and prefixes it with {@link FileTypePrefix#URL}.
+ * {@link ClassLoader#getResources(String)}. When constructed from a
+ * {@code String} it strips an optional {@link FileTypePrefix#URL} prefix and
+ * stores the resulting {@link URL}.
  *
  * @author Sven Haag
  */
@@ -48,12 +48,11 @@ public class UrlLoader implements FileLoader {
     private static final CuiLogger LOGGER = new CuiLogger(UrlLoader.class);
 
     private final URL url;
-    private transient URLConnection connection;
 
     /**
      * @param url representing a valid URL
-     * @throws IllegalArgumentException indicating that the given String represents
-     *                                  a valid URL
+     * @throws IllegalArgumentException indicating that the given String does not
+     *                                  represent a valid URL
      */
     public UrlLoader(final String url) {
         checkArgument(null != url, "url must not be null");
@@ -79,11 +78,9 @@ public class UrlLoader implements FileLoader {
 
     @Override
     public InputStream inputStream() throws IOException {
-        if (null == connection) {
-            connection = url.openConnection();
-            connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
-            connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
-        }
+        final var connection = url.openConnection();
+        connection.setConnectTimeout((int) TimeUnit.SECONDS.toMillis(5));
+        connection.setReadTimeout((int) TimeUnit.SECONDS.toMillis(5));
         return connection.getInputStream();
     }
 

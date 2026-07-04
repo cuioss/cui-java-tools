@@ -139,6 +139,26 @@ class FieldWrapperTest {
         assertEquals(test, fieldValue.get());
     }
 
+    @Test
+    void staticReadValueShouldResolveField() {
+        final var nameClass = new FieldNameClass();
+        final var test = Generators.nonEmptyStrings().next();
+        nameClass.setMyField(test);
+        var read = FieldWrapper.readValue("myField", nameClass);
+        assertTrue(read.isPresent());
+        assertEquals(test, read.get());
+    }
+
+    @Test
+    void staticReadValueShouldHandleUnresolvableField() {
+        assertFalse(FieldWrapper.readValue("notThere", new FieldNameClass()).isPresent());
+    }
+
+    @Test
+    void staticReadValueShouldHandleNullObject() {
+        assertFalse(FieldWrapper.readValue("myField", null).isPresent());
+    }
+
     private FieldWrapper getMyFieldFieldWrapper() {
         var optionalFieldWrapper = FieldWrapper.from(FieldNameClass.class, "myField");
         assertTrue(optionalFieldWrapper.isPresent(), "myField should be accessible");

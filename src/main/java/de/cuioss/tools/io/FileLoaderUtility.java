@@ -96,7 +96,7 @@ public final class FileLoaderUtility {
 
         // Create temp file with secure permissions (owner read/write only)
         // This addresses SonarQube security warning about publicly writable directories
-        final Path target = PathTraversalSecurity.createSecureTempFile(namePart, suffix);
+        final Path target = PathTraversalSecurity.createSecureTempFile(namePart, null != suffix ? "." + suffix : null);
 
         try (final var inputStream = source.inputStream()) {
             Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);

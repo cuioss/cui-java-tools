@@ -18,6 +18,8 @@ package de.cuioss.tools.net;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import de.cuioss.tools.logging.CuiLogger;
+
 import java.net.IDN;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -44,10 +46,16 @@ import java.util.regex.Pattern;
 @UtilityClass
 public class IDNInternetAddress {
 
-    private static final Pattern addressPatternWithDisplayName = Pattern
-            .compile("(.{0,64})<(.{1,64})@(.{1,64})>(.{0,64})");
+    private static final CuiLogger LOGGER = new CuiLogger(IDNInternetAddress.class);
 
-    private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,64})");
+    /**
+     * RFC 5321 limits the local part to 64 octets, the domain may be up to 255
+     * octets. Display-name segments are not length-limited.
+     */
+    private static final Pattern addressPatternWithDisplayName = Pattern
+            .compile("([^<]*)<(.{1,64})@(.{1,255})>([^>]*)");
+
+    private static final Pattern addressPattern = Pattern.compile("(.{1,64})@(.{1,255})");
 
     /**
      * Encode the domain part of an email address
@@ -70,15 +78,30 @@ public class IDNInternetAddress {
      */
     public static String encode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 4) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
-                    + sanitizer.apply(IDN.toASCII(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
+                    + sanitizer.apply(toAsciiSafely(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 2) {
-            return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(IDN.toASCII(matcher.group(2)));
+        if (matcher.matches()) {
+            return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(toAsciiSafely(matcher.group(2)));
         }
         return sanitizer.apply(completeAddress);
+    }
+
+    /**
+     * {@link IDN#toASCII(String)} throws an (undocumented) IllegalArgumentException
+     * for domains that match the address patterns but are invalid for IDN (e.g.
+     * empty labels like {@code domain..com}). Fall back to the unconverted domain
+     * in that case, keeping this utility robust against untrusted input.
+     */
+    private static String toAsciiSafely(final String domain) {
+        try {
+            return IDN.toASCII(domain);
+        } catch (IllegalArgumentException e) {
+            LOGGER.trace(e, "IDN.toASCII failed for domain '%s', using unconverted value", domain);
+            return domain;
+        }
     }
 
     /**
@@ -103,12 +126,12 @@ public class IDNInternetAddress {
      */
     public static String decode(@NonNull final String completeAddress, UnaryOperator<String> sanitizer) {
         var matcher = addressPatternWithDisplayName.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 4) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "<" + sanitizer.apply(matcher.group(2)) + "@"
                     + sanitizer.apply(IDN.toUnicode(matcher.group(3))) + ">" + sanitizer.apply(matcher.group(4));
         }
         matcher = addressPattern.matcher(completeAddress);
-        if (matcher.matches() && matcher.groupCount() == 2) {
+        if (matcher.matches()) {
             return sanitizer.apply(matcher.group(1)) + "@" + sanitizer.apply(IDN.toUnicode(matcher.group(2)));
         }
         return sanitizer.apply(completeAddress);

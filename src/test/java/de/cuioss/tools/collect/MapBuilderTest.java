@@ -108,6 +108,19 @@ class MapBuilderTest {
     }
 
     @Test
+    void toImmutableMapShouldNotBeAffectedByLaterBuilderChanges() {
+        var builder = new MapBuilder<String, String>().put(KEY_1, VALUE_1);
+        var immutable = builder.toImmutableMap();
+
+        builder.put(KEY_2, VALUE_2);
+        builder.remove(KEY_1);
+        builder.clear();
+
+        assertEquals(1, immutable.size());
+        assertEquals(VALUE_1, immutable.get(KEY_1));
+    }
+
+    @Test
     void shouldOnlyAddIfNotNull() {
         final var map = new MapBuilder<String, String>().put(KEY_1, null).putIfNotNull(KEY_2, null)
                 .putIfNotNull(KEY_3, "").toImmutableMap();

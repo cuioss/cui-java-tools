@@ -54,10 +54,10 @@
  * Map&lt;String, Integer&gt; right = MapBuilder.from("b", 2).put("c", 3).toImmutableMap();
  * MapDifference difference = MoreCollections.difference(left, right);
  *
- * // Using partial collections
+ * // Using partial collections (snapshot copy of the first elements, not a view)
  * List&lt;String&gt; originalList = Arrays.asList("a", "b", "c", "d", "e");
- * List&lt;String&gt; partialView = new PartialArrayList&lt;&gt;(originalList, 0, 3);
- * // partialView contains ["a", "b", "c"]
+ * List&lt;String&gt; partial = PartialArrayList.of(originalList, 3);
+ * // partial contains ["a", "b", "c"], isMoreAvailable() == true
  * </pre>
  *
  * <h2>Best Practices</h2>

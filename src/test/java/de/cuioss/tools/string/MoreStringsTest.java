@@ -61,6 +61,15 @@ class MoreStringsTest {
         }
     }
 
+    @Test
+    void shouldUnquoteSingleCharacterStrings() {
+        assertEquals("'", unquote("'"));
+        assertEquals("\"", unquote("\""));
+        assertEquals("a", unquote("a"));
+        assertEquals("", unquote("''"));
+        assertEquals("", unquote("\"\""));
+    }
+
     /**
      * Test for {@link MoreStrings#isAllLowerCase(CharSequence)}. COPIED FROM:
      * <a href="https://github.com/apache/commons-lang/blob/LANG_3_8_1/src/test/java/org/apache/commons/lang3/MoreStringsTest.java">...</a>
@@ -557,6 +566,9 @@ class MoreStringsTest {
         // Test normal behavior with valid checker
         assertEquals("test",
                 MoreStrings.coalesce(MoreStrings::isEmpty, "", null, "test", "other").orElseThrow());
+
+        // A non-rejected null value results in Optional.empty() instead of an NPE
+        assertTrue(MoreStrings.coalesce(value -> false, (String) null).isEmpty());
     }
 
     private static class ThrowsOnToString {

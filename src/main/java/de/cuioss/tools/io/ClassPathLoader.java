@@ -136,7 +136,10 @@ public class ClassPathLoader implements FileLoader {
         }
         var loader = Optional.ofNullable(Thread.currentThread().getContextClassLoader());
         if (loader.isPresent()) {
-            url = loader.get().getResource(path);
+            // In contrast to Class#getResource, ClassLoader#getResource expects the name
+            // without a leading slash
+            var classLoaderPath = path.startsWith("/") ? path.substring(1) : path;
+            url = loader.get().getResource(classLoaderPath);
             if (null != url) {
                 LOGGER.debug("Resolved '%s' from ContextClassLoader", path);
                 return url;
