@@ -40,7 +40,7 @@ public interface FileWriter extends Serializable {
     /**
      * @return an {@link OutputStream} on the corresponding file. It implicitly
      *         checks {@link #isWritable()} before accessing the file and will throw
-     *         an {@link IllegalStateException} in case it is not readable.
+     *         an {@link IllegalStateException} in case it is not writable.
      * @throws IOException
      */
     OutputStream outputStream() throws IOException;
