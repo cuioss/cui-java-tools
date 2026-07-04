@@ -421,10 +421,14 @@ public final class MoreReflection {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Given type defines no generic type argument: " + typeToBeExtractedFrom));
 
-        requireNotEmpty(parameterizedType.getActualTypeArguments(),
-                "No type argument found for " + typeToBeExtractedFrom.getName());
+        // Explicit length check: requireNotEmpty(array, message) would bind to the
+        // varargs overload, absorbing the message as an element
+        final var actualTypeArguments = parameterizedType.getActualTypeArguments();
+        if (actualTypeArguments.length == 0) {
+            throw new IllegalArgumentException("No type argument found for " + typeToBeExtractedFrom.getName());
+        }
 
-        final Class<?> firstType = extractGenericTypeCovariantly(parameterizedType.getActualTypeArguments()[0])
+        final Class<?> firstType = extractGenericTypeCovariantly(actualTypeArguments[0])
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Unable to determine generic type argument for " + typeToBeExtractedFrom));
 

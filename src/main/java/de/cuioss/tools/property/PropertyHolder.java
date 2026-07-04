@@ -71,7 +71,6 @@ public class PropertyHolder {
 
     private static final String UNABLE_TO_LOAD_PROPERTY_DESCRIPTOR = "Unable to load property-descriptor for attribute '%s' on type '%s'";
     private static final String NO_READ_METHOD = "No read method available for property '%s'";
-    private static final String NO_WRITE_METHOD = "No write method available for property '%s'. Check if the property has a setter method or a builder-style method.";
     private static final String TYPE_MISMATCH = "Value type mismatch for property '%s'. Expected: %s, Got: %s";
 
     private static final CuiLogger LOGGER = new CuiLogger(PropertyHolder.class);
@@ -151,9 +150,11 @@ public class PropertyHolder {
      * @return In case the property set method is void the given bean will be returned.
      *         Otherwise, the return value of the method invocation, assuming the setMethod
      *         is a builder / fluent-api type.
-     * @throws IllegalArgumentException if the given value does not match the property type
-     * @throws IllegalStateException if the property is not writeable, if no write method
-     *                               is available or if the write operation fails
+     * @throws IllegalArgumentException if the given value does not match the property
+     *                                  type, or if no write method is available for the
+     *                                  property
+     * @throws IllegalStateException if the property is not writeable or if the write
+     *                               operation fails
      * @throws NullPointerException if the bean is null
      * @since 2.0
      */
@@ -163,8 +164,10 @@ public class PropertyHolder {
         Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, target);
 
         if (writeMethod != null) {
-            if (value != null && !MoreReflection.checkWhetherParameterIsAssignable(type, value.getClass())) {
-                throw new IllegalArgumentException(TYPE_MISMATCH.formatted(name, type.getName(), value.getClass().getName()));
+            if (null == value ? type.isPrimitive()
+                    : !MoreReflection.checkWhetherParameterIsAssignable(type, value.getClass())) {
+                throw new IllegalArgumentException(TYPE_MISMATCH.formatted(name, type.getName(),
+                        null == value ? "null" : value.getClass().getName()));
             }
             try {
                 var result = writeMethod.invoke(target, value);
