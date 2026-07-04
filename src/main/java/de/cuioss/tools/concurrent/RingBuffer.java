@@ -63,7 +63,7 @@ public class RingBuffer {
      * This is the largest power of 2 that fits into a positive {@code int};
      * larger values would overflow when rounding up to the next power of 2.
      */
-    static final int MAX_CAPACITY = 1 << 30;
+    public static final int MAX_CAPACITY = 1 << 30;
 
     /**
      * Storage array for measurements.
