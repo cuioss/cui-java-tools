@@ -280,9 +280,11 @@ public final class Splitter {
      *                                                regular expression
      */
     public Splitter doNotModifySeparatorString() {
+        // Preserve the flags of a Pattern supplied via on(Pattern)
+        var existingFlags = null != splitterConfig.getPattern() ? splitterConfig.getPattern().flags() : 0;
         var newConfig = splitterConfig.copy()
                 .doNotModifySeparatorString(true)
-                .pattern(Pattern.compile(splitterConfig.getSeparator()))
+                .pattern(Pattern.compile(splitterConfig.getSeparator(), existingFlags))
                 .build();
         return new Splitter(newConfig);
     }
