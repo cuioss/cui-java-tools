@@ -58,6 +58,14 @@ public class RingBuffer {
     private static final CuiLogger LOGGER = new CuiLogger(RingBuffer.class);
 
     /**
+     * Maximum supported capacity (2^30).
+     * <p>
+     * This is the largest power of 2 that fits into a positive {@code int};
+     * larger values would overflow when rounding up to the next power of 2.
+     */
+    public static final int MAX_CAPACITY = 1 << 30;
+
+    /**
      * Storage array for measurements.
      * Uses AtomicLongArray to ensure thread-safe access and visibility.
      */
@@ -90,8 +98,8 @@ public class RingBuffer {
      * The actual capacity will be rounded up to the next power of 2
      * for performance optimization.
      *
-     * @param capacity the desired capacity (must be positive)
-     * @throws IllegalArgumentException if capacity is not positive
+     * @param capacity the desired capacity (must be positive and must not exceed 2^30)
+     * @throws IllegalArgumentException if capacity is not positive or exceeds 2^30
      */
     public RingBuffer(int capacity) {
         this(capacity, TimeUnit.MICROSECONDS);
@@ -103,14 +111,18 @@ public class RingBuffer {
      * The actual capacity will be rounded up to the next power of 2
      * for performance optimization.
      *
-     * @param capacity the desired capacity (must be positive)
+     * @param capacity the desired capacity (must be positive and must not exceed 2^30)
      * @param timeUnit the time unit for measurement values (must not be null)
-     * @throws IllegalArgumentException if capacity is not positive
+     * @throws IllegalArgumentException if capacity is not positive or exceeds 2^30
      * @throws NullPointerException if timeUnit is null
      */
     public RingBuffer(int capacity, @NonNull TimeUnit timeUnit) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be positive: " + capacity);
+        }
+        if (capacity > MAX_CAPACITY) {
+            throw new IllegalArgumentException(
+                    "Capacity must not exceed 2^30 (" + MAX_CAPACITY + "): " + capacity);
         }
 
         int actualCapacity = nextPowerOfTwo(capacity);
@@ -149,11 +161,11 @@ public class RingBuffer {
     /**
      * Gets current statistics from this ring buffer.
      * <p>
-     * This method provides comprehensive statistics including sample count,
-     * average, P95, and P99. The result is eventually consistent and may
-     * include partial updates during concurrent write operations.
+     * This method provides comprehensive statistics including sample count
+     * and the P50 (median), P95, and P99 percentiles. The result is eventually
+     * consistent and may include partial updates during concurrent write operations.
      *
-     * @return immutable statistics snapshot containing sampleCount, average, p95, and p99
+     * @return immutable statistics snapshot containing sampleCount, p50, p95, and p99
      */
     public RingBufferStatistics getStatistics() {
         long[] snapshot = getSamplesSnapshot();

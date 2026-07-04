@@ -64,8 +64,7 @@
  *
  * // Locale handling
  * Locale locale = LocaleUtils.toLocale("en_US");
- * boolean isValid = LocaleUtils.isISO639LanguageCode("en");
- * // Result: true
+ * // Result: Locale with language "en" and country "US"
  *
  * // Type-safe operations
  * String str = MoreObjects.requireType(obj, String.class);

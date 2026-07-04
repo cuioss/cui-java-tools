@@ -236,7 +236,8 @@ public class Preconditions {
      * @param errorMessageArgs     the arguments to be substituted into the message
      *                            template. Arguments are converted to strings
      *                            using {@link String#valueOf(Object)}. May be null
-     *                            or empty, but elements may not be null.
+     *                            or empty; {@code null} elements are formatted
+     *                            as {@code "null"}.
      * @throws IllegalArgumentException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
      * @since 1.0
@@ -329,7 +330,8 @@ public class Preconditions {
      * @param errorMessageArgs     the arguments to be substituted into the message
      *                            template. Arguments are converted to strings
      *                            using {@link String#valueOf(Object)}. May be null
-     *                            or empty, but elements may not be null.
+     *                            or empty; {@code null} elements are formatted
+     *                            as {@code "null"}.
      * @throws IllegalStateException if {@code expression} is false
      * @see <a href="https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Preconditions.java">Google Guava</a>
      * @since 1.0

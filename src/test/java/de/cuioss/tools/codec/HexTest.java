@@ -157,8 +157,9 @@ class HexTest {
         void encodeReadOnlyByteBuffer() {
             final var bb = ByteBuffer.allocate(16);
             final var expected = Hex.encodeHexString(bb.array());
-            bb.asReadOnlyBuffer();
-            assertEquals(expected, Hex.encodeHexString(bb));
+            final var readOnly = bb.asReadOnlyBuffer();
+            assertEquals(expected, Hex.encodeHexString(readOnly));
+            assertEquals(0, readOnly.remaining(), "Buffer should be consumed");
         }
     }
 

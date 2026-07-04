@@ -98,7 +98,7 @@ import java.nio.charset.StandardCharsets;
  *   <li>Invalid hex strings throw {@link DecoderException}</li>
  *   <li>Odd-length hex strings throw {@link DecoderException}</li>
  *   <li>Invalid character encodings throw {@link java.nio.charset.UnsupportedCharsetException}</li>
- *   <li>Null inputs throw {@link IllegalArgumentException}</li>
+ *   <li>Null inputs throw {@link NullPointerException}</li>
  * </ul>
  *
  * <h2>Migration Notes</h2>
@@ -322,7 +322,7 @@ public class Hex {
      * @param data        a byte[] to convert to Hex characters
      * @param toLowerCase {@code true} converts to lowercase, {@code false} to
      *                    uppercase
-     * @return A String containing lower-case hexadecimal characters
+     * @return A String containing hexadecimal characters in the selected case
      */
     public static String encodeHexString(final byte[] data, final boolean toLowerCase) {
         return new String(encodeHex(data, toLowerCase));
@@ -360,7 +360,7 @@ public class Hex {
      * @param data        a byte buffer to convert to Hex characters
      * @param toLowerCase {@code true} converts to lowercase, {@code false} to
      *                    uppercase
-     * @return A String containing lower-case hexadecimal characters
+     * @return A String containing hexadecimal characters in the selected case
      */
     public static String encodeHexString(final ByteBuffer data, final boolean toLowerCase) {
         return new String(encodeHex(data, toLowerCase));
@@ -447,7 +447,7 @@ public class Hex {
      *
      * @param object String to convert to byte array
      * @return the byte array
-     * @throws IllegalArgumentException if the parameter is null
+     * @throws NullPointerException if the parameter is null
      */
     public byte[] decode(final byte[] object) throws DecoderException {
         return decodeHex(new String(object, getCharset()).toCharArray());
@@ -459,7 +459,7 @@ public class Hex {
      *
      * @param object String to convert to byte array
      * @return the byte array
-     * @throws IllegalArgumentException if the parameter is null
+     * @throws NullPointerException if the parameter is null
      */
     public byte[] decode(final ByteBuffer object) throws DecoderException {
         return decodeHex(new String(toByteArray(object), getCharset()).toCharArray());
@@ -523,7 +523,7 @@ public class Hex {
      *
      * @param array the byte buffer to convert
      * @return the byte array
-     * @throws IllegalArgumentException if the parameter is null
+     * @throws NullPointerException if the parameter is null
      */
     public byte[] encode(final ByteBuffer array) {
         return encodeHexString(array).getBytes(getCharset());

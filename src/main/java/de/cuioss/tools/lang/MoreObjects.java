@@ -38,7 +38,7 @@ public class MoreObjects {
      *
      * @param <T>          defining the type to be returned.
      *
-     * @param underCheck   KeyStoreType to be checked / cast. If it is null or is
+     * @param underCheck   the object to be checked / cast. If it is null or is
      *                     not assignable to expectedType an
      *                     {@link IllegalArgumentException} will be thrown.
      * @param expectedType checks the type . If it is null an

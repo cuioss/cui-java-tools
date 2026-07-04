@@ -47,14 +47,14 @@
  * <h2>Usage Examples</h2>
  * <h3>Basic Hex Encoding/Decoding</h3>
  * <pre>
- * // Encoding bytes to hex string (uppercase)
+ * // Encoding bytes to hex string (uppercase; false = uppercase, true = lowercase)
  * byte[] bytes = "Hello, World!".getBytes(StandardCharsets.UTF_8);
- * String hexString = Hex.encodeToString(bytes, true);
+ * String hexString = Hex.encodeHexString(bytes, false);
  * // Result: "48656C6C6F2C20576F726C6421"
  *
  * // Decoding hex string back to bytes
  * try {
- *     byte[] decoded = Hex.decode(hexString);
+ *     byte[] decoded = Hex.decodeHex(hexString);
  *     String original = new String(decoded, StandardCharsets.UTF_8);
  *     // Result: "Hello, World!"
  * } catch (DecoderException e) {
@@ -70,7 +70,7 @@
  *
  * // Decoding with custom charset
  * Hex decoder = new Hex(StandardCharsets.UTF_8);
- * byte[] result = decoder.decode(hex);
+ * byte[] result = decoder.decode(hex.getBytes(StandardCharsets.UTF_8));
  * </pre>
  *
  * <h2>Performance Considerations</h2>
@@ -110,7 +110,7 @@
  * byte[] data = DatatypeConverter.parseHexBinary(hex);
  *
  * // CUI Java Tools equivalent
- * String hex = de.cuioss.tools.codec.Hex.encodeHexString(bytes, true); // true for uppercase
+ * String hex = de.cuioss.tools.codec.Hex.encodeHexString(bytes, false); // false = uppercase
  * byte[] data = de.cuioss.tools.codec.Hex.decodeHex(hex);
  * </pre>
  *

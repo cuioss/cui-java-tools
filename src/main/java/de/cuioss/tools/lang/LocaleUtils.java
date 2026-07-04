@@ -18,6 +18,7 @@ package de.cuioss.tools.lang;
 import de.cuioss.tools.base.Preconditions;
 import lombok.experimental.UtilityClass;
 
+import java.util.IllformedLocaleException;
 import java.util.Locale;
 
 /**
@@ -49,23 +50,25 @@ public class LocaleUtils {
      * </p>
      *
      * <pre>
-     *   LocaleUtils.toLocale("")           = new Locale("", "")
-     *   LocaleUtils.toLocale("en")         = new Locale("en", "")
-     *   LocaleUtils.toLocale("en_GB")      = new Locale("en", "GB")
-     *   LocaleUtils.toLocale("en_GB_xxx")  = new Locale("en", "GB", "xxx")   (#)
+     *   LocaleUtils.toLocale("")             = new Locale("", "")
+     *   LocaleUtils.toLocale("en")           = new Locale("en", "")
+     *   LocaleUtils.toLocale("en_GB")        = new Locale("en", "GB")
+     *   LocaleUtils.toLocale("en_GB_POSIX")  = new Locale("en", "GB", "POSIX")
      * </pre>
      *
      * <p>
      * This method validates the input strictly. The language code must be
      * lowercase. The country code must be uppercase. The separator must be an
-     * underscore. The length must be correct.
+     * underscore. The length must be correct. Each variant subtag must consist of
+     * 5-8 alphanumeric characters; multiple variant subtags may be separated by
+     * underscores (e.g. {@code "en_GB_POSIX_LINUX"}).
      * </p>
      *
      * <p>
-     * Note: This implementation uses the deprecated {@link Locale} constructor for
-     * backward compatibility with existing code that relies on its more lenient
-     * validation rules, particularly for variants. Future versions may migrate to
-     * {@link Locale.Builder} which enforces stricter rules.
+     * Note: This implementation is based on the strict {@link Locale.Builder}. Any
+     * {@link java.util.IllformedLocaleException} raised by the builder is
+     * translated to an {@link IllegalArgumentException} to keep the documented
+     * contract of this method.
      * </p>
      *
      * @param str the locale String to convert, null returns null
@@ -77,7 +80,11 @@ public class LocaleUtils {
         if (null == str) {
             return null;
         }
-        return toLocaleInternal(str);
+        try {
+            return toLocaleInternal(str);
+        } catch (final IllformedLocaleException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
     }
 
     private static Locale toLocaleInternal(final String str) {
@@ -94,13 +101,13 @@ public class LocaleUtils {
             return handleSimpleLocale(str);
         }
 
+        // Splitting a string that contains an underscore with limit 3 always
+        // yields two or three parts (trailing empty strings are retained).
         final var parts = str.split("_", 3);
-        return switch (parts.length) {
-            case 1 -> handleSinglePart(parts[0]);
-            case 2 -> handleTwoParts(parts[0], parts[1]);
-            case 3 -> handleThreeParts(str, parts);
-            default -> throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
-        };
+        if (parts.length == 2) {
+            return handleTwoParts(parts[0], parts[1]);
+        }
+        return handleThreeParts(str, parts);
     }
 
     private static Locale handleUnderscorePrefixedLocale(final String str) {
@@ -116,6 +123,7 @@ public class LocaleUtils {
         }
         if (parts.length == 3) {
             validateCountryCode(parts[1]);
+            validateVariant(parts[2]);
             return new Locale.Builder().setLanguage("").setRegion(parts[1]).setVariant(parts[2]).build();
         }
         throw new IllegalArgumentException(INVALID_LOCALE_FORMAT + str);
@@ -127,19 +135,12 @@ public class LocaleUtils {
         return new Locale.Builder().setLanguage(str).build();
     }
 
-    private static Locale handleSinglePart(final String language) {
-        return new Locale.Builder().setLanguage(language.toLowerCase()).build();
-    }
-
     private static Locale handleTwoParts(final String language, final String country) {
         validateLanguageCode(language);
         if (country.matches("\\d{3}")) {
             return new Locale.Builder().setLanguage(language).setRegion(country).build();
         }
         validateCountryCode(country);
-        if (language.isEmpty()) {
-            return new Locale.Builder().setLanguage("").setRegion(country).build();
-        }
         return new Locale.Builder().setLanguage(language).setRegion(country).build();
     }
 
