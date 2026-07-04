@@ -18,12 +18,12 @@ package de.cuioss.tools.reflect;
 import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.CollectionBuilder;
 import de.cuioss.tools.logging.CuiLogger;
-import lombok.Synchronized;
 import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static de.cuioss.tools.ToolsLogMessages.WARN;
 import static de.cuioss.tools.collect.MoreCollections.requireNotEmpty;
@@ -51,10 +51,16 @@ import static java.util.Objects.requireNonNull;
  * <h2>Usage Examples</h2>
  * <pre>{@code
  * // Access field with caching
- * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
+ * Optional<Field> field = MoreReflection.accessField(MyBean.class, "firstName");
  *
  * // Handle field access safely
- * field.ifPresent(f -> {Object value = f.get(bean);});
+ * field.ifPresent(f -> {
+ *     try {
+ *         Object value = f.get(bean);
+ *     } catch (IllegalAccessException e) {
+ *         // handle inaccessible field
+ *     }
+ * });
  * }</pre>
  *
  * <h2>Best Practices</h2>
@@ -75,12 +81,33 @@ public final class MoreReflection {
     private static final CuiLogger LOGGER = new CuiLogger(MoreReflection.class);
 
     /**
-     * We use {@link WeakHashMap} in order to allow the garbage collector to do its
-     * job
+     * {@link ClassValue} associates the cached metadata directly with the
+     * {@link Class} without preventing class unloading ({@link Method} and
+     * {@link Field} instances strongly reference their declaring class, which
+     * defeats map-based weak caches). It is also fully thread-safe, so no
+     * additional synchronization is required.
      */
-    private static final Map<Class<?>, List<Method>> publicObjectMethodCache = new WeakHashMap<>();
+    private static final ClassValue<List<Method>> publicObjectMethodCache = new ClassValue<>() {
+        @Override
+        protected List<Method> computeValue(Class<?> clazz) {
+            final List<Method> found = new ArrayList<>();
+            for (final Method method : clazz.getMethods()) {
+                final int modifiers = method.getModifiers();
+                if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
+                        && !"getClass".equals(method.getName())) {
+                    found.add(method);
+                }
+            }
+            return Collections.unmodifiableList(found);
+        }
+    };
 
-    private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<>();
+    private static final ClassValue<Map<String, Optional<Field>>> fieldCache = new ClassValue<>() {
+        @Override
+        protected Map<String, Optional<Field>> computeValue(Class<?> type) {
+            return new ConcurrentHashMap<>();
+        }
+    };
 
     /**
      * Tries to access a field on a given type. If none can be found it recursively
@@ -97,21 +124,10 @@ public final class MoreReflection {
      * @param fieldName to be checked, must not be null
      * @return an {@link Optional} {@link Field} if it can be found
      */
-    @Synchronized
-    // owolff: computeIfAbsent is not an option because we add null
-    // to the field
-    @SuppressWarnings("java:S3824")
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
-        if (!fieldCache.containsKey(type)) {
-            fieldCache.put(type, new HashMap<>());
-        }
-        final Map<String, Field> typeMap = fieldCache.get(type);
-        if (!typeMap.containsKey(fieldName)) {
-            typeMap.put(fieldName, resolveField(type, fieldName).orElse(null));
-        }
-        return Optional.ofNullable(typeMap.get(fieldName));
+        return fieldCache.get(type).computeIfAbsent(fieldName, name -> resolveField(type, name));
     }
 
     private static Optional<Field> resolveField(final Class<?> type, final String fieldName) {
@@ -134,22 +150,8 @@ public final class MoreReflection {
      * @param clazz to be checked
      * @return the found public-methods.
      */
-    @Synchronized
     public static List<Method> retrievePublicObjectMethods(final Class<?> clazz) {
         requireNonNull(clazz);
-
-        if (!publicObjectMethodCache.containsKey(clazz)) {
-            final List<Method> found = new ArrayList<>();
-            for (final Method method : clazz.getMethods()) {
-                final int modifiers = method.getModifiers();
-                if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
-                        && !"getClass".equals(method.getName())) {
-                    found.add(method);
-                }
-            }
-            publicObjectMethodCache.put(clazz, found);
-            return found;
-        }
         return publicObjectMethodCache.get(clazz);
     }
 
@@ -407,7 +409,8 @@ public final class MoreReflection {
      *
      * @param <T>                   identifying the type to be looked for
      * @param typeToBeExtractedFrom must not be null
-     * @return an {@link Optional} of the KeyStoreType-Argument of the given class.
+     * @return the {@link Class} representing the first generic type argument of the
+     * given class.
      * @throws IllegalArgumentException in case the given type does not represent a
      *                                  generic.
      */
@@ -416,21 +419,29 @@ public final class MoreReflection {
     public static <T> Class<T> extractFirstGenericTypeArgument(final Class<?> typeToBeExtractedFrom) {
         final var parameterizedType = extractParameterizedType(typeToBeExtractedFrom)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Given type defines no generic KeyStoreType: " + typeToBeExtractedFrom));
+                        "Given type defines no generic type argument: " + typeToBeExtractedFrom));
 
-        requireNotEmpty(parameterizedType.getActualTypeArguments(),
-                "No type argument found for " + typeToBeExtractedFrom.getName());
+        final var actualTypeArguments = requireTypeArguments(parameterizedType.getActualTypeArguments(),
+                typeToBeExtractedFrom);
 
-        final Class<?> firstType = extractGenericTypeCovariantly(parameterizedType.getActualTypeArguments()[0])
+        final Class<?> firstType = extractGenericTypeCovariantly(actualTypeArguments[0])
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Unable to determine genric type for " + typeToBeExtractedFrom));
+                        "Unable to determine generic type argument for " + typeToBeExtractedFrom));
 
-        try {
-            return (Class<T>) firstType;
-        } catch (final ClassCastException e) {
-            throw new IllegalArgumentException(
-                    "No type argument can be extracted from " + typeToBeExtractedFrom.getName(), e);
+        return (Class<T>) firstType;
+    }
+
+    /**
+     * Explicit length check: {@code requireNotEmpty(array, message)} would bind to
+     * the varargs overload, absorbing the message as an element.
+     *
+     * @throws IllegalArgumentException if the given array is empty
+     */
+    static Type[] requireTypeArguments(final Type[] actualTypeArguments, final Class<?> typeToBeExtractedFrom) {
+        if (actualTypeArguments.length == 0) {
+            throw new IllegalArgumentException("No type argument found for " + typeToBeExtractedFrom.getName());
         }
+        return actualTypeArguments;
     }
 
     /**
@@ -504,7 +515,7 @@ public final class MoreReflection {
      * method invocations to {@code handler}. The class loader of
      * {@code interfaceType} will be used to define the proxy class. To implement
      * multiple interfaces or specify a class loader, use
-     * Proxy#newProxyInstance(Class, Constructor, InvocationHandler).
+     * {@link Proxy#newProxyInstance(ClassLoader, Class[], InvocationHandler)}.
      *
      * @param interfaceType must not be null
      * @param handler       the invocation handler
@@ -556,7 +567,9 @@ public final class MoreReflection {
         } else {
             stackTraceElements = throwable.getStackTrace();
         }
-        if (null == stackTraceElements || stackTraceElements.length < 5) {
+        // A minimal valid stack consists of 4 frames: getStackTrace / this method,
+        // the intermediate frame, the marker frame at index 2, and the caller at index 3
+        if (null == stackTraceElements || stackTraceElements.length < 4) {
             return Optional.empty();
         }
         for (var index = 2; index < stackTraceElements.length; index++) {

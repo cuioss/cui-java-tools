@@ -110,6 +110,39 @@ class PropertyUtilTest {
     }
 
     @Test
+    void shouldFailOnCheckedExceptionsFromAccessors() {
+        var underTest = new ExplodingBean();
+
+        underTest.illegalAccessException();
+        assertThrows(IllegalStateException.class, () ->
+                readProperty(underTest, PROPERTY_NAME));
+        assertThrows(IllegalStateException.class, () ->
+                setProperty(underTest, PROPERTY_NAME, ""));
+
+        underTest.invocationTargetException();
+        assertThrows(IllegalStateException.class, () ->
+                readProperty(underTest, PROPERTY_NAME));
+        assertThrows(IllegalStateException.class, () ->
+                setProperty(underTest, PROPERTY_NAME, ""));
+    }
+
+    @Test
+    void shouldFailOnInaccessibleAccessorMethods() {
+        var underTest = InaccessibleBeanProvider.createInaccessibleBean();
+        assertThrows(IllegalStateException.class, () ->
+                readProperty(underTest, "value"));
+        assertThrows(IllegalStateException.class, () ->
+                setProperty(underTest, "value", "any"));
+    }
+
+    @Test
+    void shouldFailOnWritingNullToPrimitiveProperty() {
+        var underTest = new BeanWithPrimitives();
+        assertThrows(IllegalArgumentException.class, () ->
+                setProperty(underTest, PROPERTY_PRIMITIVE_NAME, null));
+    }
+
+    @Test
     void shouldBeFlexibleRegardingCaseSensitivity() {
         var underTest = new BeanWithUnusualAttributeCasing();
 
