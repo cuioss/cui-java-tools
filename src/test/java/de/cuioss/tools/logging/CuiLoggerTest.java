@@ -120,7 +120,8 @@ class CuiLoggerTest {
             assertNull(logger.getWrapped().getLevel());
 
             var logLevel = assertDoesNotThrow(logger::getLogLevel);
-            assertNotNull(logLevel);
+            assertEquals(LogLevel.INFO, logLevel,
+                    "Should resolve INFO from the root logger (or the documented fallback)");
         }
     }
 
