@@ -73,4 +73,22 @@ class PartialArrayListTest {
     void shouldImplementObjectContracts() {
         ObjectMethodsAsserts.assertNiceObject(of(randomStrings(4), 4));
     }
+
+    @Test
+    void shouldProvideSymmetricEqualityWithPlainLists() {
+        var content = randomStrings(4);
+        var plainList = new ArrayList<>(content);
+        var partial = of(content, DEFAULT_SIZE);
+        var partialMoreAvailable = of(content, content.size() - 1);
+
+        // List contract: equality is symmetric and ignores isMoreAvailable()
+        assertEquals(plainList, partial);
+        assertEquals(partial, plainList);
+        assertEquals(plainList.hashCode(), partial.hashCode());
+
+        var truncatedPlainList = new ArrayList<>(content.subList(0, content.size() - 1));
+        assertEquals(truncatedPlainList, partialMoreAvailable);
+        assertEquals(partialMoreAvailable, truncatedPlainList);
+        assertEquals(truncatedPlainList.hashCode(), partialMoreAvailable.hashCode());
+    }
 }
