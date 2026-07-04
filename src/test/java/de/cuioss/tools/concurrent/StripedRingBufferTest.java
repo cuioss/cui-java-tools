@@ -116,7 +116,7 @@ class StripedRingBufferTest {
     }
 
     @Test
-    void shouldHandleConcurrentAccess() throws InterruptedException {
+    void shouldHandleConcurrentAccess() throws Exception {
         StripedRingBuffer buffer = new StripedRingBuffer(1000);
         int threadCount = 20;
         int measurementsPerThread = 1000;

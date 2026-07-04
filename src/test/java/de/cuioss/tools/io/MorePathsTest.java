@@ -114,7 +114,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldCheckExecutablePath() throws IOException {
+    void shouldCheckExecutablePath() throws Exception {
         assertFalse(checkExecutablePath(BASE_PATH, true));
         assertFalse(checkExecutablePath(BASE_PATH, false));
 
@@ -143,7 +143,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldBackupExistingFile() throws IOException {
+    void shouldBackupExistingFile() throws Exception {
         var existing = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
@@ -160,7 +160,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldCreateTempFile() throws IOException {
+    void shouldCreateTempFile() throws Exception {
         var existing = copyPomFileToPlayground();
 
         assertFalse(Files.exists(playGroundBackup));
@@ -177,7 +177,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldBackupFileWithoutParent() throws IOException {
+    void shouldBackupFileWithoutParent() throws Exception {
         // Single-segment relative path -> Path#getParent() is null
         var relativePath = Path.of(
                 "morePathsBackupTest" + FILE_SUFFIX_DATEFORMAT.format(new Date()) + ".txt");
@@ -207,7 +207,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldDetermineFilename() throws IOException {
+    void shouldDetermineFilename() throws Exception {
         final List<Path> children = Files.list(playGroundBase).toList();
         assertTrue(children.isEmpty());
         var filename = "filename";
@@ -234,7 +234,7 @@ class MorePathsTest {
     }
 
     @Test
-    void shouldSaveAndBackup() throws IOException {
+    void shouldSaveAndBackup() throws Exception {
         var existingFile = copyPomFileToPlayground();
 
         saveAndBackup(existingFile, filePath -> assertNotEquals(existingFile.toAbsolutePath().toString(),
@@ -269,7 +269,7 @@ class MorePathsTest {
     }
 
     @Test
-    void deleteQuietlyDir() throws IOException {
+    void deleteQuietlyDir() throws Exception {
         var existingFile = copyPomFileToPlayground();
 
         var testDirectory = playGroundBackup.resolve("directory");
@@ -283,7 +283,7 @@ class MorePathsTest {
     }
 
     @Test
-    void deleteQuietlyFile() throws IOException {
+    void deleteQuietlyFile() throws Exception {
         var existingFile = copyPomFileToPlayground();
 
         assertTrue(existingFile.toFile().exists());

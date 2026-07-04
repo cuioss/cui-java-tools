@@ -93,7 +93,7 @@ class CuiLoggerFactoryTest {
     }
 
     @Test
-    void shouldAutoDetectCallerFromBottomOfStackFrame() throws InterruptedException {
+    void shouldAutoDetectCallerFromBottomOfStackFrame() throws Exception {
         // A Thread subclass overriding run() and calling getLogger() directly produces the
         // minimal possible stack of four frames: Thread#getStackTrace, findCallerInternal,
         // getLogger and run() itself. Caller detection must still succeed for such a stack.
@@ -112,7 +112,7 @@ class CuiLoggerFactoryTest {
     }
 
     @Test
-    void shouldHandleMultithreadedInitialization() throws InterruptedException {
+    void shouldHandleMultithreadedInitialization() throws Exception {
         // Test concurrent initialization to ensure thread safety
         final int threadCount = 10;
         Thread[] threads = new Thread[threadCount];

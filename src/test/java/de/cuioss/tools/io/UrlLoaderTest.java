@@ -50,7 +50,7 @@ class UrlLoaderTest {
     }
 
     @Test
-    void shouldHandleValidResource() throws IOException {
+    void shouldHandleValidResource() throws Exception {
         var url = UrlLoaderTest.class.getResource("/someTestFile.txt");
         assertNotNull(url, "Test resource not found");
 
@@ -63,7 +63,7 @@ class UrlLoaderTest {
     }
 
     @Test
-    void shouldProvideInputStreamAfterIsReadable() throws IOException {
+    void shouldProvideInputStreamAfterIsReadable() throws Exception {
         var url = UrlLoaderTest.class.getResource("/someTestFile.txt");
         assertNotNull(url, "Test resource not found");
         var loader = new UrlLoader(url);
@@ -76,7 +76,7 @@ class UrlLoaderTest {
     }
 
     @Test
-    void shouldProvideInputStreamMultipleTimes() throws IOException {
+    void shouldProvideInputStreamMultipleTimes() throws Exception {
         var url = UrlLoaderTest.class.getResource("/someTestFile.txt");
         assertNotNull(url, "Test resource not found");
         var loader = new UrlLoader(url);

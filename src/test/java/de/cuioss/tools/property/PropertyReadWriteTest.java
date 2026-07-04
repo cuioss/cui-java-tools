@@ -38,7 +38,7 @@ class PropertyReadWriteTest {
     }
 
     @Test
-    void shouldResolvePropertyDescriptor() throws IntrospectionException {
+    void shouldResolvePropertyDescriptor() throws Exception {
         assertEquals(READ_WRITE,
                 resolveWithPropertyDescriptor(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE));
         assertEquals(READ_WRITE,

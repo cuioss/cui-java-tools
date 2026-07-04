@@ -21,7 +21,6 @@ import de.cuioss.tools.support.ObjectMethodsAsserts;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static de.cuioss.tools.collect.PartialArrayList.emptyList;
@@ -47,8 +46,8 @@ class PartialArrayListTest {
         assertFalse(emptyList().isMoreAvailable());
         assertTrue(of(null, DEFAULT_SIZE).isEmpty());
         assertFalse(of(null, DEFAULT_SIZE).isMoreAvailable());
-        assertTrue(of(Collections.emptyList(), DEFAULT_SIZE).isEmpty());
-        assertFalse(of(Collections.emptyList(), DEFAULT_SIZE).isMoreAvailable());
+        assertTrue(of(List.of(), DEFAULT_SIZE).isEmpty());
+        assertFalse(of(List.of(), DEFAULT_SIZE).isMoreAvailable());
     }
 
     @Test

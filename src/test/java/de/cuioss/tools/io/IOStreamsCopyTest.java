@@ -318,7 +318,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeCharExtraLength() throws IOException {
+    void copyLargeCharExtraLength() throws Exception {
         // Create streams
         try (var is = new CharArrayReader(carr);
              var os = new CharArrayWriter()) {
@@ -337,7 +337,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeCharFullLength() throws IOException {
+    void copyLargeCharFullLength() throws Exception {
         // Create streams
         try (var is = new CharArrayReader(carr);
              var os = new CharArrayWriter()) {
@@ -355,7 +355,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeCharNoSkip() throws IOException {
+    void copyLargeCharNoSkip() throws Exception {
         // Create streams
         try (var is = new CharArrayReader(carr);
              var os = new CharArrayWriter()) {
@@ -373,7 +373,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeCharSkip() throws IOException {
+    void copyLargeCharSkip() throws Exception {
         // Create streams
         try (var is = new CharArrayReader(carr);
              var os = new CharArrayWriter()) {
@@ -403,7 +403,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeExtraLength() throws IOException {
+    void copyLargeExtraLength() throws Exception {
         // Create streams
         try (var is = new ByteArrayInputStream(iarr);
              var os = new ByteArrayOutputStream()) {
@@ -422,7 +422,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeFullLength() throws IOException {
+    void copyLargeFullLength() throws Exception {
         // Create streams
         try (var is = new ByteArrayInputStream(iarr);
              var os = new ByteArrayOutputStream()) {
@@ -440,7 +440,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeNoSkip() throws IOException {
+    void copyLargeNoSkip() throws Exception {
         // Create streams
         try (var is = new ByteArrayInputStream(iarr);
              var os = new ByteArrayOutputStream()) {
@@ -458,7 +458,7 @@ class IOStreamsCopyTest {
     }
 
     @Test
-    void copyLargeSkip() throws IOException {
+    void copyLargeSkip() throws Exception {
         // Create streams
         try (var is = new ByteArrayInputStream(iarr);
              var os = new ByteArrayOutputStream()) {

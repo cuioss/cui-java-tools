@@ -53,7 +53,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void fileLoaderUtilityCopyFileToTempWithPathTraversal() throws IOException {
+    void fileLoaderUtilityCopyFileToTempWithPathTraversal() throws Exception {
         // Test 1: Attempt to access file with "../" in path
         Path traversalPath = subDir.resolve("../../../sensitive.txt");
 
@@ -87,7 +87,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void fileLoaderUtilityCopyFileToTempWithSymbolicLink() throws IOException {
+    void fileLoaderUtilityCopyFileToTempWithSymbolicLink() throws Exception {
         // Create a symbolic link that points outside the safe directory
         Path symLink = subDir.resolve("symlink.txt");
 
@@ -113,7 +113,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void morePathsCopyToTempLocationWithPathTraversal() throws IOException {
+    void morePathsCopyToTempLocationWithPathTraversal() throws Exception {
         // Test 1: Attempt to copy file with "../" in path
         Path traversalPath = subDir.resolve("../../sensitive.txt");
 
@@ -138,7 +138,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void morePathsCopyToTempLocationWithAbsolutePath() throws IOException {
+    void morePathsCopyToTempLocationWithAbsolutePath() throws Exception {
         // Test with absolute path to sensitive file
         if (Files.exists(sensitiveFile)) {
             // This should be allowed but the result should be in temp directory
@@ -245,7 +245,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void realPathResolution() throws IOException {
+    void realPathResolution() throws Exception {
         // Test toRealPath() for detecting actual file locations
         Path pathWithDots = subDir.resolve("../safe.txt");
 
@@ -260,7 +260,7 @@ class PathTraversalSecurityTest {
     }
 
     @Test
-    void fileLoaderUtilityRejectsMaliciousFilenames() throws IOException {
+    void fileLoaderUtilityRejectsMaliciousFilenames() throws Exception {
         // Create a test file with a simple name
         Path normalFile = tempDir.resolve("normal.txt");
         Files.writeString(normalFile, "Normal content");

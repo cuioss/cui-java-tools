@@ -21,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -315,11 +314,11 @@ public final class Splitter {
     @NonNull
     public List<String> splitToList(String sequence) {
         if (null == sequence) {
-            return Collections.emptyList();
+            return List.of();
         }
         LOGGER.debug("Splitting '%s' with pattern '%s'", sequence, splitterConfig.getSeparator());
         if (isEmpty(sequence)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         var pattern = splitterConfig.getPattern();
@@ -332,7 +331,7 @@ public final class Splitter {
         var splitted = pattern.split(sequence, splitterConfig.getMaxItems());
         if (0 == splitted.length) {
             LOGGER.trace("No content to be returned for input %s and configuration %s", sequence, splitterConfig);
-            return Collections.emptyList();
+            return List.of();
         }
 
         var builder = new CollectionBuilder<String>();

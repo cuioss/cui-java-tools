@@ -18,8 +18,6 @@ package de.cuioss.tools.io;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +41,7 @@ class FileSystemLoaderTest {
     private static final String NOT_EXISTING_FILE_PATH = Path.of(NOT_EXISTING_FILE).toAbsolutePath().toString();
 
     @Test
-    void shouldHandleExistingFile() throws IOException {
+    void shouldHandleExistingFile() throws Exception {
         final var loader = new FileSystemLoader(EXISTING_FILE_PATH);
         assertTrue(loader.isReadable());
         assertTrue(loader.isFilesystemLoader());
@@ -52,7 +50,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandlePathAsArgument() throws IOException {
+    void shouldHandlePathAsArgument() throws Exception {
         final var loader = new FileSystemLoader(Path.of(EXISTING_FILE_PATH));
         assertTrue(loader.isReadable());
         assertTrue(loader.isFilesystemLoader());
@@ -61,7 +59,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleExistingExternalFile() throws IOException {
+    void shouldHandleExistingExternalFile() throws Exception {
         final var loader = new FileSystemLoader(EXISTING_EXTERNAL_FILE);
         assertTrue(loader.isReadable());
         assertTrue(loader.isFilesystemLoader());
@@ -70,7 +68,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleExternalFileWithoutLeadingSeparator() throws IOException {
+    void shouldHandleExternalFileWithoutLeadingSeparator() throws Exception {
         final var loader = new FileSystemLoader("external:" + EXISTING_FILE);
         assertTrue(loader.isReadable(), "external: paths without leading separator should resolve "
                 + "relative to the working directory");
@@ -124,7 +122,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleFilePrefixedPath() throws IOException {
+    void shouldHandleFilePrefixedPath() throws Exception {
         assertEquals(new File(EXISTING_FILE).getCanonicalPath(),
                 FileSystemLoader.checkPathName(FileTypePrefix.FILE + EXISTING_FILE));
     }
@@ -136,7 +134,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleOutputStreamForWritableFile() throws IOException {
+    void shouldHandleOutputStreamForWritableFile() throws Exception {
         // Create a temporary file for testing
         File tempFile = File.createTempFile("test", ".txt");
         tempFile.deleteOnExit();
@@ -165,7 +163,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldGetUrlForExistingFile() throws IOException {
+    void shouldGetUrlForExistingFile() throws Exception {
         var loader = new FileSystemLoader(EXISTING_FILE_PATH);
         var url = loader.getURL();
         assertNotNull(url);
@@ -173,7 +171,7 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldGetUrlForNonExistentFile() throws MalformedURLException {
+    void shouldGetUrlForNonExistentFile() throws Exception {
         var loader = new FileSystemLoader(NOT_EXISTING_FILE_PATH);
         var url = loader.getURL();
         assertNotNull(url);
