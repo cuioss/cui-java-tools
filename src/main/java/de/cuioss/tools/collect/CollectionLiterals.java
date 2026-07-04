@@ -24,10 +24,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -817,7 +821,21 @@ public class CollectionLiterals {
         if (null == source) {
             return Collections.emptyMap();
         }
-        return Collections.unmodifiableMap(new HashMap<>(source));
+        return copyToUnmodifiableMap(source);
+    }
+
+    /**
+     * Copies the given map into an unmodifiable view, preserving sorting for
+     * {@link SortedMap} sources and iteration order for all others.
+     */
+    static <K, V> Map<K, V> copyToUnmodifiableMap(Map<K, V> source) {
+        if (source instanceof NavigableMap<K, V> navigableMap) {
+            return Collections.unmodifiableNavigableMap(new TreeMap<>(navigableMap));
+        }
+        if (source instanceof SortedMap<K, V> sortedMap) {
+            return Collections.unmodifiableSortedMap(new TreeMap<>(sortedMap));
+        }
+        return Collections.unmodifiableMap(new LinkedHashMap<>(source));
     }
 
     /**

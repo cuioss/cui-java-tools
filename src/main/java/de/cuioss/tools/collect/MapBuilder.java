@@ -18,7 +18,6 @@ package de.cuioss.tools.collect;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -241,7 +240,7 @@ public final class MapBuilder<K, V> {
      *         map
      */
     public Map<K, V> toImmutableMap() {
-        return Collections.unmodifiableMap(new HashMap<>(collector));
+        return CollectionLiterals.copyToUnmodifiableMap(collector);
     }
 
     /**

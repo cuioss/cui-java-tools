@@ -19,7 +19,6 @@ import de.cuioss.tools.collect.MapDifference.ValueDifference;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -97,8 +96,14 @@ class MapDifferenceImpl<K, V> implements MapDifference<K, V> {
      */
     @Override
     public int hashCode() {
-        return Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering())
-                .hashCode();
+        // Allocation-free equivalent of
+        // Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering()).hashCode()
+        var result = 1;
+        result = 31 * result + entriesOnlyOnLeft().hashCode();
+        result = 31 * result + entriesOnlyOnRight().hashCode();
+        result = 31 * result + entriesInCommon().hashCode();
+        result = 31 * result + entriesDiffering().hashCode();
+        return result;
     }
 
     /**
@@ -217,7 +222,11 @@ class ValueDifferenceImpl<V> implements ValueDifference<V> {
      */
     @Override
     public int hashCode() {
-        return Arrays.asList(leftValue, rightValue).hashCode();
+        // Allocation-free equivalent of Arrays.asList(leftValue, rightValue).hashCode()
+        var result = 1;
+        result = 31 * result + (leftValue == null ? 0 : leftValue.hashCode());
+        result = 31 * result + (rightValue == null ? 0 : rightValue.hashCode());
+        return result;
     }
 
     @Override
