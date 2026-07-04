@@ -22,6 +22,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TextSplitterTest {
 
+    @Test
+    void shouldRejectNonPositiveLengthSettings() {
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", 0, 10));
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", 10, 0));
+        assertThrows(IllegalArgumentException.class, () -> new TextSplitter("text", -1, -1));
+    }
+
+    @Test
+    void shouldNotReportAbridgedForShortSourceEndingWithEllipsis() {
+        var splitter = new TextSplitter("short ...");
+        assertEquals("short ...", splitter.getAbridgedText());
+        assertFalse(splitter.isAbridged(),
+                "A source that naturally ends with '...' but was never truncated must not report abridged");
+    }
+
     private static final String TEXT_WITH_ENFORCED_LINEBREAKS_IS_WRONG = "Text with enforced linebreaks is wrong.";
 
     private static final String ABRIDGED_TEXT_IS_WRONG = "Abridged text is wrong.";

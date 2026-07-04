@@ -110,17 +110,41 @@ public final class TemplateFormatterImpl<T extends FormatterSupport> implements 
     /**
      * Determines whether the string token at the given index should be part of the
      * output. A string token without a preceding attribute token (leading literal)
-     * only requires a following attribute with a value, a string token without a
-     * following attribute token (trailing literal) only requires a preceding
-     * attribute with a value. String tokens between attributes require both, in
-     * order to suppress useless separators.
+     * only requires some following attribute with a value, a string token without a
+     * following attribute token (trailing literal) only requires some preceding
+     * attribute with a value. String tokens between attributes require the
+     * immediately preceding attribute and some following attribute to have values,
+     * in order to suppress useless separators.
      */
     private boolean shouldEmitStringToken(final List<Token> tokenList, final T reference, final int index) {
-        final var precedingHasValue = !containsAttributeToken(tokenList, 0, index)
-                || lookUpLastTokenHasValue(tokenList, reference, index);
-        final var followingHasValue = !containsAttributeToken(tokenList, index + 1, tokenList.size())
-                || lookUpNextTokenHasValue(tokenList, reference, index);
-        return precedingHasValue && followingHasValue;
+        final var hasAttributeBefore = containsAttributeToken(tokenList, 0, index);
+        final var hasAttributeAfter = containsAttributeToken(tokenList, index + 1, tokenList.size());
+        if (!hasAttributeBefore && !hasAttributeAfter) {
+            // Template consists of literal text only
+            return true;
+        }
+        if (!hasAttributeBefore) {
+            // Leading literal
+            return lookUpNextTokenHasValue(tokenList, reference, index);
+        }
+        if (!hasAttributeAfter) {
+            // Trailing literal: any preceding attribute with a value qualifies
+            return anyPrecedingAttributeHasValue(tokenList, reference, index);
+        }
+        // Separator between attributes: keep the established suppression semantics
+        return lookUpLastTokenHasValue(tokenList, reference, index)
+                && lookUpNextTokenHasValue(tokenList, reference, index);
+    }
+
+    private boolean anyPrecedingAttributeHasValue(final List<Token> tokenList, final T reference,
+            final int currentTokenIndex) {
+        for (var index = currentTokenIndex - 1; index >= 0; index--) {
+            final var token = tokenList.get(index);
+            if (!token.isStringToken() && !token.substituteAttribute(reference).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean containsAttributeToken(final List<Token> tokenList, final int fromInclusive,

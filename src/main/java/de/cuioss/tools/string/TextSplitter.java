@@ -15,6 +15,7 @@
  */
 package de.cuioss.tools.string;
 
+import de.cuioss.tools.base.Preconditions;
 import de.cuioss.tools.collect.MapBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
@@ -141,10 +142,13 @@ public class TextSplitter implements Serializable {
      * Creates a new TextSplitter with custom length settings.
      *
      * @param source text to be processed, will be converted to empty string if null
-     * @param forceLengthBreakCount maximum length before forcing line breaks
-     * @param abridgedLengthCount maximum length before abridging with ellipsis
+     * @param forceLengthBreakCount maximum length before forcing line breaks, must be greater than 0
+     * @param abridgedLengthCount maximum length before abridging with ellipsis, must be greater than 0
+     * @throws IllegalArgumentException if one of the length parameters is not greater than 0
      */
     public TextSplitter(final String source, final int forceLengthBreakCount, final int abridgedLengthCount) {
+        Preconditions.checkArgument(forceLengthBreakCount > 0, "forceLengthBreakCount must be greater than 0");
+        Preconditions.checkArgument(abridgedLengthCount > 0, "abridgedLengthCount must be greater than 0");
         this.source = nullToEmpty(source);
         forceLengthBreak = valueOf(forceLengthBreakCount);
         abridgedLength = valueOf(abridgedLengthCount);
@@ -186,7 +190,7 @@ public class TextSplitter implements Serializable {
      * @return {@code true} if the abridged text is truncated with ellipsis
      */
     public boolean isAbridged() {
-        return getAbridgedText().endsWith(TRADE_STR);
+        return source.length() > getAbridgedLength() && getAbridgedText().endsWith(TRADE_STR);
     }
 
     /**

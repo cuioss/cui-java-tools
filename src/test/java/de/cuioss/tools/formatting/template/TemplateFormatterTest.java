@@ -206,6 +206,16 @@ class TemplateFormatterTest {
     }
 
     @Test
+    void shouldEmitTrailingStaticTextWhenEarlierAttributeHasValue() {
+        final var personName = PersonName.builder().familyName("FamilyName").build();
+
+        final TemplateFormatter<PersonName> formatter = TemplateFormatterImpl
+                .createFormatter("[familyName] [middleName] Suffix", PersonName.class);
+
+        assertEquals("FamilyName Suffix", formatter.format(personName));
+    }
+
+    @Test
     void shouldSuppressStaticTextForMissingAttribute() {
         final var personName = PersonName.builder().givenName("GivenName").build();
 
