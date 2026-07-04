@@ -160,7 +160,7 @@ class RingBufferTest {
     }
 
     @Test
-    void shouldHandleConcurrentWrites() throws InterruptedException {
+    void shouldHandleConcurrentWrites() throws Exception {
         RingBuffer buffer = new RingBuffer(1000);
         int threadCount = 10;
         int measurementsPerThread = 1000;

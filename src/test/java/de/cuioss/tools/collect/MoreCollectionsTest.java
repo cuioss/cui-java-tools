@@ -37,7 +37,7 @@ class MoreCollectionsTest {
     void shouldDetermineEmptinessForVarags() {
         assertFalse(isEmpty("1"));
         assertFalse(isEmpty("1", "2"));
-        assertTrue(isEmpty(Collections.emptyList().toArray()));
+        assertTrue(isEmpty(List.of().toArray()));
         assertTrue(isEmpty((Object[]) null));
 
         requireNotEmpty("1");
@@ -52,12 +52,12 @@ class MoreCollectionsTest {
     void shouldDetermineEmptinessForIterable() {
         assertFalse(isEmpty((Iterable<?>) mutableList("1")));
         assertFalse(isEmpty((Iterable<?>) mutableList("1", "2")));
-        assertTrue(isEmpty((Iterable<?>) Collections.emptyList()));
+        assertTrue(isEmpty((Iterable<?>) List.of()));
         assertTrue(isEmpty((Iterable<?>) null));
 
         requireNotEmpty((Iterable<String>) mutableList("1"));
         requireNotEmpty((Iterable<String>) mutableList("1"), MESSAGE);
-        Iterable<String> emptyIterable = Collections.emptyList();
+        Iterable<String> emptyIterable = List.of();
         assertThrows(IllegalArgumentException.class, () ->
                 requireNotEmpty(emptyIterable));
 
@@ -69,12 +69,12 @@ class MoreCollectionsTest {
     void shouldDetermineEmptinessForCollection() {
         assertFalse(isEmpty(mutableList("1")));
         assertFalse(isEmpty(mutableList("1", "2")));
-        assertTrue(isEmpty(Collections.emptyList()));
+        assertTrue(isEmpty(List.of()));
         assertTrue(isEmpty((Collection<?>) null));
 
         requireNotEmpty(mutableList("1"));
         requireNotEmpty(mutableList("1"), MESSAGE);
-        List<String> emptyList = Collections.emptyList();
+        List<String> emptyList = List.of();
         assertThrows(IllegalArgumentException.class, () ->
                 requireNotEmpty(emptyList));
 
@@ -116,7 +116,7 @@ class MoreCollectionsTest {
     @Test
     void shouldDetermineEmptinessForStream() {
         assertFalse(isEmpty(mutableList("1").stream()));
-        assertFalse(isEmpty(Collections.emptyList().stream()));
+        assertFalse(isEmpty(List.of().stream()));
         assertTrue(isEmpty((Stream<?>) null));
 
         requireNotEmpty(mutableList("1").stream());
@@ -135,7 +135,7 @@ class MoreCollectionsTest {
         Map<String, String> map = immutableMap(key, value);
 
         assertFalse(containsKey(null, key));
-        assertFalse(containsKey(Collections.emptyMap(), key));
+        assertFalse(containsKey(Map.of(), key));
 
         assertFalse(containsKey(map));
         assertFalse(containsKey(map, (Object[]) null));
@@ -241,7 +241,7 @@ class MoreCollectionsTest {
                 diff.entriesDiffering()).hashCode(), diff.hashCode());
 
         assertNotEquals(diff, otherDiff);
-        assertNotEquals(diff, "someString");
+        assertNotEquals("someString", diff);
         assertNotEquals(null, diff);
     }
 
@@ -261,7 +261,7 @@ class MoreCollectionsTest {
         assertEquals(Arrays.asList("value1", "value2").hashCode(), difference.hashCode());
 
         assertNotEquals(difference, otherDifference);
-        assertNotEquals(difference, "someString");
+        assertNotEquals("someString", difference);
         assertNotEquals(null, difference);
         assertNotNull(difference.toString());
     }

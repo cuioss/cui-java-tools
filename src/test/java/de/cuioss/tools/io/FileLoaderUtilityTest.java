@@ -17,7 +17,6 @@ package de.cuioss.tools.io;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -47,7 +46,7 @@ class FileLoaderUtilityTest {
     }
 
     @Test
-    void shouldCopyExistingFile() throws IOException {
+    void shouldCopyExistingFile() throws Exception {
         final var copy = copyFileToTemp(LOADER_EXISTING_FILE_CLASSPATH, true);
         assertNotNull(copy);
         assertTrue(Files.exists(copy));
@@ -81,7 +80,7 @@ class FileLoaderUtilityTest {
     }
 
     @Test
-    void shouldReturnContentAsString() throws IOException {
+    void shouldReturnContentAsString() throws Exception {
         var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH);
         assertNotNull(loaded);
         assertFalse(loaded.isEmpty());
@@ -102,7 +101,7 @@ class FileLoaderUtilityTest {
     }
 
     @Test
-    void shouldReturnContentAsStringWithCharset() throws IOException {
+    void shouldReturnContentAsStringWithCharset() throws Exception {
         var loaded = FileLoaderUtility.toString(LOADER_EXISTING_FILE_CLASSPATH, StandardCharsets.UTF_8);
         assertNotNull(loaded);
         assertFalse(loaded.isEmpty());

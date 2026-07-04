@@ -373,7 +373,7 @@ public final class MoreReflection {
     public static <A extends Annotation> List<A> extractAllAnnotations(final Class<?> annotatedType,
             final Class<A> annotation) {
         if (null == annotatedType || Object.class.equals(annotatedType)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         final var builder = new CollectionBuilder<A>();

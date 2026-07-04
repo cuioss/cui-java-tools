@@ -31,7 +31,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -361,7 +360,7 @@ class KeyStoreProviderTest {
 
     // File Based Keystore tests
     @Test
-    void shouldHandleEmptyKeyStore() throws KeyStoreException {
+    void shouldHandleEmptyKeyStore() throws Exception {
         var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE.toFile())
                 .storePassword(KeystoreInformation.PASSWORD).keyStoreType(KeyStoreType.KEY_STORE).build();
         var keystore = provider.resolveKeyStore();
@@ -377,7 +376,7 @@ class KeyStoreProviderTest {
     }
 
     @Test
-    void shouldHandleUnprotectedEmptyKeyStore() throws KeyStoreException {
+    void shouldHandleUnprotectedEmptyKeyStore() throws Exception {
         var provider = KeyStoreProvider.builder().location(KeystoreInformation.EMPTY_KEY_STORE_NO_PASSWORD.toFile())
                 .keyStoreType(KeyStoreType.KEY_STORE).build();
         var keystore = provider.resolveKeyStore();

@@ -214,7 +214,7 @@ public class CollectionLiterals {
      * @param <E> a E class
      */
     public static <E> List<E> immutableList() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     /**
@@ -229,7 +229,7 @@ public class CollectionLiterals {
     @SafeVarargs
     public static <E> List<E> immutableList(E... elements) {
         if (isEmpty(elements)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(mutableList(elements));
     }
@@ -245,7 +245,7 @@ public class CollectionLiterals {
      */
     public static <E> List<E> immutableList(E element) {
         if (null == element) {
-            return Collections.emptyList();
+            return List.of();
         }
         return List.of(element);
     }
@@ -261,7 +261,7 @@ public class CollectionLiterals {
      */
     public static <E> List<E> immutableList(Iterable<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(mutableList(elements));
     }
@@ -278,7 +278,7 @@ public class CollectionLiterals {
      */
     public static <E> List<E> immutableList(Collection<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return Collections.unmodifiableList(mutableList(elements));
@@ -295,7 +295,7 @@ public class CollectionLiterals {
      */
     public static <E> List<E> immutableList(Stream<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(mutableList(elements));
     }
@@ -311,7 +311,7 @@ public class CollectionLiterals {
      */
     public static <E> List<E> immutableList(Iterator<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Collections.unmodifiableList(mutableList(elements));
     }
@@ -437,7 +437,7 @@ public class CollectionLiterals {
      * @param <E> a E class
      */
     public static <E> Set<E> immutableSet() {
-        return Collections.emptySet();
+        return Set.of();
     }
 
     /**
@@ -451,7 +451,7 @@ public class CollectionLiterals {
      */
     public static <E> Set<E> immutableSet(E element) {
         if (null == element) {
-            return Collections.emptySet();
+            return Set.of();
         }
         return Set.of(element);
     }
@@ -468,7 +468,7 @@ public class CollectionLiterals {
     @SafeVarargs
     public static <E> Set<E> immutableSet(E... elements) {
         if (isEmpty(elements)) {
-            return Collections.emptySet();
+            return Set.of();
         }
         return Collections.unmodifiableSet(mutableSet(elements));
     }
@@ -483,7 +483,7 @@ public class CollectionLiterals {
      */
     public static <E> Set<E> immutableSet(Iterable<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptySet();
+            return Set.of();
         }
         return Collections.unmodifiableSet(mutableSet(elements));
     }
@@ -499,7 +499,7 @@ public class CollectionLiterals {
      */
     public static <E> Set<E> immutableSet(Iterator<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptySet();
+            return Set.of();
         }
         return Collections.unmodifiableSet(mutableSet(elements));
     }
@@ -515,7 +515,7 @@ public class CollectionLiterals {
      */
     public static <E> Set<E> immutableSet(Stream<? extends E> elements) {
         if (isEmpty(elements)) {
-            return Collections.emptySet();
+            return Set.of();
         }
         return Collections.unmodifiableSet(mutableSet(elements));
     }
@@ -802,7 +802,7 @@ public class CollectionLiterals {
      * @param <V> a V class
      */
     public static <K, V> Map<K, V> immutableMap() {
-        return Collections.emptyMap();
+        return Map.of();
     }
 
     /**
@@ -819,7 +819,7 @@ public class CollectionLiterals {
      */
     public static <K, V> Map<K, V> immutableMap(Map<K, V> source) {
         if (null == source) {
-            return Collections.emptyMap();
+            return Map.of();
         }
         return copyToUnmodifiableMap(source);
     }

@@ -22,7 +22,6 @@ import lombok.experimental.UtilityClass;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -103,7 +102,7 @@ public final class UrlHelper {
      */
     public static List<String> splitPath(String pathString) {
         if (isEmpty(pathString)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Splitter.on(Pattern.compile("/")).trimResults().omitEmptyStrings().splitToList(pathString);
     }
@@ -117,7 +116,7 @@ public final class UrlHelper {
      */
     public static List<String> splitHost(String host) {
         if (isEmpty(host)) {
-            return Collections.emptyList();
+            return List.of();
         }
         return Splitter.on(Pattern.compile("\\.")).trimResults().omitEmptyStrings().splitToList(host);
     }

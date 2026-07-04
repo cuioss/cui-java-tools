@@ -97,13 +97,13 @@ class HexTest {
 
         @Test
         @DisplayName("handle empty byte array")
-        void decodeByteArrayEmpty() throws DecoderException {
+        void decodeByteArrayEmpty() throws Exception {
             assertArrayEquals(new byte[0], new Hex().decode(new byte[0]));
         }
 
         @Test
         @DisplayName("handle empty byte buffer")
-        void decodeByteBufferEmpty() throws DecoderException {
+        void decodeByteBufferEmpty() throws Exception {
             assertArrayEquals(new byte[0], new Hex().decode(ByteBuffer.allocate(0)));
         }
 
@@ -169,7 +169,7 @@ class HexTest {
 
         @Test
         @DisplayName("decode hex string correctly")
-        void decodeHexString() throws DecoderException {
+        void decodeHexString() throws Exception {
             final var input = "48656c6c6f20576f726c64";
             final var expected = "Hello World".getBytes(StandardCharsets.UTF_8);
             assertArrayEquals(expected, Hex.decodeHex(input));
@@ -177,7 +177,7 @@ class HexTest {
 
         @Test
         @DisplayName("decode hex char array correctly")
-        void decodeHexCharArray() throws DecoderException {
+        void decodeHexCharArray() throws Exception {
             final var input = "48656c6c6f20576f726c64".toCharArray();
             final var expected = "Hello World".getBytes(StandardCharsets.UTF_8);
             assertArrayEquals(expected, Hex.decodeHex(input));
@@ -287,7 +287,7 @@ class HexTest {
 
         @Test
         @DisplayName("handle empty inputs")
-        void handleEmptyInputs() throws DecoderException {
+        void handleEmptyInputs() throws Exception {
             // Empty string decode
             assertArrayEquals(new byte[0], Hex.decodeHex(""));
             assertArrayEquals(new byte[0], Hex.decodeHex(new char[0]));
@@ -332,7 +332,7 @@ class HexTest {
 
         @Test
         @DisplayName("correctly encode and decode random data")
-        void roundTripRandom() throws DecoderException {
+        void roundTripRandom() throws Exception {
             final var hex = new Hex();
             final var random = new Random();
 
@@ -350,7 +350,7 @@ class HexTest {
 
         @Test
         @DisplayName("correctly handle case sensitivity")
-        void roundTripCaseSensitivity() throws DecoderException {
+        void roundTripCaseSensitivity() throws Exception {
             final var hex = new Hex();
             final var data = "Hello World".getBytes(StandardCharsets.UTF_8);
 

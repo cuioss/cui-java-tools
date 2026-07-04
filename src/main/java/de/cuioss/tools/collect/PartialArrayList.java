@@ -22,7 +22,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -70,7 +69,7 @@ public class PartialArrayList<T extends Serializable> extends ArrayList<T> imple
      * @return an empty {@link PartialArrayList}.
      */
     public static <T extends Serializable> PartialArrayList<T> emptyList() {
-        return new PartialArrayList<>(Collections.emptyList(), false);
+        return new PartialArrayList<>(List.of(), false);
     }
 
     /**

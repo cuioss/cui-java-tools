@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static de.cuioss.tools.collect.CollectionLiterals.mutableList;
@@ -65,7 +64,7 @@ class MoreReflectionTest {
 
     @Test
     void shouldFilterAccessGetterMethods() {
-        assertEquals(3, MoreReflection.retrieveAccessMethods(MethodNameClass.class, Collections.emptyList()).size());
+        assertEquals(3, MoreReflection.retrieveAccessMethods(MethodNameClass.class, List.of()).size());
         assertEquals(2, MoreReflection.retrieveAccessMethods(MethodNameClass.class, mutableList("name")).size());
     }
 

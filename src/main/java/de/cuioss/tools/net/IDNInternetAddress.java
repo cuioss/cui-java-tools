@@ -15,10 +15,9 @@
  */
 package de.cuioss.tools.net;
 
+import de.cuioss.tools.logging.CuiLogger;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-
-import de.cuioss.tools.logging.CuiLogger;
 
 import java.net.IDN;
 import java.util.function.UnaryOperator;

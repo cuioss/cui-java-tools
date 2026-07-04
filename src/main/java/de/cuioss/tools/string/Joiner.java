@@ -204,14 +204,14 @@ public final class Joiner {
         }
         var builder = new ArrayList<CharSequence>();
         for (Object element : parts) {
-            if (null == element) {
-                if (!joinerConfig.isSkipNulls()) {
-                    builder.add(joinerConfig.getUseForNull());
+            switch (element) {
+                case null -> {
+                    if (!joinerConfig.isSkipNulls()) {
+                        builder.add(joinerConfig.getUseForNull());
+                    }
                 }
-            } else if (element instanceof CharSequence sequence) {
-                builder.add(sequence);
-            } else {
-                builder.add(MoreStrings.lenientToString(element));
+                case CharSequence sequence -> builder.add(sequence);
+                default -> builder.add(MoreStrings.lenientToString(element));
             }
         }
         if (joinerConfig.isSkipEmpty()) {

@@ -172,7 +172,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     public static List<UrlParameter> getUrlParameterFromMap(final Map<String, List<String>> map,
             final ParameterFilter parameterFilter, final boolean encode) {
         if (MoreCollections.isEmpty(map)) {
-            return Collections.emptyList();
+            return List.of();
         }
         final List<UrlParameter> extracted = new ArrayList<>();
         for (final Entry<String, List<String>> entry : map.entrySet()) {
@@ -204,7 +204,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     public static List<UrlParameter> filterParameter(final List<UrlParameter> toBeFiltered,
             final ParameterFilter parameterFilter) {
         if (toBeFiltered == null || toBeFiltered.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         final var filtered = new ArrayList<UrlParameter>();
         for (final UrlParameter parameter : toBeFiltered) {
@@ -249,7 +249,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
     public static List<UrlParameter> fromQueryString(String queryString) {
         LOGGER.trace("Parsing Query String %s", queryString);
         if (MoreStrings.isEmpty(queryString)) {
-            return Collections.emptyList();
+            return List.of();
         }
         var cleaned = queryString.trim();
         if (cleaned.startsWith("?")) {
@@ -257,7 +257,7 @@ public class UrlParameter implements Serializable, Comparable<UrlParameter> {
         }
         if (MoreStrings.isEmpty(cleaned)) {
             LOGGER.debug("Given String solely consists of '?' symbol, ignoring");
-            return Collections.emptyList();
+            return List.of();
         }
         var elements = Splitter.on(Pattern.compile("&")).trimResults().omitEmptyStrings().splitToList(cleaned);
         var builder = new CollectionBuilder<UrlParameter>();
