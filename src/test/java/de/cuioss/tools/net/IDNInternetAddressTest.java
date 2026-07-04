@@ -96,6 +96,16 @@ class IDNInternetAddressTest {
     }
 
     @Test
+    void shouldFallBackToUnconvertedDomainForMalformedIdn() {
+        // 'domain..com' matches the address patterns but IDN.toASCII rejects the
+        // empty label with an IllegalArgumentException; encode must fall back to
+        // the unconverted domain instead of propagating the exception
+        assertEquals("user1@domain..com", IDNInternetAddress.encode("user1@domain..com"));
+        assertEquals("MD KARIN KALLWITZ <user1@domain..com>",
+                IDNInternetAddress.encode("MD KARIN KALLWITZ <user1@domain..com>"));
+    }
+
+    @Test
     void shouldReturnNonMatchingInputSanitizedButUnmodified() {
         // Neither pattern matches input without an '@' character
         assertEquals("no-mail-address", IDNInternetAddress.encode("no-mail-address"));
