@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,14 +102,15 @@ public enum LogLevel {
     }
 
     /**
-     * @param juliLevel the Java Util Logging level to convert
+     * @param juliLevel the Java Util Logging level to convert, must not be null
      * @return CUI log level
+     * @throws NullPointerException if juliLevel is null
      */
     public static LogLevel from(final Level juliLevel) {
+        Objects.requireNonNull(juliLevel, "juliLevel must not be null");
         // highest value first, i.e. OFF, ERROR, WARN, INFO, DEBUG, TRACE
         List<LogLevel> sortedCuiLevels = CollectionLiterals.mutableList(values());
-        sortedCuiLevels.sort(Comparator.comparing(logLevel -> logLevel.getJuliLevel().intValue()));
-        sortedCuiLevels.sort(Comparator.reverseOrder());
+        sortedCuiLevels.sort(Comparator.comparingInt((LogLevel logLevel) -> logLevel.getJuliLevel().intValue()).reversed());
 
         final var juliIntLevel = juliLevel.intValue();
         for (LogLevel cuiLevel : sortedCuiLevels) {
@@ -121,8 +123,10 @@ public enum LogLevel {
     }
 
     private void doLog(final Logger logger, final String message, final @Nullable Throwable throwable) {
-        // We go up the stack-trace until we found the call from CuiLogger.
-        final var caller = MoreReflection.findCallerElement(throwable, MARKER_CLASS_NAMES);
+        // We go up the current call-stack until we found the call from CuiLogger. The throwable
+        // must not be used here: its stack-trace describes where it was created, not where the
+        // log-statement was issued.
+        final var caller = MoreReflection.findCallerElement(null, MARKER_CLASS_NAMES);
         if (caller.isPresent()) {
             // This is needed because otherwise LogRecord will assume this class and this
             // method as
