@@ -111,6 +111,17 @@ class CuiLoggerTest {
             underTest.getWrapped().setLevel(Level.INFO);
             assertEquals(LogLevel.INFO, underTest.getLogLevel());
         }
+
+        @Test
+        @DisplayName("Should resolve effective log level for logger with inherited level")
+        void shouldResolveEffectiveLogLevelForInheritedLevel() {
+            var logger = new CuiLogger("de.cuioss.tools.logging.inherited.level.LevelInheritingLogger");
+            // Fresh loggers inherit their level, i.e. Logger.getLevel() returns null
+            assertNull(logger.getWrapped().getLevel());
+
+            var logLevel = assertDoesNotThrow(logger::getLogLevel);
+            assertNotNull(logLevel);
+        }
     }
 
     @Nested
@@ -549,6 +560,33 @@ class CuiLoggerTest {
             assumeTrue(underTest.isErrorEnabled(), "Error logging must be enabled");
             underTest.error(throwable, message);
             handler.assertMessagePresent(message, Level.SEVERE, throwable);
+        }
+    }
+
+    @Nested
+    @DisplayName("Caller Resolution Tests")
+    class CallerResolutionTests {
+
+        @Test
+        @DisplayName("Should resolve source class and method for plain log call")
+        void shouldResolveCallerForPlainLogCall() {
+            underTest.info("plain message");
+
+            var logRecord = handler.records.getFirst();
+            assertEquals(CallerResolutionTests.class.getName(), logRecord.getSourceClassName());
+            assertEquals("shouldResolveCallerForPlainLogCall", logRecord.getSourceMethodName());
+        }
+
+        @Test
+        @DisplayName("Should resolve source class and method for log call with throwable")
+        void shouldResolveCallerForLogCallWithThrowable() {
+            // The throwable is created in a different method (before()). The caller must
+            // nevertheless be resolved from the current stack, not the throwable's stack.
+            underTest.error(throwable, "message with throwable");
+
+            var logRecord = handler.records.getFirst();
+            assertEquals(CallerResolutionTests.class.getName(), logRecord.getSourceClassName());
+            assertEquals("shouldResolveCallerForLogCallWithThrowable", logRecord.getSourceMethodName());
         }
     }
 
