@@ -108,7 +108,10 @@ public class PropertyUtil {
      * @param bean         the bean to read from, must not be null
      * @param propertyName the name of the property to read, must not be null or empty
      * @return the value of the property
-     * @throws IllegalArgumentException if the property cannot be read or does not exist
+     * @throws IllegalArgumentException if the property does not exist or the read method
+     *                                  cannot be invoked with the given bean
+     * @throws IllegalStateException if the read method is not accessible or throws an
+     *                               exception (wrapped {@link InvocationTargetException})
      * @since 2.0
      */
     @SuppressWarnings("java:S3655")
@@ -123,13 +126,16 @@ public class PropertyUtil {
         Preconditions.checkArgument(reader.isPresent(), UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass());
         try {
             return reader.get().invoke(bean);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
-            LOGGER.debug("Property read failed due to access restrictions", e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(
+                    MoreStrings.lenientFormat(UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass()), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    MoreStrings.lenientFormat(UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass()), e);
         } catch (InvocationTargetException e) {
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_READ_PROPERTY, propertyName, bean.getClass()), e);
         }
-        return null;
     }
 
     /**
@@ -139,7 +145,10 @@ public class PropertyUtil {
      * @param bean          the bean to write to, must not be null
      * @param propertyName  the name of the property to write, must not be null or empty
      * @param propertyValue the value to write to the property
-     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @throws IllegalArgumentException if the property does not exist or the write method
+     *                                  cannot be invoked with the given value
+     * @throws IllegalStateException if the write method is not accessible or throws an
+     *                               exception (wrapped {@link InvocationTargetException})
      * @since 2.4.1
      */
     public static void setProperty(Object bean, String propertyName, Object propertyValue) {
@@ -155,7 +164,10 @@ public class PropertyUtil {
      * @param propertyName  the name of the property to write, must not be null or empty
      * @param propertyValue the value to write to the property
      * @return the bean instance (for method chaining)
-     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @throws IllegalArgumentException if the property does not exist or the write method
+     *                                  cannot be invoked with the given value
+     * @throws IllegalStateException if the write method is not accessible or throws an
+     *                               exception (wrapped {@link InvocationTargetException})
      * @since 2.0
      * @deprecated Use {@link #setProperty(Object, String, Object)} for pure command operations
      */
@@ -174,25 +186,31 @@ public class PropertyUtil {
      * @param propertyName  the name of the property to write, must not be null or empty
      * @param propertyValue the value to write to the property
      * @return the bean instance (for method chaining)
-     * @throws IllegalArgumentException if the property cannot be written or does not exist
+     * @throws IllegalArgumentException if the property does not exist or the write method
+     *                                  cannot be invoked with the given value
+     * @throws IllegalStateException if the write method is not accessible or throws an
+     *                               exception (wrapped {@link InvocationTargetException})
      */
     static Object writePropertyWithChaining(Object bean, String propertyName, Object propertyValue) {
         LOGGER.debug("Writing '%s' to property '%s' on '%s'", propertyValue, propertyName, bean);
         requireNonNull(bean);
         requireNotEmptyTrimmed(propertyName);
         var writeMethod = determineWriteMethod(bean, propertyName, propertyValue);
+        var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
         try {
             var result = writeMethod.invoke(bean, propertyValue);
             return Objects.requireNonNullElse(result, bean);
-        } catch (IllegalAccessException | IllegalArgumentException e) {
-            LOGGER.debug("Property write failed due to access restrictions", e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(
+                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), target), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY, propertyName, bean.getClass(), target), e);
         } catch (InvocationTargetException e) {
-            var target = propertyValue != null ? propertyValue.getClass().getName() : "Undefined";
             throw new IllegalStateException(
                     MoreStrings.lenientFormat(UNABLE_TO_WRITE_PROPERTY_RUNTIME, propertyName, bean.getClass(), target),
                     e);
         }
-        return bean;
     }
 
     /**

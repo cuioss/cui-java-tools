@@ -79,9 +79,9 @@ public class FieldWrapper {
             LOGGER.trace("Given Object is improper type, returning Optional#empty()");
             return Optional.empty();
         }
-        var initialAccessible = field.canAccess(source);
-        LOGGER.trace("Reading from field '%s' with accessibleFlag='%s' ", field, initialAccessible);
         synchronized (field) {
+            var initialAccessible = field.canAccess(source);
+            LOGGER.trace("Reading from field '%s' with accessibleFlag='%s' ", field, initialAccessible);
             if (!initialAccessible) {
                 LOGGER.trace("Explicitly setting accessible flag");
                 field.setAccessible(true);
@@ -106,10 +106,15 @@ public class FieldWrapper {
      * resets the field accessibility.
      *
      * @param fieldName to be read
-     * @param object    to be read from
-     * @return the field value. {@link Optional#empty()} if the field cannot be read.
+     * @param object    to be read from, may be null
+     * @return the field value. {@link Optional#empty()} if the field cannot be read
+     * or the given object is null.
      */
     public static Optional<Object> readValue(final String fieldName, final Object object) {
+        if (null == object) {
+            LOGGER.trace("No Object given, returning Optional#empty()");
+            return Optional.empty();
+        }
         final var fieldProvider = from(object.getClass(), fieldName);
         LOGGER.trace("FieldWrapper: %s", fieldProvider);
         if (fieldProvider.isPresent()) {
@@ -126,12 +131,15 @@ public class FieldWrapper {
      * @param target the object to write to
      * @param value  the value to write
      * @throws IllegalStateException if the field cannot be accessed
+     * @throws IllegalArgumentException if the value is not assignable to the field type
+     *                                  or the target is not an instance of the class
+     *                                  declaring the field
      * @throws NullPointerException if target is null
      */
     public void writeValue(@NonNull Object target, Object value) {
-        var initialAccessible = field.canAccess(target);
-        LOGGER.trace("Writing to field '%s' with accessibleFlag='%s' ", field, initialAccessible);
         synchronized (field) {
+            var initialAccessible = field.canAccess(target);
+            LOGGER.trace("Writing to field '%s' with accessibleFlag='%s' ", field, initialAccessible);
             if (!initialAccessible) {
                 LOGGER.trace("Explicitly setting accessible flag");
                 field.setAccessible(true);

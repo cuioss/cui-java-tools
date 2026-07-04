@@ -24,7 +24,7 @@ public class BeanWithReadWriteProperties {
     public static final String ATTRIBUTE_READ_WRITE_WITH_BUILDER = "readWriteWithBuilder";
     public static final String ATTRIBUTE_READ_ONLY = "readOnlyProperty";
     public static final String ATTRIBUTE_WRITE_ONLY = "writeOnlyProperty";
-    public static final String ATTRIBUTE_NOT_ACCESSIBLE = "notAccesibleProperty";
+    public static final String ATTRIBUTE_NOT_ACCESSIBLE = "notAccessibleProperty";
     public static final String ATTRIBUTE_TRANSIENT_VALUE = "transientProperty";
     public static final String ATTRIBUTE_DEFAULT_VALUE = "defaultValueProperty";
     public static final String ATTRIBUTE_DEFAULT_VALUE_VALUE = "defaultValue";

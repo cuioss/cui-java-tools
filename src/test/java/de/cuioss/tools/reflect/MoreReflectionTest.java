@@ -197,4 +197,33 @@ class MoreReflectionTest {
     void shouldResolvePackageName() {
         assertEquals("de.cuioss.tools.reflect", MoreReflection.getPackageName(getClass()));
     }
+
+    @Test
+    void findCallerElementShouldHandleMinimalStack() {
+        var throwable = new Throwable();
+        throwable.setStackTrace(new StackTraceElement[]{
+                stackTraceElement("java.lang.Thread"),
+                stackTraceElement("de.cuioss.tools.reflect.MoreReflection"),
+                stackTraceElement("com.example.Marker"),
+                stackTraceElement("com.example.Caller")});
+
+        var caller = MoreReflection.findCallerElement(throwable, mutableList("com.example.Marker"));
+        assertTrue(caller.isPresent(), "A minimal stack of 4 frames must be sufficient");
+        assertEquals("com.example.Caller", caller.get().getClassName());
+    }
+
+    @Test
+    void findCallerElementShouldHandleTooShortStack() {
+        var throwable = new Throwable();
+        throwable.setStackTrace(new StackTraceElement[]{
+                stackTraceElement("java.lang.Thread"),
+                stackTraceElement("de.cuioss.tools.reflect.MoreReflection"),
+                stackTraceElement("com.example.Marker")});
+
+        assertFalse(MoreReflection.findCallerElement(throwable, mutableList("com.example.Marker")).isPresent());
+    }
+
+    private static StackTraceElement stackTraceElement(String className) {
+        return new StackTraceElement(className, "someMethod", "SomeFile.java", 42);
+    }
 }

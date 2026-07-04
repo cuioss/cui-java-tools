@@ -39,7 +39,50 @@ class PropertyHolderTest {
                 from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE_WITH_BUILDER).get().getReadWrite());
         assertEquals(READ_ONLY, from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_ONLY).get().getReadWrite());
         assertEquals(WRITE_ONLY, from(BeanWithReadWriteProperties.class, ATTRIBUTE_WRITE_ONLY).get().getReadWrite());
-        assertFalse(from(BeanWithReadWriteProperties.class, ATTRIBUTE_NOT_ACCESSIBLE).isPresent());
+    }
+
+    @Test
+    void shouldResolveFieldWithoutAccessors() {
+        var holder = from(BeanWithReadWriteProperties.class, ATTRIBUTE_NOT_ACCESSIBLE);
+        assertTrue(holder.isPresent(), "Field without accessors should be resolvable via reflection");
+        assertEquals(NONE, holder.get().getReadWrite());
+        assertEquals(String.class, holder.get().getType());
+        assertEquals(PropertyMemberInfo.DEFAULT, holder.get().getMemberInfo());
+    }
+
+    @Test
+    void shouldReturnEmptyForNonexistentProperty() {
+        assertFalse(from(BeanWithReadWriteProperties.class, "notThereAtAll").isPresent());
+    }
+
+    @Test
+    void shouldReturnEmptyForIndexedOnlyProperty() {
+        assertFalse(from(BeanWithIndexedOnlyProperty.class, "item").isPresent(),
+                "Indexed-only property provides no property type and should not be resolvable");
+    }
+
+    @Test
+    void shouldWriteAndReadPrimitiveProperty() {
+        var holder = from(BeanWithPrimitives.class, "propertyPrimitive").get();
+        assertEquals(int.class, holder.getType());
+        var bean = new BeanWithPrimitives();
+        int number = Generators.integers(1, 1024).next();
+        assertNotNull(holder.writeTo(bean, number));
+        assertEquals(number, holder.readFrom(bean));
+    }
+
+    @Test
+    void readFromShouldFailForWriteOnlyProperty() {
+        var holder = from(BeanWithReadWriteProperties.class, ATTRIBUTE_WRITE_ONLY).get();
+        var bean = new BeanWithReadWriteProperties();
+        assertThrows(IllegalStateException.class, () -> holder.readFrom(bean));
+    }
+
+    @Test
+    void writeToShouldFailForReadOnlyProperty() {
+        var holder = from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_ONLY).get();
+        var bean = new BeanWithReadWriteProperties();
+        assertThrows(IllegalStateException.class, () -> holder.writeTo(bean, "value"));
     }
 
     @Test

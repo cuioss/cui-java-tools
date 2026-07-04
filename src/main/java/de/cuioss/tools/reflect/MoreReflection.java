@@ -22,6 +22,7 @@ import lombok.Synchronized;
 import lombok.experimental.UtilityClass;
 
 import java.lang.annotation.Annotation;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -51,10 +52,16 @@ import static java.util.Objects.requireNonNull;
  * <h2>Usage Examples</h2>
  * <pre>{@code
  * // Access field with caching
- * Optional<Field> field = MoreReflection.accessField(MyBean.class;, "firstName");
+ * Optional<Field> field = MoreReflection.accessField(MyBean.class, "firstName");
  *
  * // Handle field access safely
- * field.ifPresent(f -> {Object value = f.get(bean);});
+ * field.ifPresent(f -> {
+ *     try {
+ *         Object value = f.get(bean);
+ *     } catch (IllegalAccessException e) {
+ *         // handle inaccessible field
+ *     }
+ * });
  * }</pre>
  *
  * <h2>Best Practices</h2>
@@ -76,11 +83,15 @@ public final class MoreReflection {
 
     /**
      * We use {@link WeakHashMap} in order to allow the garbage collector to do its
-     * job
+     * job. The values are wrapped in {@link SoftReference}s because {@link Method}
+     * and {@link Field} instances strongly reference their declaring {@link Class}:
+     * a strongly referenced value would otherwise keep the weakly referenced key
+     * alive forever, preventing class unloading. Cleared values are simply
+     * recomputed on the next access.
      */
-    private static final Map<Class<?>, List<Method>> publicObjectMethodCache = new WeakHashMap<>();
+    private static final Map<Class<?>, SoftReference<List<Method>>> publicObjectMethodCache = new WeakHashMap<>();
 
-    private static final Map<Class<?>, Map<String, Field>> fieldCache = new WeakHashMap<>();
+    private static final Map<Class<?>, SoftReference<Map<String, Field>>> fieldCache = new WeakHashMap<>();
 
     /**
      * Tries to access a field on a given type. If none can be found it recursively
@@ -104,10 +115,12 @@ public final class MoreReflection {
     public static Optional<Field> accessField(final Class<?> type, final String fieldName) {
         requireNonNull(type);
         requireNonNull(fieldName);
-        if (!fieldCache.containsKey(type)) {
-            fieldCache.put(type, new HashMap<>());
+        final var reference = fieldCache.get(type);
+        Map<String, Field> typeMap = null != reference ? reference.get() : null;
+        if (null == typeMap) {
+            typeMap = new HashMap<>();
+            fieldCache.put(type, new SoftReference<>(typeMap));
         }
-        final Map<String, Field> typeMap = fieldCache.get(type);
         if (!typeMap.containsKey(fieldName)) {
             typeMap.put(fieldName, resolveField(type, fieldName).orElse(null));
         }
@@ -138,19 +151,21 @@ public final class MoreReflection {
     public static List<Method> retrievePublicObjectMethods(final Class<?> clazz) {
         requireNonNull(clazz);
 
-        if (!publicObjectMethodCache.containsKey(clazz)) {
-            final List<Method> found = new ArrayList<>();
-            for (final Method method : clazz.getMethods()) {
-                final int modifiers = method.getModifiers();
-                if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
-                        && !"getClass".equals(method.getName())) {
-                    found.add(method);
-                }
-            }
-            publicObjectMethodCache.put(clazz, found);
-            return found;
+        final var reference = publicObjectMethodCache.get(clazz);
+        final List<Method> cached = null != reference ? reference.get() : null;
+        if (null != cached) {
+            return cached;
         }
-        return publicObjectMethodCache.get(clazz);
+        final List<Method> found = new ArrayList<>();
+        for (final Method method : clazz.getMethods()) {
+            final int modifiers = method.getModifiers();
+            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
+                    && !"getClass".equals(method.getName())) {
+                found.add(method);
+            }
+        }
+        publicObjectMethodCache.put(clazz, new SoftReference<>(found));
+        return found;
     }
 
     /**
@@ -407,7 +422,8 @@ public final class MoreReflection {
      *
      * @param <T>                   identifying the type to be looked for
      * @param typeToBeExtractedFrom must not be null
-     * @return an {@link Optional} of the KeyStoreType-Argument of the given class.
+     * @return the {@link Class} representing the first generic type argument of the
+     * given class.
      * @throws IllegalArgumentException in case the given type does not represent a
      *                                  generic.
      */
@@ -416,21 +432,16 @@ public final class MoreReflection {
     public static <T> Class<T> extractFirstGenericTypeArgument(final Class<?> typeToBeExtractedFrom) {
         final var parameterizedType = extractParameterizedType(typeToBeExtractedFrom)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Given type defines no generic KeyStoreType: " + typeToBeExtractedFrom));
+                        "Given type defines no generic type argument: " + typeToBeExtractedFrom));
 
         requireNotEmpty(parameterizedType.getActualTypeArguments(),
                 "No type argument found for " + typeToBeExtractedFrom.getName());
 
         final Class<?> firstType = extractGenericTypeCovariantly(parameterizedType.getActualTypeArguments()[0])
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Unable to determine genric type for " + typeToBeExtractedFrom));
+                        "Unable to determine generic type argument for " + typeToBeExtractedFrom));
 
-        try {
-            return (Class<T>) firstType;
-        } catch (final ClassCastException e) {
-            throw new IllegalArgumentException(
-                    "No type argument can be extracted from " + typeToBeExtractedFrom.getName(), e);
-        }
+        return (Class<T>) firstType;
     }
 
     /**
@@ -504,7 +515,7 @@ public final class MoreReflection {
      * method invocations to {@code handler}. The class loader of
      * {@code interfaceType} will be used to define the proxy class. To implement
      * multiple interfaces or specify a class loader, use
-     * Proxy#newProxyInstance(Class, Constructor, InvocationHandler).
+     * {@link Proxy#newProxyInstance(ClassLoader, Class[], InvocationHandler)}.
      *
      * @param interfaceType must not be null
      * @param handler       the invocation handler
@@ -556,7 +567,9 @@ public final class MoreReflection {
         } else {
             stackTraceElements = throwable.getStackTrace();
         }
-        if (null == stackTraceElements || stackTraceElements.length < 5) {
+        // A minimal valid stack consists of 4 frames: getStackTrace / this method,
+        // the intermediate frame, the marker frame at index 2, and the caller at index 3
+        if (null == stackTraceElements || stackTraceElements.length < 4) {
             return Optional.empty();
         }
         for (var index = 2; index < stackTraceElements.length; index++) {

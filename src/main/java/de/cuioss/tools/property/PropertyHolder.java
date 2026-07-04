@@ -43,16 +43,12 @@ import static java.util.Objects.requireNonNull;
  *
  * <h2>Usage</h2>
  * <pre>
- * // Create a property holder for a field
- * PropertyHolder holder = PropertyHolder.builder()
- *     .name("fieldName")
- *     .type(String.class)
- *     .memberInfo(PropertyMemberInfo.FIELD)
- *     .readWrite(PropertyReadWrite.READ_WRITE)
- *     .build();
+ * // Create a property holder for a property of a bean type
+ * PropertyHolder holder = PropertyHolder.from(MyBean.class, "propertyName")
+ *     .orElseThrow(() -&gt; new IllegalStateException("Property not resolvable"));
  *
  * // Read value
- * String value = holder.readFrom(bean);
+ * Object value = holder.readFrom(bean);
  *
  * // Write value
  * holder.writeTo(bean, "newValue");
@@ -123,8 +119,9 @@ public class PropertyHolder {
      *
      * @param source the bean to read from, must not be null
      * @return the property value, may be null
-     * @throws IllegalStateException if no read method is available
-     * @throws IllegalArgumentException if the bean is null
+     * @throws IllegalStateException if the property is not readable, if no read
+     *                               method is available or if the read operation fails
+     * @throws NullPointerException if the bean is null
      */
     public Object readFrom(Object source) {
         LOGGER.debug("Reading property '%s' from %s", name, source);
@@ -154,9 +151,10 @@ public class PropertyHolder {
      * @return In case the property set method is void the given bean will be returned.
      *         Otherwise, the return value of the method invocation, assuming the setMethod
      *         is a builder / fluent-api type.
-     * @throws IllegalArgumentException if the bean is null or if the property is not
-     *                                  writeable according to the property's write permissions
-     * @throws IllegalStateException if no write method is available or if the write operation fails
+     * @throws IllegalArgumentException if the given value does not match the property type
+     * @throws IllegalStateException if the property is not writeable, if no write method
+     *                               is available or if the write operation fails
+     * @throws NullPointerException if the bean is null
      * @since 2.0
      */
     public Object writeTo(Object target, Object value) {
@@ -165,7 +163,7 @@ public class PropertyHolder {
         Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, target);
 
         if (writeMethod != null) {
-            if (value != null && !type.isInstance(value)) {
+            if (value != null && !MoreReflection.checkWhetherParameterIsAssignable(type, value.getClass())) {
                 throw new IllegalArgumentException(TYPE_MISMATCH.formatted(name, type.getName(), value.getClass().getName()));
             }
             try {
@@ -196,7 +194,9 @@ public class PropertyHolder {
      * @param beanType      the type to create the holder for, must not be null
      * @param attributeName the name of the property to access, must not be null nor empty
      * @return an {@link Optional} containing the concrete {@link PropertyHolder} if
-     *         applicable
+     *         applicable. Returns {@link Optional#empty()} if the property cannot be
+     *         resolved, e.g. it does not exist or provides no resolvable property
+     *         type (like indexed-only properties)
      * @throws IllegalArgumentException if {@link Introspector} is not capable of resolving
      *                                  a {@link PropertyDescriptor}.
      *                                  This usually occurs with invalid Java beans.
@@ -222,6 +222,12 @@ public class PropertyHolder {
 
     private static Optional<PropertyHolder> doBuild(PropertyDescriptor propertyDescriptor, Class<?> type,
             String attributeName) {
+        if (null == propertyDescriptor.getPropertyType()) {
+            LOGGER.debug(
+                    "Property '%s' on type '%s' provides no property type (e.g. indexed-only accessors), returning empty",
+                    attributeName, type);
+            return Optional.empty();
+        }
         var builder = builder();
         builder.name(attributeName);
         builder.readWrite(PropertyReadWrite.fromPropertyDescriptor(propertyDescriptor, type, attributeName));
@@ -245,13 +251,5 @@ public class PropertyHolder {
         builder.memberInfo(PropertyMemberInfo.resolveForBean(beanType, attributeName));
         builder.type(PropertyUtil.resolvePropertyType(beanType, attributeName).orElse(Object.class));
         return Optional.of(builder.build());
-    }
-
-    public PropertyHolder build() {
-        requireNonNull(name, "name must not be null");
-        requireNonNull(type, "type must not be null");
-        requireNonNull(memberInfo, "memberInfo must not be null");
-        requireNonNull(readWrite, "readWrite must not be null");
-        return new PropertyHolder(name, type, memberInfo, readWrite, readMethod, writeMethod);
     }
 }
