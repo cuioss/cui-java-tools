@@ -164,8 +164,7 @@ public class PropertyHolder {
         Preconditions.checkState(readWrite.isWriteable(), "Property '%s' on bean '%s' can not be written", name, target);
 
         if (writeMethod != null) {
-            if (null == value ? type.isPrimitive()
-                    : !MoreReflection.checkWhetherParameterIsAssignable(type, value.getClass())) {
+            if (!isValueAssignable(value)) {
                 throw new IllegalArgumentException(TYPE_MISMATCH.formatted(name, type.getName(),
                         null == value ? "null" : value.getClass().getName()));
             }
@@ -180,6 +179,17 @@ public class PropertyHolder {
 
         // Fallback to PropertyUtil for builder-style methods
         return PropertyUtil.writePropertyWithChaining(target, name, value);
+    }
+
+    /**
+     * A null value is assignable to any non-primitive property; non-null values
+     * must be assignment-compatible with the property type (boxing included).
+     */
+    private boolean isValueAssignable(Object value) {
+        if (null == value) {
+            return !type.isPrimitive();
+        }
+        return MoreReflection.checkWhetherParameterIsAssignable(type, value.getClass());
     }
 
     /**

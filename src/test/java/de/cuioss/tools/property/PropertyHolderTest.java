@@ -72,6 +72,23 @@ class PropertyHolderTest {
     }
 
     @Test
+    void writeToShouldRejectNullForPrimitiveProperty() {
+        var holder = from(BeanWithPrimitives.class, "propertyPrimitive").get();
+        var bean = new BeanWithPrimitives();
+        var exception = assertThrows(IllegalArgumentException.class, () -> holder.writeTo(bean, null));
+        assertTrue(exception.getMessage().contains("null"),
+                "Message should name 'null' as the provided value: " + exception.getMessage());
+    }
+
+    @Test
+    void writeToShouldAcceptNullForObjectProperty() {
+        var holder = from(BeanWithReadWriteProperties.class, ATTRIBUTE_READ_WRITE).get();
+        var bean = new BeanWithReadWriteProperties();
+        assertNotNull(holder.writeTo(bean, null));
+        assertNull(holder.readFrom(bean));
+    }
+
+    @Test
     void readFromShouldFailForWriteOnlyProperty() {
         var holder = from(BeanWithReadWriteProperties.class, ATTRIBUTE_WRITE_ONLY).get();
         var bean = new BeanWithReadWriteProperties();

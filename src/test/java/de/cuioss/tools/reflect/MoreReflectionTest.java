@@ -199,6 +199,14 @@ class MoreReflectionTest {
     }
 
     @Test
+    void requireTypeArgumentsShouldRejectEmptyArray() {
+        assertThrows(IllegalArgumentException.class,
+                () -> MoreReflection.requireTypeArguments(new java.lang.reflect.Type[0], String.class));
+        var arguments = new java.lang.reflect.Type[]{String.class};
+        assertArrayEquals(arguments, MoreReflection.requireTypeArguments(arguments, String.class));
+    }
+
+    @Test
     void findCallerElementShouldHandleMinimalStack() {
         var throwable = new Throwable();
         throwable.setStackTrace(new StackTraceElement[]{
