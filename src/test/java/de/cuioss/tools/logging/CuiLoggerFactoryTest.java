@@ -93,6 +93,25 @@ class CuiLoggerFactoryTest {
     }
 
     @Test
+    void shouldAutoDetectCallerFromBottomOfStackFrame() throws InterruptedException {
+        // A Thread subclass overriding run() and calling getLogger() directly produces the
+        // minimal possible stack of four frames: Thread#getStackTrace, findCallerInternal,
+        // getLogger and run() itself. Caller detection must still succeed for such a stack.
+        final CuiLogger[] loggerHolder = new CuiLogger[1];
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                loggerHolder[0] = CuiLoggerFactory.getLogger();
+            }
+        };
+        thread.start();
+        thread.join();
+
+        assertNotNull(loggerHolder[0]);
+        assertTrue(loggerHolder[0].getName().startsWith(CuiLoggerFactoryTest.class.getName()));
+    }
+
+    @Test
     void shouldHandleMultithreadedInitialization() throws InterruptedException {
         // Test concurrent initialization to ensure thread safety
         final int threadCount = 10;

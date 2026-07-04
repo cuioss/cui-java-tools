@@ -18,7 +18,6 @@ package de.cuioss.tools.collect;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -144,8 +143,8 @@ public final class MapBuilder<K, V> {
      * put.
      * </p>
      *
-     * @param key   to be put as key, must not be empty
-     * @param value to be put as value, must not be empty
+     * @param key   to be put as key
+     * @param value to be put as value, may be {@code null}
      * @return the instance itself in order to use it in a fluent way.
      */
     public MapBuilder<K, V> put(K key, V value) {
@@ -156,8 +155,8 @@ public final class MapBuilder<K, V> {
     /**
      * Puts the entry into the map, if the value is not {@code null}.
      *
-     * @param key   to be put as key, must not be empty
-     * @param value to be put as value
+     * @param key   to be put as key
+     * @param value to be put as value, if it is {@code null} it will be ignored
      * @return the instance itself in order to use it in a fluent way.
      */
     public MapBuilder<K, V> putIfNotNull(K key, V value) {
@@ -234,12 +233,14 @@ public final class MapBuilder<K, V> {
      * </p>
      *
      * @return an immutable {@link java.util.Map} representation of the builders
-     *         content, the actual implementation does not create a copy but
-     *         provides an unmodifiable view using
-     *         {@link java.util.Collections#unmodifiableMap(Map)}
+     *         content, the actual implementation creates a copy of the builders
+     *         content and wraps it using
+     *         {@link java.util.Collections#unmodifiableMap(Map)}. Later
+     *         modifications of this builder therefore do not affect the returned
+     *         map
      */
     public Map<K, V> toImmutableMap() {
-        return Collections.unmodifiableMap(collector);
+        return CollectionLiterals.copyToUnmodifiableMap(collector);
     }
 
     /**

@@ -38,23 +38,24 @@ import java.util.regex.Pattern;
  *
  * <h2>Usage Examples</h2>
  * <pre>
- * // Basic configuration
+ * // Basic configuration: without an explicit pattern the separator is
+ * // treated as a literal string
  * SplitterConfig config1 = SplitterConfig.builder()
  *     .separator(",")
  *     .build();
  *
  * // Advanced configuration
  * SplitterConfig config2 = SplitterConfig.builder()
- *     .separator("\\s*,\\s*")  // Split on comma with optional whitespace
+ *     .separator(",")
  *     .omitEmptyStrings(true)
  *     .trimResults(true)
  *     .maxItems(3)             // Limit to 3 splits
  *     .build();
  *
- * // Raw separator configuration
+ * // Regex separator configuration
  * SplitterConfig config3 = SplitterConfig.builder()
- *     .separator("[,.]")       // Split on comma or period
- *     .doNotModifySeparatorString(true)  // Use separator as-is
+ *     .separator("[,.]")                 // Split on comma or period
+ *     .doNotModifySeparatorString(true)  // Treat separator as a raw regex
  *     .build();
  * </pre>
  *

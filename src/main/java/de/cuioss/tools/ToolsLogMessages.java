@@ -28,7 +28,6 @@ import lombok.experimental.UtilityClass;
  *   <li>001-099: INFO level</li>
  *   <li>100-199: WARN level</li>
  *   <li>200-299: ERROR level</li>
- *   <li>300-399: FATAL level</li>
  * </ul>
  *
  * <h2>Usage Examples</h2>

@@ -20,12 +20,14 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Defines a filter identifying which parameters are not to be included within
  * url parameter handling. Therefore, it filters parameter prefixed with
- * "javax.faces", depending on <code>excludeFacesParameter</code> and
- * additionally a given list of parameter names.
+ * "javax.faces" or "jakarta.faces", depending on
+ * <code>excludeFacesParameter</code> and additionally a given list of parameter
+ * names.
  *
  * @author Oliver Wolff
  */
@@ -38,6 +40,8 @@ public class ParameterFilter implements Serializable {
     private static final long serialVersionUID = -4780294784318006024L;
 
     private static final String JAVAX_FACES = "javax.faces";
+
+    private static final String JAKARTA_FACES = "jakarta.faces";
 
     /**
      * The list of string to be excluded from the parameter-list. Because the test
@@ -58,10 +62,10 @@ public class ParameterFilter implements Serializable {
     public boolean isExcluded(@NonNull final String value) {
         var excluded = false;
         if (excludeFacesParameter) {
-            excluded = value.startsWith(JAVAX_FACES);
+            excluded = value.startsWith(JAVAX_FACES) || value.startsWith(JAKARTA_FACES);
         }
         if (!excluded) {
-            excluded = excludes.contains(value.toLowerCase());
+            excluded = excludes.contains(value.toLowerCase(Locale.ROOT));
         }
         return excluded;
     }

@@ -17,6 +17,7 @@ package de.cuioss.tools.logging;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -146,12 +147,15 @@ public class LogRecordModel implements LogRecord {
     private static final String AFTER_PREFIX = ": ";
 
     @Getter
+    @NonNull
     private final String prefix;
 
     @Getter
+    @NonNull
     private final Integer identifier;
 
     @Getter
+    @NonNull
     private final String template;
 
     /**
@@ -189,7 +193,7 @@ public class LogRecordModel implements LogRecord {
     }
 
     @Builder
-    private LogRecordModel(String prefix, Integer identifier, String template) {
+    private LogRecordModel(@NonNull String prefix, @NonNull Integer identifier, @NonNull String template) {
         this.prefix = prefix;
         this.identifier = identifier;
         this.template = template;

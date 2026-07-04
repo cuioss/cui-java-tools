@@ -164,6 +164,44 @@ class IOCaseTest {
         assertEquals(WINDOWS, IOCase.SYSTEM.checkStartsWith("ABC", "abc"));
     }
 
+    @Test
+    void shouldHandleEndsWithEdgeCases() {
+        var testString = Generators.nonEmptyStrings().next();
+        assertTrue(IOCase.SENSITIVE.checkEndsWith(testString, ""));
+        assertFalse(IOCase.SENSITIVE.checkEndsWith("", testString));
+        assertTrue(IOCase.SENSITIVE.checkEndsWith("", ""));
+
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEndsWith(testString, null));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEndsWith(null, testString));
+        assertThrows(NullPointerException.class, () -> IOCase.SENSITIVE.checkEndsWith(null, null));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "ABC,C,true",
+            "ABC,BC,true",
+            "ABC,ABC,true",
+            "ABC,A,false",
+            "ABC,AB,false",
+            "ABC,ABCD,false",
+            "ABC,DABC,false"
+    })
+    void shouldHandleEndsWithVariousSuffixes(String input, String suffix, boolean expected) {
+        assertEquals(expected, IOCase.SENSITIVE.checkEndsWith(input, suffix));
+    }
+
+    @Test
+    void shouldHandleEndsWithDifferentCases() {
+        assertTrue(IOCase.SENSITIVE.checkEndsWith("ABC", "BC"));
+        assertFalse(IOCase.SENSITIVE.checkEndsWith("ABC", "bc"));
+
+        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "BC"));
+        assertTrue(IOCase.INSENSITIVE.checkEndsWith("ABC", "bc"));
+
+        assertTrue(IOCase.SYSTEM.checkEndsWith("ABC", "BC"));
+        assertEquals(WINDOWS, IOCase.SYSTEM.checkEndsWith("ABC", "bc"));
+    }
+
     private IOCase serialize(IOCase value) throws Exception {
         try (var baos = new ByteArrayOutputStream();
              var oos = new ObjectOutputStream(baos)) {
