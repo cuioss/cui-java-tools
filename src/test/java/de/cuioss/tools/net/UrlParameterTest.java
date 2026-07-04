@@ -293,4 +293,17 @@ class UrlParameterTest {
     void shouldBehaveWell() {
         ObjectMethodsAsserts.assertNiceObject(new UrlParameter("name3", "value3"));
     }
+
+    @Test
+    void createNameValueStringShouldTreatLegacyNullEncodedFlagAsEncoded() throws Exception {
+        // Instances serialized by older library versions deserialize with encoded == null;
+        // they were always stored encoded, so no re-encoding must happen
+        var parameter = new UrlParameter("name", "value%20with%20spaces", false);
+        var encodedField = UrlParameter.class.getDeclaredField("encoded");
+        encodedField.setAccessible(true);
+        encodedField.set(parameter, null);
+
+        assertEquals("name=value%20with%20spaces", parameter.createNameValueString(true),
+                "Legacy instances (encoded == null) must not be re-encoded");
+    }
 }

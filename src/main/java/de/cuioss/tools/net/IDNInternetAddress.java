@@ -18,6 +18,8 @@ package de.cuioss.tools.net;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import de.cuioss.tools.logging.CuiLogger;
+
 import java.net.IDN;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -43,6 +45,8 @@ import java.util.regex.Pattern;
  */
 @UtilityClass
 public class IDNInternetAddress {
+
+    private static final CuiLogger LOGGER = new CuiLogger(IDNInternetAddress.class);
 
     /**
      * RFC 5321 limits the local part to 64 octets, the domain may be up to 255
@@ -95,6 +99,7 @@ public class IDNInternetAddress {
         try {
             return IDN.toASCII(domain);
         } catch (IllegalArgumentException e) {
+            LOGGER.trace(e, "IDN.toASCII failed for domain '%s', using unconverted value", domain);
             return domain;
         }
     }

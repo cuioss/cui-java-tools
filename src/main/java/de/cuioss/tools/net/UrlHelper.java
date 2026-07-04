@@ -144,15 +144,6 @@ public final class UrlHelper {
      *         {@link #tryParseUri(String)}.
      */
     public boolean isValidUri(final String uri) {
-        if (MoreStrings.isEmpty(uri)) {
-            return false;
-        }
-        try {
-            new URI(uri);
-            return true;
-        } catch (URISyntaxException e) {
-            LOGGER.trace(e, "Invalid URI");
-            return false;
-        }
+        return tryParseUri(uri).isPresent();
     }
 }
