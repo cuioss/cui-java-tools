@@ -1,0 +1,27 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '27 4 * * 3'
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    # Centralized in cuioss-organization, matching every other security/CI workflow in this repo.
+    # The reusable workflow fixes the query suite to +security-and-quality org-wide;
+    # build-mode: none analyses the sources directly (no Maven build needed for this
+    # zero-dependency library).
+    uses: cuioss/cuioss-organization/.github/workflows/reusable-codeql.yml@181cc6a24d4c2b6fe7378b9ac94ac3df4665de7b # v0.7.0
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    with:
+      languages: '["java"]'
+      build-mode: none
