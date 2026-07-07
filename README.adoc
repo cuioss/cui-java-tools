@@ -3,6 +3,7 @@
 == Status
 
 image:https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml/badge.svg[Java CI with Maven,link=https://github.com/cuioss/cui-java-tools/actions/workflows/maven.yml]
+image:https://github.com/cuioss/cui-java-tools/actions/workflows/codeql.yml/badge.svg[CodeQL,link=https://github.com/cuioss/cui-java-tools/actions/workflows/codeql.yml]
 image:http://img.shields.io/:license-apache-blue.svg[License,link=http://www.apache.org/licenses/LICENSE-2.0.html]
 image:https://img.shields.io/maven-central/v/de.cuioss/cui-java-tools.svg?label=Maven%20Central["Maven Central", link="https://central.sonatype.com/artifact/de.cuioss/cui-java-tools"]
 
