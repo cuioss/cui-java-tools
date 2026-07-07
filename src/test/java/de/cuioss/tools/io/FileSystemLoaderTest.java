@@ -16,8 +16,10 @@
 package de.cuioss.tools.io;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,10 +136,9 @@ class FileSystemLoaderTest {
     }
 
     @Test
-    void shouldHandleOutputStreamForWritableFile() throws Exception {
-        // Create a temporary file for testing
-        File tempFile = File.createTempFile("test", ".txt");
-        tempFile.deleteOnExit();
+    void shouldHandleOutputStreamForWritableFile(@TempDir Path tempDir) throws Exception {
+        // Create a temporary file inside the JUnit-managed temp directory (auto-cleaned)
+        File tempFile = Files.createFile(tempDir.resolve("test.txt")).toFile();
 
         var loader = new FileSystemLoader(tempFile.getAbsolutePath());
         assertTrue(loader.isWritable());

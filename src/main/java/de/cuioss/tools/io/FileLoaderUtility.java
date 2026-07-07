@@ -18,7 +18,6 @@ package de.cuioss.tools.io;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -99,7 +98,7 @@ public final class FileLoaderUtility {
         final Path target = PathTraversalSecurity.createSecureTempFile(namePart, null != suffix ? "." + suffix : null);
 
         try (final var inputStream = source.inputStream()) {
-            Files.copy(new BufferedInputStream(inputStream), target, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
         }
         if (markDeleteOnExit) {
             target.toFile().deleteOnExit();
