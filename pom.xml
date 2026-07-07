@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.cuioss</groupId>
         <artifactId>cui-java-parent</artifactId>
-        <version>1.4.5</version>
+        <version>1.5.0</version>
         <relativePath />
     </parent>
 
