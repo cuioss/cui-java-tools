@@ -18,6 +18,7 @@ package de.cuioss.tools.io;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,7 +137,7 @@ class FileSystemLoaderTest {
     @Test
     void shouldHandleOutputStreamForWritableFile() throws Exception {
         // Create a temporary file for testing
-        File tempFile = File.createTempFile("test", ".txt");
+        File tempFile = Files.createTempFile("test", ".txt").toFile();
         tempFile.deleteOnExit();
 
         var loader = new FileSystemLoader(tempFile.getAbsolutePath());
