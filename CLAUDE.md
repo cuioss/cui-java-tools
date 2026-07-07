@@ -11,7 +11,7 @@ only compile-time dependency (dev-only, not transitive).
 - Maven coordinates: `de.cuioss:cui-java-tools`
 - Java module: `de.cuioss.java.tools` (`src/main/java/module-info.java`)
 - Java release: **21** (`maven.compiler.release`)
-- Current version: `2.6-SNAPSHOT` (see `<version>` in `pom.xml`)
+- Current version: see `<version>` in `pom.xml` (floats on the `X.Y-SNAPSHOT` minor line between releases)
 - Published on **Maven Central** — public API changes require deliberate consideration.
 
 ## Build & Test
@@ -111,7 +111,7 @@ complementary, not interchangeable.
 
 Releases are fully automated by GitHub Actions. A release is cut by bumping
 `.github/project.yml` `release.current-version` (patch bump on the `X.Y.Z` line, e.g.
-`2.6.2` → `2.6.3`) in a merged PR — the `pom.xml` stays at the floating `2.6-SNAPSHOT`.
+`2.6.2` → `2.6.3`) in a merged PR — the `pom.xml` stays on the floating `X.Y-SNAPSHOT` minor line.
 Use the `/release` skill (`.claude/skills/release/`); never run Maven release goals by hand.
 
 ## Process Rules
