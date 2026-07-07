@@ -24,5 +24,9 @@
 target/
 .flattened-pom.xml
 
-# Claude Code configuration
-.claude/
+# Claude Code configuration — ignore local settings, but track shared skills
+.claude/*
+!.claude/skills/
+
+# plan-marshall local working directory
+.plan/
