@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    uses: cuioss/cuioss-organization/.github/workflows/reusable-maven-build.yml@8b9ec112fdbaf868e0abb45b484096c911adceb9 # v0.10.0
+    uses: cuioss/cuioss-organization/.github/workflows/reusable-maven-build.yml@ef13a4cc2866081c878187fdc3243243644bb19e # v0.10.1
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
