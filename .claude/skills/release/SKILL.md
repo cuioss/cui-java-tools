@@ -102,10 +102,15 @@ SonarCloud) are all dynamic endpoints — there is **no** per-release badge to h
 git add .github/project.yml
 git commit -m "chore(release): prepare release <version>"
 git push -u origin chore/release_<version>
+gh label create skip-bot-review --repo cuioss/cui-java-tools --description "Skip automated bot review" --color ededed 2>/dev/null || true
 gh pr create --repo cuioss/cui-java-tools --base main \
   --title "chore(release): prepare release <version>" \
+  --label "skip-bot-review" \
   --body "Bump current-version to <version>. Triggers the automated Release workflow on merge."
 ```
+
+The mechanical release PR carries the `skip-bot-review` label so the automated bot review is
+skipped (the label-ensure line above creates it if it does not already exist).
 
 Use the project commit convention: `Co-Authored-By: Claude <noreply@anthropic.com>` (no
 model name / no "Generated with Claude Code" footer).
