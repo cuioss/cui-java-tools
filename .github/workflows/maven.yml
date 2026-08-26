@@ -2,6 +2,9 @@
 name: Maven Build
 
 on:
+  # Required so the 'build / conclusion' status check runs on the merge-queue
+  # branch; without it, queued PRs stay CLEAN but never merge (queue times out).
+  merge_group:
   push:
     branches: [main, "feature/*", "fix/*", "chore/*", "release/*", "dependabot/**"]
   pull_request:
