@@ -17,6 +17,10 @@
         certain apache-commons libraries and logging facades/frameworks.
     </description>
     <packaging>jar</packaging>
+    <!-- Must be declared: <inceptionYear> is inherited, and the license plugin binds
+         the copyright ${year} to it. Without this, this project would report
+         cui-parent-pom's 2022 and restamp every header on each -Ppre-commit run. -->
+    <inceptionYear>2019</inceptionYear>
 
     <url>https://github.com/cuioss/cui-java-tools/</url>
 
@@ -95,4 +99,20 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

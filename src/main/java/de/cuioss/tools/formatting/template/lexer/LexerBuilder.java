@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 CUI-OpenSource-Software (info@cuioss.de)
+ * Copyright © 2019-present CUI-OpenSource-Software (info@cuioss.de)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,9 @@ public final class LexerBuilder {
         public <F extends FormatterSupport> Lexer<F> build(final Class<F> sourceType) {
             try {
                 return build(sourceType.getDeclaredConstructor().newInstance());
-            } catch (final RuntimeException | InstantiationException | IllegalAccessException
+            }
+            /*TODO: Catch specific not RuntimeException. Suppress: // cui-rewrite:disable InvalidExceptionUsageRecipe*/
+            catch (final RuntimeException | InstantiationException | IllegalAccessException
                     | InvocationTargetException | NoSuchMethodException e) {
                 throw new IllegalStateException(
                         "Class '" + sourceType + "' should provide an accessible default constructor.", e);
