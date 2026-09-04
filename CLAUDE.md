@@ -96,8 +96,6 @@ complementary, not interchangeable.
 1. Branch: `git checkout -b <prefix>/<name>` (prefixes that trigger CI: `feature/*`,
    `fix/*`, `chore/*`, `release/*`).
 2. Commit: `git add <files> && git commit -m "<message>"`.
-   - End commit messages with: `Co-Authored-By: Claude <noreply@anthropic.com>`
-     (no model name, no "Generated with Claude Code" footer).
 3. Push: `git push -u origin <branch>`.
 4. PR: `gh pr create --repo cuioss/cui-java-tools --head <branch> --base main --title "<title>" --body "<body>"`.
 5. Wait for CI + Gemini review:

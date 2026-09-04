@@ -117,8 +117,6 @@ gh pr create --repo cuioss/cui-java-tools --base main \
 The mechanical release PR carries the `skip-bot-review` label so the automated bot review is
 skipped (the label-ensure line above creates it if it does not already exist).
 
-Use the project commit convention: `Co-Authored-By: Claude <noreply@anthropic.com>` (no
-model name / no "Generated with Claude Code" footer).
 
 ### Step 7 — Wait for PR checks (~5–8 min)
 
