@@ -23,7 +23,7 @@ Always build and test through Maven. **Never** invoke `javac` directly or write 
 - Test: `./mvnw test`
 - Single test: `./mvnw test -Dtest=ClassName#methodName`
 - Coverage: `./mvnw -Pcoverage verify`
-- Pre-commit gate (run before every commit): `./mvnw -Ppre-commit clean verify`
+- Pre-commit auto-fix (run before every commit): `./mvnw -Ppre-commit clean verify`
   - Fix **all** errors and warnings.
   - OpenRewrite recipes may add markers or rewrite sources — either accept the rewrite or
     suppress with justification. **Never commit rewrite markers**, and never leave the tree
