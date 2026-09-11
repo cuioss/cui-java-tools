@@ -17,7 +17,7 @@ jobs:
     # The reusable workflow fixes the query suite to +security-and-quality org-wide;
     # build-mode: none analyses the sources directly (no Maven build needed for this
     # zero-dependency library).
-    uses: cuioss/cuioss-organization/.github/workflows/reusable-codeql.yml@daae5e2ca7930267ceeee92cbb35041687de6544 # v0.26.0
+    uses: cuioss/cuioss-organization/.github/workflows/reusable-codeql.yml@9cffe3a2febb07d668784a1257b025101228754d # v0.27.0
     permissions:
       security-events: write
       contents: read
